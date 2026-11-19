@@ -546,11 +546,11 @@ const CAP_TOP = {
   red: 'linear-gradient(180deg,#f08a80,#b3261b 40%,#4a0d08)',
 };
 
-const CX = 12, CY = 834, CW = 3266, CH = 2160 - 834, BRIDGE = 160;   // CY = top of the channel strips; the meter bridge sits above
+const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top of the channel strips; the meter bridge sits above
 {
   const PW = CW - 68;                 // panel width between the wood cheeks
   const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
-  const UD = 964, FD = 330, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
+  const UD = 964, FD = 370, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
   const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   const busLit = (i) => (i < 11 ? [0, 1] : i < 13 ? [2, 3] : i < 19 ? [4, 5] : i < 23 ? [6, 7] : []);
   const muted = new Set([2, 22, 31]), soloed = new Set([19]);
@@ -724,7 +724,7 @@ const CX = 12, CY = 834, CW = 3266, CH = 2160 - 834, BRIDGE = 160;   // CY = top
   const lower = capture(() => {
     rect(0, 0, PW, FD, 'url(#faderBay)');
     rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
-    const top = 96, bot = 306;   // 210 px travel on an 85 px strip: a 100 mm fader on a 38 mm module
+    const top = 96, bot = 346;   // 250 px travel on an 85 px strip (long-throw fader)
     const WH2 = '#ece6da';
     const FMARK = [['10', 0], ['0', 0.2], ['10', 0.42], ['20', 0.6], ['40', 0.82], ['∞', 1]];
     for (let ch = 0; ch < NCH; ch++) {
@@ -792,18 +792,18 @@ const CX = 12, CY = 834, CW = 3266, CH = 2160 - 834, BRIDGE = 160;   // CY = top
     const BY = Y - BRIDGE;
     rect(X, BY, PW, BRIDGE, 'url(#jh600)'); rect(X, BY, PW, BRIDGE, '#000', 'opacity="0.22"');
     rect(X, BY - 8, PW, 10, 'url(#oakH)');
-    rect(X + 12, BY + 8, 52, 18, '#0c0c0d', 'rx="2"'); text(X + 38, BY + 21, 'MCI', 12, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    rect(X + 4, BY + 4, 40, 14, '#0c0c0d', 'rx="2"'); text(X + 24, BY + 15, 'MCI', 10, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
     for (let j = 0; j < 16; j++) {
       const cx = X + j * 2 * 85 + 85;
       for (const [row, n] of [[0, 2 * j + 1], [1, 2 * j + 2]]) {
-        const my = BY + 10 + row * 74;
-        rect(cx - 70, my - 3, 140, 70, '#0d0c0b', 'rx="4"');
-        vu(cx - 64, my + 1, 128, 62, Math.min(1, (tapeDb[(n - 1) % 24] ?? -12) + (n > 24 ? -4 : 0)), { label: String(n), fontScale: 0.13 });
+        const my = BY + 8 + row * 55;
+        rect(cx - 56, my - 3, 112, 52, '#0d0c0b', 'rx="4"');
+        vu(cx - 51, my + 1, 102, 46, Math.min(1, (tapeDb[(n - 1) % 24] ?? -12) + (n > 24 ? -4 : 0)), { label: String(n), fontScale: 0.13 });
       }
     }
     for (let g = 1; g < 4; g++) rect(X + g * 8 * 85 - 1.5, BY, 3, BRIDGE, '#0a0a0b');
     { const mx = X + 32 * 85, mw = PW - 32 * 85; rect(mx, BY, 3, BRIDGE, '#000');
-      vu(mx + 24, BY + 14, 206, 132, 0.4, { label: 'L', fontScale: 0.11 }); vu(mx + mw - 230, BY + 14, 206, 132, -0.6, { label: 'R', fontScale: 0.11 }); }
+      vu(mx + 50, BY + 10, 156, 100, 0.4, { label: 'L', fontScale: 0.12 }); vu(mx + mw - 206, BY + 10, 156, 100, -0.6, { label: 'R', fontScale: 0.12 }); }
     rect(X, Y - 3, PW, 3, '#000', 'opacity="0.6"');
     p(`<g transform="translate(${X} ${Y})">${upper}</g>`);
     p(`<g transform="translate(${X} ${Y + UD})">${lower.replace(/<rect x="0" y="0" width="${PW}" height="${FD}" fill="url\(#faderBay\)"\/>/, `<rect x="0" y="0" width="${PW}" height="${FD}" fill="url(#faderBay)"/>`)}</g>`);
