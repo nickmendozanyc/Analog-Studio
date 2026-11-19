@@ -274,6 +274,8 @@ p(`<defs>
   <linearGradient id="deckLower" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f5a55"/><stop offset="1" stop-color="#4c4844"/></linearGradient>
   <linearGradient id="console" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a6062"/><stop offset="0.5" stop-color="#5c5355"/><stop offset="1" stop-color="#4e4648"/></linearGradient>
   <linearGradient id="consoleAlt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5556"/><stop offset="0.5" stop-color="#4d4849"/><stop offset="1" stop-color="#413c3d"/></linearGradient>
+  <linearGradient id="jh600" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d5650"/><stop offset="0.5" stop-color="#544d47"/><stop offset="1" stop-color="#4a443f"/></linearGradient>
+  <linearGradient id="jh600alt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#635a50"/><stop offset="0.5" stop-color="#5a5148"/><stop offset="1" stop-color="#4f4740"/></linearGradient>
   <linearGradient id="consoleMaster" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#564d4f"/><stop offset="1" stop-color="#463f41"/></linearGradient>
   <linearGradient id="faderBay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d7577"/><stop offset="1" stop-color="#6a6365"/></linearGradient>
   <linearGradient id="armrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a5e3c"/><stop offset="0.12" stop-color="#7a4429"/><stop offset="0.4" stop-color="#6a3a22"/><stop offset="0.7" stop-color="#4e2a18"/><stop offset="1" stop-color="#2a160c"/></linearGradient>
@@ -548,7 +550,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
 {
   const PW = CW - 68;                 // panel width between the wood cheeks
   const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
-  const UD = 860, FD = 340, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
+  const UD = 990, FD = 212, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
   const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   const busLit = (i) => (i < 11 ? [0, 1] : i < 13 ? [2, 3] : i < 19 ? [4, 5] : i < 23 ? [6, 7] : []);
   const muted = new Set([2, 22, 31]), soloed = new Set([19]);
@@ -569,55 +571,107 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
 
   // ---------------- knob panel texture ----------------
   const upper = capture(() => {
+    // JH-600 series channel strip, laid out from the user's reference photos (top to bottom)
+    const GOLD = '#d8c27c', WH = '#ece6da';
+    const tx = (x, y, s2, size, col = WH, anchor = 'middle', w = 800) => text(x, y, s2, size, col, anchor, w);
+    const blk = (x, y, w, h, label, lit = false, litCol = '#ff3b2f') => {
+      rect(x - 0.5, y + 1.5, w + 1, h + 1, '#000', 'rx="2" opacity="0.6"');
+      rect(x, y, w, h, lit ? litCol : '#151515', `rx="2" ${lit ? 'filter="url(#glow)"' : ''}`);
+      rect(x, y, w, h, 'url(#btnOff)', 'rx="2"');
+      tx(x + w / 2, y + h / 2 + 3.4, label, 9.5, lit ? '#1a0c08' : WH, 'middle', 800);
+    };
+    const wht = (x, y, w, h, label, lit = false) => {
+      rect(x - 0.5, y + 1.5, w + 1, h + 1, '#000', 'rx="2" opacity="0.6"');
+      rect(x, y, w, h, lit ? '#fff7c8' : '#e9e7e0', `rx="2" ${lit ? 'filter="url(#glow)"' : ''}`);
+      rect(x, y, w, h, 'url(#btnOff)', 'rx="2" opacity="0.5"');
+      tx(x + w / 2, y + h / 2 + 4, label, 11, '#1b1b1b', 'middle', 800);
+    };
+    const rnd2 = (cx, cy, r, col) => { circle(cx + 0.8, cy + 1.6, r + 0.8, '#000', 'opacity="0.55"'); circle(cx, cy, r, col); circle(cx, cy, r, 'url(#capHi)', 'opacity="0.7"'); };
+    const led = (cx, cy, on) => circle(cx, cy, 2.6, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+    // printed knob scale: tick marks plus numerals at given angles
+    const scale = (cx, cy, r, marks, col = WH) => {
+      for (let i = 0; i <= 10; i++) { const a = -150 + i * 30; const [x1, y1] = polar(cx, cy, r * 1.22, a), [x2, y2] = polar(cx, cy, r * 1.38, a); p(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${GOLD}" stroke-width="0.9"/>`); }
+      for (const [a, lab] of marks) { const [mx2, my2] = polar(cx, cy, r * 1.72, a); tx(mx2, my2 + 2.8, lab, 7.5, col, 'middle', 700); }
+    };
+    const KN = (cx, cy, r, col, ang, marks, dark = false) => { scale(cx, cy, r, marks); K(cx, cy, r, col, ang, { dark }); };
+    const BLUE = '#3f8fd9', SAGE = '#7fa392', RED = '#e3452f', YEL = '#ecd03a', BLK = '#1a1a1c';
+    const GAIN14 = [[-150, '-14'], [-75, '6'], [0, '0'], [75, '6'], [150, '+14']];
     for (let ch = 0; ch < NCH; ch++) {
-      const x0 = ch * STRIP, ret = ch >= 24, c1 = x0 + 23, c2 = x0 + 62, cm = x0 + STRIP / 2;
-      rect(x0, 0, STRIP, UD, ret ? 'url(#consoleAlt)' : 'url(#console)');
-      rect(x0, 0, STRIP, UD, '#000', 'filter="url(#brushed)" opacity="0.07"');
-      rect(x0, 0, 1.5, UD, '#000', 'opacity="0.7"'); rect(x0 + 1.5, 0, 1, UD, '#fff', 'opacity="0.07"');
-      for (const sy of [12, UD - 12]) screw(cm, sy, 3.5);
-      text(cm, 40, String(ch + 1), 18, '#f0ece4', 'middle', 800);
-      const lit = busLit(ch);
-      for (let b = 0; b < 8; b++) button(x0 + 4 + (b % 4) * 20, 50 + Math.floor(b / 4) * 21, 18, 17, 'amber', lit.includes(b), String(b + 1), { size: 14 });
-      button(x0 + 4, 96, 38, 22, 'white', ch === 31, 'MIC', { size: 14 });
-      button(x0 + 44, 96, 38, 22, 'white', ch !== 31, 'LINE', { size: 13.5 });
-      ticks(c1, 150, 14); K(c1, 150, 14, '#1d1d1f', -20 + rnd() * 60, { dark: true });
-      button(x0 + 48, 128, 34, 21, 'red', ch === 0, 'PAD', { size: 14 });
-      button(x0 + 48, 154, 34, 21, 'white', ch === 2, 'Ø', { size: 15 });
-      text(c1, 186, 'TRIM', 14, L, 'middle', 800);
-      ticks(c1, 220, 13); K(c1, 220, 13, '#ecebe4', -120 + rnd() * 50);
-      button(x0 + 48, 210, 34, 21, 'white', [0, 2, 3, 19, 20, 21].includes(ch), 'IN', { size: 14 });
-      text(c1, 255, 'HPF', 14, L, 'middle', 800);
-      rect(x0 + 6, 266, STRIP - 12, 1.5, '#000', 'opacity="0.55"');
-      text(cm, 286, 'EQ', 14, '#c9c2b2', 'middle', 800, 'letter-spacing="2"');
-      [['HF', '#c8302a'], ['HMF', '#e6c02e'], ['LMF', '#2f62b0'], ['LF', '#ecebe4']].forEach(([bn, col], bi) => {
-        const yy = 314 + bi * 60;
-        ticks(c1, yy, 11); K(c1, yy, 11, '#1d1d1f', -80 + rnd() * 160, { dark: true });
-        ticks(c2, yy, 14); K(c2, yy, 14, col, (rnd() - 0.5) * 140, { dark: col === '#1d1d1f' });
-        text(c1, yy + 32, bn, 14, L, 'middle', 800);
-      });
-      const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
-      button(x0 + 12, 548, STRIP - 24, 24, 'green', eqOn, 'EQ IN', { size: 14 });
-      rect(x0 + 6, 584, STRIP - 12, 1.5, '#000', 'opacity="0.55"');
-      text(cm, 604, 'AUX', 14, '#c9c2b2', 'middle', 800, 'letter-spacing="2"');
-      const auxCols = ['#c8302a', '#c8302a', '#e6c02e', '#e6c02e'];
-      for (let a = 0; a < 4; a++) {
-        const ax = a % 2 === 0 ? c1 : c2, ay = 630 + Math.floor(a / 2) * 54;
-        const active = (a === 0 && ch < 24 && [1, 19, 20, 21, 15].includes(ch)) || (a === 1 && [19, 13, 14].includes(ch)) || (a >= 2 && ch < 24);
-        ticks(ax, ay, 12); K(ax, ay, 12, auxCols[a], active ? -40 + rnd() * 120 : -150);
-        text(ax, ay + 31, String(a + 1), 14, L, 'middle', 800);
+      const x0 = ch * STRIP, ret = ch >= 24, cm = x0 + STRIP / 2;
+      rect(x0, 0, STRIP, UD, ret ? 'url(#jh600alt)' : 'url(#jh600)');
+      rect(x0, 0, STRIP, UD, '#000', 'filter="url(#brushed)" opacity="0.06"');
+      rect(x0, 0, 1.5, UD, '#000', 'opacity="0.75"'); rect(x0 + 1.5, 0, 1, UD, '#fff', 'opacity="0.08"');
+      for (const sy of [6, UD - 6]) screw(cm, sy, 2.6);
+      // bus assign: 24 round black keys in two columns, red LED beside each
+      for (let i = 0; i < 12; i++) {
+        const y = 20 + i * 14.6;
+        for (const [k, bx, lx, nx, an] of [[2 * i + 1, x0 + 20, x0 + 32, x0 + 8, 'middle'], [2 * i + 2, x0 + 52, x0 + 64, x0 + 77, 'middle']]) {
+          rnd2(bx, y, 5.2, '#141414'); led(lx, y, readyTracks.has(ch) && ch + 1 === k);
+          tx(nx, y + 2.8, String(k), 7.5, WH, an, 700);
+        }
       }
-      button(x0 + 4, 726, 38, 22, 'blue', [0, 1, 12, 19].includes(ch), 'INS', { size: 14 });
-      button(x0 + 44, 726, 38, 22, 'white', ch >= 2 && ch < 24 && ch % 5 === 0, 'PRE', { size: 14 });
+      // input: yellow mic gain, GAIN / PHAN / LINE, red trim and odd/even bus pan
+      KN(x0 + 22, 218, 11, YEL, -20 + rnd() * 60, [[-150, '-'], [150, '+']]);
+      tx(x0 + 22, 244, 'MIC', 8, WH);
+      blk(x0 + 44, 202, 36, 13, 'GAIN', ch === 31, '#ffb02e'); blk(x0 + 44, 219, 36, 13, 'PHAN', false); blk(x0 + 44, 236, 36, 13, 'LINE', ch < 31, '#ffb02e');
+      KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']]);
+      tx(x0 + 22, 299, 'TRIM', 8, WH);
+      KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']]);
+      tx(x0 + 60, 314, 'ODD·EVEN', 7, WH, 'middle', 700);
+      // pan toggle, direct out level + LED
+      rect(x0 + 13, 330, 14, 8, '#0d0d0d', 'rx="4"'); rect(x0 + 17, 320, 6, 14, 'url(#chrome)', 'rx="3"');
+      tx(x0 + 20, 348, 'PAN', 7.5, GOLD);
+      tx(x0 + 56, 324, 'DIRECT', 7, GOLD);
+      K(x0 + 56, 337, 7.5, BLK, -60, { dark: true }); led(x0 + 76, 334, ch < 24 && ch % 7 === 3);
+      // DUMP + channel number key
+      blk(x0 + 5, 354, 36, 17, 'DUMP'); wht(x0 + 45, 354, 35, 17, String(ch + 1));
+      // EQ: three bands in a gold bracket, frequency up-right, gain down-left
+      p(`<rect x="${x0 + 3.5}" y="380" width="78" height="252" rx="2" fill="none" stroke="${GOLD}" stroke-width="1.1"/>`);
+      const bands = [
+        ['HI', BLUE, [[-150, '4.6'], [-100, '6'], [-50, '8'], [0, '11'], [50, '13'], [100, '14'], [150, '16']], 'KHz'],
+        ['MID', SAGE, [[-150, '.18'], [-100, '.25'], [-50, '.5'], [-10, '1.5'], [30, '2'], [80, '4'], [120, '8'], [150, '10']], 'KHz'],
+        ['LOW', RED, [[-150, '30'], [-60, '75'], [20, '150'], [90, '200'], [150, '250']], 'Hz'],
+      ];
+      bands.forEach(([bn, col, fm, unit], bi) => {
+        const by = 384 + bi * 82;
+        tx(x0 + 8, by + 13, bn, 10, WH, 'start', 800);
+        if (bi === 0) circle(x0 + 30, by + 9, 2.4, '#0a0a0a');
+        KN(x0 + 58, by + 28, 11, col, -100 + rnd() * 200, fm);
+        KN(x0 + 25, by + 62, 11, col, (rnd() - 0.5) * 140, GAIN14);
+      });
+      // EQ in, filters, phase, channel
+      const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
+      rnd2(x0 + 28, 648, 6, eqOn ? '#2a2a2a' : '#141414'); if (eqOn) circle(x0 + 28, 648, 2, '#59f07a', 'filter="url(#glowSm)"');
+      rnd2(x0 + 58, 648, 6, '#141414'); rnd2(x0 + 28, 668, 6, ch === 2 ? '#fff8d8' : '#e9e7e0'); rnd2(x0 + 58, 668, 6, '#141414'); rnd2(x0 + 28, 688, 6, '#d8cfae');
+      tx(x0 + 9, 651, 'IN', 7.5, WH, 'middle', 800); tx(x0 + 9, 671, 'Ø', 9, WH, 'middle', 800); tx(x0 + 10, 691, 'CHN', 6.5, WH, 'middle', 800);
+      p(`<path d="M${x0 + 69} 652 L${x0 + 72} 645 L${x0 + 78} 645" fill="none" stroke="${WH}" stroke-width="1"/><path d="M${x0 + 69} 665 L${x0 + 75} 665 L${x0 + 78} 672" fill="none" stroke="${WH}" stroke-width="1"/>`);
+      // sends: 1-2 yellow levels (PRE, WET); 3-4 and 5-6 pan + level (PRE, 2MIX)
+      const sendHead = (y, nm) => { rect(x0 + 4, y, 77, 1.1, GOLD); tx(x0 + 80, y + 12, 'SEND', 9, GOLD, 'end', 800); tx(x0 + 80, y + 23, nm, 9, GOLD, 'end', 800); };
+      const lv = (on) => (on ? -40 + rnd() * 120 : -150);
+      sendHead(702, '1-2');
+      KN(x0 + 22, 722, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-150, '∞'], [0, '1'], [150, '+3']]);
+      blk(x0 + 4, 741, 30, 14, 'PRE'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-150, '∞'], [0, '2'], [150, '+3']]);
+      blk(x0 + 4, 759, 30, 14, 'WET');
+      sendHead(778, '3-4');
+      KN(x0 + 22, 798, 11, BLUE, 0, [[0, 'C'], [-150, '3'], [150, '4']]);
+      blk(x0 + 4, 817, 30, 14, 'PRE'); KN(x0 + 56, 828, 11, BLUE, lv(ch < 24), [[-150, '∞'], [0, 'LVL'], [150, '+3']]);
+      sendHead(848, '5-6');
+      KN(x0 + 22, 868, 11, RED, 0, [[0, 'C'], [-150, '5'], [150, '6']]);
+      blk(x0 + 4, 887, 30, 14, 'PRE'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-150, '∞'], [0, 'LVL'], [150, '+3']]);
+      blk(x0 + 4, 905, 30, 14, '2MIX');
+      rect(x0 + 4, 924, 77, 1.1, GOLD);
+      // mute + numbered solo key, bus level and channel pan
+      blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
+      tx(x0 + 7, 962, 'BUS', 6.5, GOLD, 'start', 800);
+      K(x0 + 16, 974, 7, BLK, -20, { dark: true });
       const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
-      ticks(cm, 778, 16); K(cm, 778, 16, '#1d1d1f', pan, { dark: true });
-      text(cm, 812, 'PAN', 14, L, 'middle', 800);
-      button(x0 + 4, 822, 38, 28, 'red', muted.has(ch), 'MUTE', { size: 13 });
-      button(x0 + 44, 822, 38, 28, 'yellow', soloed.has(ch), 'SOLO', { size: 13 });
+      KN(x0 + 55, 970, 12, BLK, pan, [[0, 'C'], [-150, 'L'], [150, 'R']], true);
     }
     for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');
     // ---- master section ----
     const mx = MXL, mw = MWD;
-    rect(mx, 0, mw, UD, 'url(#consoleMaster)'); rect(mx, 0, mw, UD, '#000', 'filter="url(#brushed)" opacity="0.07"'); rect(mx, 0, 3, UD, '#000');
+    rect(mx, 0, mw, UD, 'url(#jh600)'); rect(mx, 0, mw, UD, '#000', 'filter="url(#brushed)" opacity="0.06"'); rect(mx, 0, 3, UD, '#000');
+    rect(mx + 14, 790, mw - 28, 186, '#3e3934', 'rx="3"'); for (let ry = 800; ry < 970; ry += 9) { rect(mx + 22, ry, mw - 44, 4, '#2a2622', 'rx="2"'); rect(mx + 22, ry + 4, mw - 44, 1, '#fff', 'opacity="0.08"'); }
     text(mx + mw / 2, 34, 'MASTER', 18, '#f0ece4', 'middle', 800, 'letter-spacing="5"');
     vu(mx + 22, 50, 200, 140, 0.4, { label: 'L', fontScale: 0.11 });
     vu(mx + mw - 222, 50, 200, 140, -0.6, { label: 'R', fontScale: 0.11 });
@@ -668,40 +722,54 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
   const lower = capture(() => {
     rect(0, 0, PW, FD, 'url(#faderBay)');
     rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
-    rect(0, 0, PW, 36, '#f3f1ea'); rect(0, 36, PW, 2, '#000', 'opacity="0.4"');
-    const top = 64, bot = 296;
+    const top = 84, bot = 192;
+    const WH2 = '#ece6da';
+    const FMARK = [['10', 0], ['0', 0.2], ['10', 0.42], ['20', 0.6], ['40', 0.82], ['∞', 1]];
     for (let ch = 0; ch < NCH; ch++) {
-      const x0 = ch * STRIP, cm = x0 + STRIP / 2, fx = x0 + 54;
-      rect(x0, 0, 1, 36, '#bdb8ad');
-      text(cm, 26, consoleNames[ch], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-      for (const [lab, fr] of MARKS) {
-        const yy = top + fr * (bot - top);
-        p(`<line x1="${fx - 22}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="#1e1a1b" stroke-opacity="${lab === '0' ? 1 : 0.6}" stroke-width="${lab === '0' ? 2 : 1.2}"/>`);
-        text(fx - 25, yy + 5, lab, 14, '#1e1a1b', 'end', 700);
+      const x0 = ch * STRIP, cm = x0 + STRIP / 2, fx = x0 + 52;
+      rect(x0, 0, STRIP, FD, 'url(#jh600)'); rect(x0, 0, 1.5, FD, '#000', 'opacity="0.75"');
+      // REV / PFL keys and the EQ / CHN / SOLO / TAPE status LEDs
+      for (const [k, yy, lit] of [['REV', 6, false], ['PFL', 24, soloed.has(ch)]]) {
+        rect(x0 + 4, yy + 1.5, 32, 15, '#000', 'rx="2" opacity="0.6"'); rect(x0 + 4, yy, 32, 14, lit ? '#ffe14a' : '#151515', `rx="2" ${lit ? 'filter="url(#glow)"' : ''}`); rect(x0 + 4, yy, 32, 14, 'url(#btnOff)', 'rx="2"');
+        text(x0 + 20, yy + 10.5, k, 9, lit ? '#1a1208' : WH2, 'middle', 800);
       }
-      rect(fx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"'); rect(fx - 1, top - 6, 2, bot - top + 12, '#2a2a2a');
+      const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
+      [['EQ', eqOn], ['CHN', false], ['SOLO', soloed.has(ch)], ['TAPE', ch < 24]].forEach(([k, on], i) => {
+        const ly = 9 + i * 9.5;
+        circle(x0 + 44, ly, 2.5, on ? (k === 'SOLO' ? '#ffe14a' : '#ff3b2f') : '#4a1612', on ? 'filter="url(#glowSm)"' : '');
+        text(x0 + 50, ly + 2.6, k, 7, WH2, 'start', 700);
+      });
+      // scribble strip
+      rect(x0 + 3, 48, STRIP - 6, 20, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 58)"`);
+      text(cm, 63, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      for (const [lab, fr] of FMARK) {
+        const yy = top + fr * (bot - top);
+        p(`<line x1="${fx - 20}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="${WH2}" stroke-opacity="${fr === 0.2 ? 1 : 0.55}" stroke-width="${fr === 0.2 ? 1.6 : 1}"/>`);
+        text(fx - 22, yy + 3, lab, 7.5, WH2, 'end', 700);
+      }
+      rect(fx - 3.5, top - 6, 7, bot - top + 12, '#050505', 'rx="3.5"'); rect(fx - 1, top - 4, 2, bot - top + 8, '#2a2a2a');
       const cy = top + faderPos[ch] * (bot - top);
-      p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
-      CAP(fx, cy, 30, 50, 20, 'black', ch >= 24 ? '#e6c02e' : '#ffffff');
-      text(cm, 326, String(ch + 1), 16, '#1e1a1b', 'middle', 800);
-      rect(x0, 36, 1, FD - 36, '#000', 'opacity="0.25"');
+      p(`<ellipse cx="${fx + 5}" cy="${cy + 8}" rx="18" ry="24" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
+      CAP(fx, cy, 26, 36, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
+      text(x0 + 76, FD - 8, String(ch + 1), 9, WH2, 'end', 800);
     }
     const mx = MXL, mw = MWD;
     rect(mx, 0, 3, FD, '#000', 'opacity="0.4"');
-    text(mx + mw / 2, 26, 'GROUPS 1–8 · STEREO', 14, '#3a3436', 'middle', 800, 'letter-spacing="2"');
+    rect(mx, 0, mw, FD, 'url(#jh600)');
+    text(mx + mw / 2, 34, 'GROUPS 1–8 · STEREO', 13, '#d8c27c', 'middle', 800, 'letter-spacing="2"');
     const gc = ['yellow', 'green', 'white', 'black'];
     for (let g = 0; g < 8; g++) {
       const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
-      if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
+      if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
       rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-      CAP(gx, cy, 24, 42, 18, gc[g % 4], '#111');
-      text(gx, 326, `G${g + 1}`, 14, '#1e1a1b', 'middle', 800);
+      CAP(gx, cy, 22, 34, 18, gc[g % 4], '#111');
+      text(gx, FD - 6, `G${g + 1}`, 12, '#ece6da', 'middle', 800);
     }
     const mfx = mx + mw - 54;
-    for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
-    rect(mfx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-    CAP(mfx, top + 0.22 * (bot - top), 54, 56, 22, 'red', '#ffffff');
-    text(mfx, 326, 'STEREO', 14, '#1e1a1b', 'middle', 800, 'letter-spacing="1"');
+    for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
+    for (const ox of [-16, 16]) rect(mfx + ox - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
+    CAP(mfx - 16, top + 0.22 * (bot - top), 24, 36, 22, 'yellow', '#111'); CAP(mfx + 16, top + 0.22 * (bot - top), 24, 36, 22, 'green', '#111');
+    text(mfx, FD - 6, 'STEREO', 12, '#ece6da', 'middle', 800, 'letter-spacing="1"');
   });
 
   // ---------------- assemble the 3D console ----------------
@@ -728,6 +796,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
     rect(X, ary + 10, PW, CY + CH - ary - 10, 'url(#armrest)');
     rect(X, ary + 10, PW, CY + CH - ary - 10, '#000', 'filter="url(#vinyl)" opacity="0.35"');
     rect(X, ary + 14, PW, 2, '#fff', 'opacity="0.08"');
+    for (let sxx = X + 130; sxx < X + PW - 40; sxx += 150) { rect(sxx, ary + 10, 2, CY + CH - ary - 10, '#000', 'opacity="0.45"'); rect(sxx + 2, ary + 10, 1, CY + CH - ary - 10, '#fff', 'opacity="0.08"'); }
   } else scenes3d.push(`<div style="position:absolute;left:${CX}px;top:${CY}px;width:${CW}px;height:${CH}px;perspective:6500px;perspective-origin:50% -45%;">
     <div style="${B3(`left:34px;top:${YF - FD}px;width:${PW}px;height:${FD}px;transform-origin:50% 100%;transform:rotateX(54deg)`)}">
       ${svgWrap(PW, FD, lower)}
