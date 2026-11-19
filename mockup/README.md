@@ -27,7 +27,7 @@ Corrected against the MCI listings on [SoundBroker](https://www.soundbroker.com/
 | JH-24 deck, autolocator, meter bridge | Slate blue-grey finish (was dark anthracite); woodgrain laminate edge for the cabinet front |
 | Tape VU meters | Cool white faces in a 3 × 8 bridge (were amber) |
 | Transport | Coloured square caps on a brushed silver strip |
-| Reels | From your photos: a red Quantegy GP9 (supply) and a silver Ampex 499 (take-up). Solid flanges with two radial slots, a black hub with six screws, and the printed labels |
+| Reels | From your photos: a silver Ampex 499 (full supply reel, left) and a red Quantegy GP9 (take-up, right). Solid flanges with two radial slots, a black hub with six screws, and the printed labels |
 | Console panel | Warm taupe-grey, as on the JH-636 (was blue-grey) |
 | Knob caps | Colour-coded by row: black trim, white HPF, red HF, yellow HMF, blue LMF, white LF, red/yellow aux, black pan |
 | Scribble strip | One continuous white strip above the faders (was masking tape at the top) |

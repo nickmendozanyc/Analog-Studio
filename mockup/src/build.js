@@ -365,8 +365,8 @@ for (const [sx2, sy2] of [[TX + 24, TY + 24], [TX + TW - 24, TY + 24], [TX + 24,
 
 // reels
 const R = 240;
-const supply = { cx: TX + 300, cy: TY + 300, pack: 200, rot: 18, style: 'gp9' };
-const takeup = { cx: TX + TW - 300, cy: TY + 300, pack: 138, rot: -27, style: 'a499' };
+const supply = { cx: TX + 300, cy: TY + 300, pack: 200, rot: 18, style: 'a499' };
+const takeup = { cx: TX + TW - 300, cy: TY + 300, pack: 138, rot: -27, style: 'gp9' };
 // Reel styles from the user's reference photos: Quantegy GP9 (red anodized) and Ampex 499 (silver)
 const REEL_STYLES = {
   gp9: { face: 'url(#flangeRed)', back: '#6e1c12', edge: '#7a2216', sheenOp: 0.18 },
