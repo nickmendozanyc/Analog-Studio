@@ -351,7 +351,7 @@ text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 // =====================================================================
 // TAPE MACHINE: rendered as a CSS 3D scene by jh24.js and layered over this SVG
 // =====================================================================
-const TX = 24, TY = 76, TW = 1360, TH = 816;
+const TX = 24, TY = 76, TW = 1360, TH = 590;   // top row trimmed to make room for the console meter bridge
 p(`<g filter="url(#shadow)">`);
 rect(TX, TY, TW, TH, '#2a2725', 'rx="10"');
 p(`</g>`);
@@ -369,7 +369,7 @@ const readyTracks = new Set([19, 20, 21]);
 const LEG = '#ece7dc';   // legend colour on taupe
 
 // ---------------- AL-III autolocator on its pedestal ----------------
-const AX = 1408, AY = 76, AW = 400, AH = 816;
+const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tall, shown scaled to fit the top row
 {
   const FW = 376, FD = 640, LIP = 44, TOP = -40, SLOPE = 28;
   const face = capture(() => {
@@ -434,7 +434,7 @@ const AX = 1408, AY = 76, AW = 400, AH = 816;
     <rect x="186" y="${AH - 46}" width="30" height="16" rx="2" fill="url(#pole)"/>
     ${[0, 1, 2].map((k) => `<path d="M${300 + k * 8} ${yb + 30} C${330 + k * 8} ${yb + 120} ${250 + k * 10} ${AH - 120} ${410} ${AH - 40 - k * 10}" fill="none" stroke="url(#cab)" stroke-width="9" stroke-linecap="round"/>`).join('')}
   </svg>`;
-  scenes3d.push(`<div style="position:absolute;left:${AX}px;top:${AY}px;width:${AW}px;height:${AH}px;perspective:2600px;perspective-origin:50% 30%;">
+  scenes3d.push(`<div style="position:absolute;left:${AX + (AW - AW * ALK) / 2}px;top:${AY}px;width:${AW}px;height:${AH}px;transform:scale(${ALK});transform-origin:0 0;perspective:2600px;perspective-origin:50% 30%;">
     ${cable}
     <div style="${B3(`left:12px;top:0;width:${FW}px;height:${AH}px`)}">
       ${side(0)}${side(FW)}
@@ -445,9 +445,9 @@ const AX = 1408, AY = 76, AW = 400, AH = 816;
 }
 
 // ---------------- Tape meter bridge: three stepped tiers of 8 VU meters ----------------
-const MX = 1830, MY = 76, MW = 1440, MH = 816;
+const MBK = 0.723, MX = 1830, MY = 76, MW = Math.round(1440 / 0.723), MH = 816;   // logical size; shown scaled by MBK
 {
-  const TW3 = 1400, FH = 236, STEP = 58, X0 = 20, Y0 = 34;
+  const TW3 = MW - 40, FH = 236, STEP = 58, X0 = 20, Y0 = 34, PITCH = TW3 / 8;
   const tierFace = (tier) => capture(() => {
     rect(0, 0, TW3, FH, 'url(#deck)');
     rect(0, 0, TW3, FH, '#000', 'opacity="0.38"');
@@ -455,7 +455,7 @@ const MX = 1830, MY = 76, MW = 1440, MH = 816;
     rect(0, 0, TW3, 2, '#fff', 'opacity="0.18"');
     rect(0, FH - 3, TW3, 3, '#000', 'opacity="0.5"');
     for (let c = 0; c < 8; c++) {
-      const i = (2 - tier) * 8 + c, x = 10 + c * 173.5;
+      const i = (2 - tier) * 8 + c, x = c * PITCH + (PITCH - 170) / 2;
       const on = readyTracks.has(i);
       // lamps above each meter: red record, blue status
       circle(x + 138, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
@@ -493,7 +493,7 @@ const MX = 1830, MY = 76, MW = 1440, MH = 816;
     text(TW3 - 330, 41, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
     [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 18, 96, 32, 'green', on, k, { size: 14 }));
   });
-  scenes3d.push(`<div style="position:absolute;left:${MX}px;top:${MY}px;width:${MW}px;height:${MH}px;perspective:1800px;perspective-origin:50% -25%;">
+  scenes3d.push(`<div style="position:absolute;left:${MX}px;top:${MY}px;width:${MW}px;height:${MH}px;transform:scale(${MBK});transform-origin:0 0;perspective:2400px;perspective-origin:50% -25%;">
     <div style="${B3(`left:0;top:0;width:${MW}px;height:${MH}px;transform-origin:50% 100%;transform:rotateX(6deg)`)}">
       ${endCap(X0)}${endCap(X0 + TW3)}
       ${topCap}
@@ -546,11 +546,11 @@ const CAP_TOP = {
   red: 'linear-gradient(180deg,#f08a80,#b3261b 40%,#4a0d08)',
 };
 
-const CX = 12, CY = 916, CW = 3266, CH = 1244;
+const CX = 12, CY = 834, CW = 3266, CH = 2160 - 834, BRIDGE = 160;   // CY = top of the channel strips; the meter bridge sits above
 {
   const PW = CW - 68;                 // panel width between the wood cheeks
   const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
-  const UD = 990, FD = 212, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
+  const UD = 964, FD = 330, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
   const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   const busLit = (i) => (i < 11 ? [0, 1] : i < 13 ? [2, 3] : i < 19 ? [4, 5] : i < 23 ? [6, 7] : []);
   const muted = new Set([2, 22, 31]), soloed = new Set([19]);
@@ -604,12 +604,13 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       for (const sy of [6, UD - 6]) screw(cm, sy, 2.6);
       // bus assign: 24 round black keys in two columns, red LED beside each
       for (let i = 0; i < 12; i++) {
-        const y = 20 + i * 14.6;
+        const y = 16 + i * 12.6;
         for (const [k, bx, lx, nx, an] of [[2 * i + 1, x0 + 20, x0 + 32, x0 + 8, 'middle'], [2 * i + 2, x0 + 52, x0 + 64, x0 + 77, 'middle']]) {
-          rnd2(bx, y, 5.2, '#141414'); led(lx, y, readyTracks.has(ch) && ch + 1 === k);
+          rnd2(bx, y, 4.8, '#141414'); led(lx, y, readyTracks.has(ch) && ch + 1 === k);
           tx(nx, y + 2.8, String(k), 7.5, WH, an, 700);
         }
       }
+      p('<g transform="translate(0 -26)">');
       // input: yellow mic gain, GAIN / PHAN / LINE, red trim and odd/even bus pan
       KN(x0 + 22, 218, 11, YEL, -20 + rnd() * 60, [[-150, '-'], [150, '+']]);
       tx(x0 + 22, 244, 'MIC', 8, WH);
@@ -666,15 +667,15 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       K(x0 + 16, 974, 7, BLK, -20, { dark: true });
       const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
       KN(x0 + 55, 970, 12, BLK, pan, [[0, 'C'], [-150, 'L'], [150, 'R']], true);
+      p('</g>');
     }
     for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');
     // ---- master section ----
     const mx = MXL, mw = MWD;
     rect(mx, 0, mw, UD, 'url(#jh600)'); rect(mx, 0, mw, UD, '#000', 'filter="url(#brushed)" opacity="0.06"'); rect(mx, 0, 3, UD, '#000');
-    rect(mx + 14, 790, mw - 28, 186, '#3e3934', 'rx="3"'); for (let ry = 800; ry < 970; ry += 9) { rect(mx + 22, ry, mw - 44, 4, '#2a2622', 'rx="2"'); rect(mx + 22, ry + 4, mw - 44, 1, '#fff', 'opacity="0.08"'); }
+    rect(mx + 14, 640, mw - 28, 310, '#3e3934', 'rx="3"'); for (let ry = 650; ry < 944; ry += 9) { rect(mx + 22, ry, mw - 44, 4, '#2a2622', 'rx="2"'); rect(mx + 22, ry + 4, mw - 44, 1, '#fff', 'opacity="0.08"'); }
     text(mx + mw / 2, 34, 'MASTER', 18, '#f0ece4', 'middle', 800, 'letter-spacing="5"');
-    vu(mx + 22, 50, 200, 140, 0.4, { label: 'L', fontScale: 0.11 });
-    vu(mx + mw - 222, 50, 200, 140, -0.6, { label: 'R', fontScale: 0.11 });
+    p('<g transform="translate(0 -150)">');
     let y = 226;
     text(mx + 18, y, 'AUX MASTERS', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
     text(mx + mw - 18, y, 'RETURNS', 14, '#c9c2b2', 'end', 800, 'letter-spacing="1"');
@@ -713,6 +714,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
     ticks(mx + 222, y + 36, 13); K(mx + 222, y + 36, 13, '#1d1d1f', -150, { dark: true });
     text(mx + 222, y + 70, 'OSC', 14, L, 'middle', 800);
     button(mx + 262, y + 20, 196, 34, 'amber', false, 'BOUNCE MIX → WAV', { size: 14 });
+    p('</g>');
     // oak top trim
     rect(0, 0, PW, 6, 'url(#oakH)');
   });
@@ -722,7 +724,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
   const lower = capture(() => {
     rect(0, 0, PW, FD, 'url(#faderBay)');
     rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
-    const top = 84, bot = 192;
+    const top = 96, bot = 306;   // 210 px travel on an 85 px strip: a 100 mm fader on a 38 mm module
     const WH2 = '#ece6da';
     const FMARK = [['10', 0], ['0', 0.2], ['10', 0.42], ['20', 0.6], ['40', 0.82], ['∞', 1]];
     for (let ch = 0; ch < NCH; ch++) {
@@ -749,8 +751,8 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       }
       rect(fx - 3.5, top - 6, 7, bot - top + 12, '#050505', 'rx="3.5"'); rect(fx - 1, top - 4, 2, bot - top + 8, '#2a2a2a');
       const cy = top + faderPos[ch] * (bot - top);
-      p(`<ellipse cx="${fx + 5}" cy="${cy + 8}" rx="18" ry="24" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
-      CAP(fx, cy, 26, 36, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
+      p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
+      CAP(fx, cy, 34, 48, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
       text(x0 + 76, FD - 8, String(ch + 1), 9, WH2, 'end', 800);
     }
     const mx = MXL, mw = MWD;
@@ -762,13 +764,13 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
       if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
       rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-      CAP(gx, cy, 22, 34, 18, gc[g % 4], '#111');
+      CAP(gx, cy, 30, 44, 18, gc[g % 4], '#111');
       text(gx, FD - 6, `G${g + 1}`, 12, '#ece6da', 'middle', 800);
     }
     const mfx = mx + mw - 54;
     for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
-    for (const ox of [-16, 16]) rect(mfx + ox - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-    CAP(mfx - 16, top + 0.22 * (bot - top), 24, 36, 22, 'yellow', '#111'); CAP(mfx + 16, top + 0.22 * (bot - top), 24, 36, 22, 'green', '#111');
+    for (const ox of [-18, 18]) rect(mfx + ox - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
+    CAP(mfx - 18, top + 0.22 * (bot - top), 32, 48, 22, 'yellow', '#111'); CAP(mfx + 18, top + 0.22 * (bot - top), 32, 48, 22, 'green', '#111');
     text(mfx, FD - 6, 'STEREO', 12, '#ece6da', 'middle', 800, 'letter-spacing="1"');
   });
 
@@ -785,12 +787,28 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
   if (FLAT) {
     // flat front view: knob panel, fader panel, oak cheeks, oak rail and leather armrest
     const X = CX + 34, Y = CY;
-    rect(CX, CY - 8, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
-    rect(X, Y - 6, PW, 8, 'url(#oakH)');
+    rect(CX, CY - BRIDGE - 14, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
+    // console meter bridge (JH-600 style): two staggered rows of VUs, one per channel, stereo pair over the master
+    const BY = Y - BRIDGE;
+    rect(X, BY, PW, BRIDGE, 'url(#jh600)'); rect(X, BY, PW, BRIDGE, '#000', 'opacity="0.22"');
+    rect(X, BY - 8, PW, 10, 'url(#oakH)');
+    rect(X + 12, BY + 8, 52, 18, '#0c0c0d', 'rx="2"'); text(X + 38, BY + 21, 'MCI', 12, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    for (let j = 0; j < 16; j++) {
+      const cx = X + j * 2 * 85 + 85;
+      for (const [row, n] of [[0, 2 * j + 1], [1, 2 * j + 2]]) {
+        const my = BY + 10 + row * 74;
+        rect(cx - 70, my - 3, 140, 70, '#0d0c0b', 'rx="4"');
+        vu(cx - 64, my + 1, 128, 62, Math.min(1, (tapeDb[(n - 1) % 24] ?? -12) + (n > 24 ? -4 : 0)), { label: String(n), fontScale: 0.13 });
+      }
+    }
+    for (let g = 1; g < 4; g++) rect(X + g * 8 * 85 - 1.5, BY, 3, BRIDGE, '#0a0a0b');
+    { const mx = X + 32 * 85, mw = PW - 32 * 85; rect(mx, BY, 3, BRIDGE, '#000');
+      vu(mx + 24, BY + 14, 206, 132, 0.4, { label: 'L', fontScale: 0.11 }); vu(mx + mw - 230, BY + 14, 206, 132, -0.6, { label: 'R', fontScale: 0.11 }); }
+    rect(X, Y - 3, PW, 3, '#000', 'opacity="0.6"');
     p(`<g transform="translate(${X} ${Y})">${upper}</g>`);
     p(`<g transform="translate(${X} ${Y + UD})">${lower.replace(/<rect x="0" y="0" width="${PW}" height="${FD}" fill="url\(#faderBay\)"\/>/, `<rect x="0" y="0" width="${PW}" height="${FD}" fill="url(#faderBay)"/>`)}</g>`);
     rect(X, Y + UD, PW, 2, '#000', 'opacity="0.6"');
-    for (const wx of [CX, CX + CW - 34]) { rect(wx, CY - 6, 34, CH + 6, 'url(#wood)', 'rx="4"'); rect(wx, CY - 6, 34, CH + 6, '#000', 'filter="url(#woodgrain)" opacity="0.8" rx="4"'); }
+    for (const wx of [CX, CX + CW - 34]) { rect(wx, CY - BRIDGE - 8, 34, CH + BRIDGE + 8, 'url(#wood)', 'rx="4"'); rect(wx, CY - BRIDGE - 8, 34, CH + BRIDGE + 8, '#000', 'filter="url(#woodgrain)" opacity="0.8" rx="4"'); }
     const ary = Y + UD + FD;
     rect(X, ary, PW, 10, 'url(#oakH)');
     rect(X, ary + 10, PW, CY + CH - ary - 10, 'url(#armrest)');

@@ -357,8 +357,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${TH - WOODY - 14}" fill="#000" filter="url(#grainV)"/>`);
   cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${TH - WOODY - 14}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
   cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="36" fill="url(#shadeTop)"/>`);
-  cab.push(`<rect x="${TW - 118}" y="${WOODY + 150}" width="62" height="22" rx="2" fill="#2a2725"/>`);
-  cab.push(txt(TW - 87, WOODY + 165, 'JH-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
+  cab.push(`<rect x="${TW - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2725"/>`);
+  cab.push(txt(TW - 87, TH - 17, 'JH-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
   // cabinet side frames
   cab.push(`<rect x="0" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#3a3633"/><rect x="${TW - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#33302d"/>`);
 
