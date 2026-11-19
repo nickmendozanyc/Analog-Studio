@@ -55,14 +55,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const R = 250, hubR = R * 0.36, holeR = R * 0.27;
   const supply = { cx: 300, cy: 292, pack: 212, rot: 18, labelAt: 198, style: 'a499' };
   const takeup = { cx: DW - 300, cy: 292, pack: 146, rot: -27, style: 'gp9' };
-  const TAPE_Y = 566;                           // tape front line across the heads
-  const postL = { cx: 112, cy: 578, r: 22 }, postR = { cx: DW - 112, cy: 578, r: 22 };
-  const rollG = { cx: 420, cy: TAPE_Y + 12, r: 12 };
-  const capstan = { cx: 952, cy: TAPE_Y - 11, r: 11 };
-  const pinch = { cx: 952, cy: TAPE_Y + 26, r: 26 };
-  const idler = { cx: 1022, cy: TAPE_Y + 15, r: 15 };
-  const head = { x: headX - 205, y: 418, w: 410, d: 124, h: 150 };   // head assembly box
-  const STRIP = { x: 84, y: 628, w: DW - 168, d: 82, zFront: 16, slope: -15 };
+  // Transport layout from the user's JH-24 photos: tape runs across the FRONT of the head block.
+  const TAPE_Y = 548;                                         // tape line across the head faces
+  const guideL = { cx: 440, cy: TAPE_Y + 24, r: 24 };         // tall black roller, in front of the tape
+  const lifterPin = { cx: 410, cy: TAPE_Y - 18, r: 5 };       // thin chrome lifter pin
+  const capstan = { cx: 905, cy: TAPE_Y - 20, r: 20 };        // black ribbed capstan, behind the tape
+  const pinch = { cx: 917, cy: TAPE_Y + 13, r: 13 };          // slim cream pinch roller, in front
+  const guideR = { cx: 1012, cy: TAPE_Y - 26, r: 26 };        // chunky black take-up guide, behind the tape
+  const head = { x: 478, y: 412, w: 384, d: 126, h: 140 };    // head assembly box
+  const STRIP = { x: 40, y: 606, w: DW - 80, d: 100, zFront: 14, slope: -8 };
 
   // ---------- flat deck surface (plan-view SVG) ----------
   let deckSvg = '';
@@ -78,16 +79,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   deckSvg += `<rect x="16" y="16" width="${DW - 32}" height="${DD - 30}" rx="6" filter="url(#tex)"/>`;
   deckSvg += `<rect x="16.5" y="16.5" width="${DW - 33}" height="${DD - 31}" rx="6" fill="none" stroke="#2f2b28" stroke-width="2"/>`;
   // head plate seam
-  deckSvg += `<rect x="${headX - 340}" y="396" width="680" height="226" rx="10" fill="none" stroke="#4a4541" stroke-width="2.5"/><rect x="${headX - 338}" y="398" width="676" height="222" rx="9" fill="none" stroke="#fff" stroke-opacity="0.10"/>`;
+  deckSvg += `<rect x="${headX - 330}" y="392" width="700" height="210" rx="10" fill="none" stroke="#4a4541" stroke-width="2.5"/><rect x="${headX - 328}" y="394" width="696" height="206" rx="9" fill="none" stroke="#fff" stroke-opacity="0.10"/>`;
   // shadows (light from upper-front-left -> shadows fall back and right)
   for (const rl of [supply, takeup]) deckSvg += `<ellipse cx="${rl.cx + 30}" cy="${rl.cy - 14}" rx="${R + 18}" ry="${R + 10}" fill="#000" opacity="0.38" filter="url(#dsh)"/>`;
   deckSvg += `<rect x="${head.x + 26}" y="${head.y - 30}" width="${head.w + 30}" height="${head.d + 10}" rx="12" fill="#000" opacity="0.45" filter="url(#dsh)"/>`;
-  for (const c of [postL, postR, rollG, capstan, pinch, idler]) deckSvg += `<ellipse cx="${c.cx + 22}" cy="${c.cy - 26}" rx="${c.r + 14}" ry="${c.r + 26}" fill="#000" opacity="0.4" filter="url(#dsh2)"/>`;
+  for (const c of [guideL, capstan, pinch, guideR, lifterPin]) deckSvg += `<ellipse cx="${c.cx + 22}" cy="${c.cy - 26}" rx="${c.r + 14}" ry="${c.r + 26}" fill="#000" opacity="0.4" filter="url(#dsh2)"/>`;
   // screws
   const screwSvg = (x, y, r = 5, a = 30) => `<circle cx="${x}" cy="${y + 0.8}" r="${r + 1}" fill="#000" opacity="0.45"/><circle cx="${x}" cy="${y}" r="${r}" fill="#a9a59e"/><line x1="${x - r * 0.75 * Math.cos(a)}" y1="${y - r * 0.75 * Math.sin(a)}" x2="${x + r * 0.75 * Math.cos(a)}" y2="${y + r * 0.75 * Math.sin(a)}" stroke="#3a3633" stroke-width="1.6"/>`;
-  for (const [x, y] of [[34, 34], [DW - 34, 34], [34, DD - 36], [DW - 34, DD - 36], [headX - 326, 410], [headX + 326, 410], [headX - 326, 608], [headX + 326, 608]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
+  for (const [x, y] of [[34, 34], [DW - 34, 34], [34, DD - 36], [DW - 34, DD - 36], [headX - 316, 406], [headX + 356, 406], [headX - 316, 588], [headX + 356, 588]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
   // engraved legends on the head plate
-  for (const [lab, hx] of [['ERASE', headX - 125], ['RECORD / SYNC', headX], ['REPRO', headX + 125]]) deckSvg += txt(hx, 604, lab, 11, '#2f2b28', 'middle', 800, 'letter-spacing="2"');
   // reel table hint rings
   for (const rl of [supply, takeup]) deckSvg += `<circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="#5f5a55" stroke="#3f3b37" stroke-width="2"/><circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="none" stroke="#fff" stroke-opacity="0.12" stroke-width="1" transform="translate(0 1.5)"/>`;
 
@@ -189,13 +189,13 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SW = [-0.7, 0.7], SE = [0.7, 0.7];
   const sPack = { cx: supply.cx, cy: supply.cy, r: supply.pack }, tPack = { cx: takeup.cx, cy: takeup.cy, r: takeup.pack };
   const chain = [
-    [sPack, W], [postL, SW], [rollG, N], [capstan, S], [idler, N], [postR, SE], [tPack, E],
+    [sPack, SE, null], [guideL, N, N], [capstan, S, S], [guideR, S, E], [tPack, E, null],
   ];
   const tapeSegs = [];
   const contacts = [];
   for (let i = 0; i < chain.length - 1; i++) {
     const [A, ha] = chain[i], [B, hb] = chain[i + 1];
-    const [pa, pb] = pickTangent(A, B, i === 0 ? W : (A === postL ? S : ha), B === postR ? S : hb);
+    const [pa, pb] = pickTangent(A, B, chain[i][2] || chain[i][1], chain[i + 1][1]);
     tapeSegs.push([pa, pb]);
     contacts.push([pa, pb]);
   }
@@ -229,7 +229,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     for (const [sx, sy] of [[24, 22], [w - 24, 22], [24, d - 24], [w - 24, d - 24]]) lid.push(`<circle cx="${sx}" cy="${sy}" r="4" fill="#777"/><line x1="${sx - 3}" y1="${sy}" x2="${sx + 3}" y2="${sy}" stroke="#333" stroke-width="1.4"/>`);
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform:translateZ(${h}px)`)}">${svg(w, d, lid.join(''))}</div>`);
     // head stacks (erase, record/sync, repro) protruding toward the tape
-    for (const hx of [headX - 125, headX, headX + 125]) {
+    for (const hx of [headX - 120, headX, headX + 120]) {
       const hw = 66, hd = TAPE_Y - (y + d) - 1, z0 = 14, z1 = 112;
       plate(hx - hw / 2, y + d, hw, hd, z1, 'linear-gradient(180deg,#9a9da2,#d9dbde)');
       side(hx - hw / 2, y + d, hd, z0, z1, '#7d8086');
@@ -248,74 +248,92 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     const s = [];
     const ink = '#2a2624';
     s.push(`<defs>
-      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfcac1"/><stop offset="1" stop-color="#a39e95"/></linearGradient>
+      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7e7871"/><stop offset="1" stop-color="#6a645e"/></linearGradient>
       <linearGradient id="bt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.6"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></linearGradient>
       <radialGradient id="kn" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#55555a"/><stop offset="1" stop-color="#0b0b0c"/></radialGradient>
       <filter id="gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="bs" x="-30%" y="-30%" width="160%" height="200%"><feGaussianBlur stdDeviation="2"/></filter>
     </defs>`);
-    s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="5" fill="url(#fp)"/><rect x="0" y="0" width="${w}" height="1.5" fill="#fff" opacity="0.6"/>`);
-    s.push(`<rect x="7" y="7" width="${w - 14}" height="${d - 14}" rx="4" fill="none" stroke="#7b766f"/>`);
-    const btn = (bx, by, bw, bh, col, lit, glyph, label) => {
+    // panel in deck colour with the light outline that steps back on the right (as on the JH-24)
+    const stepA = w * 0.55, stepB = w * 0.61;
+    const outline = `M12 ${d - 10} L12 30 L${stepA} 30 L${stepB} 8 L${w - 12} 8 L${w - 12} ${d - 10} Z`;
+    s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="6" fill="url(#fp)"/>`);
+    s.push(`<path d="${outline}" fill="#77716a" stroke="#000" stroke-opacity="0.35" stroke-width="5" transform="translate(1 2)"/>`);
+    s.push(`<path d="${outline}" fill="#77716a" stroke="#e6e1d8" stroke-width="3" stroke-linejoin="round"/>`);
+    const btn = (bx, by, bw, bh, col, lit, glyph, label, bezel = false) => {
+      if (bezel) s.push(`<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 14}" rx="4" fill="#111"/><rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="2" fill="#555"/>`);
       s.push(`<rect x="${bx + 2}" y="${by + 5}" width="${bw}" height="${bh}" rx="3" fill="#000" opacity="0.55" filter="url(#bs)"/>`);
-      s.push(`<rect x="${bx}" y="${by + 4}" width="${bw}" height="${bh}" rx="3" fill="#000" opacity="0.5"/>`);
+      s.push(`<rect x="${bx}" y="${by + 4}" width="${bw}" height="${bh}" rx="3" fill="#000" opacity="0.55"/>`);
       s.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="${col}" ${lit ? 'filter="url(#gl)"' : ''}/>`);
       s.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="url(#bt)"/>`);
-      if (glyph) s.push(txt(bx + bw / 2, by + bh / 2 + 6, glyph, 16, '#1a1208', 'middle', 800));
-      if (label) s.push(txt(bx + bw / 2, d - 13, label, 8.5, ink, 'middle', 800, 'letter-spacing="0.8"'));
+      if (glyph) s.push(txt(bx + bw / 2, by + bh / 2 + 5, glyph, 13, '#1a1208', 'middle', 800));
+      if (label) s.push(txt(bx + bw / 2, by + bh + (bezel ? 18 : 16), label, 7.5, '#e9e4da', 'middle', 800, 'letter-spacing="0.6"'));
     };
     const knobS = (kx, ky, r, ang, label) => {
-      s.push(`<circle cx="${kx + 2}" cy="${ky + 4}" r="${r + 2}" fill="#000" opacity="0.45" filter="url(#bs)"/><circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#kn)"/>`);
-      const a = (ang - 90) * Math.PI / 180; s.push(`<line x1="${kx}" y1="${ky}" x2="${f(kx + r * 0.9 * Math.cos(a))}" y2="${f(ky + r * 0.9 * Math.sin(a))}" stroke="#eee" stroke-width="2" stroke-linecap="round"/>`);
-      if (label) s.push(txt(kx, d - 13, label, 8.5, ink, 'middle', 800));
+      s.push(`<circle cx="${kx + 2}" cy="${ky + 4}" r="${r + 2}" fill="#000" opacity="0.5" filter="url(#bs)"/><circle cx="${kx}" cy="${ky}" r="${r}" fill="url(#kn)"/><circle cx="${kx}" cy="${ky}" r="${r * 0.55}" fill="#1c1c1e"/>`);
+      const a = (ang - 90) * Math.PI / 180; s.push(`<line x1="${f(kx + r * 0.3 * Math.cos(a))}" y1="${f(ky + r * 0.3 * Math.sin(a))}" x2="${f(kx + r * 0.95 * Math.cos(a))}" y2="${f(ky + r * 0.95 * Math.sin(a))}" stroke="#eee" stroke-width="2" stroke-linecap="round"/>`);
+      if (label) s.push(txt(kx, ky + r + 15, label, 7.5, '#e9e4da', 'middle', 800));
     };
-    const by = 16, bh = 36;
-    // power / record-safe lamp, vari-speed + shuttle knobs, tape-lifter lever
-    s.push(`<circle cx="44" cy="${by + 18}" r="11" fill="#d42a1e" filter="url(#gl)"/><circle cx="41" cy="${by + 14}" r="4" fill="#fff" opacity="0.5"/>`); s.push(txt(44, d - 13, 'POWER', 8.5, ink));
-    knobS(92, by + 18, 13, -40, 'VARI SPD'); knobS(140, by + 18, 13, 30, 'SHUTTLE');
-    s.push(`<rect x="176" y="${by + 13}" width="46" height="10" rx="5" fill="#2a2624"/><rect x="184" y="${by + 3}" width="14" height="28" rx="3" fill="#d9dbde" stroke="#777"/>`); s.push(txt(199, d - 13, 'LIFTERS', 8.5, ink));
-    const T = [['◀◀', 'REW', '#efece4', 0], ['▶▶', 'F FWD', '#efece4', 0], ['■', 'STOP', '#efece4', 0], ['▶', 'PLAY', '#59f07a', 1], ['●', 'REC', '#ff3b2f', 1], ['▲', 'LIFT', '#5aa0e6', 0], ['✂', 'EDIT', '#e8962e', 0]];
-    T.forEach(([g, l, c, lit], i) => btn(250 + i * 60, by, 48, bh + 6, c, lit, g, l));
-    let x2 = 690;
-    s.push(`<line x1="${x2 - 14}" y1="14" x2="${x2 - 14}" y2="${d - 14}" stroke="#7b766f"/>`);
-    btn(x2, by + 4, 40, 30, '#efece4', 0, '15', ''); btn(x2 + 46, by + 4, 40, 30, '#ffb02e', 1, '30', ''); s.push(txt(x2 + 43, d - 13, 'SPEED IPS', 8.5, ink));
-    btn(x2 + 104, by + 4, 40, 30, '#fff6e0', 1, '', ''); s.push(txt(x2 + 124, by + 24, 'AES', 10, '#1a1208')); btn(x2 + 150, by + 4, 40, 30, '#efece4', 0, '', ''); s.push(txt(x2 + 170, by + 24, 'NAB', 10, '#1a1208')); s.push(txt(x2 + 147, d - 13, 'EQ', 8.5, ink));
-    x2 = 912;
-    s.push(`<line x1="${x2 - 18}" y1="14" x2="${x2 - 18}" y2="${d - 14}" stroke="#7b766f"/>`);
-    knobS(x2 + 14, by + 18, 14, 40, 'SATURATION'); knobS(x2 + 78, by + 18, 14, -60, 'WOW / FLUT'); knobS(x2 + 140, by + 18, 14, -90, 'HISS');
-    btn(x2 + 184, by + 4, 70, 30, '#e8a840', 0, '', 'TAPE CHAR'); s.push(txt(x2 + 219, by + 24, 'BYPASS', 10, '#1a1208'));
-    // top face sloped: origin at the front edge, raised at the back
+    // left group: white indicator pin, red pushbutton, two black knobs, tape-lifter toggle
+    const ly = 58;
+    s.push(`<circle cx="34" cy="${ly + 2}" r="5" fill="#000" opacity="0.5"/><circle cx="34" cy="${ly}" r="4.5" fill="#efece4"/>`);
+    btn(52, ly - 12, 24, 22, '#d42a1e', true, '', 'POWER');
+    knobS(118, ly, 12, -40, 'VARI SPD'); knobS(166, ly, 12, 30, 'SHUTTLE');
+    s.push(`<rect x="204" y="${ly - 3}" width="44" height="7" rx="3.5" fill="#1c1a18"/><rect x="218" y="${ly - 14}" width="9" height="22" rx="3" fill="#d9dbde" stroke="#666"/>`); s.push(txt(226, ly + 27, 'LIFTERS', 7.5, '#e9e4da'));
+    // transport keys: white, white, white, green, red in a black bezel
+    const ty = 42;
+    [['◀◀', 'REW'], ['▶▶', 'F FWD'], ['■', 'STOP']].forEach(([g, l], i) => btn(330 + i * 54, ty, 40, 30, '#efece4', false, g, l));
+    btn(492, ty, 40, 30, '#3fc9a0', true, '▶', 'PLAY');
+    btn(556, ty - 4, 44, 30, '#e0322a', true, '●', 'REC', true);
+    // stepped-back section: blue, orange, then speed / EQ and the app's tape-character trims
+    const ry = 22;
+    btn(stepB + 22, ry, 36, 28, '#3f7fd6', false, '▲', 'LIFT');
+    btn(stepB + 72, ry, 36, 28, '#ea8a2a', false, '✂', 'EDIT');
+    btn(stepB + 136, ry + 2, 32, 24, '#efece4', false, '15', ''); btn(stepB + 172, ry + 2, 32, 24, '#ffb02e', true, '30', ''); s.push(txt(stepB + 170, ry + 44, 'IPS', 7.5, '#e9e4da'));
+    btn(stepB + 224, ry + 2, 32, 24, '#fff6e0', true, '', ''); s.push(txt(stepB + 240, ry + 18, 'AES', 8, '#1a1208'));
+    btn(stepB + 260, ry + 2, 32, 24, '#efece4', false, '', ''); s.push(txt(stepB + 276, ry + 18, 'NAB', 8, '#1a1208'));
+    s.push(txt(stepB + 258, ry + 44, 'EQ', 7.5, '#e9e4da'));
+    knobS(stepB + 330, ry + 14, 10, 40, 'SAT'); knobS(stepB + 370, ry + 14, 10, -60, 'W/F'); knobS(stepB + 410, ry + 14, 10, -90, 'HISS');
+    btn(stepB + 440, ry + 2, 32, 24, '#e8a840', false, '', 'BYPASS');
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform-origin:50% 100%;transform:translateZ(${zFront}px) rotateX(${slope}deg)`)}">${svg(w, d, s.join(''))}</div>`);
     const zBack = zFront + d * Math.sin(-slope * Math.PI / 180);
-    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#8a857d,#6b665f)');
-    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#8a857d,#6b665f)');
-    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#8a857d,#6b665f)');
+    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#77716a,#5a554f)');
+    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#77716a,#5a554f)');
+    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#77716a,#5a554f)');
   }
 
   // ---------- draw, roughly back to front (preserve-3d sorts by depth anyway) ----------
   reel(supply);
   reel(takeup);
   headAssembly();
-  // guide posts: tall black, chrome cap
-  for (const pst of [postL, postR]) {
-    cylinder(pst.cx, pst.cy, pst.r + 6, 0, 12, 'linear-gradient(90deg,#0a0a0a,#3a3a3c 35%,#0b0b0c)', '#1a1a1c', 3);
-    cylinder(pst.cx, pst.cy, pst.r, 12, 150, 'linear-gradient(90deg,#060606,#3d3d40 32%,#151517 60%,#050505)', 'radial-gradient(circle at 40% 35%, #f2f3f5, #9ea2a8 45%, #4a4d52)');
-  }
-  // flanged roller guide
-  cylinder(rollG.cx, rollG.cy, rollG.r + 8, 0, 20, 'linear-gradient(90deg,#0a0a0a,#3a3a3c 35%,#0b0b0c)', '#1a1a1c', 3);
-  cylinder(rollG.cx, rollG.cy, rollG.r, 20, TAPE_Z1 + 6, 'linear-gradient(90deg,#6d7178,#f0f1f3 35%,#8e9298 65%,#55585e)', '#ccc', 2.2);
-  cylinder(rollG.cx, rollG.cy, rollG.r + 7, TAPE_Z1 + 6, TAPE_Z1 + 12, 'linear-gradient(90deg,#6d7178,#f0f1f3 35%,#55585e)', 'radial-gradient(circle at 40% 35%, #fafafa, #9ea2a8 60%)', 2);
-  // capstan: motor boss + thin chrome shaft
-  cylinder(capstan.cx, capstan.cy, 30, 0, 16, 'linear-gradient(90deg,#0a0a0a,#3a3a3c 35%,#0b0b0c)', '#161618', 3);
-  cylinder(capstan.cx, capstan.cy, capstan.r, 16, 122, 'linear-gradient(90deg,#6d7178,#f7f8f9 35%,#8e9298 65%,#4a4d52)', 'radial-gradient(circle at 40% 35%, #fafafa, #9ea2a8 60%)', 2);
-  // pinch roller on its arm
-  wall(pinch.cx, pinch.cy, pinch.cx + 92, pinch.cy + 22, 6, 22, '#121214');
-  plate(pinch.cx, pinch.cy - 9, 94, 18, 22, '#1a1a1c', `transform-origin:0 50%;transform:translateZ(22px) rotateZ(${f(Math.atan2(22, 92) * 180 / Math.PI)}deg)`);
-  cylinder(pinch.cx + 92, pinch.cy + 22, 12, 0, 30, 'linear-gradient(90deg,#0a0a0a,#3a3a3c 35%,#0b0b0c)', 'radial-gradient(circle, #c9ccd0 4px, #111 5px)', 3);
-  cylinder(pinch.cx, pinch.cy, pinch.r, 22, TAPE_Z1 + 8, 'linear-gradient(90deg,#030303,#2c2c2e 30%,#0d0d0e 60%,#020202)', 'radial-gradient(circle, #c9ccd0 6px, #222 7px, #111 60%, #1c1c1e)', 2.2);
-  // cream idler / tach roller
-  cylinder(idler.cx, idler.cy, idler.r + 7, 0, 14, 'linear-gradient(90deg,#0a0a0a,#3a3a3c 35%,#0b0b0c)', '#161618', 3);
-  cylinder(idler.cx, idler.cy, idler.r, 14, 128, 'linear-gradient(90deg,#9b917c,#f1ead8 35%,#c9bfa6 65%,#8a816c)', 'radial-gradient(circle at 40% 35%, #fffaf0, #d2c8b0 60%)', 2.2);
+  const BLK = 'linear-gradient(90deg,#060606,#3a3a3d 30%,#141416 62%,#040404)';
+  const BLK_TOP = 'radial-gradient(circle at 40% 35%, #3a3a3d, #0d0d0e 70%)';
+  // ribbed black cylinder: alternating light/dark layers read as grooves
+  const ribbed = (c, z0, z1, rr) => { for (let z = z0; z < z1; z += 2) disc(c.cx, c.cy, rr + ((Math.floor(z / 6) % 2) ? 0 : -1.2), z, (Math.floor(z / 6) % 2) ? BLK : 'linear-gradient(90deg,#030303,#26262a 30%,#0a0a0b 62%,#020202)'); disc(c.cx, c.cy, rr, z1, BLK_TOP); };
+  // left supply guide: flanged base, tall black roller (tape wraps its back side)
+  cylinder(guideL.cx, guideL.cy, guideL.r + 12, 0, 8, BLK, '#1a1a1c', 2);
+  cylinder(guideL.cx, guideL.cy, guideL.r + 6, 8, 18, BLK, '#161618', 2);
+  cylinder(guideL.cx, guideL.cy, guideL.r, 18, 150, BLK, BLK_TOP);
+  disc(guideL.cx, guideL.cy, 7, 150.5, 'radial-gradient(circle at 40% 35%, #fafafa, #8d9196)');
+  // thin chrome tape-lifter pin beside it
+  cylinder(lifterPin.cx, lifterPin.cy, lifterPin.r + 5, 0, 8, BLK, '#161618', 2);
+  cylinder(lifterPin.cx, lifterPin.cy, lifterPin.r, 8, 136, 'linear-gradient(90deg,#6d7178,#f7f8f9 35%,#8e9298 65%,#4a4d52)', 'radial-gradient(circle, #fff, #9ea2a8)');
+  // capstan: black motor boss + tall black ribbed capstan behind the tape
+  cylinder(capstan.cx, capstan.cy, capstan.r + 14, 0, 14, BLK, '#151517', 2);
+  ribbed(capstan, 14, 136, capstan.r);
+  disc(capstan.cx, capstan.cy, 6, 136.5, 'radial-gradient(circle at 40% 35%, #fafafa, #8d9196)');
+  // pinch roller: slim cream roller in front of the tape, on a black boxy arm housing to its right
+  const armX = pinch.cx + 14, armY = TAPE_Y + 4, armW = 60, armD = 30, armH = 30;
+  plate(armX, armY, armW, armD, armH, 'linear-gradient(135deg,#2a2a2d,#0c0c0d)');
+  front(armX, armY + armD, armW, 0, armH, 'linear-gradient(180deg,#1b1b1d,#060606)');
+  side(armX, armY, armD, 0, armH, '#101012'); side(armX + armW, armY, armD, 0, armH, '#0a0a0b');
+  cylinder(pinch.cx, pinch.cy, pinch.r + 5, 0, 10, BLK, '#151517', 2);
+  cylinder(pinch.cx, pinch.cy, pinch.r, 10, 150, 'linear-gradient(90deg,#8f8672,#f3ecdb 32%,#d6ccb4 62%,#8a816c)', 'radial-gradient(circle at 40% 35%, #fffaf0, #cfc4ab 70%)');
+  // right take-up guide: chunky flared black base, tall ribbed black roller (tape wraps its front and right side)
+  cylinder(guideR.cx, guideR.cy, guideR.r + 20, 0, 8, BLK, '#1a1a1c', 2);
+  cylinder(guideR.cx, guideR.cy, guideR.r + 12, 8, 18, BLK, '#161618', 2);
+  cylinder(guideR.cx, guideR.cy, guideR.r + 6, 18, 26, BLK, '#141416', 2);
+  ribbed(guideR, 26, 156, guideR.r);
   // the tape itself
   for (const [[x1, y1], [x2, y2]] of tapeSegs) wall(x1, y1, x2, y2, TAPE_Z0, TAPE_Z1, TAPE_BG);
   transportStrip();
