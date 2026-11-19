@@ -802,7 +802,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     const WH2 = '#ece6da';
     const FMARK = [['10', 0], ['0', 0.2], ['10', 0.42], ['20', 0.6], ['40', 0.82], ['∞', 1]];
     for (let ch = 0; ch < NCH; ch++) {
-      const x0 = ch * STRIP, cm = x0 + STRIP / 2, fx = x0 + 52;
+      const x0 = ch * STRIP, cm = x0 + STRIP / 2, fx = x0 + 45;   // fader set left to leave room for the automation keys
       rect(x0, 0, STRIP, FD, 'url(#jh600)'); rect(x0, 0, 1.5, FD, '#000', 'opacity="0.75"');
       // REV / PFL keys and the EQ / CHN / SOLO / TAPE status LEDs
       for (const [k, yy, lit] of [['REV', 6, false], ['PFL', 24, soloed.has(ch)]]) {
@@ -825,15 +825,15 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       }
       rect(fx - 3.5, top - 6, 7, bot - top + 12, '#050505', 'rx="3.5"'); rect(fx - 1, top - 4, 2, bot - top + 8, '#2a2a2a');
       // automation: one small key per mode beside the fader; the active mode's key lights in its colour
-      { const m = modeOf(ch), kx = x0 + 71;
-        circle(kx + 6, top + 2, 2.6, touched(ch) ? '#7fd0ff' : '#18303e', touched(ch) ? 'filter="url(#glowSm)"' : '');   // touch-sense LED
+      { const m = modeOf(ch), kx = x0 + 68;
+        circle(kx + 7, top + 2, 2.6, touched(ch) ? '#7fd0ff' : '#18303e', touched(ch) ? 'filter="url(#glowSm)"' : '');   // touch-sense LED
         [['off', 'O'], ['read', 'R'], ['write', 'W'], ['touch', 'T'], ['latch', 'L'], ['trim', 'Tr']].forEach(([k, l], n) => {
           const ky = top + 14 + n * 22, on = k === m, col = AUTO[k][1];
-          rect(kx, ky + 1.2, 12, 15, '#000', 'rx="1.5" opacity="0.6"');
-          rect(kx, ky, 12, 15, on ? col : '#151515', `rx="1.5" ${on && k !== 'off' ? 'filter="url(#glowSm)"' : ''}`);
-          rect(kx, ky, 12, 15, on ? 'url(#btnLit)' : 'url(#btnOff)', 'rx="1.5"');
-          circle(kx + 6, ky + 4, 1.6, on ? '#fff' : col, on ? '' : 'opacity="0.45"');
-          text(kx + 6, ky + 13, l, l.length > 1 ? 6 : 7, on ? '#10140f' : '#cfc9bd', 'middle', 900);
+          rect(kx, ky + 1.2, 14, 16, '#000', 'rx="1.5" opacity="0.6"');
+          rect(kx, ky, 14, 16, on ? col : '#151515', `rx="1.5" ${on && k !== 'off' ? 'filter="url(#glowSm)"' : ''}`);
+          rect(kx, ky, 14, 16, on ? 'url(#btnLit)' : 'url(#btnOff)', 'rx="1.5"');
+          circle(kx + 7, ky + 4, 1.7, on ? '#fff' : col, on ? '' : 'opacity="0.45"');
+          text(kx + 7, ky + 13.5, l, l.length > 1 ? 6.5 : 7.5, on ? '#10140f' : '#cfc9bd', 'middle', 900);
         });
       }
       const cy = top + faderPos[ch] * (bot - top);
