@@ -859,6 +859,10 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
       CAP(fx, cy, 34, 48, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
       text(x0 + 76, FD - 8, String(ch + 1), 9, WH2, 'end', 800);
+      // VCA group selector readout (click cycles –, G1–G8)
+      { const grp = ch < 11 ? 1 : ch < 13 ? 2 : ch < 16 ? 3 : ch < 19 ? 4 : ch < 22 ? 5 : ch < 24 ? 6 : ch < 30 ? 7 : 0;
+        rect(x0 + 3, FD - 20, 23, 15, '#000', 'rx="2" opacity="0.6"'); rect(x0 + 3, FD - 21, 23, 15, '#0a0302', 'rx="2"');
+        text(x0 + 14.5, FD - 9.5, grp ? `G${grp}` : '–', 10, grp ? '#ff3a24' : '#5a1410', 'middle', 800, `font-family="'JetBrains Mono', monospace" ${grp ? 'filter="url(#glowSm)"' : ''}`); }
     }
     const mx = MXL, mw = MWD;
     rect(mx, 0, 3, FD, '#000', 'opacity="0.4"');
