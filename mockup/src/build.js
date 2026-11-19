@@ -502,386 +502,394 @@ const MX = 1830, MY = 76, MW = 1440, MH = 816;
 }
 
 // =====================================================================
-// CONSOLE (MCI JH-600 style)
+// CONSOLE (MCI JH-636 / JH-600 style) — CSS 3D: knob panel + fader panel + armrest
+// Faces are drawn with the SVG helpers (capture); knobs and fader caps are real 3D solids.
+// Text is 14 px or larger (50" 4K legibility rule).
 // =====================================================================
+const disc3 = (x, y, r, z, bg, extra = '') => `<div style="${B3(`left:${(x - r).toFixed(1)}px;top:${(y - r).toFixed(1)}px;width:${(2 * r).toFixed(1)}px;height:${(2 * r).toFixed(1)}px;border-radius:50%;transform:translateZ(${z.toFixed(1)}px);background:${bg};${extra}`)}"></div>`;
+const SIDE_BLK = 'linear-gradient(90deg,#050505,#3a3a3d 32%,#141416 65%,#020202)';
+function knob3d(x, y, r, cap, ang, opts = {}) {
+  const { dark = false, h = Math.max(9, r * 0.95), skirt = true, ptr = '#ffffff' } = opts;
+  let s = '';
+  if (skirt) { s += disc3(x, y, r * 1.16, 0, SIDE_BLK); s += disc3(x, y, r * 1.16, 1.6, 'radial-gradient(circle at 40% 35%, #4a4a4e, #141416 70%)'); }
+  for (let z = skirt ? 2.4 : 0; z < h; z += 2) s += disc3(x, y, r * 0.84, z, SIDE_BLK);
+  const cr = r * 0.84, pw = Math.max(2, r * 0.14);
+  s += `<div style="${B3(`left:${(x - cr).toFixed(1)}px;top:${(y - cr).toFixed(1)}px;width:${(2 * cr).toFixed(1)}px;height:${(2 * cr).toFixed(1)}px;border-radius:50%;transform:translateZ(${h.toFixed(1)}px);background:radial-gradient(circle at 36% 30%, rgba(255,255,255,${dark ? 0.32 : 0.7}), rgba(255,255,255,0) 46%), radial-gradient(circle, rgba(0,0,0,0) 58%, rgba(0,0,0,0.45) 100%), ${cap}`)}"><div style="position:absolute;left:50%;top:5%;width:${pw.toFixed(1)}px;height:45%;margin-left:-${(pw / 2).toFixed(1)}px;background:${ptr};border-radius:2px;transform-origin:50% 100%;transform:rotate(${ang}deg)"></div></div>`;
+  return s;
+}
+// knob scale ticks drawn into the face texture
+function ticks(cx, cy, r, col = '#d9d3c2') {
+  for (let i = 0; i <= 10; i++) {
+    const a = -150 + i * 30;
+    const [x1, y1] = polar(cx, cy, r * 1.25, a), [x2, y2] = polar(cx, cy, r * 1.42, a);
+    p(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-opacity="0.75" stroke-width="${i % 5 === 0 ? 1.8 : 1.1}"/>`);
+  }
+  circle(cx + 2, cy + 4, r * 1.25, 'url(#kShadow)');
+}
+// 3D fader cap (box) centred at x,y on the fader plane
+function cap3d(x, y, w, d, h, topBg, idx = '#ffffff') {
+  const L = (x - w / 2).toFixed(1), T = (y - d / 2).toFixed(1);
+  let s = '';
+  s += `<div style="${B3(`left:${L}px;top:${T}px;width:${w}px;height:${d}px;border-radius:3px;transform:translateZ(${h}px);background:repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 5px, rgba(0,0,0,0.35) 5px 6px, rgba(255,255,255,0.12) 6px 7px), ${topBg}`)}"><div style="position:absolute;left:2px;right:2px;top:50%;height:3px;margin-top:-1.5px;background:${idx}"></div></div>`;
+  s += `<div style="${B3(`left:${L}px;top:${(y + d / 2 - h).toFixed(1)}px;width:${w}px;height:${h}px;transform-origin:50% 100%;transform:rotateX(-90deg);background:linear-gradient(180deg,#2a2a2c,#050505)`)}"></div>`;
+  s += `<div style="${B3(`left:${L}px;top:${(y - d / 2 - h).toFixed(1)}px;width:${w}px;height:${h}px;transform-origin:50% 100%;transform:rotateX(-90deg);background:#111`)}"></div>`;
+  for (const sx of [x - w / 2, x + w / 2]) s += `<div style="${B3(`left:${(sx - h).toFixed(1)}px;top:${T}px;width:${h}px;height:${d}px;transform-origin:100% 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#060606,#1c1c1e)`)}"></div>`;
+  return s;
+}
+const CAP_TOP = {
+  black: 'linear-gradient(180deg,#5b5e62,#2a2c2f 40%,#111214)',
+  yellow: 'linear-gradient(180deg,#fff1a0,#e6c02e 40%,#8a6c12)',
+  green: 'linear-gradient(180deg,#a8e0a0,#3f8f3a 40%,#1a3d18)',
+  white: 'linear-gradient(180deg,#ffffff,#e6e4dc 40%,#9a978f)',
+  red: 'linear-gradient(180deg,#f08a80,#b3261b 40%,#4a0d08)',
+};
+
 const CX = 12, CY = 916, CW = 3266, CH = 1244;
-// console back edge / meter hood shadow
-rect(CX, CY - 8, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
-rect(CX + 34, CY - 6, CW - 68, 8, 'url(#oakH)');
-// wood end cheeks
-for (const wx of [CX, CX + CW - 34]) {
-  rect(wx, CY, 34, CH, 'url(#wood)', 'rx="4"');
-  rect(wx, CY, 34, CH, '#000', 'filter="url(#woodgrain)" opacity="0.8" rx="4"');
-}
-const SX0 = CX + 34, STRIP = 85, NCH = 32;
-const MASTER_X = SX0 + NCH * STRIP, MASTER_W = CX + CW - 34 - MASTER_X;
-const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
-const busLit = (i) => (i < 11 ? [0] : i < 13 ? [2] : i < 19 ? [4] : i < 23 ? [6] : []);
-const muted = new Set([2, 22, 31]);
-const soloed = new Set([19]);
-const faderPos = consoleNames.map((n, i) => (i === 19 ? 0.2 : i === 31 ? 0.98 : 0.24 + rnd() * 0.2));
+{
+  const PW = CW - 68;                 // panel width between the wood cheeks
+  const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
+  const UD = 860, FD = 340, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
+  const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
+  const busLit = (i) => (i < 11 ? [0, 1] : i < 13 ? [2, 3] : i < 19 ? [4, 5] : i < 23 ? [6, 7] : []);
+  const muted = new Set([2, 22, 31]), soloed = new Set([19]);
+  const faderPos = consoleNames.map((n, i) => (i === 19 ? 0.2 : i === 31 ? 0.98 : 0.24 + rnd() * 0.2));
+  const L = '#ece7dc';
+  const upKnobs = [], fdCaps = [];
+  const K = (x, y, r, cap, ang, o = {}) => { upKnobs.push(knob3d(x, y, r, cap, ang, o)); };
 
-for (let ch = 0; ch < NCH; ch++) {
-  const x = SX0 + ch * STRIP;
-  const ret = ch >= 24;
-  rect(x, CY, STRIP, 1174 - 330, ret ? 'url(#consoleAlt)' : 'url(#console)');
-  rect(x, CY, STRIP, 844, '#000', 'filter="url(#brushed)" opacity="0.07"');
-  rect(x, CY, 1, 1174, '#000', 'opacity="0.7"');
-  rect(x + 1, CY, 1, 1174, '#fff', 'opacity="0.06"');
-  const c1 = x + 23, c2 = x + 62, cm = x + STRIP / 2;
-  const L = '#d9d3c2';
-  // scribble strip
-  text(cm, CY + 30, String(ch + 1), 16, '#f0ece4', 'middle', 800);
-  // bus assign 1-8
-  let y = CY + 52;
-  const lit = busLit(ch);
-  for (let b = 0; b < 8; b++) {
-    const bx = x + 7 + (b % 4) * 18.5, by = y + Math.floor(b / 4) * 20;
-    button(bx, by, 15, 15, 'amber', lit.includes(b) || (lit.includes(b - 1) && b % 2 === 1), String(b + 1), { size: 8 });
-  }
-  y += 44;
-  button(x + 7, y, 34, 16, 'white', ch === 31, 'MIC', { size: 8 });
-  button(x + 45, y, 34, 16, 'white', ch !== 31, 'LINE', { size: 8 });
-  text(cm, y + 30, ret ? 'RETURN' : 'TAPE', 8, '#a9a493', 'middle', 700, 'letter-spacing="1"');
-  // input
-  y = CY + 160;
-  knob(c1, y, 14, '#1d1d1f', -20 + rnd() * 60, { label: 'TRIM', labelColor: L, labelSize: 8, dark: true });
-  button(c2 - 14, y - 22, 28, 15, 'red', ch === 0, 'PAD', { size: 8 });
-  button(c2 - 14, y + 2, 28, 15, 'white', ch === 2, 'Ø', { size: 9 });
-  // HPF
-  y = CY + 222;
-  knob(c1, y, 13, '#ecebe4', -120 + rnd() * 50, { label: 'HPF', labelColor: L, labelSize: 8 });
-  button(c2 - 14, y - 8, 28, 15, 'white', [0, 2, 3, 19, 20, 21].includes(ch), 'IN', { size: 8 });
-  // EQ
-  const bands = [['HF', '#c8302a'], ['HMF', '#e6c02e'], ['LMF', '#2f62b0'], ['LF', '#ecebe4']];
-  rect(x + 4, CY + 256, STRIP - 8, 1, '#000', 'opacity="0.5"');
-  text(cm, CY + 270, 'EQUALIZER', 8, '#a9a493', 'middle', 800, 'letter-spacing="1"');
-  bands.forEach(([bn, col], bi) => {
-    const yy = CY + 300 + bi * 62;
-    knob(c1, yy, 11, '#1d1d1f', -80 + rnd() * 160, { label: bn + ' FREQ', labelColor: L, labelSize: 7, ticks: true });
-    knob(c2, yy, 14, col, (rnd() - 0.5) * 140, { label: 'GAIN', labelColor: L, labelSize: 7 });
+  // ---------------- knob panel texture ----------------
+  const upper = capture(() => {
+    for (let ch = 0; ch < NCH; ch++) {
+      const x0 = ch * STRIP, ret = ch >= 24, c1 = x0 + 23, c2 = x0 + 62, cm = x0 + STRIP / 2;
+      rect(x0, 0, STRIP, UD, ret ? 'url(#consoleAlt)' : 'url(#console)');
+      rect(x0, 0, STRIP, UD, '#000', 'filter="url(#brushed)" opacity="0.07"');
+      rect(x0, 0, 1.5, UD, '#000', 'opacity="0.7"'); rect(x0 + 1.5, 0, 1, UD, '#fff', 'opacity="0.07"');
+      for (const sy of [12, UD - 12]) screw(cm, sy, 3.5);
+      text(cm, 40, String(ch + 1), 18, '#f0ece4', 'middle', 800);
+      const lit = busLit(ch);
+      for (let b = 0; b < 8; b++) button(x0 + 4 + (b % 4) * 20, 50 + Math.floor(b / 4) * 21, 18, 17, 'amber', lit.includes(b), String(b + 1), { size: 14 });
+      button(x0 + 4, 96, 38, 22, 'white', ch === 31, 'MIC', { size: 14 });
+      button(x0 + 44, 96, 38, 22, 'white', ch !== 31, 'LINE', { size: 13.5 });
+      ticks(c1, 150, 14); K(c1, 150, 14, '#1d1d1f', -20 + rnd() * 60, { dark: true });
+      button(x0 + 48, 128, 34, 21, 'red', ch === 0, 'PAD', { size: 14 });
+      button(x0 + 48, 154, 34, 21, 'white', ch === 2, 'Ø', { size: 15 });
+      text(c1, 186, 'TRIM', 14, L, 'middle', 800);
+      ticks(c1, 220, 13); K(c1, 220, 13, '#ecebe4', -120 + rnd() * 50);
+      button(x0 + 48, 210, 34, 21, 'white', [0, 2, 3, 19, 20, 21].includes(ch), 'IN', { size: 14 });
+      text(c1, 255, 'HPF', 14, L, 'middle', 800);
+      rect(x0 + 6, 266, STRIP - 12, 1.5, '#000', 'opacity="0.55"');
+      text(cm, 286, 'EQ', 14, '#c9c2b2', 'middle', 800, 'letter-spacing="2"');
+      [['HF', '#c8302a'], ['HMF', '#e6c02e'], ['LMF', '#2f62b0'], ['LF', '#ecebe4']].forEach(([bn, col], bi) => {
+        const yy = 314 + bi * 60;
+        ticks(c1, yy, 11); K(c1, yy, 11, '#1d1d1f', -80 + rnd() * 160, { dark: true });
+        ticks(c2, yy, 14); K(c2, yy, 14, col, (rnd() - 0.5) * 140, { dark: col === '#1d1d1f' });
+        text(c1, yy + 32, bn, 14, L, 'middle', 800);
+      });
+      const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
+      button(x0 + 12, 548, STRIP - 24, 24, 'green', eqOn, 'EQ IN', { size: 14 });
+      rect(x0 + 6, 584, STRIP - 12, 1.5, '#000', 'opacity="0.55"');
+      text(cm, 604, 'AUX', 14, '#c9c2b2', 'middle', 800, 'letter-spacing="2"');
+      const auxCols = ['#c8302a', '#c8302a', '#e6c02e', '#e6c02e'];
+      for (let a = 0; a < 4; a++) {
+        const ax = a % 2 === 0 ? c1 : c2, ay = 630 + Math.floor(a / 2) * 54;
+        const active = (a === 0 && ch < 24 && [1, 19, 20, 21, 15].includes(ch)) || (a === 1 && [19, 13, 14].includes(ch)) || (a >= 2 && ch < 24);
+        ticks(ax, ay, 12); K(ax, ay, 12, auxCols[a], active ? -40 + rnd() * 120 : -150);
+        text(ax, ay + 31, String(a + 1), 14, L, 'middle', 800);
+      }
+      button(x0 + 4, 726, 38, 22, 'blue', [0, 1, 12, 19].includes(ch), 'INS', { size: 14 });
+      button(x0 + 44, 726, 38, 22, 'white', ch >= 2 && ch < 24 && ch % 5 === 0, 'PRE', { size: 14 });
+      const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
+      ticks(cm, 778, 16); K(cm, 778, 16, '#1d1d1f', pan, { dark: true });
+      text(cm, 812, 'PAN', 14, L, 'middle', 800);
+      button(x0 + 4, 822, 38, 28, 'red', muted.has(ch), 'MUTE', { size: 13 });
+      button(x0 + 44, 822, 38, 28, 'yellow', soloed.has(ch), 'SOLO', { size: 13 });
+    }
+    for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');
+    // ---- master section ----
+    const mx = MXL, mw = MWD;
+    rect(mx, 0, mw, UD, 'url(#consoleMaster)'); rect(mx, 0, mw, UD, '#000', 'filter="url(#brushed)" opacity="0.07"'); rect(mx, 0, 3, UD, '#000');
+    text(mx + mw / 2, 34, 'MASTER', 18, '#f0ece4', 'middle', 800, 'letter-spacing="5"');
+    vu(mx + 22, 50, 200, 140, 0.4, { label: 'L', fontScale: 0.11 });
+    vu(mx + mw - 222, 50, 200, 140, -0.6, { label: 'R', fontScale: 0.11 });
+    let y = 226;
+    text(mx + 18, y, 'AUX MASTERS', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    text(mx + mw - 18, y, 'RETURNS', 14, '#c9c2b2', 'end', 800, 'letter-spacing="1"');
+    for (let a = 0; a < 4; a++) {
+      const kx = mx + 36 + a * 50, rx = mx + mw - 186 + a * 50;
+      ticks(kx, y + 34, 14); K(kx, y + 34, 14, a < 2 ? '#c8302a' : '#e6c02e', 20 + a * 10);
+      text(kx, y + 66, String(a + 1), 14, L, 'middle', 800);
+      ticks(rx, y + 34, 14); K(rx, y + 34, 14, '#1d1d1f', -10 + a * 15, { dark: true });
+      text(rx, y + 66, `R${a + 1}`, 14, L, 'middle', 800);
+    }
+    y = 320; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
+    text(mx + 18, y + 6, 'CONTROL ROOM', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    ['MIX', '2-TRK', 'CUE 1', 'CUE 2'].forEach((s2, i) => button(mx + 16 + i * 70, y + 18, 64, 30, 'white', i === 0, s2, { size: 14 }));
+    [['DIM', 'amber'], ['MONO', 'amber'], ['CUT', 'red']].forEach(([s2, c], i) => button(mx + 16 + i * 70, y + 58, 64, 30, c, false, s2, { size: 14 }));
+    ticks(mx + mw - 64, y + 70, 40, '#d9d3c2');
+    upKnobs.push(knob3d(mx + mw - 64, y + 70, 40, 'radial-gradient(circle, #2a2a2c, #0c0c0d)', 40, { dark: true, h: 30 }));
+    text(mx + mw - 64, y + 142, 'MONITOR', 14, L, 'middle', 800, 'letter-spacing="1"');
+    y = 488; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
+    text(mx + 18, y + 6, 'CUE / STUDIO', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    [['CUE 1', '#e6c02e', 30], ['CUE 2', '#e6c02e', 10], ['STUDIO', '#1d1d1f', -40]].forEach(([s2, c, a], i) => {
+      const kx = mx + 40 + i * 64; ticks(kx, y + 38, 14); K(kx, y + 38, 14, c, a, { dark: c === '#1d1d1f' });
+      text(kx, y + 72, s2, 14, L, 'middle', 800);
+    });
+    button(mx + 226, y + 20, 112, 30, 'white', true, 'CUE → CR', { size: 14 });
+    button(mx + 346, y + 20, 112, 30, 'yellow', true, 'SOLO CLR', { size: 14 });
+    y = 596; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
+    text(mx + 18, y + 6, 'TALKBACK', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    button(mx + 16, y + 18, 140, 54, 'red', false, 'TALK', { size: 20 });
+    ticks(mx + 196, y + 44, 14); K(mx + 196, y + 44, 14, '#ecebe4', -20);
+    text(mx + 196, y + 78, 'TB LVL', 14, L, 'middle', 800);
+    button(mx + 236, y + 24, 104, 30, 'white', false, 'SLATE', { size: 14 });
+    button(mx + 348, y + 24, 112, 30, 'white', false, 'TB → CUE', { size: 14 });
+    y = 700; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
+    text(mx + 18, y + 6, 'OSCILLATOR · BOUNCE', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    ['100', '1k', '10k'].forEach((s2, i) => button(mx + 16 + i * 62, y + 20, 56, 30, 'green', false, s2, { size: 14 }));
+    ticks(mx + 222, y + 36, 13); K(mx + 222, y + 36, 13, '#1d1d1f', -150, { dark: true });
+    text(mx + 222, y + 70, 'OSC', 14, L, 'middle', 800);
+    button(mx + 262, y + 20, 196, 34, 'amber', false, 'BOUNCE MIX → WAV', { size: 14 });
+    // oak top trim
+    rect(0, 0, PW, 6, 'url(#oakH)');
   });
-  const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
-  button(x + 14, CY + 534, STRIP - 28, 18, 'green', eqOn, 'EQ IN', { size: 9 });
-  // aux
-  rect(x + 4, CY + 562, STRIP - 8, 1, '#000', 'opacity="0.5"');
-  text(cm, CY + 576, 'AUX SENDS', 8, '#a9a493', 'middle', 800, 'letter-spacing="1"');
-  const auxCols = ['#c8302a', '#c8302a', '#e6c02e', '#e6c02e'];
-  for (let a = 0; a < 4; a++) {
-    const ax = a % 2 === 0 ? c1 : c2, ay = CY + 604 + Math.floor(a / 2) * 56;
-    const active = (a === 0 && ch < 24 && [1, 19, 20, 21, 15].includes(ch)) || (a === 1 && [19, 13, 14].includes(ch)) || (a >= 2 && ch < 24);
-    knob(ax, ay, 12, auxCols[a], active ? -40 + rnd() * 120 : -150, { label: `AUX ${a + 1}`, labelColor: L, labelSize: 7 });
-  }
-  // insert + pre
-  y = CY + 704;
-  button(x + 7, y, 34, 16, 'blue', [0, 1, 12, 19].includes(ch), 'INS', { size: 8 });
-  button(x + 45, y, 34, 16, 'white', ch >= 2 && ch < 24 && ch % 5 === 0, 'PRE', { size: 8 });
-  // pan
-  knob(cm, CY + 754, 16, '#1d1d1f', ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2), { label: 'PAN', labelColor: L, labelSize: 8, dark: true });
-  // mute / solo
-  y = CY + 800;
-  button(x + 6, y, 35, 26, 'red', muted.has(ch), 'MUTE', { size: 8 });
-  button(x + 44, y, 35, 26, 'yellow', soloed.has(ch), 'SOLO', { size: 8 });
-  // fader bay
-  rect(x, CY + 844, STRIP, 330, 'url(#faderBay)');
-  rect(x, CY + 844, STRIP, 2, '#000', 'opacity="0.6"');
-  rect(x, CY + 846, STRIP, 30, '#f3f1ea');
-  rect(x, CY + 846, 1, 30, '#bdb8ad');
-  text(cm, CY + 868, consoleNames[ch], consoleNames[ch].length > 7 ? 12 : 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-  fader(x + 52, CY + 900, CY + 1130, faderPos[ch], { capW: 30, capH: 48, index: ret ? '#e6c02e' : '#ffffff', capFill: 'url(#faderCapBlack)', scaleColor: '#1e1a1b' });
-  text(cm, CY + 1162, String(ch + 1), 13, '#1e1a1b', 'middle', 800);
-}
-// group dividers (every 8 channels)
-for (let g = 1; g < 4; g++) rect(SX0 + g * 8 * STRIP - 1, CY, 3, 1174, '#0a0a0b');
 
-// ---- master section ----
-const mx = MASTER_X;
-rect(mx, CY, MASTER_W, 1174, 'url(#consoleMaster)');
-rect(mx, CY, MASTER_W, 1174, '#000', 'filter="url(#brushed)" opacity="0.07"');
-rect(mx, CY, 3, 1174, '#000');
-text(mx + MASTER_W / 2, CY + 30, 'MASTER', 15, '#e9e3d0', 'middle', 800, 'letter-spacing="5"');
-vu(mx + 22, CY + 48, 196, 140, 0.4, { label: 'L', brand: 'MCI' });
-vu(mx + MASTER_W - 218, CY + 48, 196, 140, -0.6, { label: 'R', brand: 'MCI' });
-// aux masters + returns
-let my = CY + 236;
-text(mx + 20, my, 'AUX MASTERS', 9, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-text(mx + MASTER_W / 2 + 10, my, 'AUX RETURNS', 9, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-for (let a = 0; a < 4; a++) {
-  knob(mx + 40 + a * 50, my + 38, 14, a < 2 ? '#e8c34a' : '#e8e0cc', 20 + a * 10, { label: String(a + 1), labelSize: 8 });
-  knob(mx + MASTER_W / 2 + 30 + a * 50, my + 38, 14, '#8f8a7c', -10 + a * 15, { label: `R${a + 1}`, labelSize: 8 });
-}
-// monitor section
-my = CY + 330;
-rect(mx + 12, my - 14, MASTER_W - 24, 1, '#000', 'opacity="0.5"');
-text(mx + 20, my + 6, 'CONTROL ROOM', 10, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-const srcs = [['MIX', true], ['2-TRK', false], ['CUE 1', false], ['CUE 2', false]];
-srcs.forEach(([s, on], i) => button(mx + 20 + i * 64, my + 20, 56, 26, 'white', on, s, { size: 9 }));
-button(mx + 20, my + 58, 56, 26, 'amber', false, 'DIM', { size: 9 });
-button(mx + 84, my + 58, 56, 26, 'amber', false, 'MONO', { size: 9 });
-button(mx + 148, my + 58, 56, 26, 'red', false, 'CUT', { size: 9 });
-button(mx + 212, my + 58, 56, 26, 'white', false, 'ALT SPK', { size: 8 });
-bigKnob(mx + MASTER_W - 80, my + 70, 46, 40, { label: 'MONITOR LEVEL', capColor: '#242628' });
-// cue / studio
-my = CY + 470;
-text(mx + 20, my, 'CUE / STUDIO', 10, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-knob(mx + 46, my + 40, 15, '#e8c34a', 30, { label: 'CUE 1', labelSize: 8 });
-knob(mx + 106, my + 40, 15, '#e8c34a', 10, { label: 'CUE 2', labelSize: 8 });
-knob(mx + 166, my + 40, 15, '#8f8a7c', -40, { label: 'STUDIO', labelSize: 8 });
-button(mx + 210, my + 26, 66, 26, 'white', true, 'CUE→CR', { size: 8 });
-button(mx + 286, my + 26, 66, 26, 'white', false, 'CUE→ST', { size: 8 });
-button(mx + 362, my + 26, 66, 26, 'yellow', true, 'SOLO CLR', { size: 8 });
-// talkback
-my = CY + 580;
-rect(mx + 12, my - 14, MASTER_W - 24, 1, '#000', 'opacity="0.5"');
-text(mx + 20, my + 6, 'TALKBACK', 10, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-button(mx + 20, my + 20, 140, 56, 'red', false, 'TALK', { size: 16 });
-knob(mx + 200, my + 46, 15, '#c8c2b0', -20, { label: 'TB LEVEL', labelSize: 8 });
-button(mx + 240, my + 26, 70, 26, 'white', false, 'SLATE', { size: 9 });
-button(mx + 320, my + 26, 70, 26, 'white', false, 'TB→CUE', { size: 9 });
-// talkback mic grille
-for (let gx = 0; gx < 7; gx++) for (let gy2 = 0; gy2 < 3; gy2++) circle(mx + 410 + gx * 8 - 24, my + 66 + gy2 * 8, 2, '#0a0a0a');
-// oscillator
-my = CY + 690;
-text(mx + 20, my + 6, 'OSCILLATOR', 10, '#a9a493', 'start', 800, 'letter-spacing="1.5"');
-button(mx + 20, my + 18, 56, 22, 'green', false, '100', { size: 9 });
-button(mx + 82, my + 18, 56, 22, 'green', false, '1k', { size: 9 });
-button(mx + 144, my + 18, 56, 22, 'green', false, '10k', { size: 9 });
-knob(mx + 236, my + 30, 13, '#8f8a7c', -150, { label: 'OSC LVL', labelSize: 7 });
-button(mx + 290, my + 18, 140, 22, 'amber', false, 'BOUNCE MIX → WAV', { size: 9 });
-// master fader bay
-rect(mx, CY + 844, MASTER_W, 330, 'url(#faderBay)');
-rect(mx, CY + 844, MASTER_W, 2, '#000', 'opacity="0.6"');
-rect(mx, CY + 846, MASTER_W, 30, '#f3f1ea');
-text(mx + MASTER_W / 2, CY + 867, 'GROUPS 1–8  ·  STEREO MASTER', 12, '#3a3436', 'middle', 800, 'letter-spacing="2"');
-for (let g = 0; g < 8; g++) {
-  const gx = mx + 40 + g * 40;
-  fader(gx, CY + 900, CY + 1130, 0.22 + (g % 3) * 0.03, { capW: 24, capH: 40, scale: g === 0, capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4], index: '#111', scaleColor: '#1e1a1b' });
-  text(gx, CY + 1162, `G${g + 1}`, 11, '#1e1a1b', 'middle', 800);
-}
-const mfx = mx + MASTER_W - 64;
-fader(mfx, CY + 900, CY + 1130, 0.22, { capW: 52, capH: 56, scale: true, capFill: 'url(#faderCapRed)', index: '#ffffff', scaleColor: '#1e1a1b' });
-text(mfx, CY + 1162, 'STEREO', 11, '#1e1a1b', 'middle', 800, 'letter-spacing="1"');
+  // ---------------- fader panel texture ----------------
+  const MARKS = [['+10', 0], ['0', 0.22], ['10', 0.46], ['20', 0.62], ['40', 0.84], ['∞', 1]];
+  const lower = capture(() => {
+    rect(0, 0, PW, FD, 'url(#faderBay)');
+    rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
+    rect(0, 0, PW, 36, '#f3f1ea'); rect(0, 36, PW, 2, '#000', 'opacity="0.4"');
+    const top = 64, bot = 296;
+    for (let ch = 0; ch < NCH; ch++) {
+      const x0 = ch * STRIP, cm = x0 + STRIP / 2, fx = x0 + 54;
+      rect(x0, 0, 1, 36, '#bdb8ad');
+      text(cm, 26, consoleNames[ch], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      for (const [lab, fr] of MARKS) {
+        const yy = top + fr * (bot - top);
+        p(`<line x1="${fx - 22}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="#1e1a1b" stroke-opacity="${lab === '0' ? 1 : 0.6}" stroke-width="${lab === '0' ? 2 : 1.2}"/>`);
+        text(fx - 25, yy + 5, lab, 14, '#1e1a1b', 'end', 700);
+      }
+      rect(fx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"'); rect(fx - 1, top - 6, 2, bot - top + 12, '#2a2a2a');
+      const cy = top + faderPos[ch] * (bot - top);
+      p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
+      fdCaps.push(cap3d(fx, cy, 30, 50, 20, CAP_TOP.black, ch >= 24 ? '#e6c02e' : '#ffffff'));
+      text(cm, 326, String(ch + 1), 16, '#1e1a1b', 'middle', 800);
+      rect(x0, 36, 1, FD - 36, '#000', 'opacity="0.25"');
+    }
+    const mx = MXL, mw = MWD;
+    rect(mx, 0, 3, FD, '#000', 'opacity="0.4"');
+    text(mx + mw / 2, 26, 'GROUPS 1–8 · STEREO', 14, '#3a3436', 'middle', 800, 'letter-spacing="2"');
+    const gc = ['yellow', 'green', 'white', 'black'];
+    for (let g = 0; g < 8; g++) {
+      const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
+      if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
+      rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
+      fdCaps.push(cap3d(gx, cy, 24, 42, 18, CAP_TOP[gc[g % 4]], '#111'));
+      text(gx, 326, `G${g + 1}`, 14, '#1e1a1b', 'middle', 800);
+    }
+    const mfx = mx + mw - 54;
+    for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
+    rect(mfx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
+    fdCaps.push(cap3d(mfx, top + 0.22 * (bot - top), 54, 56, 22, CAP_TOP.red, '#ffffff'));
+    text(mfx, 326, 'STEREO', 14, '#1e1a1b', 'middle', 800, 'letter-spacing="1"');
+  });
 
-// armrest
-const ary = CY + 1174;
-rect(CX + 34, ary, CW - 68, 14, 'url(#oakH)');
-rect(CX + 34, ary, CW - 68, 14, '#000', 'filter="url(#woodgrainH)" opacity="0.5"');
-rect(CX + 34, ary + 14, CW - 68, 56, 'url(#armrest)');
-rect(CX + 34, ary + 14, CW - 68, 56, '#000', 'filter="url(#vinyl)" opacity="0.35"');
-rect(CX + 34, ary + 6, CW - 68, 2, '#fff', 'opacity="0.06"');
-for (let sxx = CX + 140; sxx < CX + CW - 80; sxx += 420) rect(sxx, ary + 4, 1, 64, '#000', 'opacity="0.4"');
+  // ---------------- assemble the 3D console ----------------
+  const woodBg = 'linear-gradient(90deg,#8a5a2c,#c48a4c 40%,#a06c34 70%,#6e4420)';
+  const cheek = (x, d, h) => `<div style="${B3(`left:${x - h}px;top:0;width:${h}px;height:${d}px;transform-origin:100% 50%;transform:rotateY(90deg);background:${woodBg}`)}"></div>`;
+  const cheekTop = (x, d, h) => `<div style="${B3(`left:${x}px;top:0;width:34px;height:${d}px;transform:translateZ(0.5px);background:linear-gradient(90deg,#8a5a2c,#d9a362 45%,#b9813f 70%,#7a4c22)`)}"></div>`;
+  const leather = 'linear-gradient(180deg,#a8694a 0%,#86492c 18%,#6a3a22 45%,#4e2a18 75%,#2a160c 100%)';
+  const armrest = `
+    <div style="${B3(`left:-34px;top:${FD - 16}px;width:${PW + 68}px;height:16px;transform:translateZ(8px);background:linear-gradient(180deg,#d9a362,#a8763e)`)}"></div>
+    <div style="${B3(`left:-34px;top:${FD}px;width:${PW + 68}px;height:78px;transform:translateZ(46px);background:${leather};border-radius:0 0 30px 30px`)}"></div>
+    <div style="${B3(`left:-34px;top:${FD + 78 - 46}px;width:${PW + 68}px;height:46px;transform-origin:50% 100%;transform:rotateX(-90deg);background:linear-gradient(180deg,#3a1f12,#140a05)`)}"></div>
+    <div style="${B3(`left:-34px;top:${FD - 46}px;width:${PW + 68}px;height:46px;transform-origin:50% 100%;transform:rotateX(-90deg);background:#1a0e07`)}"></div>`;
+  scenes3d.push(`<div style="position:absolute;left:${CX}px;top:${CY}px;width:${CW}px;height:${CH}px;perspective:6500px;perspective-origin:50% -45%;">
+    <div style="${B3(`left:34px;top:${YF - FD}px;width:${PW}px;height:${FD}px;transform-origin:50% 100%;transform:rotateX(54deg)`)}">
+      ${svgWrap(PW, FD, lower)}
+      ${fdCaps.join('')}
+      ${cheek(-34, FD, 30)}${cheek(PW + 34, FD, 30)}${cheekTop(-34, FD, 40)}${cheekTop(PW, FD, 40)}
+      ${armrest}
+      <div style="${B3(`left:0;top:${-UD}px;width:${PW}px;height:${UD}px;transform-origin:50% 100%;transform:rotateX(-34deg)`)}">
+        ${svgWrap(PW, UD, upper)}
+        ${upKnobs.join('')}
+        ${cheek(-34, UD, 30)}${cheek(PW + 34, UD, 30)}${cheekTop(-34, UD, 40)}${cheekTop(PW, UD, 40)}
+        <div style="${B3(`left:-34px;top:-30px;width:${PW + 68}px;height:30px;transform-origin:50% 100%;transform:translateZ(0) rotateX(-90deg);background:linear-gradient(180deg,#d9a362,#8a5a2c)`)}"></div>
+      </div>
+    </div>
+  </div>`);
+}
 
 // =====================================================================
-// OUTBOARD RACK
+// OUTBOARD RACK — CSS 3D cabinet, seen from the left; units with 3D knobs
 // =====================================================================
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
-rect(RX, RY, RW, RH, '#0b0a09');
-// cabinet sides
-for (const wx of [RX, RX + RW - 26]) {
-  rect(wx, RY, 26, RH, 'url(#wood)');
-  rect(wx, RY, 26, RH, '#000', 'filter="url(#woodgrain)" opacity="0.8"');
-}
-const rl = RX + 26, rr = RX + RW - 26;
-rect(rl, RY, 22, RH, 'url(#rail)');
-rect(rr - 22, RY, 22, RH, 'url(#rail)');
-for (let yy = RY + 10; yy < RY + RH; yy += 15.2) {
-  rect(rl + 8, yy, 7, 5, '#151515', 'rx="1"');
-  rect(rr - 15, yy, 7, 5, '#151515', 'rx="1"');
-}
-text(RX + RW / 2, RY + 30, 'OUTBOARD RACK', 14, '#e9e3d0', 'middle', 800, 'letter-spacing="4"');
-text(RX + RW / 2, RY + 50, 'drag a unit to a channel insert or aux send', 11, '#d9d3c7', 'middle', 600);
-const U = 50, UX = rl + 2, UW = rr - rl - 4;
-let uy = RY + 70;
-
-function rackUnit(units, fill, draw) {
-  const h = units * U - 4;
-  rect(UX + 3, uy + 6, UW, h, '#000', 'opacity="0.6" filter="url(#soft)"');
-  rect(UX, uy, UW, h, fill, 'rx="2"');
-  rect(UX, uy, UW, 2, '#fff', 'opacity="0.12"');
-  rect(UX, uy + h - 2, UW, 2, '#000', 'opacity="0.5"');
-  // rack ears + screws
-  for (const ex of [UX + 12, UX + UW - 12]) {
-    screw(ex, uy + 13, 5);
-    if (units > 1) screw(ex, uy + h - 13, 5);
+{
+  const U = 60, UX = 50, UW = RW - 100, DEPTH = 70;
+  const units = [];      // { y, h, html }
+  let uy = 70;
+  const rackKnobs = [];
+  const RK = (x, y, r, cap, ang, o = {}) => rackKnobs.push(knob3d(x, y, r, cap, ang, o));
+  const LW = '#e6e2d8';
+  function unit(n, fill, draw) {
+    const h = n * U - 4, y0 = uy, kStart = rackKnobs.length;
+    const face = capture(() => {
+      rect(0, 0, UW, h, fill, 'rx="2"');
+      rect(0, 0, UW, 2, '#fff', 'opacity="0.14"'); rect(0, h - 2, UW, 2, '#000', 'opacity="0.55"');
+      for (const ex of [14, UW - 14]) { screw(ex, 15, 5); if (n > 1) screw(ex, h - 15, 5); }
+      draw(UW, h);
+    });
+    const kn = rackKnobs.splice(kStart).join('');
+    units.push(`<div style="${B3(`left:${UX}px;top:${y0}px;width:${UW}px;height:${h}px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)`)}">${svgWrap(UW, h, face)}${kn}</div>`);
+    uy += n * U;
   }
-  draw(UX, uy, UW, h);
-  // insert routing tag
-  uy += units * U;
-}
-function routeTag(x, y, s, col = '#e8c34a') {
-  rect(x, y, s.length * 6.4 + 14, 16, '#000', 'rx="8" opacity="0.6"');
-  text(x + 7, y + 12, s, 9.5, col, 'start', 800, 'letter-spacing="0.5"');
-}
-
-// Lexicon 224 (3U)
-rackUnit(3, 'url(#rack224)', (x, y, w, h) => {
-  text(x + 30, y + 38, 'lexicon', 26, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
-  text(x + 30, y + 58, '224 DIGITAL REVERBERATOR', 10, '#d6cfbe', 'start', 800, 'letter-spacing="1.5"');
-  rect(x + 30, y + 70, 150, 50, '#000', 'rx="3"');
-  rect(x + 34, y + 74, 142, 42, 'url(#displayBg)', 'rx="2"');
-  seg7(x + 42, y + 81, 28, '4.1', '#ff3220');
-  seg7(x + 106, y + 81, 28, '2.4', '#ff3220');
-  text(x + 60, y + 134, 'PROG', 8, '#d6cfbe', 'middle', 800); text(x + 140, y + 134, 'RT60', 8, '#d6cfbe', 'middle', 800);
-  const sl = ['BASS RT', 'MID RT', 'X-OVER', 'HF CUT', 'DEPTH', 'PREDLY'];
-  sl.forEach((s, i) => {
-    const fx = x + 204 + i * 34;
-    rect(fx - 2, y + 26, 4, 84, '#0b0b0b', 'rx="2"');
-    const cy2 = y + 36 + (0.2 + rnd() * 0.6) * 64;
-    rect(fx - 10, cy2 - 7, 20, 14, 'url(#faderCapBlack)', 'rx="2"');
-    rect(fx - 8, cy2 - 1, 16, 2, '#e8e0cc');
-    text(fx, y + 126, s, 7, '#d6cfbe', 'middle', 800);
-  });
-  for (let b = 0; b < 4; b++) button(x + w - 74 + (b % 2) * 28, y + 30 + Math.floor(b / 2) * 26, 22, 18, 'red', b === 0, String(b + 1), { size: 8 });
-  text(x + w - 60, y + 100, 'BANK', 8, '#d6cfbe', 'middle', 800);
-  routeTag(x + w - 106, y + h - 24, 'AUX 1 → 25/26');
-});
-// UA 1176 x2 (2U)
-for (let k = 0; k < 2; k++) {
-  rackUnit(2, 'url(#rackBlack)', (x, y, w, h) => {
-    text(x + 32, y + 26, 'UNIVERSAL AUDIO', 8, '#cfcfcf', 'start', 800, 'letter-spacing="1"');
-    text(x + 32, y + 52, '1176LN', 22, '#f2f2f2', 'start', 800);
-    text(x + 32, y + 68, 'PEAK LIMITER', 8, '#cfcfcf', 'start', 800, 'letter-spacing="1.5"');
-    bigKnob(x + 160, y + 44, 22, k ? 10 : 40, { label: '', capColor: '#101010' });
-    text(x + 160, y + 88, 'INPUT', 7, '#cfcfcf', 'middle', 800);
-    bigKnob(x + 226, y + 44, 22, -10, { label: '', capColor: '#101010' });
-    text(x + 226, y + 88, 'OUTPUT', 7, '#cfcfcf', 'middle', 800);
-    knob(x + 272, y + 32, 9, '#cfd2d6', 60, { ticks: false, dark: true });
-    knob(x + 272, y + 64, 9, '#cfd2d6', -40, { ticks: false, dark: true });
-    text(x + 290, y + 35, 'ATK', 7, '#cfcfcf', 'start', 800);
-    text(x + 290, y + 67, 'REL', 7, '#cfcfcf', 'start', 800);
-    ['20', '12', '8', '4'].forEach((r, i) => {
-      rect(x + 318, y + 12 + i * 18, 22, 14, i === 3 - k ? '#f4f0e6' : '#9a978f', 'rx="1"');
-      text(x + 346, y + 23 + i * 18, r, 8, '#cfcfcf', 'start', 800);
+  // Lexicon 224 (3U)
+  unit(3, 'url(#rack224)', (w, h) => {
+    text(26, 42, 'lexicon', 30, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
+    text(26, 64, '224 DIGITAL REVERB', 14, '#d6cfbe', 'start', 800, 'letter-spacing="1"');
+    rect(26, 80, 150, 56, '#000', 'rx="3"'); rect(30, 84, 142, 48, 'url(#displayBg)', 'rx="2"');
+    seg7(38, 92, 30, '4.1', '#ff3220'); seg7(104, 92, 30, '2.4', '#ff3220');
+    text(60, 158, 'PROG', 14, '#d6cfbe', 'middle', 800); text(140, 158, 'RT60', 14, '#d6cfbe', 'middle', 800);
+    ['BASS', 'MID', 'XOVR', 'HF', 'DPTH'].forEach((s2, i) => {
+      const fx = 206 + i * 36;
+      rect(fx - 2.5, 24, 5, 104, '#0b0b0b', 'rx="2.5"');
+      const cy = 34 + (0.2 + rnd() * 0.6) * 84;
+      rect(fx - 11, cy - 8, 22, 16, 'url(#faderCapBlack)', 'rx="2"'); rect(fx - 9, cy - 1, 18, 2, '#e8e0cc');
+      text(fx, 156, s2, 14, '#d6cfbe', 'middle', 800);
     });
-    vu(x + 368, y + 14, 82, 60, k ? -6 : -3.5, {});
-    text(x + 409, y + 88, k ? 'INS · VOX' : 'INS · BASS', 7, '#e8c34a', 'middle', 800);
+    for (let b = 0; b < 4; b++) button(w - 86 + (b % 2) * 32, 30 + Math.floor(b / 2) * 30, 26, 22, 'red', b === 0, String(b + 1), { size: 14 });
+    text(w - 57, 110, 'BANK', 14, '#d6cfbe', 'middle', 800);
+    text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
   });
-}
-// Yamaha SPX90 x2 (1U)
-for (let k = 0; k < 2; k++) {
-  rackUnit(1, 'url(#rackSpx)', (x, y, w, h) => {
-    text(x + 30, y + 18, 'YAMAHA', 10, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
-    text(x + 30, y + 32, 'SPX90 DIGITAL MULTI-EFFECT', 6.5, '#d0d0d0', 'start', 700);
-    knob(x + 148, y + 23, 8, '#202124', -30, { ticks: false, dark: true });
-    text(x + 148, y + 44, 'IN', 6, '#d0d0d0', 'middle', 700);
-    rect(x + 170, y + 8, 40, 30, '#000', 'rx="2"');
-    seg7(x + 176, y + 12, 21, k ? '12' : '03', '#ff3220');
-    rect(x + 216, y + 10, 92, 26, 'url(#lcd)', 'rx="2"');
-    text(x + 222, y + 22, k ? 'PITCH CHANGE A' : 'REV 1 HALL', 8, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
-    text(x + 222, y + 32, k ? 'L -8  R +8' : 'RT=2.6s', 8, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
-    ['MEM', 'PARAM', '▲', '▼', 'STORE', 'RECALL'].forEach((b, i) => button(x + 316 + i * 21, y + 13, 18, 14, 'grey', false, '', {}));
-    text(x + 380, y + 40, 'MEMORY · PARAM', 6, '#d0d0d0', 'middle', 700);
-    knob(x + 454, y + 23, 8, '#202124', 10, { ticks: false, dark: true });
-  });
-}
-// Lexicon PCM41 x2 (1U)
-for (let k = 0; k < 2; k++) {
-  rackUnit(1, 'url(#rackBlack)', (x, y, w, h) => {
-    text(x + 30, y + 20, 'lexicon', 13, '#f0f0f0', 'start', 900);
-    text(x + 30, y + 34, 'PCM 41 DIGITAL DELAY', 6.5, '#cfcfcf', 'start', 700, 'letter-spacing="0.5"');
-    ledLadder(x + 132, y + 18, 6, 6, 8, k ? 3 : 4);
-    const labs = ['INPUT', 'RANGE', 'DELAY', 'DEPTH', 'SWEEP', 'FDBK', 'MIX', 'OUTPUT'];
-    labs.forEach((l, i) => {
-      const kx2 = x + 196 + i * 31;
-      knob(kx2, y + 19, 8, i === 2 ? '#c83a2c' : '#d8d8d8', -100 + rnd() * 200, { ticks: false, dark: i !== 2 });
-      text(kx2, y + 41, l, 5.8, '#cfcfcf', 'middle', 700);
-    });
-    button(x + w - 52, y + 14, 22, 14, 'red', false, '', {});
-  });
-}
-// Lexicon PCM42 x2 (1U)
-for (let k = 0; k < 2; k++) {
-  rackUnit(1, 'url(#rackBlack)', (x, y, w, h) => {
-    text(x + 30, y + 20, 'lexicon', 13, '#f0f0f0', 'start', 900);
-    text(x + 30, y + 34, 'PCM 42 DIGITAL DELAY', 6.5, '#cfcfcf', 'start', 700, 'letter-spacing="0.5"');
-    rect(x + 132, y + 8, 64, 30, '#000', 'rx="2"');
-    seg7(x + 137, y + 13, 20, k ? '375' : '250', '#ff3220', { gap: 0.25 });
-    text(x + 208, y + 22, 'ms', 7, '#cfcfcf', 'start', 700);
-    const labs = ['INPUT', 'MANUAL', 'VCO', 'FDBK', 'MIX', 'OUTPUT'];
-    labs.forEach((l, i) => {
-      const kx2 = x + 232 + i * 30;
-      knob(kx2, y + 19, 8, i === 1 ? '#c83a2c' : '#d8d8d8', -100 + rnd() * 200, { ticks: false, dark: i !== 1 });
-      text(kx2, y + 41, l, 5.8, '#cfcfcf', 'middle', 700);
-    });
-    ['×2', 'HOLD', 'BYP'].forEach((b, i) => button(x + w - 80 + i * 21, y + 14, 18, 14, i === 0 && k === 1 ? 'red' : 'grey', i === 0 && k === 1, '', {}));
-  });
-}
-// free plugin slots
-uy += 6;
-text(RX + RW / 2, uy + 4, 'PLUGIN SLOTS', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="3"');
-uy += 14;
-rackUnit(1, '#1a1b1e', (x, y, w, h) => {
-  rect(x + 28, y + 6, w - 56, h - 12, '#26292e', 'rx="3"');
-  text(x + 44, y + 22, 'VST3', 9, '#7fb0ff', 'start', 800);
-  text(x + 44, y + 36, 'Plate Reverb', 12, '#e8e4d8', 'start', 600);
-  ledLadder(x + 220, y + 18, 8, 6, 8, 5);
-  text(x + w - 40, y + 28, 'AUX 2 · open ▸', 9, '#e8c34a', 'end', 800);
-});
-for (let k = 0; k < 2; k++) {
-  rackUnit(1, '#121315', (x, y, w, h) => {
-    rect(x + 28, y + 6, w - 56, h - 12, 'none', 'rx="3" stroke="#4a4c50" stroke-width="1.5" stroke-dasharray="6 5"');
-    text(x + w / 2, y + 28, '+  drop a VST3 / AU plugin here', 11, '#7a776c', 'middle', 700);
-  });
-}
-// patchbay (2U)
-uy += 10;
-rackUnit(2, 'url(#rackBlack)', (x, y, w, h) => {
-  text(x + w / 2, y + 12, 'PATCHBAY · INSERTS', 7, '#cfcfcf', 'middle', 800, 'letter-spacing="2"');
-  for (let row = 0; row < 2; row++) {
-    for (let j = 0; j < 24; j++) {
-      const jx = x + 34 + j * 18.2, jy = y + 30 + row * 40;
-      circle(jx, jy, 5.2, '#5d6066'); circle(jx, jy, 3.2, '#050505');
-      if (row === 0) text(jx, jy - 9, String(j + 1), 5.5, '#bdbdbd', 'middle', 700);
+  // UA 1176LN x2 (2U)
+  for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
+    text(26, 30, 'UNIVERSAL AUDIO', 14, '#cfcfcf', 'start', 800);
+    text(26, 64, '1176LN', 28, '#f2f2f2', 'start', 800);
+    text(26, 88, k ? 'INS · VOX' : 'INS · BASS', 14, '#e8c34a', 'start', 800);
+    for (const [kx, lab, a] of [[184, 'IN', k ? 10 : 40], [246, 'OUT', -10]]) {
+      ticks(kx, 48, 24, '#cfcfcf');
+      RK(kx, 48, 24, 'radial-gradient(circle, #1a1a1a, #050505)', a, { dark: true, h: 16 });
+      text(kx, 104, lab, 14, '#cfcfcf', 'middle', 800);
     }
-    rect(x + 26, y + 40 + row * 40, w - 52, 8, '#e9dfc6', 'opacity="0.85"');
-    text(x + 30, y + 46 + row * 40, row ? 'INSERT RETURN' : 'INSERT SEND', 5.5, '#333', 'start', 800);
-  }
-});
-// patch cables
-const cable = (x1, y1, x2, y2, sag, col) => {
-  const d = `M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}`;
-  p(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="7" transform="translate(3 6)"/>`);
-  p(`<path d="${d}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round"/>`);
-  p(`<path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="1.5" transform="translate(-1 -1)"/>`);
-  for (const [cx, cy] of [[x1, y1], [x2, y2]]) { circle(cx, cy, 6.5, 'url(#chrome)'); circle(cx, cy, 3, '#222'); }
-};
-const pbY = uy - 2 * U;
-cable(UX + 34, pbY + 30, UX + 34 + 12 * 18.2, pbY + 70, 70, '#c0392b');
-cable(UX + 34 + 19 * 18.2, pbY + 30, UX + 34 + 1 * 18.2, pbY + 70, 90, '#2f6fb3');
-cable(UX + 34 + 6 * 18.2, pbY + 30, UX + 34 + 20 * 18.2, pbY + 70, 60, '#e8c34a');
-
-// plugin browser
-uy += 20;
-const bx0 = UX + 2, bw = UW - 4, by0 = uy, bh = RY + RH - 24 - uy;
-rect(bx0, by0, bw, bh, '#141517', 'rx="6"');
-rect(bx0, by0, bw, bh, 'none', 'rx="6" stroke="#2c2e32" stroke-width="1.5"');
-text(bx0 + 20, by0 + 34, 'PLUGINS', 14, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-button(bx0 + bw - 110, by0 + 16, 90, 28, 'amber', false, 'SCAN', { size: 11 });
-rect(bx0 + 20, by0 + 56, bw - 40, 34, '#0b0b0c', 'rx="4"');
-text(bx0 + 34, by0 + 78, 'Search plugins…', 13, '#6f6c62', 'start', 500);
-text(bx0 + 20, by0 + 118, 'BUILT-IN VINTAGE', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-const builtins = ['224 Digital Reverb', '1176LN Peak Limiter', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'];
-builtins.forEach((b, i) => {
-  const ry = by0 + 130 + i * 40;
-  rect(bx0 + 20, ry, bw - 40, 34, i % 2 ? '#17181b' : '#1c1d20', 'rx="3"');
-  rect(bx0 + 30, ry + 9, 26, 16, '#3a3226', 'rx="2"');
-  text(bx0 + 43, ry + 21, 'IN', 8, '#e8c34a', 'middle', 800);
-  text(bx0 + 68, ry + 22, b, 13, '#e8e4d8', 'start', 600);
-  text(bx0 + bw - 34, ry + 22, i === 0 ? '1 in rack' : '2 in rack', 10, '#d9d3c7', 'end', 600);
-});
-const tp = by0 + 350;
-text(bx0 + 20, tp, 'THIRD-PARTY · 14 FOUND', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-const third = [['Plate Reverb', 'VST3'], ['Tape Echo', 'AU'], ['Bus Compressor', 'VST3'], ['Vintage EQ', 'AU'], ['Spring Reverb', 'VST3'], ['De-Esser', 'VST3'], ['Chorus Ensemble', 'AU'], ['Room Reverb', 'VST3'], ['Opto Leveler', 'AU'], ['Saturator', 'VST3'], ['Gate', 'AU'], ['Flanger', 'VST3']];
-third.forEach(([n, f], i) => {
-  const ry = tp + 12 + i * 40;
-  if (ry + 34 > by0 + bh - 70) return;
-  rect(bx0 + 20, ry, bw - 40, 34, i % 2 ? '#17181b' : '#1c1d20', 'rx="3"');
-  rect(bx0 + 30, ry + 9, 34, 16, f === 'VST3' ? '#1c2a44' : '#2a1c3a', 'rx="2"');
-  text(bx0 + 47, ry + 21, f, 8, f === 'VST3' ? '#7fb0ff' : '#c49bff', 'middle', 800);
-  text(bx0 + 76, ry + 22, n, 13, '#e8e4d8', 'start', 600);
-  text(bx0 + bw - 34, ry + 22, '⠿ drag', 10, '#6f6c62', 'end', 600);
-});
-text(bx0 + bw / 2, by0 + bh - 26, 'Scan · list · drag into a rack slot', 11, '#6f6c62', 'middle', 600);
+    RK(298, 34, 10, '#cfd2d6', 60, { h: 9 }); text(314, 39, 'ATK', 14, '#cfcfcf', 'start', 800);
+    RK(298, 76, 10, '#cfd2d6', -40, { h: 9 }); text(314, 81, 'REL', 14, '#cfcfcf', 'start', 800);
+    vu(w - 98, 10, 76, 52, k ? -6 : -3.5, { fontScale: 0.14 });
+    ['20', '12', '8', '4'].forEach((r, i) => button(w - 100 + i * 20, 70, 18, 20, 'white', i === 3 - k, r, { size: 12 }));
+  });
+  // Yamaha SPX90 x2 (1U)
+  for (let k = 0; k < 2; k++) unit(1, 'url(#rackSpx)', (w, h) => {
+    text(26, 26, 'YAMAHA', 16, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
+    text(26, 46, 'SPX90', 14, '#d0d0d0', 'start', 800);
+    RK(130, 22, 10, '#202124', -30, { dark: true }); text(130, 52, 'IN', 14, '#d0d0d0', 'middle', 800);
+    rect(156, 8, 46, 40, '#000', 'rx="2"'); seg7(162, 14, 26, k ? '12' : '03', '#ff3220');
+    rect(210, 8, 168, 40, 'url(#lcd)', 'rx="2"');
+    text(218, 25, k ? 'PITCH CHANGE A' : 'REV 1 HALL', 14, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
+    text(218, 42, k ? 'L -8  R +8' : 'RT = 2.6 s', 14, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
+    RK(w - 48, 22, 10, '#202124', 10, { dark: true }); text(w - 48, 52, 'OUT', 14, '#d0d0d0', 'middle', 800);
+  });
+  // Lexicon PCM41 x2 (1U)
+  for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
+    text(26, 26, 'lexicon', 18, '#f0f0f0', 'start', 900);
+    text(26, 46, 'PCM 41', 14, '#cfcfcf', 'start', 800);
+    ['IN', 'RNG', 'DLY', 'DEP', 'SWP', 'FB', 'MIX', 'OUT'].forEach((l, i) => {
+      const kx = 128 + i * 38;
+      RK(kx, 20, 9, i === 2 ? '#c83a2c' : '#d8d8d8', -100 + rnd() * 200, { dark: i !== 2, h: 8 });
+      text(kx, 52, l, 14, '#cfcfcf', 'middle', 800);
+    });
+  });
+  // Lexicon PCM42 x2 (1U)
+  for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
+    text(26, 26, 'lexicon', 18, '#f0f0f0', 'start', 900);
+    text(26, 46, 'PCM 42', 14, '#cfcfcf', 'start', 800);
+    rect(112, 8, 72, 40, '#000', 'rx="2"'); seg7(118, 14, 26, k ? '375' : '250', '#ff3220', { gap: 0.22 });
+    text(190, 34, 'ms', 14, '#cfcfcf', 'start', 700);
+    ['IN', 'MAN', 'VCO', 'FB', 'MIX', 'OUT'].forEach((l, i) => {
+      const kx = 232 + i * 35;
+      RK(kx, 20, 9, i === 1 ? '#c83a2c' : '#d8d8d8', -100 + rnd() * 200, { dark: i !== 1, h: 8 });
+      text(kx, 52, l, 14, '#cfcfcf', 'middle', 800);
+    });
+  });
+  const slotsY = uy + 8; uy += 34;
+  unit(1, '#1a1b1e', (w, h) => {
+    rect(30, 6, w - 60, h - 12, '#26292e', 'rx="3"');
+    text(44, 35, 'VST3', 14, '#7fb0ff', 'start', 800);
+    text(96, 35, 'Plate Reverb', 16, '#e8e4d8', 'start', 600);
+    text(w - 44, 35, 'AUX 2 ▸', 14, '#e8c34a', 'end', 800);
+  });
+  for (let k = 0; k < 2; k++) unit(1, '#121315', (w, h) => {
+    rect(30, 6, w - 60, h - 12, 'none', 'rx="3" stroke="#5a5c60" stroke-width="1.5" stroke-dasharray="6 5"');
+    text(w / 2, 35, '+ drop a VST3 / AU plugin', 14, '#8a877c', 'middle', 700);
+  });
+  uy += 10;
+  const pbY = uy;
+  unit(2, 'url(#rackBlack)', (w, h) => {
+    text(w / 2, 22, 'PATCHBAY · INSERTS', 14, '#cfcfcf', 'middle', 800, 'letter-spacing="2"');
+    for (let row = 0; row < 2; row++) {
+      for (let j = 0; j < 24; j++) {
+        const jx = 34 + j * 16.5, jy = 46 + row * 40;
+        circle(jx, jy, 5.6, '#5d6066'); circle(jx, jy, 3.4, '#050505');
+      }
+      text(18, 50 + row * 40, row ? 'R' : 'S', 14, '#e8c34a', 'middle', 800);
+    }
+  });
+  // patch cables in front of the patchbay
+  const cab = (x1, y1, x2, y2, sag, col) => `<path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"/><path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="${x1}" cy="${y1}" r="7" fill="#c9ccd0"/><circle cx="${x2}" cy="${y2}" r="7" fill="#c9ccd0"/>`;
+  const jx = (j) => UX + 34 + j * 16.5;
+  const cables = `<svg width="${RW}" height="${RH}" style="position:absolute;left:0;top:0;overflow:visible">${cab(jx(12), pbY + 46, jx(0), pbY + 86, 80, '#c0392b')}${cab(jx(19), pbY + 46, jx(1), pbY + 86, 100, '#2f6fb3')}${cab(jx(6), pbY + 46, jx(20), pbY + 86, 70, '#e8c34a')}</svg>`;
+  // plugin browser drawer
+  uy += 24;
+  const by0 = uy, bh = RH - 30 - uy, bw = UW;
+  const browser = capture(() => {
+    rect(0, 0, bw, bh, '#141517', 'rx="6"'); rect(0, 0, bw, bh, 'none', 'rx="6" stroke="#2c2e32" stroke-width="1.5"');
+    text(20, 38, 'PLUGINS', 18, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
+    button(bw - 112, 16, 92, 32, 'amber', false, 'SCAN', { size: 14 });
+    rect(20, 62, bw - 40, 38, '#0b0b0c', 'rx="4"'); text(34, 87, 'Search plugins…', 15, '#77746a', 'start', 500);
+    text(20, 132, 'BUILT-IN VINTAGE', 14, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
+    ['224 Digital Reverb', '1176LN Peak Limiter', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'].forEach((b, i) => {
+      const ry = 146 + i * 44;
+      rect(20, ry, bw - 40, 38, i % 2 ? '#17181b' : '#1c1d20', 'rx="3"');
+      text(34, ry + 25, b, 15, '#e8e4d8', 'start', 600);
+      text(bw - 34, ry + 25, i === 0 ? '1 in rack' : '2 in rack', 14, '#a9a594', 'end', 600);
+    });
+    const tp = 390;
+    text(20, tp, 'THIRD-PARTY · 14 FOUND', 14, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
+    [['Plate Reverb', 'VST3'], ['Tape Echo', 'AU'], ['Bus Compressor', 'VST3'], ['Vintage EQ', 'AU'], ['Spring Reverb', 'VST3'], ['De-Esser', 'VST3'], ['Chorus Ensemble', 'AU'], ['Room Reverb', 'VST3'], ['Opto Leveler', 'AU'], ['Saturator', 'VST3']].forEach(([n, f], i) => {
+      const ry = tp + 14 + i * 44;
+      if (ry + 38 > bh - 60) return;
+      rect(20, ry, bw - 40, 38, i % 2 ? '#17181b' : '#1c1d20', 'rx="3"');
+      rect(30, ry + 9, 46, 20, f === 'VST3' ? '#1c2a44' : '#2a1c3a', 'rx="2"');
+      text(53, ry + 24, f, 14, f === 'VST3' ? '#7fb0ff' : '#c49bff', 'middle', 800);
+      text(88, ry + 25, n, 15, '#e8e4d8', 'start', 600);
+      text(bw - 34, ry + 25, '⠿ drag', 14, '#77746a', 'end', 600);
+    });
+    text(bw / 2, bh - 24, 'Scan · list · drag into a rack slot', 14, '#77746a', 'middle', 600);
+  });
+  const header = `<div style="position:absolute;left:0;top:14px;width:${RW}px;text-align:center;font:800 18px ${SANS};letter-spacing:4px;color:#e9e3d0">OUTBOARD RACK</div><div style="position:absolute;left:0;top:40px;width:${RW}px;text-align:center;font:600 14px ${SANS};color:#bdb8aa">drag a unit to an insert or aux send</div>`;
+  // cabinet: back panel, side walls (wood), rails with holes
+  const rails = capture(() => {
+    for (const rx of [26, RW - 48]) {
+      rect(rx, 0, 22, RH, 'url(#rail)');
+      for (let yy = 10; yy < RH; yy += 15.2) rect(rx + 8, yy, 7, 5, '#151515', 'rx="1"');
+    }
+  });
+  const woodV = 'linear-gradient(90deg,#6e4420,#b37a3e 40%,#8a5a2c 70%,#4a2c14)';
+  scenes3d.push(`<div style="position:absolute;left:${RX}px;top:${RY}px;width:${RW}px;height:${RH}px;perspective:2200px;perspective-origin:-60% 40%;">
+    <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px`)}">
+      <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-${DEPTH}px);background:#0b0a09`)}"></div>
+      <div style="${B3(`left:26px;top:0;width:${DEPTH}px;height:${RH}px;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#3a2414,#1a0f08)`)}"></div>
+      <div style="${B3(`left:${RW - 26}px;top:0;width:${DEPTH}px;height:${RH}px;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#2a190c,#120a05)`)}"></div>
+      <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-4px)`)}">${svgWrap(RW, RH, rails)}</div>
+      <div style="${B3(`left:0;top:0;width:26px;height:${RH}px;transform:translateZ(8px);background:${woodV}`)}"></div>
+      <div style="${B3(`left:${RW - 26}px;top:0;width:26px;height:${RH}px;transform:translateZ(8px);background:${woodV}`)}"></div>
+      <div style="${B3(`left:0;top:0;width:8px;height:${RH}px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14`)}"></div>
+      ${header}
+      ${units.join('\n')}
+      <div style="${B3(`left:0;top:${slotsY}px;width:${RW}px;transform:translateZ(2px);text-align:center;font:800 14px ${SANS};letter-spacing:3px;color:#d9d3c7`)}">PLUGIN SLOTS</div>
+      <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(12px)`)}">${cables}</div>
+      <div style="${B3(`left:${UX}px;top:${by0}px;width:${bw}px;height:${bh}px;transform:translateZ(2px)`)}">${svgWrap(bw, bh, browser)}</div>
+    </div>
+  </div>`);
+}
 
 // rack edge shadow over console + room lighting
 rect(RX - 30, RY, 30, RH, 'url(#sheen)', 'opacity="0"');
