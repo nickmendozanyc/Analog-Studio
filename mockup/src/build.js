@@ -756,12 +756,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     text(mx + mw / 2, 34, 'MASTER', 18, '#f0ece4', 'middle', 800, 'letter-spacing="5"');
     p(`<g transform="translate(${mx + 52} 0) scale(0.78) translate(${-mx} -150)">`);
     let y = 226;
-    text(mx + 18, y, 'AUX MASTERS', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
+    text(mx + 18, y, 'SEND MASTERS', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
     text(mx + mw - 18, y, 'RETURNS', 14, '#c9c2b2', 'end', 800, 'letter-spacing="1"');
     for (let a = 0; a < 4; a++) {
       const kx = mx + 36 + a * 50, rx = mx + mw - 186 + a * 50;
-      ticks(kx, y + 34, 14); K(kx, y + 34, 14, a < 2 ? '#c8302a' : '#e6c02e', 20 + a * 10);
-      text(kx, y + 66, String(a + 1), 14, L, 'middle', 800);
+      if (a < 2) { const sx = mx + 46 + a * 64; ticks(sx, y + 34, 14); K(sx, y + 34, 14, '#ecd03a', 20 + a * 10); text(sx, y + 66, `SEND ${a + 1}`, 14, L, 'middle', 800); }
       ticks(rx, y + 34, 14); K(rx, y + 34, 14, '#1d1d1f', -10 + a * 15, { dark: true });
       text(rx, y + 66, `R${a + 1}`, 14, L, 'middle', 800);
     }
@@ -774,7 +773,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     text(mx + mw - 64, y + 142, 'MONITOR', 14, L, 'middle', 800, 'letter-spacing="1"');
     y = 488; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
     text(mx + 18, y + 6, 'CUE / STUDIO', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
-    [['CUE 1', '#e6c02e', 30], ['CUE 2', '#e6c02e', 10], ['STUDIO', '#1d1d1f', -40]].forEach(([s2, c, a], i) => {
+    [['CUE 1', '#3f8fd9', 30], ['CUE 2', '#e3452f', 10], ['STUDIO', '#1d1d1f', -40]].forEach(([s2, c, a], i) => {
       const kx = mx + 40 + i * 64; ticks(kx, y + 38, 14); K(kx, y + 38, 14, c, a, { dark: c === '#1d1d1f' });
       text(kx, y + 72, s2, 14, L, 'middle', 800);
     });

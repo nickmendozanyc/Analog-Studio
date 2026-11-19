@@ -126,12 +126,13 @@
   const DEFAULT = [
     ['isend:20', 'fxin:1176 A'], ['fxout:1176 A', 'iret:20'], ['isend:13', 'fxin:1176 B'], ['fxout:1176 B', 'iret:13'],
     ['aux:SEND 1', 'fxin:224 L'], ['fxout:224 L', 'lin:LINE 25'], ['fxout:224 R', 'lin:LINE 26'],
-    ['aux:SEND 3', 'fxin:SPX A L'], ['fxout:SPX A L', 'lin:LINE 27'], ['fxout:SPX A R', 'lin:LINE 28'],
-    ['aux:SEND 4', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'lin:LINE 29'], ['aux:SEND 2', 'fxin:SLOT1 L'],
+    ['aux:SEND 2', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'lin:LINE 29'],
+    ['aux:MIX L', 'ifout:1'], ['aux:MIX R', 'ifout:2'],
+    ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
   ];
   let patches = DEFAULT.map(([a, b], k) => ({ a, b, c: COLS[k % COLS.length] }));
-  try { const s = JSON.parse(localStorage.getItem('as-patches') || 'null'); if (Array.isArray(s)) patches = s; } catch (e) { /* storage unavailable */ }
-  const save = () => { try { localStorage.setItem('as-patches', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
+  try { const s = JSON.parse(localStorage.getItem('as-patches-v2') || 'null'); if (Array.isArray(s)) patches = s; } catch (e) { /* storage unavailable */ }
+  const save = () => { try { localStorage.setItem('as-patches-v2', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
 
   const PB = { x0: 430, pitch: 104, top: 70, rowH: 128, pairGap: 22 };
   const jackPos = {};
