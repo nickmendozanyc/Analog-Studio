@@ -675,9 +675,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     // ---- master section ----
     const mx = MXL, mw = MWD;
     rect(mx, 0, mw, UD, 'url(#jh600)'); rect(mx, 0, mw, UD, '#000', 'filter="url(#brushed)" opacity="0.06"'); rect(mx, 0, 3, UD, '#000');
-    rect(mx + 14, 640, mw - 28, 310, '#3e3934', 'rx="3"'); for (let ry = 650; ry < 944; ry += 9) { rect(mx + 22, ry, mw - 44, 4, '#2a2622', 'rx="2"'); rect(mx + 22, ry + 4, mw - 44, 1, '#fff', 'opacity="0.08"'); }
+    rect(mx + 14, 472, mw - 28, 484, '#3e3934', 'rx="3"'); for (let ry = 482; ry < 950; ry += 9) { rect(mx + 22, ry, mw - 44, 4, '#2a2622', 'rx="2"'); rect(mx + 22, ry + 4, mw - 44, 1, '#fff', 'opacity="0.08"'); }
     text(mx + mw / 2, 34, 'MASTER', 18, '#f0ece4', 'middle', 800, 'letter-spacing="5"');
-    p('<g transform="translate(0 -150)">');
+    p(`<g transform="translate(${mx + 52} 0) scale(0.78) translate(${-mx} -150)">`);
     let y = 226;
     text(mx + 18, y, 'AUX MASTERS', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
     text(mx + mw - 18, y, 'RETURNS', 14, '#c9c2b2', 'end', 800, 'letter-spacing="1"');
@@ -717,6 +717,74 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     text(mx + 222, y + 70, 'OSC', 14, L, 'middle', 800);
     button(mx + 262, y + 20, 196, 34, 'amber', false, 'BOUNCE MIX → WAV', { size: 14 });
     p('</g>');
+    // ---- Lexicon 224X remote resting on the master section (layout traced from the user's photos) ----
+    {
+      const RWd = 296, RHt = 462, rx = mx + (mw - RWd) / 2, ry = 486, sc = RWd / 640;
+      p(`<rect x="${rx + 10}" y="${ry + 16}" width="${RWd}" height="${RHt}" rx="8" fill="#000" opacity="0.6" filter="url(#soft)"/>`);
+      // grey DB25 cable out of the remote's right side, toward the 224X mainframe in the rack
+      { const sx = rx + RWd - 6, sy = ry + 60, d = `M${sx} ${sy} C${sx + 40} ${sy - 4} ${mx + mw - 30} ${sy - 30} ${mx + mw + 40} ${sy - 46}`;
+        p(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="12" transform="translate(3 6)"/><path d="${d}" fill="none" stroke="#9fa3a8" stroke-width="10"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="2.5" transform="translate(-1 -2)"/>`);
+        rect(sx - 6, sy - 20, 16, 40, '#c9ccd0', 'rx="3"'); }
+      p(`<g transform="translate(${rx} ${ry}) scale(${sc}) translate(-430 -62)">`);
+      const T = (x, y, str, size, anchor = 'middle', w = 700, extra = '') => text(x, y, str, size, '#f2f4f8', anchor, w, extra);
+      p(`<defs><linearGradient id="l224blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cc4"/><stop offset="0.6" stop-color="#2f6db3"/><stop offset="1" stop-color="#245a98"/></linearGradient></defs>`);
+      rect(455, 84, 590, 962, 'url(#l224blue)');
+      rect(455, 84, 590, 962, '#000', 'filter="url(#brushed)" opacity="0.05"');
+      for (const x of [430, 1045]) { rect(x, 62, 25, 1000, '#111214', 'rx="4"'); rect(x + 4, 62, 4, 1000, '#fff', 'opacity="0.12"'); }
+      // logo + model
+      rect(500, 110, 134, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
+      T(567, 150, 'lexicon', 40, 'middle', 900, 'letter-spacing="-1"');
+      T(736, 150, '224X', 34, 'middle', 800); T(1002, 150, 'Digital Reverb', 30, 'end', 700, 'font-style="italic"');
+      // display window: headroom bars + red 3-digit readout
+      rect(515, 180, 475, 92, '#120404'); rect(515, 180, 260, 92, '#2a0705');
+      T(533, 212, 'L', 16); T(533, 247, 'R', 16);
+      [['24', 563], ['18', 598], ['12', 633], ['6', 668], ['0dB', 713]].forEach(([l, x]) => T(x, 233, l, 17, 'middle', 700));
+      for (let k = 0; k < 6; k++) for (const yy of [200, 242]) rect(552 + k * 35, yy, 22, 6, '#ff3a24', `opacity="${k < (yy === 200 ? 4 : 3) ? 0.9 : 0.12}" ${k < 3 ? 'filter="url(#glowSm)"' : ''}`);
+      T(748, 262, 'ovfl', 16);
+      rect(778, 186, 138, 80, '#1a0503');
+      seg7(790, 198, 56, '2.6', '#ff3a24');
+      [['sec', 203, true], ['ms', 221, false], ['Hz', 239, false], ['kHz', 257, false]].forEach(([u, yy, on]) => { T(932, yy, u, 15, 'middle', 700); circle(966, yy - 5, 3.5, on ? '#ff3a24' : '#4a1612', on ? 'filter="url(#glowSm)"' : ''); });
+      T(638, 291, 'HEADROOM-dB', 13, 'middle', 800); T(753, 307, 'PROGRAM', 17, 'middle', 800);
+      const cols = [550, 608, 666, 723, 780, 838, 897, 953];
+      cols.forEach((x, i) => T(x, 330, String(i + 1), 17, 'middle', 700));
+      // two rows of eight keys with red LEDs
+      for (const [y0, litIdx] of [[342, 0], [458, 6]]) {
+        rect(517, y0, 468, 90, '#141518');
+        cols.forEach((x, i) => {
+          rect(x - 25, y0 + 6, 50, 76, '#22252a'); rect(x - 25, y0 + 6, 50, 2, '#fff', 'opacity="0.12"');
+          circle(x, y0 + 22, 7, i === litIdx ? '#ff3a24' : '#5a1410', i === litIdx ? 'filter="url(#glow)"' : '');
+          rect(x - 20, y0 + 40, 40, 36, '#2d3036'); rect(x - 20, y0 + 40, 40, 36, 'url(#btnOff)');
+        });
+      }
+      p(`<path d="M1008 372 Q1022 372 1022 390 L1022 418 M1008 512 Q1022 512 1022 494 L1022 466" fill="none" stroke="#f2f4f8" stroke-width="2.5"/>`);
+      T(1016, 438, "ext'd", 13, 'middle', 700); T(1016, 452, 'reg.', 13, 'middle', 700);
+      [['PAGE', 553], ['SET', 610], ['CALL', 666], ['SHIFT', 724], ['A', 780], ['B', 838], ['C', 895], ['D', 952]].forEach(([l, x]) => T(x, 568, l, 17, 'middle', 700));
+      T(553, 590, 'immed.', 13, 'middle', 700); T(718, 590, 'extended', 13, 'middle', 700);
+      p(`<path d="M610 578 Q610 586 618 586 L660 586 Q668 586 668 578 M690 586 L686 586" fill="none" stroke="#f2f4f8" stroke-width="2"/><path d="M780 586 L816 586 M916 586 L952 586" stroke="#f2f4f8" stroke-width="2"/>`);
+      T(866, 591, 'REGISTER', 17, 'middle', 700);
+      // six long sliders with white tick lines between the slots
+      const sl = [553, 632, 712, 791, 870, 950], pos = [0.92, 0.9, 0.55, 0.88, 0.7, 0.86];
+      sl.forEach((x, i) => {
+        rect(x - 4, 617, 8, 226, '#050505', 'rx="3"');
+        if (i < 5) for (const ty of [637, 688, 740, 791]) rect(x + 16, ty, sl[i + 1] - x - 32, 3, '#f2f4f8', 'opacity="0.92"');
+        const cy = 640 + pos[i] * 200;
+        rect(x - 33, cy - 18, 70, 46, '#000', 'opacity="0.5" filter="url(#soft)"');
+        rect(x - 35, cy - 22, 70, 44, '#0c0c0e', 'rx="3"'); rect(x - 35, cy - 22, 70, 3, '#3a3b3f'); rect(x - 35, cy - 22, 70, 44, 'url(#btnOff)', 'rx="3" opacity="0.6"');
+      });
+      T(589, 882, 'REVERB-TIME', 15, 'middle', 800); T(555, 899, 'BASS', 15, 'middle', 800); T(634, 899, 'MID', 15, 'middle', 800);
+      T(712, 882, 'CROSS-', 15, 'middle', 800); T(712, 899, 'OVER', 15, 'middle', 800);
+      T(791, 882, 'TREBLE', 15, 'middle', 800); T(791, 899, 'DECAY', 15, 'middle', 800);
+      T(871, 893, 'DEPTH', 15, 'middle', 800);
+      T(949, 882, 'PRE-', 15, 'middle', 800); T(949, 899, 'DELAY', 15, 'middle', 800);
+      // bottom row: six keys with LEDs
+      rect(513, 905, 479, 82, '#0e0f11');
+      sl.forEach((x, i) => {
+        rect(x - 36, 910, 74, 72, '#191b1f'); rect(x - 36, 910, 74, 2, '#fff', 'opacity="0.1"');
+        circle(x, 926, 6.5, i === 0 ? '#ff3a24' : '#5a1410', i === 0 ? 'filter="url(#glow)"' : '');
+        T([527, 606, 686, 766, 845, 922][i], 1012, String(i + 1), 17, 'middle', 700);
+      });
+      p('</g>');
+    }
     // oak top trim
     rect(0, 0, PW, 6, 'url(#oakH)');
   });
