@@ -347,26 +347,28 @@ rect(3660, 8, 160, 40, '#2a2b2e', 'rx="4"');
 text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 
 // =====================================================================
-// TAPE MACHINE (MCI JH-24 style)
+// TAPE MACHINE (MCI JH-24, top deck as seen from the operator position)
 // =====================================================================
 const TX = 24, TY = 76, TW = 1360, TH = 816;
+const DECK_B = TY + 628;          // bottom edge of the flat top deck
 p(`<g filter="url(#shadow)">`);
 rect(TX, TY, TW, TH, '#3d3936', 'rx="10"');
-rect(TX, TY + TH - 18, TW, 18, 'url(#laminate)', 'rx="4"');
-rect(TX, TY + TH - 18, TW, 18, '#000', 'filter="url(#woodgrainH)" opacity="0.7" rx="4"');
 p(`</g>`);
-rect(TX + 8, TY + 8, TW - 16, 650, 'url(#deck)', 'rx="6"');
-rect(TX + 8, TY + 8, TW - 16, 650, '#000', 'filter="url(#brushed)" opacity="0.10" rx="6"');
-rect(TX + 8, TY + 8, TW - 16, 650, 'url(#sheen)', 'rx="6"');
-rect(TX + 8, TY + 666, TW - 16, TH - 692, 'url(#deckLower)', 'rx="6"');
-// trim
-rect(TX + 8, TY + 658, TW - 16, 8, 'url(#chrome)', 'opacity="0.7"');
-for (const [sx2, sy2] of [[TX + 24, TY + 24], [TX + TW - 24, TY + 24], [TX + 24, TY + 640], [TX + TW - 24, TY + 640]]) screw(sx2, sy2, 6);
+// flat top deck
+rect(TX + 8, TY + 8, TW - 16, DECK_B - TY - 8, 'url(#deck)', 'rx="6"');
+rect(TX + 8, TY + 8, TW - 16, DECK_B - TY - 8, '#000', 'filter="url(#brushed)" opacity="0.08" rx="6"');
+rect(TX + 8, TY + 8, TW - 16, DECK_B - TY - 8, 'url(#sheen)', 'rx="6"');
+rect(TX + 8, TY + 8, TW - 16, 2, '#fff', 'opacity="0.18"');
+// removable head-area plate (seam lines)
+const headX = TX + TW / 2, TL = TY + 546;   // TL = tape line (centre of guides/capstan)
+rect(headX - 330, TY + 404, 660, DECK_B - TY - 420, 'none', 'rx="8" stroke="#3f3b37" stroke-width="2"');
+rect(headX - 329, TY + 405, 658, DECK_B - TY - 422, 'none', 'rx="8" stroke="#fff" stroke-opacity="0.08" stroke-width="1"');
+for (const [sx2, sy2] of [[TX + 24, TY + 24], [TX + TW - 24, TY + 24], [TX + 24, DECK_B - 18], [TX + TW - 24, DECK_B - 18], [headX - 316, TY + 418], [headX + 316, TY + 418], [headX - 316, DECK_B - 28], [headX + 316, DECK_B - 28]]) screw(sx2, sy2, 5);
 
-// reels
+// reels (sit straight on the turntables)
 const R = 240;
-const supply = { cx: TX + 300, cy: TY + 300, pack: 200, rot: 18, style: 'a499' };
-const takeup = { cx: TX + TW - 300, cy: TY + 300, pack: 138, rot: -27, style: 'gp9' };
+const supply = { cx: TX + 290, cy: TY + 268, pack: 200, rot: 18, style: 'a499' };
+const takeup = { cx: TX + TW - 290, cy: TY + 268, pack: 138, rot: -27, style: 'gp9' };
 // Reel styles from the user's reference photos: Quantegy GP9 (red anodized) and Ampex 499 (silver)
 const REEL_STYLES = {
   gp9: { face: 'url(#flangeRed)', back: '#6e1c12', edge: '#7a2216', sheenOp: 0.18 },
@@ -388,9 +390,7 @@ function slotPath(cx, cy, rIn, rOut, w, ang, c) {
 function reel({ cx, cy, pack, rot, style }) {
   const st = REEL_STYLES[style];
   // motor plate + shadow
-  circle(cx, cy, R + 14, '#3a3633');
-  circle(cx, cy, R + 14, 'url(#bezelHi)', 'opacity="0.5"');
-  circle(cx + 8, cy + 14, R + 4, 'url(#kShadow)', 'opacity="0.8"');
+  circle(cx + 10, cy + 16, R + 10, 'url(#kShadow)', 'opacity="0.85"');
   // back flange seen through the slots
   circle(cx, cy, R, st.back);
   circle(cx, cy, R, 'url(#capHiDark)', 'opacity="0.6"');
@@ -421,7 +421,13 @@ function reel({ cx, cy, pack, rot, style }) {
     p(`<path d="M${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} Z" fill="#131315"/>`);
   }
   // turntable spindle
-  circle(cx, cy, 30, '#1a1c22'); circle(cx, cy, 22, 'url(#chrome)'); circle(cx, cy, 8, '#2a2c30');
+  // black reel hold-down knob on the turntable spindle
+  circle(cx + 3, cy + 6, 36, 'url(#kShadow)');
+  circle(cx, cy, 33, '#0d0d0e');
+  for (let k = 0; k < 3; k++) { const [kx3, ky3] = polar(cx, cy, 27, rot + k * 120); circle(kx3, ky3, 12, '#0d0d0e'); }
+  circle(cx, cy, 33, 'url(#capHiDark)');
+  circle(cx, cy, 20, '#1b1b1d'); circle(cx, cy, 20, 'url(#capHiDark)');
+  circle(cx, cy, 6, 'url(#chrome)');
   // 6 flange screws
   for (let k = 0; k < 6; k++) { const [sx3, sy3] = polar(cx, cy, R * 0.42, rot + 30 + k * 60); circle(sx3, sy3 + 0.8, 4.2, '#000', 'opacity="0.5"'); circle(sx3, sy3, 3.6, '#1b1b1d'); }
   // printed label between the slots
@@ -440,117 +446,124 @@ function reel({ cx, cy, pack, rot, style }) {
   }
   p(`</g>`);
 }
-// tape path
-const gy = TY + 528;
-const guideL = [TX + 150, gy + 40], armL = [TX + 330, gy + 4], headX = TX + TW / 2, capX = TX + 900, armR = [TX + TW - 330, gy + 4], guideR = [TX + TW - 150, gy + 40];
-// tape (brown ribbon)
-const tape = `M${supply.cx - 120} ${supply.cy + 150} L${guideL[0] - 16} ${guideL[1] + 6} L${armL[0] - 4} ${armL[1] + 34} L${headX - 230} ${gy + 52} L${capX + 30} ${gy + 52} L${armR[0] + 4} ${armR[1] + 34} L${guideR[0] + 16} ${guideR[1] + 6} L${takeup.cx + 90} ${takeup.cy + 100}`;
-p(`<path d="${tape}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="9" transform="translate(3 5)"/>`);
-p(`<path d="${tape}" fill="none" stroke="#5a3a22" stroke-width="7" stroke-linejoin="round"/>`);
-p(`<path d="${tape}" fill="none" stroke="#8a5f3e" stroke-width="1.5" stroke-linejoin="round" opacity="0.6"/>`);
+
+// ---- tape path: supply -> guide post -> roller guide -> heads -> capstan/pinch -> idler -> guide post -> take-up
+const postL = [TX + 118, TL + 22], postR = [TX + TW - 118, TL + 22];
+const rollL = [headX - 262, TL], capstan = [headX + 258, TL], idler = [headX + 336, TL];
+const TF = TL + 13;                 // tape front line across the heads
+const tape = `M${supply.cx - 165} ${supply.cy + 120} L${postL[0] - 23} ${postL[1]} A23 23 0 0 0 ${postL[0]} ${postL[1] + 23} L${rollL[0]} ${TF} L${idler[0]} ${TF + 1} L${postR[0]} ${postR[1] + 23} A23 23 0 0 0 ${postR[0] + 23} ${postR[1]} L${takeup.cx + 120} ${takeup.cy + 80}`;
+p(`<path d="${tape}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="10" transform="translate(4 7)"/>`);
+p(`<path d="${tape}" fill="none" stroke="#4a3020" stroke-width="7" stroke-linejoin="round"/>`);
+p(`<path d="${tape}" fill="none" stroke="#8a6040" stroke-width="1.4" stroke-linejoin="round" opacity="0.7"/>`);
 reel(supply);
 reel(takeup);
-function guide(cx, cy, r = 18) {
-  circle(cx + 3, cy + 5, r + 4, 'url(#kShadow)');
-  circle(cx, cy, r + 3, '#0f0f10');
-  circle(cx, cy, r, '#1d1d1f');
+// tape re-drawn where it leaves each pack between the flanges is hidden by the front flange (correct)
+
+// tall black guide post with a chrome cap (seen from above)
+function post(cx, cy, r) {
+  circle(cx + 6, cy + 12, r + 8, 'url(#kShadow)');
+  circle(cx, cy, r + 4, '#0b0b0c');
+  circle(cx, cy, r, '#1c1c1e');
   circle(cx, cy, r, 'url(#capHiDark)');
-  circle(cx, cy, r * 0.45, 'url(#chrome)');
+  circle(cx, cy, r * 0.42, 'url(#chrome)');
+  circle(cx, cy, r * 0.15, '#222');
 }
-// tension arms
-for (const [ax, ay, pivotX] of [[...armL, TX + 270], [...armR, TX + TW - 270]]) {
-  p(`<line x1="${pivotX}" y1="${gy + 80}" x2="${ax}" y2="${ay + 20}" stroke="url(#chrome)" stroke-width="12" stroke-linecap="round"/>`);
-  circle(pivotX, gy + 80, 14, '#1c1d20'); circle(pivotX, gy + 80, 9, 'url(#chrome)');
-  guide(ax, ay + 20, 15);
+function guide(cx, cy, r) { // flanged roller guide
+  circle(cx + 3, cy + 6, r + 6, 'url(#kShadow)');
+  circle(cx, cy, r + 5, '#141416');
+  circle(cx, cy, r, 'url(#chrome)');
+  circle(cx, cy, r * 0.4, '#2a2a2c');
 }
-guide(...guideL); guide(...guideR);
+post(...postL, 22);
+post(...postR, 22);
+guide(...rollL, 12);
 
-// motion hint arcs
-for (const rl of [supply, takeup]) {
-  const [ax0, ay0] = polar(rl.cx, rl.cy, R + 26, -40), [ax1, ay1] = polar(rl.cx, rl.cy, R + 26, 40);
-  p(`<path d="M${ax0} ${ay0} A${R + 26} ${R + 26} 0 0 1 ${ax1} ${ay1}" fill="none" stroke="#ffcf6b" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="4 8"/>`);
+// head assembly: black housing with a brushed silver lid; head faces at the front edge
+const hcL = headX - 200, hcW = 400, hcT = TL - 122, hcB = TL - 6;
+rect(hcL + 8, hcT + 14, hcW, hcB - hcT, '#000', 'rx="8" opacity="0.55" filter="url(#soft)"');
+rect(hcL, hcT, hcW, hcB - hcT, '#121214', 'rx="8"');
+rect(hcL, hcT, hcW, hcB - hcT, 'url(#bezelHi)', 'rx="8" opacity="0.7"');
+rect(hcL + 14, hcT + 10, hcW - 28, 76, 'url(#silverPanel)', 'rx="3"');
+rect(hcL + 14, hcT + 10, hcW - 28, 76, '#000', 'filter="url(#brushed)" opacity="0.2" rx="3"');
+for (let k = 0; k < 9; k++) rect(hcL + 40 + k * 38, hcT + 26, 20, 44, '#8d9095', 'rx="3" opacity="0.55"');  // vent slots
+for (const [sx2, sy2] of [[hcL + 26, hcT + 22], [hcL + hcW - 26, hcT + 22], [hcL + 26, hcT + 74], [hcL + hcW - 26, hcT + 74]]) screw(sx2, sy2, 3.5);
+// head faces (erase, record/sync, repro) touching the tape
+const headsAt = [['ERASE', headX - 120], ['RECORD / SYNC', headX], ['REPRO', headX + 120]];
+for (const [lab, hx] of headsAt) {
+  rect(hx - 36, TL - 18, 72, 28, 'url(#chrome)', 'rx="5"');        // head mount
+  rect(hx - 32, TL - 15, 64, 22, '#1d2a3c', 'rx="3"');          // blue-black head stack (photo)
+  for (let k = 0; k < 8; k++) rect(hx - 28 + k * 7.6, TL - 12, 4, 12, '#3a4a60', 'rx="1"');
+  rect(hx - 30, TF - 4, 60, 5, 'url(#chrome)', 'rx="2"');        // gap face
+  text(hx, TF + 24, lab, 9, '#ece7dc', 'middle', 800, 'letter-spacing="1.5"');
 }
+// capstan, pinch roller on its arm, cream idler/tach roller
+p(`<line x1="${capstan[0] + 74}" y1="${TL + 44}" x2="${capstan[0]}" y2="${TL + 38}" stroke="#141416" stroke-width="16" stroke-linecap="round"/>`);
+circle(capstan[0] + 74, TL + 44, 10, '#0b0b0c'); circle(capstan[0] + 74, TL + 44, 4, 'url(#chrome)');
+circle(capstan[0] + 4, TL + 44, 29, 'url(#kShadow)');
+circle(capstan[0], TL + 38, 24, '#0a0a0a'); circle(capstan[0], TL + 38, 24, 'url(#capHiDark)'); circle(capstan[0], TL + 38, 7, 'url(#chrome)');
+circle(capstan[0] + 3, TL + 5, 18, 'url(#kShadow)');
+circle(capstan[0], TL, 12, '#0c0c0d'); circle(capstan[0], TL, 7, 'url(#chrome)');
+text(capstan[0] - 30, TL + 70, 'CAPSTAN', 9, '#ece7dc', 'middle', 800, 'letter-spacing="1.5"');
+circle(idler[0] + 4, idler[1] + 8, 22, 'url(#kShadow)');
+circle(idler[0], idler[1], 15, '#d9d0bb'); circle(idler[0], idler[1], 15, 'url(#capHi)'); circle(idler[0], idler[1], 5, '#8a8270');
 
-// head block
-const hbX = headX - 230, hbY = gy + 52;
-rect(hbX - 10, hbY - 4, 440, 76, '#000', 'rx="8" opacity="0.5" filter="url(#soft)"');
-rect(hbX, hbY - 2, 420, 66, '#24262a', 'rx="6"');
-rect(hbX, hbY - 2, 420, 66, 'url(#bezelHi)', 'rx="6"');
-// head cover: black housing, brushed silver lid (per photos)
-rect(headX - 196, hbY - 112, 392, 112, '#000', 'rx="6" opacity="0.55" filter="url(#soft)" transform="translate(6 10)"');
-rect(headX - 196, hbY - 112, 392, 106, '#141416', 'rx="6"');
-rect(headX - 184, hbY - 104, 368, 74, 'url(#silverPanel)', 'rx="3"');
-rect(headX - 184, hbY - 104, 368, 74, '#000', 'filter="url(#brushed)" opacity="0.18" rx="3"');
-for (let k = 0; k < 7; k++) rect(headX - 170 + k * 50, hbY - 24, 30, 10, '#2a2a2c', 'rx="2"');
-text(headX, hbY - 60, 'HEAD ASSEMBLY', 10, '#3a3633', 'middle', 800, 'letter-spacing="3"');
-const heads = [['ERASE', hbX + 70], ['RECORD', hbX + 210], ['REPRO', hbX + 350]];
-for (const [lab, hx] of heads) {
-  rect(hx - 34, hbY - 10, 68, 28, 'url(#chrome)', 'rx="6"');
-  rect(hx - 30, hbY - 6, 60, 6, '#2a2b2e', 'rx="2"');
-  for (let k = 0; k < 6; k++) rect(hx - 27 + k * 10, hbY + 4, 6, 10, '#6b6f75', 'rx="1"');
-  text(hx, hbY + 46, lab, 11, '#ece7dc', 'middle', 800, 'letter-spacing="1.5"');
-}
-// head shield
-// capstan + pinch roller
-circle(capX + 30, gy + 52, 12, 'url(#chrome)');
-circle(capX + 30, gy + 52 + 37, 26, '#0e0e0f'); circle(capX + 30, gy + 89, 22, '#1b1b1d'); circle(capX + 30, gy + 89, 8, 'url(#chrome)');
-text(capX + 66, gy + 94, 'CAPSTAN', 9, '#ece7dc', 'start', 800, 'letter-spacing="1.5"');
-// logo plate
-rect(headX - 120, TY + 40, 240, 70, '#0f1012', 'rx="4"');
-rect(headX - 120, TY + 40, 240, 70, 'url(#bezelHi)', 'rx="4"');
-text(headX - 62, TY + 88, 'MCI', 38, '#e9e3d0', 'middle', 900, 'font-style="italic" letter-spacing="2"');
-text(headX + 46, TY + 72, 'JH-24', 22, '#e9e3d0', 'middle', 800, 'letter-spacing="2"');
-text(headX + 46, TY + 94, '24 TRACK · 2"', 11, '#ece7dc', 'middle', 700, 'letter-spacing="2"');
-// tape timer / tach window between reels
-rect(headX - 90, TY + 150, 180, 58, '#0a0202', 'rx="4"');
-rect(headX - 90, TY + 150, 180, 58, 'url(#bezelHi)', 'rx="4"');
-seg7(headX - 76, TY + 162, 34, '03:42', '#ff3220');
-text(headX, TY + 228, 'TAPE TIME', 10, '#ece7dc', 'middle', 800, 'letter-spacing="2"');
-// tension / status lamps
-const lamps = [['TENSION', 'green', true], ['SERVO', 'green', true], ['REC', 'red', true], ['VARI', 'amber', false]];
-lamps.forEach(([lab, col, on], i) => {
-  const lx = headX - 100 + i * 52;
-  button(lx, TY + 260, 36, 16, col, on);
-  text(lx + 18, TY + 292, lab, 9, '#ece7dc', 'middle', 800, 'letter-spacing="1"');
-});
-
-// transport controls on lower panel
-const ly0 = TY + 680;
-rect(TX + 28, ly0 + 30, 610, 92, '#000', 'rx="5" opacity="0.5" filter="url(#soft)" transform="translate(3 6)"');
-rect(TX + 28, ly0 + 30, 610, 92, 'url(#silverPanel)', 'rx="5"');
-rect(TX + 28, ly0 + 30, 610, 92, '#000', 'filter="url(#brushed)" opacity="0.15" rx="5"');
-rect(TX + 34, ly0 + 36, 598, 80, 'none', 'rx="4" stroke="#6d6a66" stroke-width="1"');
-text(TX + 40, ly0 + 22, 'TRANSPORT', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
-// red lamp + two black knobs at the left of the strip, as on the deck
-circle(TX + 60, ly0 + 64, 11, '#c8231a', 'filter="url(#glow)"'); circle(TX + 60, ly0 + 64, 11, 'url(#capHi)');
-text(TX + 60, ly0 + 104, 'POWER', 8.5, '#2a2624', 'middle', 800);
-knob(TX + 108, ly0 + 64, 12, '#1d1d1f', -30, { ticks: false, dark: true });
-text(TX + 108, ly0 + 104, 'VARI', 8.5, '#2a2624', 'middle', 800);
-knob(TX + 152, ly0 + 64, 12, '#1d1d1f', 20, { ticks: false, dark: true });
-text(TX + 152, ly0 + 104, 'EDIT', 8.5, '#2a2624', 'middle', 800);
-const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'grey', false], ['▶', 'PLAY', 'green', true], ['●', 'RECORD', 'red', true], ['▲', 'LIFT', 'blue', false], ['✂', 'EDIT', 'amber', false]];
+// ---- front transport faceplate (angled strip across the front of the deck)
+const FS = DECK_B + 6, FH = 118, FL = TX + 40, FW = TW - 80;
+rect(FL + 4, FS + 10, FW, FH, '#000', 'rx="6" opacity="0.5" filter="url(#soft)"');
+p(`<linearGradient id="faceplate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9c4bb"/><stop offset="0.1" stop-color="#b3aea5"/><stop offset="1" stop-color="#8e8981"/></linearGradient>`);
+rect(FL, FS, FW, FH, 'url(#faceplate)', 'rx="6"');
+rect(FL, FS, FW, FH, '#000', 'filter="url(#brushed)" opacity="0.14" rx="6"');
+rect(FL, FS, FW, 2, '#fff', 'opacity="0.5"');
+rect(FL + 8, FS + 8, FW - 16, FH - 16, 'none', 'rx="4" stroke="#6f6a63" stroke-width="1"');
+const ink = '#2a2624', by = FS + 28;
+// left cluster: red record-safe lamp, two black knobs, tape-lifter lever
+circle(FL + 40, by + 22, 12, '#c8231a', 'filter="url(#glow)"'); circle(FL + 40, by + 22, 12, 'url(#capHi)');
+text(FL + 40, by + 66, 'POWER', 8.5, ink, 'middle', 800);
+knob(FL + 90, by + 22, 13, '#141416', -40, { ticks: false, dark: true });
+text(FL + 90, by + 66, 'VARI SPD', 8.5, ink, 'middle', 800);
+knob(FL + 140, by + 22, 13, '#141416', 30, { ticks: false, dark: true });
+text(FL + 140, by + 66, 'SHUTTLE', 8.5, ink, 'middle', 800);
+rect(FL + 178, by + 6, 46, 10, '#2a2624', 'rx="5"');
+rect(FL + 186, by - 2, 14, 26, 'url(#chrome)', 'rx="3"');
+text(FL + 201, by + 66, 'LIFTERS', 8.5, ink, 'middle', 800);
+// transport buttons (small square coloured caps)
+const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'white', false], ['▶', 'PLAY', 'green', true], ['●', 'REC', 'red', true], ['▲', 'LIFT', 'blue', false], ['✂', 'EDIT', 'amber', false]];
 tbtns.forEach(([g, lab, col, on], i) => {
-  const bx = TX + 186 + i * 63;
-  button(bx, ly0 + 44, 52, 46, col, on, '', { pastel: true });
-  text(bx + 26, ly0 + 74, g, 18, '#1a1208', 'middle', 800);
-  text(bx + 26, ly0 + 108, lab, 9, '#2a2624', 'middle', 800, 'letter-spacing="1"');
+  const bx = FL + 250 + i * 62;
+  button(bx, by, 50, 44, col, on, '', { pastel: true });
+  text(bx + 25, by + 29, g, 17, '#1a1208', 'middle', 800);
+  text(bx + 25, by + 66, lab, 8.5, ink, 'middle', 800, 'letter-spacing="1"');
 });
-// speed
-const spX = TX + 660;
-text(spX, ly0 + 22, 'SPEED', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
-button(spX, ly0 + 44, 64, 34, 'amber', false, '15 IPS', { size: 11 });
-button(spX + 74, ly0 + 44, 64, 34, 'amber', true, '30 IPS', { size: 11 });
-text(spX, ly0 + 104, 'EQ', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-button(spX + 30, ly0 + 92, 52, 20, 'white', true, 'AES', { size: 9 });
-button(spX + 88, ly0 + 92, 52, 20, 'white', false, 'NAB', { size: 9 });
-// tape character
-const fxX = TX + 880;
-text(fxX, ly0 + 22, 'TAPE CHARACTER', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
-knob(fxX + 40, ly0 + 70, 20, '#c9a24a', 40, { label: 'SATURATION' });
-knob(fxX + 140, ly0 + 70, 20, '#c9a24a', -60, { label: 'WOW/FLUTTER' });
-knob(fxX + 240, ly0 + 70, 20, '#c9a24a', -90, { label: 'HISS' });
-button(fxX + 310, ly0 + 52, 120, 34, 'amber', false, 'BYPASS ALL', { size: 11 });
-text(fxX + 370, ly0 + 110, 'AMOUNT · GLOBAL BYPASS', 9, '#d9d3c7', 'middle', 700, 'letter-spacing="1"');
+// speed + EQ
+let sx4 = FL + 704;
+p(`<line x1="${sx4 - 14}" y1="${FS + 18}" x2="${sx4 - 14}" y2="${FS + FH - 18}" stroke="#6f6a63" stroke-width="1"/>`);
+button(sx4, by + 4, 42, 32, 'white', false, '15', { size: 12, pastel: true });
+button(sx4 + 48, by + 4, 42, 32, 'amber', true, '30', { size: 12 });
+text(sx4 + 45, by + 66, 'SPEED IPS', 8.5, ink, 'middle', 800);
+button(sx4 + 108, by + 4, 42, 32, 'white', true, 'AES', { size: 10 });
+button(sx4 + 156, by + 4, 42, 32, 'white', false, 'NAB', { size: 10, pastel: true });
+text(sx4 + 153, by + 66, 'EQ', 8.5, ink, 'middle', 800);
+// tape character (app controls styled as small trim knobs)
+sx4 = FL + 930;
+p(`<line x1="${sx4 - 18}" y1="${FS + 18}" x2="${sx4 - 18}" y2="${FS + FH - 18}" stroke="#6f6a63" stroke-width="1"/>`);
+knob(sx4 + 16, by + 22, 15, '#141416', 40, { dark: true, labelColor: ink });
+knob(sx4 + 82, by + 22, 15, '#141416', -60, { dark: true, labelColor: ink });
+knob(sx4 + 148, by + 22, 15, '#141416', -90, { dark: true, labelColor: ink });
+text(sx4 + 16, by + 66, 'SATURATION', 8.5, ink, 'middle', 800);
+text(sx4 + 82, by + 66, 'WOW / FLUT', 8.5, ink, 'middle', 800);
+text(sx4 + 148, by + 66, 'HISS', 8.5, ink, 'middle', 800);
+button(sx4 + 196, by + 4, 70, 32, 'amber', false, 'BYPASS', { size: 10, pastel: true });
+text(sx4 + 231, by + 66, 'TAPE CHAR', 8.5, ink, 'middle', 800);
+
+// ---- cabinet lip with badge, then woodgrain drawer front
+const LIP = FS + FH + 6;
+rect(TX + 8, LIP, TW - 16, 26, '#45413d', 'rx="3"');
+rect(TX + 8, LIP, TW - 16, 1.5, '#fff', 'opacity="0.12"');
+rect(TX + 40, LIP + 4, 92, 18, '#0d0d0e', 'rx="2"');
+text(TX + 86, LIP + 18, 'MCI', 15, '#d9dbde', 'middle', 900, 'font-style="italic" letter-spacing="3"');
+text(TX + TW - 40, LIP + 18, 'JH-24  ·  24 TRACK  ·  2"', 10, '#d9d3c7', 'end', 800, 'letter-spacing="2"');
+rect(TX + 8, LIP + 28, TW - 16, TY + TH - LIP - 34, 'url(#laminate)', 'rx="3"');
+rect(TX + 8, LIP + 28, TW - 16, TY + TH - LIP - 34, '#000', 'filter="url(#woodgrainH)" opacity="0.75" rx="3"');
 
 // =====================================================================
 // AUTOLOCATOR REMOTE

@@ -10,7 +10,7 @@ Full resolution: [`analog-studio-mockup-4k.png`](analog-studio-mockup-4k.png). A
 
 | Area | Contents |
 | --- | --- |
-| Tape machine (top left) | JH-24-style 2" deck: flanged reels (supply full, take-up partly wound), tape path with guides, tension arms, erase/record/repro heads, capstan and pinch roller; tape-time display and status lamps; transport (REW, F FWD, STOP, PLAY, RECORD); 15/30 IPS and AES/NAB EQ; tape character (saturation, wow/flutter, hiss, global bypass) |
+| Tape machine (top left) | JH-24 top deck: Ampex 499 supply reel (full) and Quantegy GP9 take-up on black hold-down knobs; tape path supply → black guide post → roller guide → erase, record/sync and repro heads → capstan and pinch roller → cream idler → guide post → take-up; head cover with silver lid on a removable head plate. Angled front faceplate: power lamp, vari-speed and shuttle knobs, lifter lever, REW / F FWD / STOP / PLAY / REC / LIFT / EDIT, 15/30 IPS, AES/NAB, and the app's tape-character knobs (saturation, wow/flutter, hiss, bypass). MCI badge on the cabinet lip above the woodgrain drawer front |
 | Autolocator (top centre) | Lit counter, 4 named locate points, keypad, STORE/RECALL/LOCATE/ZERO, punch in/out/auto, all-ready/all-safe |
 | Tape meter bridge (top right) | 24 backlit VU meters, each with a masking-tape track label, READY/SAFE switches and a REC/REPRO status line (tracks 20–22 armed) |
 | Console (bottom) | 32 JH-600-style strips: scribble strip, 8 bus-assign buttons, mic/line, trim, pad, phase, HPF, 4-band EQ (freq + gain) with EQ IN, 4 aux sends, insert, pre, pan, mute, solo, long-throw fader. Channels 1–24 are tape returns; 25–32 (warm-tinted) are effect returns and live inputs |
@@ -27,7 +27,8 @@ Corrected against your JH-24 photos and the MCI listings on [SoundBroker](https:
 | JH-24 deck, autolocator, meter bridge | Warm taupe-grey finish, from your JH-24 photos; woodgrain laminate edge for the cabinet front |
 | Tape VU meters | Warm cream, amber-backlit faces in a 3 × 8 bridge, with a record lamp and a status lamp above each meter |
 | Transport | Raised silver strip with small coloured square buttons (REW, F FWD, STOP, PLAY, RECORD, LIFT, EDIT), a red power lamp and two black knobs |
-| Head assembly | Tall black head cover with a brushed silver lid, flanked by black roller-guide posts |
+| Head assembly | Tall black head cover with a brushed silver lid; blue-black head stacks at the tape face; black guide posts; capstan with pinch roller on its arm; cream idler roller |
+| Deck layout | Removed the non-original logo plate, tape-time display, status lamps and swinging tension arms from the top deck. The tape counter lives on the autolocator, as on the real machine |
 | Autolocator | Light-blue keypad keys, as on the AL-III |
 | Reels | From your photos: a silver Ampex 499 (full supply reel, left) and a red Quantegy GP9 (take-up, right). Solid flanges with two radial slots, a black hub with six screws, and the printed labels |
 | Console panel | Warm taupe-grey, as on the JH-636 (was blue-grey) |
