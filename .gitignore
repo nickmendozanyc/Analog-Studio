@@ -1,3 +1,5 @@
 mockup/analog-studio-mockup.svg
 node_modules/
 .DS_Store
+prototype/reels/node_modules/
+prototype/reels/dist/shot-*.png

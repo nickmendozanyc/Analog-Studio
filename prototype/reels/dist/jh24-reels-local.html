@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>JH-24 Reel Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* One-screen instrument: the 3D deck fills the window; a transport strip and readouts float over it. */
+  :root {
+    --room: #0e0c0b;        /* control-room dark */
+    --panel: #6f6a63;       /* JH-24 deck taupe */
+    --panel-dk: #4c4844;
+    --outline: #e6e1d8;     /* strip outline */
+    --ink: #f1ece3;
+    --ink-dim: #b8b1a5;
+    --led: #ff3a24;
+    --font-ui: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --font-num: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--room); color: var(--ink); font: 500 15px/1.35 var(--font-ui); overflow: hidden; }
+  #stage { position: fixed; inset: 0; }
+  #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  #stage canvas:active { cursor: grabbing; }
+
+  .hud { position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); display: grid; gap: 10px; pointer-events: none; }
+  .counter { display: inline-flex; align-items: baseline; gap: 12px; padding: 10px 16px; background: #0a0302; border: 1px solid #2a0d08; border-radius: 6px; box-shadow: inset 0 0 18px rgba(255, 40, 20, .12); }
+  .counter b { font: 700 40px/1 var(--font-num); color: var(--led); letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 58, 36, .65); font-variant-numeric: tabular-nums; }
+  .counter span { font-size: 14px; color: #c9786c; letter-spacing: 1.5px; text-transform: uppercase; }
+  .readouts { display: grid; grid-template-columns: auto auto; gap: 4px 18px; padding: 10px 14px; background: rgba(20, 18, 16, .78); border: 1px solid rgba(230, 225, 216, .14); border-radius: 6px; font-size: 14px; }
+  .readouts dt { color: var(--ink-dim); letter-spacing: .5px; }
+  .readouts dd { margin: 0; text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+  .state { font: 700 14px var(--font-ui); letter-spacing: 2px; text-transform: uppercase; color: var(--ink-dim); }
+  .state.on { color: #7ee08f; }
+  .state.rec { color: #ff7a6a; }
+
+  .strip { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 18px; padding: 12px 18px; max-width: calc(100% - 32px); box-sizing: border-box; background: linear-gradient(180deg, #7e7871, #67625c); border: 2px solid var(--outline); border-radius: 8px; box-shadow: 0 10px 30px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .25); }
+  .group { display: flex; align-items: center; gap: 8px; }
+  .group + .group { padding-left: 18px; border-left: 1px solid rgba(0, 0, 0, .3); }
+  .lbl { font-size: 14px; letter-spacing: 1px; color: #f3efe6; text-transform: uppercase; }
+  button.key { font: 800 15px var(--font-ui); min-width: 54px; height: 44px; padding: 0 10px; border-radius: 4px; border: 0; cursor: pointer; color: #1a1208; background: #efece4; box-shadow: 0 4px 0 #2a2624, 0 6px 10px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .7); transition: transform .05s, box-shadow .05s, filter .1s; }
+  button.key:active { transform: translateY(3px); box-shadow: 0 1px 0 #2a2624, inset 0 1px 0 rgba(255, 255, 255, .5); }
+  button.key:focus-visible { outline: 3px solid #ffd27a; outline-offset: 2px; }
+  button.key.play { background: #3fc9a0; } button.key.rec { background: #e0322a; color: #fff; } button.key.lift { background: #3f7fd6; color: #fff; }
+  button.key.small { min-width: 44px; height: 36px; font-size: 14px; }
+  button.key[aria-pressed="true"] { filter: brightness(1.18) saturate(1.2); box-shadow: 0 1px 0 #2a2624, 0 0 16px rgba(255, 240, 200, .55), inset 0 1px 0 rgba(255, 255, 255, .6); transform: translateY(3px); }
+  button.key.play[aria-pressed="true"] { box-shadow: 0 1px 0 #2a2624, 0 0 18px rgba(80, 255, 170, .8); }
+  button.key.rec[aria-pressed="true"] { box-shadow: 0 1px 0 #2a2624, 0 0 18px rgba(255, 60, 40, .9); }
+  input[type="range"] { width: 180px; accent-color: #ffb02e; }
+  .hint { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(14px + env(safe-area-inset-top, 0px)); max-width: 300px; padding: 10px 14px; font-size: 14px; color: var(--ink-dim); background: rgba(20, 18, 16, .7); border: 1px solid rgba(230, 225, 216, .12); border-radius: 6px; }
+  .hint kbd { font: 700 13px var(--font-num); color: var(--ink); background: #2a2725; padding: 1px 6px; border-radius: 3px; border: 1px solid #44403c; }
+  .err { position: fixed; inset: auto 16px 50% 16px; text-align: center; font-size: 16px; color: #ffb4a8; }
+  @media (max-width: 700px) { .hint { display: none; } .counter b { font-size: 30px; } input[type="range"] { width: 120px; } }
+  @media (prefers-reduced-motion: reduce) { button.key { transition: none; } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@600;700&display=swap">
+
+<div id="stage" aria-label="3D view of the JH-24 transport"></div>
+
+<div class="hud">
+  <div class="counter" aria-live="off"><b id="ctr">00:00.0</b><span>tape time</span></div>
+  <dl class="readouts">
+    <dt>Transport</dt><dd><span id="st" class="state">STOP</span></dd>
+    <dt>Tape speed</dt><dd id="v">0.0 ips</dd>
+    <dt>Supply reel</dt><dd id="rs">0 rpm</dd>
+    <dt>Take-up reel</dt><dd id="rt">0 rpm</dd>
+    <dt>Left on supply</dt><dd id="left">5000 ft</dd>
+    <dt>Frame rate</dt><dd id="fps">– fps</dd>
+  </dl>
+</div>
+
+<div class="hint" id="hint">
+  <kbd>Space</kbd> play / stop · <kbd>←</kbd> rewind · <kbd>→</kbd> fast forward · <kbd>R</kbd> record · <kbd>S</kbd> stop · <kbd>B</kbd> motion blur. Drag to look around, scroll to zoom.
+</div>
+
+<div class="strip" role="toolbar" aria-label="Transport">
+  <div class="group">
+    <button class="key" id="k-rew" aria-pressed="false" title="Rewind (←)">◀◀</button>
+    <button class="key" id="k-ff" aria-pressed="false" title="Fast forward (→)">▶▶</button>
+    <button class="key" id="k-stop" aria-pressed="true" title="Stop (S)">■</button>
+    <button class="key play" id="k-play" aria-pressed="false" title="Play (Space)">▶</button>
+    <button class="key rec" id="k-rec" aria-pressed="false" title="Record (R)">●</button>
+    <button class="key lift small" id="k-lift" aria-pressed="false" title="Defeat the tape lifters">LIFT</button>
+  </div>
+  <div class="group">
+    <span class="lbl">IPS</span>
+    <button class="key small" id="k-15" aria-pressed="false">15</button>
+    <button class="key small" id="k-30" aria-pressed="true">30</button>
+  </div>
+  <div class="group">
+    <label class="lbl" for="shuttle">Shuttle</label>
+    <input type="range" id="shuttle" min="-100" max="100" value="0" step="1">
+  </div>
+  <div class="group">
+    <span class="lbl">Reel</span>
+    <button class="key small" id="k-head" title="Load a full supply reel">Head</button>
+    <button class="key small" id="k-mid" title="Half and half">Middle</button>
+    <button class="key small" id="k-tail" title="Near the end of the tape">Tail</button>
+  </div>
+  <div class="group">
+    <button class="key small" id="k-blur" aria-pressed="true" title="Motion blur (B)">Blur</button>
+  </div>
+</div>
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<script type="module">
+// ---------------- physics (inlined from physics.js at build time) ----------------
+// JH-24 reel and transport physics (SI units).
+// Renderer-independent so it can be ported 1:1 to the C++ engine.
+//
+// Model
+//  - Tape is wound on two hubs. A pack's outer radius follows from the tape length on it:
+//      r(L) = sqrt(rHub^2 + L * thickness / pi)
+//  - Tape speed v (m/s, + = toward take-up) is the one state variable of the transport.
+//    Each reel turns at w = v / r, so the full reel turns slowly and the empty one fast.
+//  - PLAY / RECORD: the capstan and pinch roller hold v at the selected speed with a fast,
+//    servo-like response. From a wind, the reels brake first and the pinch roller only
+//    engages once the tape is near play speed (the JH-24's motion sensing).
+//  - Winds (F FWD, REW, shuttle, stop from a wind): the reel motors are force-limited, so
+//    acceleration = force / effective mass, where the effective mass of the reels seen at the
+//    tape is I_supply / r_s^2 + I_takeup / r_t^2. A full reel therefore spools up and brakes
+//    more slowly than a nearly empty one.
+//  - Lifters hold the tape off the heads at wind speed; LIFT defeats them.
+//  - Tape running off a reel stops the transport.
+//
+// Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
+
+const TAPE = {
+  thickness: 38.1e-6,   // 1.5 mil base + oxide (approx, typical of 456 / 499 / GP9)
+  width: 0.0508,        // 2 inch
+  density: 1350,        // kg/m^3 (approx)
+  hubR: 0.0572,         // 4.5" hub diameter (approx)
+  flangeR: 0.1778,      // 14" reel
+};
+
+const MACHINE = {
+  emptyReelInertia: 0.0127, // kg m^2, aluminium 14" reel (approx)
+  windSpeed: 9.0,           // m/s (~354 ips) (approx)
+  windForce: 42,            // N, reel-motor drive force at the tape (approx)
+  brakeForce: 64,           // N, braking force at the tape (approx)
+  capstanTau: 0.11,         // s, capstan servo time constant (approx)
+  capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
+  pinchEngageWindow: 0.06,  // m/s, pinch roller engages within this of play speed
+  lifterSpeed: 1.6,         // m/s, lifters come in above this speed
+};
+
+const IPS = 0.0254; // m/s per inch-per-second
+const FT = 0.3048;
+
+const packRadius = (len, tape = TAPE) => Math.sqrt(tape.hubR * tape.hubR + Math.max(0, len) * tape.thickness / Math.PI);
+const packMass = (len, tape = TAPE) => Math.max(0, len) * tape.thickness * tape.width * tape.density;
+const reelInertia = (len, tape = TAPE, m = MACHINE) => {
+  const r = packRadius(len, tape);
+  return m.emptyReelInertia + 0.5 * packMass(len, tape) * (r * r + tape.hubR * tape.hubR);
+};
+const capacity = (tape = TAPE) => Math.PI * (tape.flangeR * tape.flangeR - tape.hubR * tape.hubR) / tape.thickness;
+
+class Transport {
+  constructor({ totalLength = 5000 * FT, onTakeup = 0, speedIPS = 30, tape = TAPE, machine = MACHINE } = {}) {
+    this.tape = tape; this.m = machine;
+    this.total = Math.min(totalLength, capacity(tape));
+    this.take = Math.min(Math.max(onTakeup, 0), this.total);
+    this.v = 0;
+    this.mode = 'stop';           // stop | play | rec | ff | rew | shuttle
+    this.speedIPS = speedIPS;     // 15 | 30
+    this.shuttle = 0;             // -1 .. 1
+    this.liftDefeat = false;
+    this.pinch = 0;               // 0 = retracted, 1 = engaged (smoothed for animation)
+    this.lift = 0;                // 0 = tape on heads, 1 = lifted (smoothed)
+    this.angleS = 0; this.angleT = 0;
+    this.zero = this.take;        // counter zero point (tape position)
+    this.endOfTape = false;
+  }
+  get supply() { return this.total - this.take; }
+  get rS() { return packRadius(this.supply, this.tape); }
+  get rT() { return packRadius(this.take, this.tape); }
+  get wS() { return this.v / this.rS; }      // rad/s (supply pays out when v > 0)
+  get wT() { return this.v / this.rT; }
+  get playSpeed() { return this.speedIPS * IPS; }
+  get counter() { return (this.take - this.zero) / this.playSpeed; } // seconds of tape at the selected speed
+  get capstanDriving() { return (this.mode === 'play' || this.mode === 'rec') && this.pinch > 0.98; }
+
+  command(mode) {
+    if (mode === 'rec' && this.mode !== 'play' && this.mode !== 'rec') mode = 'rec'; // REC from stop = PLAY + REC
+    this.mode = mode;
+    if (mode !== 'stop') this.endOfTape = false;
+  }
+  setSpeed(ips) { this.speedIPS = ips; }
+  setShuttle(x) { this.shuttle = Math.max(-1, Math.min(1, x)); if (x !== 0) this.mode = 'shuttle'; }
+  locate(pos) { this.take = Math.max(0, Math.min(this.total, pos)); this.v = 0; this.mode = 'stop'; }
+
+  targetSpeed() {
+    switch (this.mode) {
+      case 'play': case 'rec': return this.playSpeed;
+      case 'ff': return this.m.windSpeed;
+      case 'rew': return -this.m.windSpeed;
+      case 'shuttle': return this.shuttle * this.m.windSpeed;
+      default: return 0;
+    }
+  }
+
+  effectiveMass() {
+    const rs = this.rS, rt = this.rT;
+    return reelInertia(this.supply, this.tape, this.m) / (rs * rs) + reelInertia(this.take, this.tape, this.m) / (rt * rt);
+  }
+
+  // advance by dt seconds (call with small steps, e.g. 1 ms)
+  step(dt) {
+    const target = this.targetSpeed();
+    const playing = this.mode === 'play' || this.mode === 'rec';
+    const nearPlay = Math.abs(this.v - this.playSpeed) < this.m.pinchEngageWindow;
+    const pinchWanted = playing && (this.pinch > 0.5 || nearPlay);
+    this.pinch += ((pinchWanted ? 1 : 0) - this.pinch) * Math.min(1, dt / 0.06);
+
+    if (playing && this.pinch > 0.5) {
+      // capstan servo: first-order approach to play speed, slew limited
+      const dv = (target - this.v) * Math.min(1, dt / this.m.capstanTau);
+      const lim = this.m.capstanSlew * dt;
+      this.v += Math.max(-lim, Math.min(lim, dv));
+    } else {
+      // reel motors: force limited; braking when the speed magnitude must fall
+      const goal = playing ? this.playSpeed : target;
+      const diff = goal - this.v;
+      const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
+      const F = braking ? this.m.brakeForce : this.m.windForce;
+      const aMax = F / this.effectiveMass();
+      // soft landing: ease off in the last 0.4 m/s so the reels settle instead of snapping
+      const a = aMax * Math.min(1, Math.abs(diff) / 0.4 + 0.08);
+      const dvMax = a * dt;
+      this.v += Math.max(-dvMax, Math.min(dvMax, diff));
+    }
+
+    // lifters
+    const liftWanted = !this.liftDefeat && Math.abs(this.v) > this.m.lifterSpeed && !this.capstanDriving;
+    this.lift += ((liftWanted ? 1 : 0) - this.lift) * Math.min(1, dt / 0.08);
+
+    // move tape
+    const rs = this.rS, rt = this.rT;
+    this.take += this.v * dt;
+    this.angleS += (this.v / rs) * dt;
+    this.angleT += (this.v / rt) * dt;
+    if (this.take >= this.total || this.take <= 0) {
+      this.take = Math.max(0, Math.min(this.total, this.take));
+      this.v = 0; this.mode = 'stop'; this.endOfTape = true;
+    }
+  }
+
+  // advance real time with fixed substeps
+  advance(seconds, sub = 0.001) {
+    let t = seconds;
+    while (t > 1e-9) { const h = Math.min(sub, t); this.step(h); t -= h; }
+  }
+}
+
+
+// ---------------- renderer ----------------
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const stage = document.getElementById('stage');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+} catch (e) {
+  document.body.insertAdjacentHTML('beforeend', '<p class="err">This browser could not start WebGL, so the 3D deck cannot be shown.</p>');
+  throw e;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.82;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e0c0b);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.environmentIntensity = 0.42;
+
+const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+const view = { az: 0, el: 0.86, dist: 112, target: new THREE.Vector3(0, 3, 3) };
+function placeCamera() {
+  const { az, el, dist, target } = view;
+  camera.position.set(target.x + dist * Math.sin(az) * Math.cos(el), target.y + dist * Math.sin(el), target.z + dist * Math.cos(az) * Math.cos(el));
+  camera.lookAt(target);
+}
+placeCamera();
+
+// lights: soft key from the front-left above (control-room ceiling), cool fill, warm rim
+const key = new THREE.DirectionalLight(0xfff1dc, 1.9);
+key.position.set(-40, 90, 60); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); key.shadow.camera.left = -60; key.shadow.camera.right = 60; key.shadow.camera.top = 50; key.shadow.camera.bottom = -50; key.shadow.camera.near = 20; key.shadow.camera.far = 220; key.shadow.radius = 6; key.shadow.bias = -0.0004;
+scene.add(key);
+scene.add(new THREE.HemisphereLight(0xcfd8ff, 0x2a2018, 0.22));
+const rim = new THREE.DirectionalLight(0xffc89a, 0.6); rim.position.set(50, 40, -60); scene.add(rim);
+const LIGHT_PHI = Math.atan2(-(key.position.z), key.position.x); // light direction in reel uv space (uv.y = -z)
+
+// ---------- helpers ----------
+const CM = 100; // metres -> cm
+function canvasTex(w, h, draw, repeat = false) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; }
+  return t;
+}
+const blackPlastic = new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.38, metalness: 0.0 });
+const blackRubber = new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 0.85, metalness: 0.0 });
+const chrome = new THREE.MeshStandardMaterial({ color: 0xc8cbd0, roughness: 0.16, metalness: 1.0 });
+const cream = new THREE.MeshStandardMaterial({ color: 0xe9e0c8, roughness: 0.42, metalness: 0.0 });
+const ribTex = canvasTex(64, 256, (g, w, h) => { for (let y = 0; y < h; y += 8) { g.fillStyle = '#9a9a9a'; g.fillRect(0, y, w, 5); g.fillStyle = '#3a3a3a'; g.fillRect(0, y + 5, w, 3); } }, true);
+const ribbed = new THREE.MeshStandardMaterial({ color: 0x1a1a1c, roughness: 0.55, metalness: 0.0, bumpMap: ribTex, bumpScale: 0.06 });
+const cyl = (r, h, mat, seg = 48) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), mat); m.castShadow = true; m.receiveShadow = true; return m; };
+const boxM = (w, h, d, mat) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.castShadow = true; m.receiveShadow = true; return m; };
+
+// ---------- deck ----------
+const deckTex = canvasTex(1024, 1024, (g, w, h) => {
+  g.fillStyle = '#5e5852'; g.fillRect(0, 0, w, h);
+  const img = g.getImageData(0, 0, w, h); const d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 10; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  g.putImageData(img, 0, 0);
+});
+const deckMat = new THREE.MeshStandardMaterial({ map: deckTex, roughness: 0.62, metalness: 0.04 });
+const deck = boxM(104, 4, 66, deckMat); deck.position.set(0, -2, 3); scene.add(deck);
+const rimMat = new THREE.MeshStandardMaterial({ color: 0x45413d, roughness: 0.5 });
+for (const [x, z, w, d] of [[0, -30.5, 108, 3], [0, 36.5, 108, 3], [-53, 3, 3, 70], [53, 3, 3, 70]]) { const b = boxM(w, 5.4, d, rimMat); b.position.set(x, -1.3, z); scene.add(b); }
+const front = boxM(108, 30, 2, new THREE.MeshStandardMaterial({ color: 0x3e3a37, roughness: 0.6 })); front.position.set(0, -19, 38); scene.add(front);
+// head plate (removable plate around the head block)
+const plate = boxM(46, 0.25, 24, new THREE.MeshStandardMaterial({ color: 0x56514c, roughness: 0.55 })); plate.position.set(0, 0.12, 12); scene.add(plate);
+
+// ---------- geometry of the transport (cm, x right, z toward the operator) ----------
+const TF = 16.45;                           // tape front line across the head faces
+const Y0 = 3.2, TW = TAPE.width * CM;      // tape bottom height, tape width
+const YM = Y0 + TW / 2;
+const P = {
+  supply: { x: -21, z: -6 }, takeup: { x: 21, z: -6 },
+  guideL: { x: -14.5, z: TF + 1.3, r: 1.3 },
+  capstan: { x: 13.4, z: TF - 1.0, r: 1.0 },
+  pinch: { x: 13.6, z: TF + 0.75, r: 0.75 },
+  guideR: { x: 19.2, z: TF - 1.4, r: 1.4 },
+  pinL: { x: -10.6, r: 0.3 }, pinR: { x: 10.6, r: 0.3 },
+};
+
+// ---------- reels ----------
+const R = TAPE.flangeR * CM, HUB = TAPE.hubR * CM, FLANGE_GAP = 5.9, YB = 2.8, YF = YB + FLANGE_GAP;
+function labelTexture(kind) {
+  return canvasTex(1024, 1024, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    const c = w / 2, sc = w / 2;       // 1.0 = flange radius
+    // label sits between the slots (slots are along the local x axis), on the +y side
+    g.save(); g.translate(c, c);
+    if (kind === 'a499') {
+      g.textAlign = 'center'; g.fillStyle = '#121212'; g.font = '900 58px Archivo, Arial'; g.fillText('AMPEX', 0, -0.70 * sc);
+      g.fillStyle = '#a9802f'; g.font = '900 120px Archivo, Arial'; g.fillText('499', 0, -0.47 * sc);
+      g.fillStyle = '#121212'; g.font = '800 26px Archivo, Arial'; g.fillText('GRAND MASTER™ GOLD', 0, -0.40 * sc);
+      g.fillStyle = '#a9802f'; g.font = '600 22px Archivo, Arial'; g.fillText('Studio Mastering Audio Tape', 0, -0.35 * sc);
+    } else {
+      g.textAlign = 'center'; g.fillStyle = '#1b1b1b'; g.font = '900 46px Archivo, Arial'; g.fillText('QUANTEGY', 0.02 * sc, -0.72 * sc);
+      g.save(); g.rotate(-0.2); g.fillStyle = '#f3f1ec'; g.beginPath(); g.ellipse(0, -0.56 * sc, 170, 58, 0, 0, Math.PI * 2); g.fill(); g.restore();
+      g.fillStyle = '#3a3a3c'; g.font = 'italic 900 118px Archivo, Arial'; g.fillText('GP9', 0.02 * sc, -0.50 * sc);
+      g.fillStyle = '#1b1b1b'; g.font = '800 24px Archivo, Arial'; g.fillText('GRAND MASTER PLATINUM', 0.02 * sc, -0.40 * sc);
+    }
+    // six screws around the hub
+    for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; g.fillStyle = '#111'; g.beginPath(); g.arc(Math.cos(a) * 0.42 * sc, Math.sin(a) * 0.42 * sc, 9, 0, 7); g.fill(); g.fillStyle = '#666'; g.beginPath(); g.arc(Math.cos(a) * 0.42 * sc - 2, Math.sin(a) * 0.42 * sc - 2, 3, 0, 7); g.fill(); }
+    g.restore();
+  });
+}
+// Flange shader: slots, hub hole, label and brush streaks are evaluated in the reel's frame
+// at several instants across the shutter interval, so a spinning reel blurs like it does on film.
+function flangeMaterial(kind) {
+  const mat = new THREE.MeshStandardMaterial({
+    color: kind === 'a499' ? 0xc9ccd1 : 0xa8291a, metalness: kind === 'a499' ? 0.9 : 0.55, roughness: kind === 'a499' ? 0.3 : 0.38,
+    map: labelTexture(kind), transparent: true, side: THREE.DoubleSide,
+  });
+  mat.userData.u = { uAngle: { value: 0 }, uBlur: { value: 0 }, uLightPhi: { value: LIGHT_PHI }, uSheen: { value: new THREE.Color(kind === 'a499' ? 0xb0b0b0 : 0x803020) } };
+  mat.onBeforeCompile = (sh) => {
+    Object.assign(sh.uniforms, mat.userData.u);
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        uniform float uAngle; uniform float uBlur; uniform float uLightPhi; uniform vec3 uSheen;
+        float gLabA; float gR; float gPhi;`)
+      .replace('#include <map_fragment>', `
+        vec2 pp = vMapUv * 2.0 - 1.0;
+        gR = length(pp); gPhi = atan(pp.y, pp.x);
+        if (gR > 1.0) discard;
+        const int NS = 16;
+        float cov = 0.0, labA = 0.0, streak = 0.0; vec3 lab = vec3(0.0);
+        for (int k = 0; k < NS; k++) {
+          float a = uAngle + uBlur * ((float(k) + 0.5) / float(NS) - 0.5);
+          float c = cos(a), s = sin(a);
+          vec2 q = vec2(c * pp.x + s * pp.y, -s * pp.x + c * pp.y);
+          float ax = abs(q.x), ay = abs(q.y);
+          float slot = smoothstep(0.495, 0.505, ax) * (1.0 - smoothstep(0.835, 0.845, ax)) * (1.0 - smoothstep(0.08, 0.09, ay));
+          float hole = max(slot, 1.0 - smoothstep(0.355, 0.365, gR));
+          cov += 1.0 - hole;
+          vec4 L = texture2D(map, q * 0.5 + 0.5);
+          lab += L.rgb * L.a; labA += L.a;
+          float ph = atan(q.y, q.x);
+          streak += fract(sin(floor(ph * 700.0) * 12.9898 + floor(gR * 40.0) * 3.1) * 43758.5453);
+        }
+        vec3 labCol = lab / max(labA, 1e-4);
+        cov /= float(NS); labA /= float(NS); streak /= float(NS);
+        if (cov < 0.015) discard;
+        vec3 base = diffuse * (0.94 + 0.12 * streak);
+        diffuseColor.rgb = mix(base, labCol, labA);
+        diffuseColor.a = cov;
+        gLabA = labA;
+      `)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+        // radially brushed metal: a fixed bow-tie highlight facing the light, independent of rotation
+        float bow = pow(abs(cos(gPhi - uLightPhi)), 10.0);
+        totalEmissiveRadiance += uSheen * bow * 0.22 * smoothstep(0.37, 0.45, gR) * (1.0 - gLabA);
+      `);
+  };
+  return mat;
+}
+const packTopTex = canvasTex(1024, 1024, (g, w, h) => {
+  const c = w / 2;
+  for (let r = c; r > 0; r -= 2) { const k = 60 + Math.random() * 30 + (r % 18 < 2 ? 25 : 0); g.fillStyle = `rgb(${k + 18},${k + 6},${k - 6})`; g.beginPath(); g.arc(c, c, r, 0, 7); g.fill(); }
+});
+const packSide = new THREE.MeshStandardMaterial({ color: 0x17120f, roughness: 0.7, metalness: 0.0 });
+const packTop = new THREE.MeshStandardMaterial({ map: packTopTex, roughness: 0.35, metalness: 0.15 });
+
+function makeReel(kind, at) {
+  const g = new THREE.Group(); g.position.set(at.x, 0, at.z); scene.add(g);
+  const turntable = cyl(9, 2.6, new THREE.MeshStandardMaterial({ color: 0x2b2825, roughness: 0.5 })); turntable.position.y = 1.3; g.add(turntable);
+  const flangeGeo = new THREE.CircleGeometry(R, 160); flangeGeo.rotateX(-Math.PI / 2);
+  const fm = flangeMaterial(kind);
+  const back = new THREE.Mesh(flangeGeo, fm); back.position.y = YB; back.receiveShadow = true; g.add(back);
+  const frontF = new THREE.Mesh(flangeGeo, fm); frontF.position.y = YF; frontF.castShadow = true; frontF.receiveShadow = true; frontF.renderOrder = 2; g.add(frontF);
+  const edgeMat = new THREE.MeshStandardMaterial({ color: kind === 'a499' ? 0xb9bdc2 : 0x8a2414, metalness: 0.85, roughness: 0.3 });
+  for (const y of [YB, YF]) { const e = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.18, 160, 1, true), edgeMat); e.position.y = y - 0.09; g.add(e); }
+  const hub = cyl(HUB, FLANGE_GAP, blackPlastic, 64); hub.position.y = YB + FLANGE_GAP / 2; g.add(hub);
+  const pack = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, TW, 160, 1, false), [packSide, packTop, packTop]); pack.position.y = YM; pack.castShadow = true; pack.receiveShadow = true; g.add(pack);
+  // three-lobed black hold-down knob on the spindle
+  const knob = new THREE.Group(); knob.position.y = YF;
+  const kc = cyl(3.0, 2.4, blackPlastic, 48); kc.position.y = 1.2; knob.add(kc);
+  for (let k = 0; k < 3; k++) { const l = cyl(1.25, 2.2, blackPlastic, 32); const a = k * Math.PI * 2 / 3; l.position.set(Math.cos(a) * 2.7, 1.1, Math.sin(a) * 2.7); knob.add(l); }
+  const cap = cyl(0.6, 0.3, chrome, 24); cap.position.y = 2.55; knob.add(cap);
+  g.add(knob);
+  return { g, fm, pack, knob, dir: 1, angle: 0 };
+}
+const reelS = makeReel('a499', P.supply);
+const reelT = makeReel('gp9', P.takeup);
+
+// ---------- guides, capstan, pinch roller, head block ----------
+function post(at, r, h, mat, baseR) {
+  const g = new THREE.Group(); g.position.set(at.x, 0, at.z);
+  const base = cyl(baseR, 1.0, blackPlastic); base.position.y = 0.5; g.add(base);
+  const body = cyl(r, h, mat); body.position.y = 1 + h / 2; g.add(body);
+  const top = cyl(r * 0.45, 0.2, chrome, 24); top.position.y = 1 + h + 0.1; g.add(top);
+  scene.add(g); return g;
+}
+post(P.guideL, P.guideL.r, 11.5, blackPlastic, 2.4);
+post(P.guideR, P.guideR.r, 12.5, ribbed, 3.4);
+post(P.capstan, P.capstan.r, 12, ribbed, 2.6);
+const pins = [P.pinL, P.pinR].map((pn) => { const m = cyl(pn.r, 10, chrome, 16); m.position.set(pn.x, 1 + 5, TF - 0.8); scene.add(m); return m; });
+const pinchG = new THREE.Group(); scene.add(pinchG);
+const pinchRoller = cyl(P.pinch.r, 10.5, cream, 32); pinchRoller.position.y = 1 + 5.25; pinchG.add(pinchRoller);
+const pinchArm = boxM(5.5, 2.2, 2.4, blackPlastic); pinchArm.position.set(3.2, 1.1, 0.6); pinchG.add(pinchArm);
+// head block: black housing, brushed silver lid, three head stacks touching the tape
+const head = new THREE.Group(); scene.add(head);
+const hb = boxM(22, 12, 9.6, new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.42 })); hb.position.set(0, 6, 10.6); head.add(hb);
+const lidTex = canvasTex(512, 256, (g, w, h) => { g.fillStyle = '#c3c6ca'; g.fillRect(0, 0, w, h); for (let i = 0; i < 2000; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,255,255' : '0,0,0'},0.05)`; g.fillRect(Math.random() * w, Math.random() * h, 80, 1); } g.fillStyle = '#5c5f63'; for (let k = 0; k < 9; k++) g.fillRect(40 + k * 50, 50, 22, 156); });
+const lid = boxM(20.6, 0.3, 8.4, new THREE.MeshStandardMaterial({ map: lidTex, metalness: 0.85, roughness: 0.32 })); lid.position.set(0, 12.15, 10.6); head.add(lid);
+const headMat = new THREE.MeshStandardMaterial({ color: 0x1d2a3c, roughness: 0.3, metalness: 0.5 });
+for (const hx of [-7.5, 0, 7.5]) {
+  const mount = boxM(5.2, 8.4, 0.9, chrome); mount.position.set(hx, 6.0, 15.55); head.add(mount);
+  const core = boxM(4.4, TW + 0.2, 0.25, headMat); core.position.set(hx, YM, 16.1); head.add(core);
+  const gap = boxM(0.12, TW + 0.2, 0.3, chrome); gap.position.set(hx, YM, 16.2); head.add(gap);
+}
+
+// ---------- 3D transport strip (lights follow the transport state) ----------
+const strip = new THREE.Group(); strip.position.set(0, 0, 28); strip.rotation.x = -0.14; scene.add(strip);
+const stripBody = boxM(84, 2, 7, new THREE.MeshStandardMaterial({ color: 0x5e5852, roughness: 0.55 })); stripBody.position.y = 1; strip.add(stripBody);
+const stripKeys = {};
+[['rew', 0xefece4], ['ff', 0xefece4], ['stop', 0xefece4], ['play', 0x3fc9a0], ['rec', 0xe0322a], ['lift', 0x3f7fd6], ['edit', 0xea8a2a]].forEach(([k, c], i) => {
+  const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.35, emissive: c, emissiveIntensity: 0 });
+  const b = boxM(3, 0.8, 2.6, m); b.position.set(-12 + i * 4.2, 2.3, 0); strip.add(b); stripKeys[k] = m;
+});
+
+// ---------- tape ribbon (2" tape standing on edge, rebuilt every frame) ----------
+const MAXP = 900;
+const tapeGeo = new THREE.BufferGeometry();
+const tPos = new Float32Array(MAXP * 2 * 3), tNor = new Float32Array(MAXP * 2 * 3), tUv = new Float32Array(MAXP * 2 * 2);
+tapeGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
+tapeGeo.setAttribute('normal', new THREE.BufferAttribute(tNor, 3));
+tapeGeo.setAttribute('uv', new THREE.BufferAttribute(tUv, 2));
+const idx = []; for (let i = 0; i < MAXP - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } tapeGeo.setIndex(idx);
+const tapeTex = canvasTex(512, 16, (g, w, h) => { for (let x = 0; x < w; x++) { const k = 42 + Math.random() * 22; g.fillStyle = `rgb(${k + 10},${k},${k - 8})`; g.fillRect(x, 0, 1, h); } }, true);
+const tapeMat = new THREE.MeshStandardMaterial({ map: tapeTex, color: 0x5a4636, roughness: 0.5, metalness: 0.05, side: THREE.DoubleSide });
+const tapeMesh = new THREE.Mesh(tapeGeo, tapeMat); tapeMesh.castShadow = true; tapeMesh.receiveShadow = true; tapeMesh.frustumCulled = false; scene.add(tapeMesh);
+
+const N = [0, -1], S = [0, 1], E = [1, 0], SE = [0.7, 0.7];
+function tangent(A, B, sa, sb) {
+  const dx = B.x - A.x, dz = B.z - A.z, D = Math.hypot(dx, dz);
+  const ra = sa * A.r, rb = sb * B.r, k = (ra - rb) / D, ux = dx / D, uz = dz / D, h = Math.sqrt(Math.max(0, 1 - k * k));
+  return [1, -1].map((sg) => { const nx = k * ux - sg * h * uz, nz = k * uz + sg * h * ux; return [[A.x + ra * nx, A.z + ra * nz], [B.x + rb * nx, B.z + rb * nz]]; });
+}
+function pickTangent(A, B, ha, hb) {
+  let best, bs = -1e9;
+  for (const sa of [1, -1]) for (const sb of [1, -1]) for (const [pa, pb] of tangent(A, B, sa, sb)) {
+    const s = ((pa[0] - A.x) * ha[0] + (pa[1] - A.z) * ha[1]) / A.r + ((pb[0] - B.x) * hb[0] + (pb[1] - B.z) * hb[1]) / B.r;
+    if (s > bs) { bs = s; best = [pa, pb]; }
+  }
+  return best;
+}
+function tapePath(rS, rT, lift, pinchOut) {
+  const sPack = { x: P.supply.x, z: P.supply.z, r: rS }, tPack = { x: P.takeup.x, z: P.takeup.z, r: rT };
+  const chain = [[sPack, SE, SE], [P.guideL, N, N]];
+  if (lift > 0.02) {
+    const zp = TF - 0.35 + 0.75 * lift;
+    chain.push([{ x: P.pinL.x, z: zp, r: P.pinL.r }, S, S], [{ x: P.pinR.x, z: zp, r: P.pinR.r }, S, S]);
+  }
+  chain.push([P.capstan, S, S], [P.guideR, S, E], [tPack, E, E]);
+  const pts = [];
+  const contacts = [];
+  for (let i = 0; i < chain.length - 1; i++) contacts.push(pickTangent(chain[i][0], chain[i + 1][0], chain[i][2], chain[i + 1][1]));
+  pts.push(contacts[0][0]);
+  for (let i = 1; i < chain.length; i++) {
+    const pin = contacts[i - 1][1]; pts.push(pin);
+    if (i === chain.length - 1) break;
+    const C = chain[i][0], pout = contacts[i][0];
+    let a0 = Math.atan2(pin[1] - C.z, pin[0] - C.x), a1 = Math.atan2(pout[1] - C.z, pout[0] - C.x);
+    let da = a1 - a0; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+    const n = Math.max(2, Math.ceil(Math.abs(da) / 0.12));
+    for (let k = 1; k <= n; k++) { const t = a0 + da * k / n; pts.push([C.x + C.r * Math.cos(t), C.z + C.r * Math.sin(t)]); }
+  }
+  // tape also wraps a little way onto each pack, hidden between the flanges
+  return { pts, first: contacts[0][0], firstDir: sub(contacts[0][1], contacts[0][0]), last: contacts[contacts.length - 1][1], lastDir: sub(contacts[contacts.length - 1][1], contacts[contacts.length - 1][0]) };
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
+function writeTape(pts, offset) {
+  let L = 0; const n = Math.min(pts.length, MAXP);
+  for (let i = 0; i < n; i++) {
+    const [x, z] = pts[i];
+    if (i > 0) L += Math.hypot(x - pts[i - 1][0], z - pts[i - 1][1]);
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+    let nx = -(b[1] - a[1]), nz = b[0] - a[0]; const nl = Math.hypot(nx, nz) || 1; nx /= nl; nz /= nl;
+    const o = i * 6;
+    tPos[o] = x; tPos[o + 1] = Y0; tPos[o + 2] = z; tPos[o + 3] = x; tPos[o + 4] = Y0 + TW; tPos[o + 5] = z;
+    tNor[o] = nx; tNor[o + 1] = 0; tNor[o + 2] = nz; tNor[o + 3] = nx; tNor[o + 4] = 0; tNor[o + 5] = nz;
+    const u = L / 18 - offset; const q = i * 4; tUv[q] = u; tUv[q + 1] = 0; tUv[q + 2] = u; tUv[q + 3] = 1;
+  }
+  tapeGeo.setDrawRange(0, Math.max(0, (n - 1) * 6));
+  tapeGeo.attributes.position.needsUpdate = true; tapeGeo.attributes.normal.needsUpdate = true; tapeGeo.attributes.uv.needsUpdate = true;
+}
+const cross2 = (a, b) => a[0] * b[1] - a[1] * b[0];
+
+// ---------- simulation + UI ----------
+const tr = new Transport({ totalLength: 5000 * FT, onTakeup: 0, speedIPS: 30 });
+let blurOn = true;
+const $ = (id) => document.getElementById(id);
+const keysUI = { rew: $('k-rew'), ff: $('k-ff'), stop: $('k-stop'), play: $('k-play'), rec: $('k-rec') };
+function setMode(m) { if (m !== 'shuttle') $('shuttle').value = 0; tr.command(m); }
+$('k-rew').onclick = () => setMode('rew'); $('k-ff').onclick = () => setMode('ff'); $('k-stop').onclick = () => setMode('stop');
+$('k-play').onclick = () => setMode('play'); $('k-rec').onclick = () => setMode('rec');
+$('k-lift').onclick = () => { tr.liftDefeat = !tr.liftDefeat; };
+$('k-15').onclick = () => tr.setSpeed(15); $('k-30').onclick = () => tr.setSpeed(30);
+$('shuttle').oninput = (e) => { const v = Number(e.target.value) / 100; if (v === 0) tr.command('stop'); else tr.setShuttle(v * Math.abs(v)); };
+$('shuttle').onchange = (e) => { if (Number(e.target.value) === 0) tr.command('stop'); };
+const load = (frac) => { tr.locate(tr.total * frac); tr.zero = 0; };
+$('k-head').onclick = () => load(0); $('k-mid').onclick = () => load(0.5); $('k-tail').onclick = () => load(0.97);
+$('k-blur').onclick = () => { blurOn = !blurOn; };
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  const k = e.key.toLowerCase();
+  if (k === ' ') { e.preventDefault(); setMode(tr.mode === 'play' || tr.mode === 'rec' ? 'stop' : 'play'); }
+  else if (k === 'arrowleft') setMode('rew'); else if (k === 'arrowright') setMode('ff');
+  else if (k === 's') setMode('stop'); else if (k === 'r') setMode('rec'); else if (k === 'b') blurOn = !blurOn;
+});
+// orbit / zoom
+let drag = null;
+renderer.domElement.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, az: view.az, el: view.el }; renderer.domElement.setPointerCapture(e.pointerId); });
+renderer.domElement.addEventListener('pointermove', (e) => { if (!drag) return; view.az = Math.max(-0.7, Math.min(0.7, drag.az - (e.clientX - drag.x) * 0.004)); view.el = Math.max(0.3, Math.min(1.35, drag.el + (e.clientY - drag.y) * 0.004)); placeCamera(); });
+renderer.domElement.addEventListener('pointerup', () => { drag = null; });
+renderer.domElement.addEventListener('wheel', (e) => { e.preventDefault(); view.dist = Math.max(45, Math.min(190, view.dist * Math.exp(e.deltaY * 0.001))); placeCamera(); }, { passive: false });
+window.addEventListener('resize', () => { renderer.setSize(window.innerWidth, window.innerHeight); camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); });
+
+const fmtTime = (s) => { const neg = s < 0; s = Math.abs(s); const m = Math.floor(s / 60), r = s - m * 60; return (neg ? '-' : '') + String(m).padStart(2, '0') + ':' + r.toFixed(1).padStart(4, '0'); };
+let last = performance.now(), fpsAcc = 0, fpsN = 0, fpsT = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  tr.advance(dt);
+  fpsAcc += dt; fpsN++; if (now - fpsT > 500) { $('fps').textContent = `${Math.round(fpsN / fpsAcc)} fps`; fpsAcc = 0; fpsN = 0; fpsT = now; }
+
+  const rS = tr.rS * CM, rT = tr.rT * CM;
+  const path = tapePath(rS, rT, tr.lift, 1 - tr.pinch);
+  writeTape(path.pts, (tr.take * CM) / 18);
+  // reel direction from where the tape meets each pack; screen-CCW is positive in reel uv space
+  const dirS = -Math.sign(cross2(sub(path.first, [P.supply.x, P.supply.z]), path.firstDir)) || 1;
+  const dirT = -Math.sign(cross2(sub(path.last, [P.takeup.x, P.takeup.z]), path.lastDir)) || 1;
+  const shutter = blurOn ? 0.5 * Math.max(dt, 1 / 120) : 0;
+  for (const [reel, ang, w, r, dir] of [[reelS, tr.angleS, tr.wS, rS, dirS], [reelT, tr.angleT, tr.wT, rT, dirT]]) {
+    const a = dir * ang;
+    reel.fm.userData.u.uAngle.value = a;
+    reel.fm.userData.u.uBlur.value = Math.min(Math.PI * 2, Math.abs(w) * shutter);
+    reel.knob.rotation.y = a;
+    reel.pack.scale.set(r, 1, r);
+    // a hint of flange run-out, as on a real reel
+    reel.g.rotation.x = 0.0016 * Math.sin(a); reel.g.rotation.z = 0.0016 * Math.cos(a);
+  }
+  // pinch roller swings in when the capstan drives
+  const out = 1 - tr.pinch;
+  pinchG.position.set(P.pinch.x + 1.0 * out, 0, P.pinch.z + 1.6 * out);
+  pinchRoller.rotation.y = tr.capstanDriving ? (-tr.take * CM / P.pinch.r) : pinchRoller.rotation.y;
+  pins.forEach((m) => { m.position.z = TF - 0.35 + 0.75 * tr.lift; });
+  // strip lights + HTML keys
+  const m = tr.mode;
+  for (const [k, mat] of Object.entries(stripKeys)) mat.emissiveIntensity = (k === m || (k === 'play' && m === 'rec') || (k === 'lift' && tr.liftDefeat)) ? 0.9 : 0.0;
+  for (const [k, el] of Object.entries(keysUI)) el.setAttribute('aria-pressed', String(k === m || (k === 'play' && m === 'rec')));
+  $('k-lift').setAttribute('aria-pressed', String(tr.liftDefeat));
+  $('k-15').setAttribute('aria-pressed', String(tr.speedIPS === 15)); $('k-30').setAttribute('aria-pressed', String(tr.speedIPS === 30));
+  $('k-blur').setAttribute('aria-pressed', String(blurOn));
+  // readouts
+  $('ctr').textContent = fmtTime(tr.counter);
+  const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE' })[m];
+  st.className = 'state' + (m === 'rec' ? ' rec' : m !== 'stop' ? ' on' : '');
+  $('v').textContent = `${(tr.v / IPS).toFixed(1)} ips`;
+  $('rs').textContent = `${Math.round(Math.abs(tr.wS) * 60 / (2 * Math.PI))} rpm`;
+  $('rt').textContent = `${Math.round(Math.abs(tr.wT) * 60 / (2 * Math.PI))} rpm`;
+  $('left').textContent = `${Math.round(tr.supply / FT)} ft`;
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__jh24 = { tr, setMode, view, placeCamera };
+</script>
+
+</body></html>
