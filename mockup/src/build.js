@@ -150,7 +150,7 @@ function vuAngle(db) {
 }
 let vuId = 0;
 function vu(x, y, w, h, db, opts = {}) {
-  const { label = '', faceFill = 'url(#vuFace)', bezel = '#0e0e0f', brand = '' } = opts;
+  const { label = '', faceFill = 'url(#vuFace)', bezel = '#0e0e0f', brand = '', fontScale = 0.085 } = opts;
   const id = `vuc${vuId++}`;
   rect(x - 4, y - 4, w + 8, h + 8, bezel, 'rx="5"');
   rect(x - 4, y - 4, w + 8, h + 8, 'url(#bezelHi)', 'rx="5"');
@@ -165,12 +165,12 @@ function vu(x, y, w, h, db, opts = {}) {
   };
   arc(R * 0.78, -45, vuAngle(0), '#1b1712', Math.max(1, h * 0.012));
   arc(R * 0.78 + h * 0.025, vuAngle(0), 45, '#c81e12', h * 0.05);
-  const fs = Math.max(6, h * 0.085);
+  const fs = Math.max(6, h * fontScale);
   for (const [d] of VU_MAP) {
     const a = vuAngle(d);
     const [x1, y1] = polar(cx, cy, R * 0.78, a), [x2, y2] = polar(cx, cy, R * 0.86, a);
     p(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${d > 0 ? '#c81e12' : '#1b1712'}" stroke-width="${Math.max(1, h * 0.014)}"/>`);
-    if ([-20, -10, -7, -5, -3, -1, 0, 1, 2, 3].includes(d) && !(h < 90 && [-7, -1, 2].includes(d))) {
+    if ([-20, -10, -7, -5, -3, -1, 0, 1, 2, 3].includes(d) && !(h < 90 && [-7, -1, 2].includes(d)) && !(fontScale > 0.1 && [-1, 1, 2].includes(d))) {
       const [tx, ty] = polar(cx, cy, R * 0.93, a);
       text(tx, ty + fs * 0.35, d > 0 ? `+${d}` : String(Math.abs(d)), fs, d > 0 ? '#c81e12' : '#1b1712', 'middle', 700);
     }
@@ -355,88 +355,150 @@ rect(TX, TY, TW, TH, '#2a2725', 'rx="10"');
 p(`</g>`);
 
 // =====================================================================
-// AUTOLOCATOR REMOTE
+// AUTOLOCATOR (AL-III) + TAPE METER BRIDGE: CSS 3D scenes; faces drawn with the SVG helpers
 // =====================================================================
-const AX = 1408, AY = 96, AW = 400, AH = 776;
-p(`<g filter="url(#shadow)">`);
-rect(AX, AY, AW, AH, '#3d3936', 'rx="10"');
-p(`</g>`);
-rect(AX + 8, AY + 8, AW - 16, AH - 16, 'url(#deck)', 'rx="6"');
-rect(AX + 8, AY + 8, AW - 16, AH - 16, '#000', 'filter="url(#brushed)" opacity="0.1" rx="6"');
-text(AX + 28, AY + 44, 'AUTOLOCATOR', 15, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(AX + AW - 28, AY + 44, 'AL-III', 13, '#ece7dc', 'end', 800, 'letter-spacing="2"');
-// counter
-rect(AX + 24, AY + 64, AW - 48, 104, '#000', 'rx="6"');
-rect(AX + 30, AY + 70, AW - 60, 92, 'url(#displayBg)', 'rx="4"');
-seg7(AX + 46, AY + 86, 56, '03:42.1', '#ff3220');
-rect(AX + 30, AY + 70, AW - 60, 40, 'url(#glass)', 'rx="4"');
-text(AX + 40, AY + 186, 'MIN', 9, '#d9d3c7', 'start', 800);
-text(AX + 150, AY + 186, 'SEC', 9, '#d9d3c7', 'start', 800);
-text(AX + 286, AY + 186, 'TENTHS', 9, '#d9d3c7', 'start', 800);
-// locate points
-text(AX + 28, AY + 222, 'LOCATE POINTS', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-const locs = [['1', 'INTRO', '00:00.0'], ['2', 'VERSE 1', '00:21.4'], ['3', 'CHORUS', '01:02.8'], ['4', 'SOLO', '02:47.3']];
-locs.forEach(([n, nm, tm], i) => {
-  const ry = AY + 236 + i * 46;
-  button(AX + 28, ry, 48, 36, 'amber', i === 2, `LOC ${n}`, { size: 10 });
-  rect(AX + 86, ry, AW - 114, 36, '#0b0b0c', 'rx="3"');
-  text(AX + 98, ry + 23, nm, 13, '#e9dcc0', 'start', 600);
-  text(AX + AW - 40, ry + 24, tm, 15, '#ff6a50', 'end', 700, `font-family="'JetBrains Mono', monospace"`);
-});
-// keypad
-const kx = AX + 28, ky = AY + 438;
-const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'CLR', '0', 'ENT'];
-keys.forEach((k, i) => {
-  const c = i % 3, r = Math.floor(i / 3);
-  button(kx + c * 62, ky + r * 48, 54, 40, 'blue', false, k, { size: 13, pastel: true });
-});
-const sideKeys = [['STORE', 'amber', false], ['RECALL', 'amber', false], ['LOCATE', 'green', false], ['ZERO', 'white', false]];
-sideKeys.forEach(([k, col, on], i) => button(kx + 200, ky + i * 48, 144, 40, col, on, k, { size: 12 }));
-// punch + track arm group
-const py = ky + 206;
-text(AX + 28, py, 'PUNCH', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-button(AX + 28, py + 12, 106, 38, 'red', true, 'PUNCH IN', { size: 11 });
-button(AX + 144, py + 12, 106, 38, 'red', false, 'PUNCH OUT', { size: 11 });
-button(AX + 260, py + 12, 84, 38, 'amber', false, 'AUTO', { size: 11 });
-text(AX + 28, py + 78, 'TRACKS', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-button(AX + 28, py + 90, 156, 34, 'red', false, 'ALL READY', { size: 11 });
-button(AX + 192, py + 90, 152, 34, 'white', false, 'ALL SAFE', { size: 11 });
-
-// =====================================================================
-// TAPE METER BRIDGE (24 VU + READY/SAFE)
-// =====================================================================
-const MX = 1830, MY = 76, MW = 1440, MH = 816;
-p(`<g filter="url(#shadow)">`);
-rect(MX, MY, MW, MH, '#3d3936', 'rx="10"');
-p(`</g>`);
-rect(MX + 8, MY + 8, MW - 16, MH - 16, 'url(#deck)', 'rx="6"');
-rect(MX + 8, MY + 8, MW - 16, MH - 16, '#000', 'filter="url(#brushed)" opacity="0.08" rx="6"');
-text(MX + 30, MY + 42, 'TAPE METER BRIDGE', 13, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(MX + MW - 30, MY + 42, 'REPRO  ·  INPUT  ·  SYNC', 11, '#d9d3c7', 'end', 800, 'letter-spacing="2"');
-button(MX + MW - 330, MY + 26, 66, 22, 'green', true, 'REPRO', { size: 9 });
+const capture = (fn) => { const st = out.length; fn(); return out.splice(st).join('\n'); };
+const svgWrap = (w, h, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="position:absolute;left:0;top:0;overflow:visible">${body}</svg>`;
+const B3 = (st) => `position:absolute;transform-style:preserve-3d;${st}`;
+const scenes3d = [];
 const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'TAMB'];
 const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + rnd() * 15));
 const readyTracks = new Set([19, 20, 21]);
-for (let i = 0; i < 24; i++) {
-  const c = i % 8, r = Math.floor(i / 8);
-  const cx0 = MX + 24 + c * 174, cy0 = MY + 66 + r * 246;
-  rect(cx0, cy0, 166, 234, '#4c4743', 'rx="4"');
-  rect(cx0, cy0, 166, 234, 'url(#bezelHi)', 'rx="4" opacity="0.6"');
-  const lampOn = readyTracks.has(i);
-  circle(cx0 + 148, cy0 + 11, 4.5, lampOn ? '#ff3b2f' : '#4a1612', lampOn ? 'filter="url(#glow)"' : '');
-  circle(cx0 + 134, cy0 + 11, 4.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
-  vu(cx0 + 11, cy0 + 24, 144, 100, tapeDb[i], { label: String(i + 1), brand: 'MCI' });
-  // track number + name
-  text(cx0 + 12, cy0 + 150, String(i + 1).padStart(2, '0'), 20, '#e9e3d0', 'start', 800);
-  rect(cx0 + 50, cy0 + 132, 104, 24, 'url(#tapeMask)', 'rx="1" transform="rotate(-0.6 ' + (cx0 + 100) + ' ' + (cy0 + 144) + ')"');
-  text(cx0 + 102, cy0 + 150, tapeNames[i], 13, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-  const ready = lampOn;
-  button(cx0 + 12, cy0 + 168, 68, 30, 'red', ready, 'READY', { size: 10 });
-  button(cx0 + 86, cy0 + 168, 68, 30, 'white', !ready, 'SAFE', { size: 10 });
-  // rec lamp
-  circle(cx0 + 20, cy0 + 218, 5, ready ? '#ff3b2f' : '#3a1210', ready ? 'filter="url(#glow)"' : '');
-  text(cx0 + 32, cy0 + 222, ready ? 'REC' : 'IN ' + (i + 1), 10, ready ? '#ff8a7a' : '#d9d3c7', 'start', 800, 'letter-spacing="1"');
-  text(cx0 + 154, cy0 + 222, ready ? 'INPUT' : 'REPRO', 10, '#d9d3c7', 'end', 800, 'letter-spacing="1"');
+const LEG = '#ece7dc';   // legend colour on taupe
+
+// ---------------- AL-III autolocator on its pedestal ----------------
+const AX = 1408, AY = 76, AW = 400, AH = 816;
+{
+  const FW = 376, FD = 640, LIP = 44, TOP = -40, SLOPE = 28;
+  const face = capture(() => {
+    rect(0, 0, FW, FD, 'url(#deck)', 'rx="8"');
+    rect(0, 0, FW, FD, '#000', 'filter="url(#brushed)" opacity="0.1" rx="8"');
+    rect(0, 0, FW, 2, '#fff', 'opacity="0.25"');
+    rect(4, 4, FW - 8, FD - 8, 'none', 'rx="6" stroke="#2f2b28" stroke-width="1.5"');
+    rect(14, 14, 64, 24, '#0c0c0d', 'rx="2"');
+    text(46, 32, 'MCI', 15, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    text(FW - 14, 33, 'AUTOLOCATOR III', 15, LEG, 'end', 800, 'letter-spacing="1.5"');
+    // two red LED displays
+    rect(12, 48, 244, 76, '#000', 'rx="5"'); rect(17, 53, 234, 66, 'url(#displayBg)', 'rx="3"');
+    seg7(26, 63, 44, '03:42.1', '#ff3220'); rect(17, 53, 234, 26, 'url(#glass)', 'rx="3"');
+    rect(264, 48, 100, 76, '#000', 'rx="5"'); rect(269, 53, 90, 66, 'url(#displayBg)', 'rx="3"');
+    seg7(290, 63, 44, ' 3', '#ff3220'); rect(269, 53, 90, 26, 'url(#glass)', 'rx="3"');
+    text(134, 144, 'TAPE TIME', 14, LEG, 'middle', 800, 'letter-spacing="1"');
+    text(314, 144, 'LOC', 14, LEG, 'middle', 800, 'letter-spacing="1"');
+    // locate memories
+    const locs = [['1', 'INTRO', '00:00.0'], ['2', 'VERSE 1', '00:21.4'], ['3', 'CHORUS', '01:02.8'], ['4', 'SOLO', '02:47.3']];
+    locs.forEach(([n, nm, tm], i) => {
+      const ry = 158 + i * 42;
+      button(12, ry, 60, 34, 'amber', i === 2, `LOC ${n}`, { size: 14, pastel: i !== 2 });
+      rect(80, ry, FW - 92, 34, '#0b0b0c', 'rx="3"'); rect(80, ry, FW - 92, 2, '#000', 'opacity="0.8"');
+      text(92, ry + 23, nm, 15, '#e9dcc0', 'start', 600);
+      text(FW - 22, ry + 24, tm, 16, '#ff6a50', 'end', 700, `font-family="'JetBrains Mono', monospace"`);
+    });
+    // 24 round black track-select buttons (armed tracks glow red)
+    text(12, 344, 'TRACK READY', 14, LEG, 'start', 800, 'letter-spacing="1"');
+    for (let t = 0; t < 24; t++) {
+      const cx = 30 + (t % 8) * 45, cy = 370 + Math.floor(t / 8) * 36;
+      const on = readyTracks.has(t);
+      circle(cx + 1.5, cy + 3, 15, '#000', 'opacity="0.5"');
+      if (on) circle(cx, cy, 16, '#ff3b2f', 'filter="url(#glow)"');
+      circle(cx, cy, 14, '#121214'); circle(cx, cy, 14, 'url(#capHiDark)');
+      text(cx, cy + 5, String(t + 1), 14, on ? '#ff8a7a' : '#d8d8d8', 'middle', 800);
+    }
+    // keypad (light blue), function keys, punch keys
+    const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'CLR', '0', 'ENT'];
+    keys.forEach((k, i) => button(12 + (i % 3) * 48, 478 + Math.floor(i / 3) * 34, 42, 28, 'blue', false, k, { size: k.length > 1 ? 14 : 16, pastel: true }));
+    ['STORE', 'RECALL', 'LOCATE', 'ZERO'].forEach((k, i) => button(162, 478 + i * 34, 94, 28, i === 2 ? 'green' : 'white', false, k, { size: 14, pastel: true }));
+    [['PUNCH IN', 'red', true], ['PUNCH OUT', 'red', false], ['AUTO', 'amber', false], ['ALL SAFE', 'white', false]].forEach(([k, c, on], i) => button(266, 478 + i * 34, 98, 28, c, on, k, { size: 14, pastel: !on }));
+    // transport keys
+    [['◀◀', 'white'], ['▶▶', 'white'], ['■', 'yellow'], ['▶', 'green'], ['●', 'red']].forEach(([g, c], i) => {
+      button(12 + i * 72, 614, 64, 20, c, i >= 3, '', { pastel: i < 3 });
+      text(44 + i * 72, 630, g, 15, '#1a1208', 'middle', 800);
+    });
+  });
+  // side planes (wedge)
+  const depth = FD * Math.sin(SLOPE * Math.PI / 180), rise = FD * Math.cos(SLOPE * Math.PI / 180);
+  const yb = TOP + FD;            // bottom edge of the face (rotation origin)
+  const side = (x) => `<div style="${B3(`left:${x}px;top:${yb - rise}px;width:${depth}px;height:${rise + LIP}px;transform-origin:0 0;transform:rotateY(90deg);background:linear-gradient(180deg,#5a5550,#3a3633);clip-path:polygon(${depth}px 0, 0 ${rise}px, 0 ${rise + LIP}px, ${depth}px ${rise + LIP}px)`)}"></div>`;
+  const cable = `<svg width="${AW}" height="${AH}" style="position:absolute;left:0;top:0;overflow:visible">
+    <defs><linearGradient id="cab" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6d7078"/><stop offset="0.4" stop-color="#b9bcc2"/><stop offset="1" stop-color="#55585e"/></linearGradient>
+    <linearGradient id="pole" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c2926"/><stop offset="0.35" stop-color="#7a746d"/><stop offset="0.6" stop-color="#4a4541"/><stop offset="1" stop-color="#1e1c1a"/></linearGradient>
+    <linearGradient id="foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a746d"/><stop offset="1" stop-color="#2c2926"/></linearGradient>
+    <filter id="cs"><feGaussianBlur stdDeviation="8"/></filter></defs>
+    <ellipse cx="200" cy="${AH - 18}" rx="170" ry="16" fill="#000" opacity="0.55" filter="url(#cs)"/>
+    <rect x="186" y="${yb + LIP - 6}" width="30" height="${AH - yb - LIP - 22}" fill="url(#pole)"/>
+    <rect x="176" y="${yb + LIP - 8}" width="50" height="16" rx="3" fill="url(#foot)"/>
+    <path d="M40 ${AH - 34} L360 ${AH - 34} L372 ${AH - 20} L28 ${AH - 20} Z" fill="url(#foot)"/>
+    <rect x="22" y="${AH - 22}" width="40" height="14" rx="3" fill="#1e1c1a"/><rect x="338" y="${AH - 22}" width="40" height="14" rx="3" fill="#1e1c1a"/>
+    <rect x="186" y="${AH - 46}" width="30" height="16" rx="2" fill="url(#pole)"/>
+    ${[0, 1, 2].map((k) => `<path d="M${300 + k * 8} ${yb + 30} C${330 + k * 8} ${yb + 120} ${250 + k * 10} ${AH - 120} ${410} ${AH - 40 - k * 10}" fill="none" stroke="url(#cab)" stroke-width="9" stroke-linecap="round"/>`).join('')}
+  </svg>`;
+  scenes3d.push(`<div style="position:absolute;left:${AX}px;top:${AY}px;width:${AW}px;height:${AH}px;perspective:2600px;perspective-origin:50% 30%;">
+    ${cable}
+    <div style="${B3(`left:12px;top:0;width:${FW}px;height:${AH}px`)}">
+      ${side(0)}${side(FW)}
+      <div style="${B3(`left:0;top:${yb}px;width:${FW}px;height:${LIP}px;background:linear-gradient(180deg,#4e4945,#2e2a27);border-radius:0 0 6px 6px`)}"><div style="position:absolute;left:14px;top:12px;font:800 14px ${SANS};color:${LEG};letter-spacing:2px">AL-III REMOTE</div></div>
+      <div style="${B3(`left:0;top:${TOP}px;width:${FW}px;height:${FD}px;transform-origin:50% 100%;transform:rotateX(${SLOPE}deg);filter:drop-shadow(0 10px 18px rgba(0,0,0,0.5))`)}">${svgWrap(FW, FD, face)}</div>
+    </div>
+  </div>`);
+}
+
+// ---------------- Tape meter bridge: three stepped tiers of 8 VU meters ----------------
+const MX = 1830, MY = 76, MW = 1440, MH = 816;
+{
+  const TW3 = 1400, FH = 236, STEP = 58, X0 = 20, Y0 = 34;
+  const tierFace = (tier) => capture(() => {
+    rect(0, 0, TW3, FH, 'url(#deck)');
+    rect(0, 0, TW3, FH, '#000', 'opacity="0.38"');
+    rect(0, 0, TW3, FH, '#000', 'filter="url(#brushed)" opacity="0.08"');
+    rect(0, 0, TW3, 2, '#fff', 'opacity="0.18"');
+    rect(0, FH - 3, TW3, 3, '#000', 'opacity="0.5"');
+    for (let c = 0; c < 8; c++) {
+      const i = (2 - tier) * 8 + c, x = 10 + c * 173.5;
+      const on = readyTracks.has(i);
+      // lamps above each meter: red record, blue status
+      circle(x + 138, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+      circle(x + 120, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
+      // recessed meter window
+      rect(x + 6, 26, 156, 118, '#0a0908', 'rx="6"');
+      rect(x + 6, 26, 156, 118, 'url(#bezelHi)', 'rx="6"');
+      vu(x + 16, 34, 136, 102, tapeDb[i], { fontScale: 0.125 });
+      rect(x + 12, 30, 144, 10, '#000', 'opacity="0.35"');          // recess shadow, top
+      rect(x + 12, 30, 6, 110, '#000', 'opacity="0.25"');           // recess shadow, left
+      // number, masking-tape name, READY / SAFE
+      text(x + 8, 172, String(i + 1).padStart(2, '0'), 18, LEG, 'start', 800);
+      rect(x + 42, 154, 120, 26, 'url(#tapeMask)', `rx="1" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 100} ${167})"`);
+      text(x + 102, 173, tapeNames[i], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      button(x + 8, 190, 74, 30, 'red', on, 'READY', { size: 14, pastel: false });
+      button(x + 88, 190, 74, 30, 'white', !on, 'SAFE', { size: 14 });
+    }
+  });
+  const faces = [0, 1, 2].map((t) => {
+    const top = Y0 + (2 - t) * FH, z = -t * STEP;
+    const ledge = t < 2 ? `<div style="${B3(`left:${X0}px;top:${top}px;width:${TW3}px;height:${STEP}px;transform-origin:50% 0;transform:translateZ(${z}px) rotateX(-90deg);background:linear-gradient(0deg,#5a5550,#3e3a37)`)}"></div>` : '';
+    return `<div style="${B3(`left:${X0}px;top:${top}px;width:${TW3}px;height:${FH}px;transform:translateZ(${z}px)`)}">${svgWrap(TW3, FH, tierFace(t))}</div>${ledge}`;
+  }).join('\n');
+  // top cap and stepped end caps
+  const topCap = `<div style="${B3(`left:${X0}px;top:${Y0}px;width:${TW3}px;height:${STEP + 40}px;transform-origin:50% 0;transform:translateZ(${-2 * STEP}px) rotateX(-90deg);background:linear-gradient(0deg,#625c56,#3a3633)`)}"></div>`;
+  const yb = Y0 + 3 * FH, D = 2 * STEP + 40;
+  const poly = `0 ${yb - Y0}px, 0 ${2 * FH}px, ${STEP}px ${2 * FH}px, ${STEP}px ${FH}px, ${2 * STEP}px ${FH}px, ${2 * STEP}px 0, ${D}px 0, ${D}px ${yb - Y0}px`;
+  const endCap = (x) => `<div style="${B3(`left:${x}px;top:${Y0}px;width:${D}px;height:${yb - Y0}px;transform-origin:0 0;transform:rotateY(90deg);background:linear-gradient(90deg,#4a4541,#2c2926);clip-path:polygon(${poly})`)}"></div>`;
+  // plinth with the monitor-mode keys
+  const plinth = capture(() => {
+    rect(0, 0, TW3 + 24, 86, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
+    rect(0, 0, TW3 + 24, 86, '#000', 'opacity="0.15"');
+    rect(18, 22, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 41, 'MCI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    text(104, 41, 'JH-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
+    text(TW3 - 330, 41, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
+    [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 18, 96, 32, 'green', on, k, { size: 14 }));
+  });
+  scenes3d.push(`<div style="position:absolute;left:${MX}px;top:${MY}px;width:${MW}px;height:${MH}px;perspective:1800px;perspective-origin:50% -25%;">
+    <div style="${B3(`left:0;top:0;width:${MW}px;height:${MH}px;transform-origin:50% 100%;transform:rotateX(6deg)`)}">
+      ${endCap(X0)}${endCap(X0 + TW3)}
+      ${topCap}
+      ${faces}
+      <div style="${B3(`left:${X0 - 12}px;top:${yb}px;width:${TW3 + 24}px;height:86px;transform:translateZ(14px)`)}">${svgWrap(TW3 + 24, 86, plinth)}</div>
+    </div>
+  </div>`);
 }
 
 // =====================================================================
@@ -841,6 +903,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><title>Analog Stu
 <style>html,body{margin:0;background:#000;}body>svg{display:block;}#stage{position:relative;width:3840px;height:2160px;}</style></head><body><div id="stage">
 ${svg}
 ${jh24}
+${scenes3d.join('\n')}
 </div></body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
 console.log('wrote', svg.length, 'bytes');
