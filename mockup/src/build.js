@@ -434,7 +434,7 @@ const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tal
     <rect x="186" y="${AH - 46}" width="30" height="16" rx="2" fill="url(#pole)"/>
     ${[0, 1, 2].map((k) => `<path d="M${300 + k * 8} ${yb + 30} C${330 + k * 8} ${yb + 120} ${250 + k * 10} ${AH - 120} ${410} ${AH - 40 - k * 10}" fill="none" stroke="url(#cab)" stroke-width="9" stroke-linecap="round"/>`).join('')}
   </svg>`;
-  scenes3d.push(`<div style="position:absolute;left:${AX + (AW - AW * ALK) / 2}px;top:${AY}px;width:${AW}px;height:${AH}px;transform:scale(${ALK});transform-origin:0 0;perspective:2600px;perspective-origin:50% 30%;">
+  scenes3d.push(`<div style="position:absolute;left:${AX}px;top:${AY}px;width:${AW}px;height:${AH}px;transform:scale(${ALK});transform-origin:0 0;perspective:2600px;perspective-origin:50% 30%;">
     ${cable}
     <div style="${B3(`left:12px;top:0;width:${FW}px;height:${AH}px`)}">
       ${side(0)}${side(FW)}
@@ -445,9 +445,10 @@ const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tal
 }
 
 // ---------------- Tape meter bridge: three stepped tiers of 8 VU meters ----------------
-const MBK = 0.723, MX = 1830, MY = 76, MW = Math.round(1440 / 0.723), MH = 816;   // logical size; shown scaled by MBK
+// logical size MW x MH, shown scaled by MBK so it fills the top row from the autolocator to the rack
+const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Math.round((3282 - MX) / MBK);
 {
-  const TW3 = MW - 40, FH = 236, STEP = 58, X0 = 20, Y0 = 34, PITCH = TW3 / 8;
+  const TW3 = MW - 40, FH = 236, STEP = 58, X0 = 20, Y0 = 8, PITCH = TW3 / 8, CW = PITCH - 16, PLH = 52;
   const tierFace = (tier) => capture(() => {
     rect(0, 0, TW3, FH, 'url(#deck)');
     rect(0, 0, TW3, FH, '#000', 'opacity="0.38"');
@@ -455,23 +456,24 @@ const MBK = 0.723, MX = 1830, MY = 76, MW = Math.round(1440 / 0.723), MH = 816; 
     rect(0, 0, TW3, 2, '#fff', 'opacity="0.18"');
     rect(0, FH - 3, TW3, 3, '#000', 'opacity="0.5"');
     for (let c = 0; c < 8; c++) {
-      const i = (2 - tier) * 8 + c, x = c * PITCH + (PITCH - 170) / 2;
+      const i = (2 - tier) * 8 + c, x = c * PITCH + 8, w = CW;
       const on = readyTracks.has(i);
       // lamps above each meter: red record, blue status
-      circle(x + 138, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
-      circle(x + 120, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
-      // recessed meter window
-      rect(x + 6, 26, 156, 118, '#0a0908', 'rx="6"');
-      rect(x + 6, 26, 156, 118, 'url(#bezelHi)', 'rx="6"');
-      vu(x + 16, 34, 136, 102, tapeDb[i], { fontScale: 0.125 });
-      rect(x + 12, 30, 144, 10, '#000', 'opacity="0.35"');          // recess shadow, top
-      rect(x + 12, 30, 6, 110, '#000', 'opacity="0.25"');           // recess shadow, left
+      circle(x + w - 14, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+      circle(x + w - 32, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
+      // recessed meter window, wide like the JH-24 bridge meters
+      rect(x + 4, 26, w - 8, 118, '#0a0908', 'rx="6"');
+      rect(x + 4, 26, w - 8, 118, 'url(#bezelHi)', 'rx="6"');
+      vu(x + 14, 34, w - 28, 102, tapeDb[i], { fontScale: 0.125 });
+      rect(x + 10, 30, w - 20, 10, '#000', 'opacity="0.35"');        // recess shadow, top
+      rect(x + 10, 30, 6, 110, '#000', 'opacity="0.25"');            // recess shadow, left
       // number, masking-tape name, READY / SAFE
-      text(x + 8, 172, String(i + 1).padStart(2, '0'), 18, LEG, 'start', 800);
-      rect(x + 42, 154, 120, 26, 'url(#tapeMask)', `rx="1" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 100} ${167})"`);
-      text(x + 102, 173, tapeNames[i], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-      button(x + 8, 190, 74, 30, 'red', on, 'READY', { size: 14, pastel: false });
-      button(x + 88, 190, 74, 30, 'white', !on, 'SAFE', { size: 14 });
+      text(x + 6, 172, String(i + 1).padStart(2, '0'), 18, LEG, 'start', 800);
+      rect(x + 40, 154, w - 42, 26, 'url(#tapeMask)', `rx="1" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + w / 2} ${167})"`);
+      text(x + 40 + (w - 42) / 2, 173, tapeNames[i], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      const bw = (w - 10) / 2;
+      button(x + 2, 190, bw, 30, 'red', on, 'READY', { size: 14, pastel: false });
+      button(x + 8 + bw, 190, bw, 30, 'white', !on, 'SAFE', { size: 14 });
     }
   });
   const faces = [0, 1, 2].map((t) => {
@@ -486,19 +488,19 @@ const MBK = 0.723, MX = 1830, MY = 76, MW = Math.round(1440 / 0.723), MH = 816; 
   const endCap = (x) => `<div style="${B3(`left:${x}px;top:${Y0}px;width:${D}px;height:${yb - Y0}px;transform-origin:0 0;transform:rotateY(90deg);background:linear-gradient(90deg,#4a4541,#2c2926);clip-path:polygon(${poly})`)}"></div>`;
   // plinth with the monitor-mode keys
   const plinth = capture(() => {
-    rect(0, 0, TW3 + 24, 86, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
-    rect(0, 0, TW3 + 24, 86, '#000', 'opacity="0.15"');
-    rect(18, 22, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 41, 'MCI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
-    text(104, 41, 'JH-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
-    text(TW3 - 330, 41, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
-    [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 18, 96, 32, 'green', on, k, { size: 14 }));
+    rect(0, 0, TW3 + 24, PLH, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
+    rect(0, 0, TW3 + 24, PLH, '#000', 'opacity="0.15"');
+    rect(18, 12, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 31, 'MCI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    text(104, 31, 'JH-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
+    text(TW3 - 330, 31, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
+    [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 9, 96, 32, 'green', on, k, { size: 14 }));
   });
   scenes3d.push(`<div style="position:absolute;left:${MX}px;top:${MY}px;width:${MW}px;height:${MH}px;transform:scale(${MBK});transform-origin:0 0;perspective:2400px;perspective-origin:50% -25%;">
     <div style="${B3(`left:0;top:0;width:${MW}px;height:${MH}px;transform-origin:50% 100%;transform:rotateX(6deg)`)}">
       ${endCap(X0)}${endCap(X0 + TW3)}
       ${topCap}
       ${faces}
-      <div style="${B3(`left:${X0 - 12}px;top:${yb}px;width:${TW3 + 24}px;height:86px;transform:translateZ(14px)`)}">${svgWrap(TW3 + 24, 86, plinth)}</div>
+      <div style="${B3(`left:${X0 - 12}px;top:${yb}px;width:${TW3 + 24}px;height:${PLH}px;transform:translateZ(14px)`)}">${svgWrap(TW3 + 24, PLH, plinth)}</div>
     </div>
   </div>`);
 }
