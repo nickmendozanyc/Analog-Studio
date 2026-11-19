@@ -688,10 +688,10 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         }
       }
       p('<g transform="translate(0 -26)">');
-      // input: yellow mic gain, GAIN / PHAN / LINE, red trim and odd/even bus pan
-      KN(x0 + 22, 218, 11, YEL, -20 + rnd() * 60, [[-150, '-'], [150, '+']]);
-      tx(x0 + 22, 244, 'MIC', 8, WH);
-      blk(x0 + 44, 202, 36, 13, 'GAIN', ch === 31, '#ffb02e'); blk(x0 + 44, 219, 36, 13, 'PHAN', false); blk(x0 + 44, 236, 36, 13, 'LINE', ch < 31, '#ffb02e');
+      // bus feed: BUS level rotary feeding the assigned buses (through odd/even pan); INPUT / TAPE source select
+      KN(x0 + 23, 224, 14, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[-150, '∞'], [0, '0'], [150, '+10']]);
+      tx(x0 + 23, 255, 'BUS', 8, GOLD);
+      blk(x0 + 46, 208, 34, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 46, 228, 34, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
       KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']]);
       tx(x0 + 22, 299, 'TRIM', 8, WH);
       KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']]);
@@ -740,10 +740,8 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       rect(x0 + 4, 924, 77, 1.1, GOLD);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
-      tx(x0 + 7, 962, 'BUS', 6.5, GOLD, 'start', 800);
-      K(x0 + 16, 974, 7, BLK, -20, { dark: true });
       const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
-      KN(x0 + 55, 970, 12, BLK, pan, [[0, 'C'], [-150, 'L'], [150, 'R']], true);
+      KN(x0 + 42, 970, 12, BLK, pan, [[0, 'C'], [-150, 'L'], [150, 'R']], true);
       p('</g>');
     }
     for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');
