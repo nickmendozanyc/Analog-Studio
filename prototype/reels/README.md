@@ -1,6 +1,6 @@
 # JH-24 reel prototype
 
-A first, runnable test of how the reels and tape move. It shows a 3D JH-24 transport (Ampex 499 supply, Quantegy GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
+A first, runnable test of how the reels and tape move. A full roll is 1800 ft. It shows a 3D JH-24 transport (Ampex 499 supply, Quantegy GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
 
 ## Run it
 
@@ -11,7 +11,7 @@ Controls: **Space** play / stop, **←** rewind, **→** fast forward, **R** rec
 
 ## What to judge
 
-1. Play from the head: the full supply reel turns slowly (about 45 rpm) and the empty take-up fast (about 115 rpm). Load Middle and they match; load Tail and the ratio reverses.
+1. Play from the head at 30 IPS: the full 1800 ft supply reel turns at about 73 rpm and the empty take-up at about 127 rpm. Load Middle and both run at about 90 rpm; load Tail and the ratio reverses.
 2. Fast forward and rewind spool up and brake with weight; a full reel is slower to start and stop than a balanced one.
 3. Press PLAY during a wind: the reels brake first, then the cream pinch roller swings in and the capstan takes over.
 4. During winds the lifter pins push the tape off the heads; LIFT keeps it on.
@@ -31,4 +31,4 @@ node build.mjs
 node check.mjs         # writes dist/shot-*.png (software WebGL: fps here is meaningless)
 ```
 
-Figures marked "approx" in `physics.js` (reel inertia, motor force, wind speed, 5000 ft of 1.5 mil tape) are starting values to tune against the real machine.
+Figures marked "approx" in `physics.js` (reel inertia, motor force, wind speed, 1.5 mil tape thickness) are starting values to tune against the real machine.

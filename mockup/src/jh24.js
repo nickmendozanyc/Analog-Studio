@@ -53,8 +53,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const headX = DW / 2;
   const TAPE_Z0 = 26, TAPE_Z1 = 98;            // 2" tape = 72 units
   const R = 250, hubR = R * 0.36, holeR = R * 0.27;
-  const supply = { cx: 300, cy: 292, pack: 212, rot: 18, labelAt: 198, style: 'a499' };
-  const takeup = { cx: DW - 300, cy: 292, pack: 146, rot: -27, style: 'gp9' };
+  const supply = { cx: 300, cy: 292, pack: 125, rot: 18, labelAt: 198, style: 'a499' };   // 1800 ft roll, 03:42 in at 30 IPS
+  const takeup = { cx: DW - 300, cy: 292, pack: 102, rot: -27, style: 'gp9' };
   // Transport layout from the user's JH-24 photos: tape runs across the FRONT of the head block.
   const TAPE_Y = 548;                                         // tape line across the head faces
   const guideL = { cx: 440, cy: TAPE_Y + 24, r: 24 };         // tall black roller, in front of the tape

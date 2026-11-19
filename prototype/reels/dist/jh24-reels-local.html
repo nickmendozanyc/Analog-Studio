@@ -63,7 +63,7 @@
     <dt>Tape speed</dt><dd id="v">0.0 ips</dd>
     <dt>Supply reel</dt><dd id="rs">0 rpm</dd>
     <dt>Take-up reel</dt><dd id="rt">0 rpm</dd>
-    <dt>Left on supply</dt><dd id="left">5000 ft</dd>
+    <dt>Left on supply</dt><dd id="left">1800 ft</dd>
     <dt>Frame rate</dt><dd id="fps">– fps</dd>
   </dl>
 </div>
@@ -122,7 +122,7 @@
 //  - Lifters hold the tape off the heads at wind speed; LIFT defeats them.
 //  - Tape running off a reel stops the transport.
 //
-// Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
+// A full roll is 1800 ft. Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
 
 const TAPE = {
   thickness: 38.1e-6,   // 1.5 mil base + oxide (approx, typical of 456 / 499 / GP9)
@@ -145,6 +145,7 @@ const MACHINE = {
 
 const IPS = 0.0254; // m/s per inch-per-second
 const FT = 0.3048;
+const ROLL_FT = 1800; // feet of tape on a full roll
 
 const packRadius = (len, tape = TAPE) => Math.sqrt(tape.hubR * tape.hubR + Math.max(0, len) * tape.thickness / Math.PI);
 const packMass = (len, tape = TAPE) => Math.max(0, len) * tape.thickness * tape.width * tape.density;
@@ -155,7 +156,7 @@ const reelInertia = (len, tape = TAPE, m = MACHINE) => {
 const capacity = (tape = TAPE) => Math.PI * (tape.flangeR * tape.flangeR - tape.hubR * tape.hubR) / tape.thickness;
 
 class Transport {
-  constructor({ totalLength = 5000 * FT, onTakeup = 0, speedIPS = 30, tape = TAPE, machine = MACHINE } = {}) {
+  constructor({ totalLength = ROLL_FT * FT, onTakeup = 0, speedIPS = 30, tape = TAPE, machine = MACHINE } = {}) {
     this.tape = tape; this.m = machine;
     this.total = Math.min(totalLength, capacity(tape));
     this.take = Math.min(Math.max(onTakeup, 0), this.total);
@@ -550,7 +551,7 @@ function writeTape(pts, offset) {
 const cross2 = (a, b) => a[0] * b[1] - a[1] * b[0];
 
 // ---------- simulation + UI ----------
-const tr = new Transport({ totalLength: 5000 * FT, onTakeup: 0, speedIPS: 30 });
+const tr = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 0, speedIPS: 30 });
 let blurOn = true;
 const $ = (id) => document.getElementById(id);
 const keysUI = { rew: $('k-rew'), ff: $('k-ff'), stop: $('k-stop'), play: $('k-play'), rec: $('k-rec') };

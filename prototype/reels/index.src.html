@@ -61,7 +61,7 @@
     <dt>Tape speed</dt><dd id="v">0.0 ips</dd>
     <dt>Supply reel</dt><dd id="rs">0 rpm</dd>
     <dt>Take-up reel</dt><dd id="rt">0 rpm</dd>
-    <dt>Left on supply</dt><dd id="left">5000 ft</dd>
+    <dt>Left on supply</dt><dd id="left">1800 ft</dd>
     <dt>Frame rate</dt><dd id="fps">– fps</dd>
   </dl>
 </div>
@@ -402,7 +402,7 @@ function writeTape(pts, offset) {
 const cross2 = (a, b) => a[0] * b[1] - a[1] * b[0];
 
 // ---------- simulation + UI ----------
-const tr = new Transport({ totalLength: 5000 * FT, onTakeup: 0, speedIPS: 30 });
+const tr = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 0, speedIPS: 30 });
 let blurOn = true;
 const $ = (id) => document.getElementById(id);
 const keysUI = { rew: $('k-rew'), ff: $('k-ff'), stop: $('k-stop'), play: $('k-play'), rec: $('k-rec') };

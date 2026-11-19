@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Transport, TAPE, MACHINE, IPS, FT, packRadius, capacity } from './physics.js';
+import { Transport, TAPE, MACHINE, IPS, FT, ROLL_FT, packRadius, capacity } from './physics.js';
 
 const close = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b} (±${tol})`);
 
 test('pack radius grows with the square root of tape length', () => {
   close(packRadius(0), TAPE.hubR, 1e-12, 'empty hub');
-  const r = packRadius(5000 * FT);
-  assert.ok(r > TAPE.hubR && r < TAPE.flangeR, '5000 ft fits inside a 14" flange');
+  const r = packRadius(ROLL_FT * FT);
+  assert.ok(r > TAPE.hubR && r < TAPE.flangeR, 'a full 1800 ft roll fits inside the flange');
   close(packRadius(capacity()), TAPE.flangeR, 1e-9, 'capacity fills the flange exactly');
 });
 
@@ -17,7 +17,7 @@ test('reel angular speed equals tape speed over pack radius', () => {
   close(t.v, 30 * IPS, 1e-4, 'play speed reached');
   close(t.wS, t.v / t.rS, 1e-12, 'supply');
   close(t.wT, t.v / t.rT, 1e-12, 'take-up');
-  assert.ok(t.wT > t.wS * 2, 'near-empty take-up spins much faster than the full supply');
+  assert.ok(t.wT > t.wS * 1.6, 'near-empty take-up spins about 1.7x faster than a full 1800 ft supply');
 });
 
 test('play reaches speed quickly through the capstan', () => {
@@ -35,7 +35,7 @@ test('15 IPS halves the play speed', () => {
 
 test('winds are force limited: a full reel spools up more slowly than a balanced one', () => {
   const full = new Transport(); full.command('ff'); full.advance(0.5);
-  const mid = new Transport({ onTakeup: 2500 * FT }); mid.command('ff'); mid.advance(0.5);
+  const mid = new Transport({ onTakeup: (ROLL_FT / 2) * FT }); mid.command('ff'); mid.advance(0.5);
   assert.ok(full.v > 0.5, 'full reel is accelerating');
   assert.ok(mid.v > full.v, `balanced packs accelerate faster (${mid.v.toFixed(2)} > ${full.v.toFixed(2)})`);
   full.advance(4); close(full.v, MACHINE.windSpeed, 0.05, 'reaches wind speed');
@@ -71,7 +71,7 @@ test('lifters lift the tape at wind speed and drop for play', () => {
 });
 
 test('tape running off the supply stops the transport', () => {
-  const t = new Transport({ onTakeup: 5000 * FT - 20 });
+  const t = new Transport({ onTakeup: ROLL_FT * FT - 20 });
   t.command('ff'); t.advance(10);
   assert.equal(t.mode, 'stop'); assert.ok(t.endOfTape); close(t.supply, 0, 1e-9, 'supply empty');
 });
@@ -86,4 +86,10 @@ test('counter reads tape time at the selected speed', () => {
   const t = new Transport();
   t.command('play'); t.advance(10.5);
   assert.ok(t.counter > 9.8 && t.counter < 10.5, `about 10 s of tape (${t.counter.toFixed(2)})`);
+});
+
+test('a full roll is 1800 feet', () => {
+  const t = new Transport();
+  close(t.total / FT, 1800, 1e-9, 'roll length');
+  close(t.supply / FT, 1800, 1e-9, 'all on the supply at the head');
 });
