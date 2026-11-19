@@ -91,7 +91,14 @@ const LIT = {
 };
 function button(x, y, w, h, color = 'grey', lit = false, label = '', opts = {}) {
   const [on, off] = LIT[color];
-  const { labelIn = true, labelColor, size = Math.min(9, h * 0.5) } = opts;
+  const { labelIn = true, labelColor, size = Math.min(9, h * 0.5), pastel = false } = opts;
+  if (pastel && !lit) {
+    rect(x - 1, y - 1, w + 2, h + 3, '#000', 'rx="2.5" opacity="0.55"');
+    rect(x, y, w, h, on, 'rx="2" opacity="0.78"');
+    rect(x, y, w, h, 'url(#btnOff)', 'rx="2"');
+    if (label) text(x + w / 2, y + h / 2 + size * 0.36, label, size, '#1a1208', 'middle', 800);
+    return;
+  }
   rect(x - 1, y - 1, w + 2, h + 3, '#000', 'rx="2.5" opacity="0.55"');
   if (lit) {
     rect(x, y, w, h, on, `rx="2" filter="url(#glow)"`);
@@ -255,19 +262,24 @@ p(`<defs>
   <linearGradient id="btnOff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.22"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.02"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></linearGradient>
   <linearGradient id="faderCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9dbdd"/><stop offset="0.12" stop-color="#8d9196"/><stop offset="0.5" stop-color="#5b5f64"/><stop offset="0.88" stop-color="#3a3d41"/><stop offset="1" stop-color="#1e2023"/></linearGradient>
   <linearGradient id="faderCapBlack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6e72"/><stop offset="0.15" stop-color="#2c2e31"/><stop offset="1" stop-color="#0c0d0e"/></linearGradient>
+  <linearGradient id="faderCapYellow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1a0"/><stop offset="0.15" stop-color="#e6c02e"/><stop offset="1" stop-color="#7a6010"/></linearGradient>
+  <linearGradient id="faderCapGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8e0a0"/><stop offset="0.15" stop-color="#3f8f3a"/><stop offset="1" stop-color="#1a3d18"/></linearGradient>
+  <linearGradient id="faderCapWhite" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.15" stop-color="#e6e4dc"/><stop offset="1" stop-color="#8f8c84"/></linearGradient>
   <linearGradient id="faderCapRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f08a80"/><stop offset="0.15" stop-color="#b3261b"/><stop offset="1" stop-color="#4a0d08"/></linearGradient>
-  <linearGradient id="vuFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9b8"/><stop offset="0.6" stop-color="#f2d690"/><stop offset="1" stop-color="#d9b065"/></linearGradient>
-  <radialGradient id="vuGlow" cx="0.5" cy="0.95" r="0.9"><stop offset="0" stop-color="#ffcf6b" stop-opacity="0.0"/><stop offset="0.7" stop-color="#000" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></radialGradient>
+  <linearGradient id="vuFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfaf4"/><stop offset="0.6" stop-color="#f1efe6"/><stop offset="1" stop-color="#ddd9cc"/></linearGradient>
+  <radialGradient id="vuGlow" cx="0.5" cy="0.95" r="0.9"><stop offset="0" stop-color="#fff" stop-opacity="0.0"/><stop offset="0.7" stop-color="#000" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></radialGradient>
   <linearGradient id="glass" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   <linearGradient id="bezelHi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.18"/><stop offset="0.1" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.4"/></linearGradient>
-  <linearGradient id="deck" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#4a4e55"/><stop offset="0.5" stop-color="#33363b"/><stop offset="1" stop-color="#25272b"/></linearGradient>
-  <linearGradient id="deckLower" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f3237"/><stop offset="1" stop-color="#1d1f22"/></linearGradient>
-  <linearGradient id="console" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3e434b"/><stop offset="0.5" stop-color="#353940"/><stop offset="1" stop-color="#2b2e34"/></linearGradient>
-  <linearGradient id="consoleAlt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4339"/><stop offset="0.5" stop-color="#3f3a32"/><stop offset="1" stop-color="#34302a"/></linearGradient>
-  <linearGradient id="consoleMaster" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f343b"/><stop offset="1" stop-color="#23262b"/></linearGradient>
-  <linearGradient id="faderBay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26292e"/><stop offset="1" stop-color="#1c1e22"/></linearGradient>
-  <linearGradient id="armrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c2a1e"/><stop offset="0.08" stop-color="#1a1411"/><stop offset="0.35" stop-color="#2b211b"/><stop offset="0.55" stop-color="#161210"/><stop offset="1" stop-color="#0a0807"/></linearGradient>
-  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4b2a17"/><stop offset="0.3" stop-color="#7a4527"/><stop offset="0.6" stop-color="#6a3a20"/><stop offset="1" stop-color="#3a2012"/></linearGradient>
+  <linearGradient id="deck" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#6a7290"/><stop offset="0.5" stop-color="#565d78"/><stop offset="1" stop-color="#474d64"/></linearGradient>
+  <linearGradient id="deckLower" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d5369"/><stop offset="1" stop-color="#3c4154"/></linearGradient>
+  <linearGradient id="console" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a6062"/><stop offset="0.5" stop-color="#5c5355"/><stop offset="1" stop-color="#4e4648"/></linearGradient>
+  <linearGradient id="consoleAlt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5556"/><stop offset="0.5" stop-color="#4d4849"/><stop offset="1" stop-color="#413c3d"/></linearGradient>
+  <linearGradient id="consoleMaster" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#564d4f"/><stop offset="1" stop-color="#463f41"/></linearGradient>
+  <linearGradient id="faderBay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d7577"/><stop offset="1" stop-color="#6a6365"/></linearGradient>
+  <linearGradient id="armrest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a5e3c"/><stop offset="0.12" stop-color="#7a4429"/><stop offset="0.4" stop-color="#6a3a22"/><stop offset="0.7" stop-color="#4e2a18"/><stop offset="1" stop-color="#2a160c"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a5a2c"/><stop offset="0.3" stop-color="#c48a4c"/><stop offset="0.6" stop-color="#b37a3e"/><stop offset="1" stop-color="#7a4c22"/></linearGradient>
+  <linearGradient id="oakH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a362"/><stop offset="0.5" stop-color="#b9813f"/><stop offset="1" stop-color="#8a5a2c"/></linearGradient>
+  <linearGradient id="laminate" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a5232"/><stop offset="0.5" stop-color="#9a6b42"/><stop offset="1" stop-color="#6e482b"/></linearGradient>
   <linearGradient id="woodH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a4527"/><stop offset="0.5" stop-color="#5e341d"/><stop offset="1" stop-color="#3a2012"/></linearGradient>
   <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17130f"/><stop offset="1" stop-color="#0d0b09"/></linearGradient>
   <linearGradient id="rackPanel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2b2e"/><stop offset="0.5" stop-color="#1d1e20"/><stop offset="1" stop-color="#141516"/></linearGradient>
@@ -337,12 +349,14 @@ text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 // =====================================================================
 const TX = 24, TY = 76, TW = 1360, TH = 816;
 p(`<g filter="url(#shadow)">`);
-rect(TX, TY, TW, TH, '#16171a', 'rx="10"');
+rect(TX, TY, TW, TH, '#3a3f52', 'rx="10"');
+rect(TX, TY + TH - 18, TW, 18, 'url(#laminate)', 'rx="4"');
+rect(TX, TY + TH - 18, TW, 18, '#000', 'filter="url(#woodgrainH)" opacity="0.7" rx="4"');
 p(`</g>`);
 rect(TX + 8, TY + 8, TW - 16, 650, 'url(#deck)', 'rx="6"');
 rect(TX + 8, TY + 8, TW - 16, 650, '#000', 'filter="url(#brushed)" opacity="0.10" rx="6"');
 rect(TX + 8, TY + 8, TW - 16, 650, 'url(#sheen)', 'rx="6"');
-rect(TX + 8, TY + 666, TW - 16, TH - 674, 'url(#deckLower)', 'rx="6"');
+rect(TX + 8, TY + 666, TW - 16, TH - 692, 'url(#deckLower)', 'rx="6"');
 // trim
 rect(TX + 8, TY + 658, TW - 16, 8, 'url(#chrome)', 'opacity="0.7"');
 for (const [sx2, sy2] of [[TX + 24, TY + 24], [TX + TW - 24, TY + 24], [TX + 24, TY + 640], [TX + TW - 24, TY + 640]]) screw(sx2, sy2, 6);
@@ -428,80 +442,82 @@ for (const [lab, hx] of heads) {
   rect(hx - 34, hbY - 10, 68, 28, 'url(#chrome)', 'rx="6"');
   rect(hx - 30, hbY - 6, 60, 6, '#2a2b2e', 'rx="2"');
   for (let k = 0; k < 6; k++) rect(hx - 27 + k * 10, hbY + 4, 6, 10, '#6b6f75', 'rx="1"');
-  text(hx, hbY + 46, lab, 11, '#bdb8a8', 'middle', 800, 'letter-spacing="1.5"');
+  text(hx, hbY + 46, lab, 11, '#e1e3ea', 'middle', 800, 'letter-spacing="1.5"');
 }
 // head shield
 // capstan + pinch roller
 circle(capX + 30, gy + 52, 12, 'url(#chrome)');
 circle(capX + 30, gy + 52 + 37, 26, '#0e0e0f'); circle(capX + 30, gy + 89, 22, '#1b1b1d'); circle(capX + 30, gy + 89, 8, 'url(#chrome)');
-text(capX + 66, gy + 94, 'CAPSTAN', 9, '#bdb8a8', 'start', 800, 'letter-spacing="1.5"');
+text(capX + 66, gy + 94, 'CAPSTAN', 9, '#e1e3ea', 'start', 800, 'letter-spacing="1.5"');
 // logo plate
 rect(headX - 120, TY + 40, 240, 70, '#0f1012', 'rx="4"');
 rect(headX - 120, TY + 40, 240, 70, 'url(#bezelHi)', 'rx="4"');
 text(headX - 62, TY + 88, 'MCI', 38, '#e9e3d0', 'middle', 900, 'font-style="italic" letter-spacing="2"');
 text(headX + 46, TY + 72, 'JH-24', 22, '#e9e3d0', 'middle', 800, 'letter-spacing="2"');
-text(headX + 46, TY + 94, '24 TRACK · 2"', 11, '#bdb8a8', 'middle', 700, 'letter-spacing="2"');
+text(headX + 46, TY + 94, '24 TRACK · 2"', 11, '#e1e3ea', 'middle', 700, 'letter-spacing="2"');
 // tape timer / tach window between reels
 rect(headX - 90, TY + 150, 180, 58, '#0a0202', 'rx="4"');
 rect(headX - 90, TY + 150, 180, 58, 'url(#bezelHi)', 'rx="4"');
 seg7(headX - 76, TY + 162, 34, '03:42', '#ff3220');
-text(headX, TY + 228, 'TAPE TIME', 10, '#bdb8a8', 'middle', 800, 'letter-spacing="2"');
+text(headX, TY + 228, 'TAPE TIME', 10, '#e1e3ea', 'middle', 800, 'letter-spacing="2"');
 // tension / status lamps
 const lamps = [['TENSION', 'green', true], ['SERVO', 'green', true], ['REC', 'red', true], ['VARI', 'amber', false]];
 lamps.forEach(([lab, col, on], i) => {
   const lx = headX - 100 + i * 52;
   button(lx, TY + 260, 36, 16, col, on);
-  text(lx + 18, TY + 292, lab, 9, '#bdb8a8', 'middle', 800, 'letter-spacing="1"');
+  text(lx + 18, TY + 292, lab, 9, '#e1e3ea', 'middle', 800, 'letter-spacing="1"');
 });
 
 // transport controls on lower panel
 const ly0 = TY + 680;
-text(TX + 40, ly0 + 22, 'TRANSPORT', 11, '#8f8b7e', 'start', 800, 'letter-spacing="3"');
-const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'white', false], ['▶', 'PLAY', 'green', true], ['●', 'RECORD', 'red', true]];
+rect(TX + 28, ly0 + 30, 600, 86, 'url(#silverPanel)', 'rx="4"');
+rect(TX + 28, ly0 + 30, 600, 86, '#000', 'filter="url(#brushed)" opacity="0.15" rx="4"');
+text(TX + 40, ly0 + 22, 'TRANSPORT', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
+const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'yellow', false], ['▶', 'PLAY', 'green', true], ['●', 'RECORD', 'red', true]];
 tbtns.forEach(([g, lab, col, on], i) => {
   const bx = TX + 40 + i * 118;
-  button(bx, ly0 + 38, 96, 70, col, on, '', {});
-  text(bx + 48, ly0 + 84, g, 26, on ? '#1a1208' : '#e8e4d8', 'middle', 800);
-  text(bx + 48, ly0 + 126, lab, 11, '#bdb8a8', 'middle', 800, 'letter-spacing="1.5"');
+  button(bx, ly0 + 38, 96, 70, col, on, '', { pastel: true });
+  text(bx + 48, ly0 + 84, g, 26, '#1a1208', 'middle', 800);
+  text(bx + 48, ly0 + 128, lab, 11, '#e6e8f0', 'middle', 800, 'letter-spacing="1.5"');
 });
 // speed
 const spX = TX + 660;
-text(spX, ly0 + 22, 'SPEED', 11, '#8f8b7e', 'start', 800, 'letter-spacing="3"');
+text(spX, ly0 + 22, 'SPEED', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
 button(spX, ly0 + 44, 64, 34, 'amber', false, '15 IPS', { size: 11 });
 button(spX + 74, ly0 + 44, 64, 34, 'amber', true, '30 IPS', { size: 11 });
-text(spX, ly0 + 104, 'EQ', 10, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(spX, ly0 + 104, 'EQ', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 button(spX + 30, ly0 + 92, 52, 20, 'white', true, 'AES', { size: 9 });
 button(spX + 88, ly0 + 92, 52, 20, 'white', false, 'NAB', { size: 9 });
 // tape character
 const fxX = TX + 880;
-text(fxX, ly0 + 22, 'TAPE CHARACTER', 11, '#8f8b7e', 'start', 800, 'letter-spacing="3"');
+text(fxX, ly0 + 22, 'TAPE CHARACTER', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
 knob(fxX + 40, ly0 + 70, 20, '#c9a24a', 40, { label: 'SATURATION' });
 knob(fxX + 140, ly0 + 70, 20, '#c9a24a', -60, { label: 'WOW/FLUTTER' });
 knob(fxX + 240, ly0 + 70, 20, '#c9a24a', -90, { label: 'HISS' });
 button(fxX + 310, ly0 + 52, 120, 34, 'amber', false, 'BYPASS ALL', { size: 11 });
-text(fxX + 370, ly0 + 110, 'AMOUNT · GLOBAL BYPASS', 9, '#8f8b7e', 'middle', 700, 'letter-spacing="1"');
+text(fxX + 370, ly0 + 110, 'AMOUNT · GLOBAL BYPASS', 9, '#c9ccd8', 'middle', 700, 'letter-spacing="1"');
 
 // =====================================================================
 // AUTOLOCATOR REMOTE
 // =====================================================================
 const AX = 1408, AY = 96, AW = 400, AH = 776;
 p(`<g filter="url(#shadow)">`);
-rect(AX, AY, AW, AH, '#1a1c1f', 'rx="10"');
+rect(AX, AY, AW, AH, '#3a3f52', 'rx="10"');
 p(`</g>`);
 rect(AX + 8, AY + 8, AW - 16, AH - 16, 'url(#deck)', 'rx="6"');
 rect(AX + 8, AY + 8, AW - 16, AH - 16, '#000', 'filter="url(#brushed)" opacity="0.1" rx="6"');
 text(AX + 28, AY + 44, 'AUTOLOCATOR', 15, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(AX + AW - 28, AY + 44, 'AL-III', 13, '#bdb8a8', 'end', 800, 'letter-spacing="2"');
+text(AX + AW - 28, AY + 44, 'AL-III', 13, '#e1e3ea', 'end', 800, 'letter-spacing="2"');
 // counter
 rect(AX + 24, AY + 64, AW - 48, 104, '#000', 'rx="6"');
 rect(AX + 30, AY + 70, AW - 60, 92, 'url(#displayBg)', 'rx="4"');
 seg7(AX + 46, AY + 86, 56, '03:42.1', '#ff3220');
 rect(AX + 30, AY + 70, AW - 60, 40, 'url(#glass)', 'rx="4"');
-text(AX + 40, AY + 186, 'MIN', 9, '#8f8b7e', 'start', 800);
-text(AX + 150, AY + 186, 'SEC', 9, '#8f8b7e', 'start', 800);
-text(AX + 286, AY + 186, 'TENTHS', 9, '#8f8b7e', 'start', 800);
+text(AX + 40, AY + 186, 'MIN', 9, '#c9ccd8', 'start', 800);
+text(AX + 150, AY + 186, 'SEC', 9, '#c9ccd8', 'start', 800);
+text(AX + 286, AY + 186, 'TENTHS', 9, '#c9ccd8', 'start', 800);
 // locate points
-text(AX + 28, AY + 222, 'LOCATE POINTS', 11, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, AY + 222, 'LOCATE POINTS', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 const locs = [['1', 'INTRO', '00:00.0'], ['2', 'VERSE 1', '00:21.4'], ['3', 'CHORUS', '01:02.8'], ['4', 'SOLO', '02:47.3']];
 locs.forEach(([n, nm, tm], i) => {
   const ry = AY + 236 + i * 46;
@@ -521,11 +537,11 @@ const sideKeys = [['STORE', 'amber', false], ['RECALL', 'amber', false], ['LOCAT
 sideKeys.forEach(([k, col, on], i) => button(kx + 200, ky + i * 48, 144, 40, col, on, k, { size: 12 }));
 // punch + track arm group
 const py = ky + 206;
-text(AX + 28, py, 'PUNCH', 11, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, py, 'PUNCH', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 button(AX + 28, py + 12, 106, 38, 'red', true, 'PUNCH IN', { size: 11 });
 button(AX + 144, py + 12, 106, 38, 'red', false, 'PUNCH OUT', { size: 11 });
 button(AX + 260, py + 12, 84, 38, 'amber', false, 'AUTO', { size: 11 });
-text(AX + 28, py + 78, 'TRACKS', 11, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, py + 78, 'TRACKS', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 button(AX + 28, py + 90, 156, 34, 'red', false, 'ALL READY', { size: 11 });
 button(AX + 192, py + 90, 152, 34, 'white', false, 'ALL SAFE', { size: 11 });
 
@@ -534,12 +550,12 @@ button(AX + 192, py + 90, 152, 34, 'white', false, 'ALL SAFE', { size: 11 });
 // =====================================================================
 const MX = 1830, MY = 76, MW = 1440, MH = 816;
 p(`<g filter="url(#shadow)">`);
-rect(MX, MY, MW, MH, '#141518', 'rx="10"');
+rect(MX, MY, MW, MH, '#3a3f52', 'rx="10"');
 p(`</g>`);
-rect(MX + 8, MY + 8, MW - 16, MH - 16, '#1f2125', 'rx="6"');
+rect(MX + 8, MY + 8, MW - 16, MH - 16, 'url(#deck)', 'rx="6"');
 rect(MX + 8, MY + 8, MW - 16, MH - 16, '#000', 'filter="url(#brushed)" opacity="0.08" rx="6"');
 text(MX + 30, MY + 42, 'TAPE METER BRIDGE', 13, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(MX + MW - 30, MY + 42, 'REPRO  ·  INPUT  ·  SYNC', 11, '#8f8b7e', 'end', 800, 'letter-spacing="2"');
+text(MX + MW - 30, MY + 42, 'REPRO  ·  INPUT  ·  SYNC', 11, '#c9ccd8', 'end', 800, 'letter-spacing="2"');
 button(MX + MW - 330, MY + 26, 66, 22, 'green', true, 'REPRO', { size: 9 });
 const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'TAMB'];
 const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + rnd() * 15));
@@ -547,7 +563,8 @@ const readyTracks = new Set([19, 20, 21]);
 for (let i = 0; i < 24; i++) {
   const c = i % 8, r = Math.floor(i / 8);
   const cx0 = MX + 24 + c * 174, cy0 = MY + 66 + r * 246;
-  rect(cx0, cy0, 166, 234, '#191a1d', 'rx="4"');
+  rect(cx0, cy0, 166, 234, '#454b61', 'rx="4"');
+  rect(cx0, cy0, 166, 234, 'url(#bezelHi)', 'rx="4" opacity="0.6"');
   vu(cx0 + 11, cy0 + 12, 144, 108, tapeDb[i], { label: String(i + 1), brand: 'MCI' });
   // track number + name
   text(cx0 + 12, cy0 + 150, String(i + 1).padStart(2, '0'), 20, '#e9e3d0', 'start', 800);
@@ -558,8 +575,8 @@ for (let i = 0; i < 24; i++) {
   button(cx0 + 86, cy0 + 168, 68, 30, 'white', !ready, 'SAFE', { size: 10 });
   // rec lamp
   circle(cx0 + 20, cy0 + 218, 5, ready ? '#ff3b2f' : '#3a1210', ready ? 'filter="url(#glow)"' : '');
-  text(cx0 + 32, cy0 + 222, ready ? 'REC' : 'IN ' + (i + 1), 10, ready ? '#ff8a7a' : '#8f8b7e', 'start', 800, 'letter-spacing="1"');
-  text(cx0 + 154, cy0 + 222, ready ? 'INPUT' : 'REPRO', 10, '#8f8b7e', 'end', 800, 'letter-spacing="1"');
+  text(cx0 + 32, cy0 + 222, ready ? 'REC' : 'IN ' + (i + 1), 10, ready ? '#ff8a7a' : '#c9ccd8', 'start', 800, 'letter-spacing="1"');
+  text(cx0 + 154, cy0 + 222, ready ? 'INPUT' : 'REPRO', 10, '#c9ccd8', 'end', 800, 'letter-spacing="1"');
 }
 
 // =====================================================================
@@ -568,6 +585,7 @@ for (let i = 0; i < 24; i++) {
 const CX = 12, CY = 916, CW = 3266, CH = 1244;
 // console back edge / meter hood shadow
 rect(CX, CY - 8, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
+rect(CX + 34, CY - 6, CW - 68, 8, 'url(#oakH)');
 // wood end cheeks
 for (const wx of [CX, CX + CW - 34]) {
   rect(wx, CY, 34, CH, 'url(#wood)', 'rx="4"');
@@ -591,9 +609,7 @@ for (let ch = 0; ch < NCH; ch++) {
   const c1 = x + 23, c2 = x + 62, cm = x + STRIP / 2;
   const L = '#d9d3c2';
   // scribble strip
-  rect(x + 4, CY + 8, STRIP - 8, 34, 'url(#tapeMask)', `rx="1" transform="rotate(${(rnd() - 0.5) * 1.2} ${cm} ${CY + 25})"`);
-  text(cm, CY + 22, String(ch + 1), 10, '#555', 'middle', 800);
-  text(cm, CY + 37, consoleNames[ch], consoleNames[ch].length > 7 ? 10 : 12, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+  text(cm, CY + 30, String(ch + 1), 16, '#f0ece4', 'middle', 800);
   // bus assign 1-8
   let y = CY + 52;
   const lit = busLit(ch);
@@ -607,20 +623,20 @@ for (let ch = 0; ch < NCH; ch++) {
   text(cm, y + 30, ret ? 'RETURN' : 'TAPE', 8, '#a9a493', 'middle', 700, 'letter-spacing="1"');
   // input
   y = CY + 160;
-  knob(c1, y, 14, '#c8c2b0', -20 + rnd() * 60, { label: 'TRIM', labelColor: L, labelSize: 8 });
+  knob(c1, y, 14, '#1d1d1f', -20 + rnd() * 60, { label: 'TRIM', labelColor: L, labelSize: 8, dark: true });
   button(c2 - 14, y - 22, 28, 15, 'red', ch === 0, 'PAD', { size: 8 });
   button(c2 - 14, y + 2, 28, 15, 'white', ch === 2, 'Ø', { size: 9 });
   // HPF
   y = CY + 222;
-  knob(c1, y, 13, '#8f8a7c', -120 + rnd() * 50, { label: 'HPF', labelColor: L, labelSize: 8 });
+  knob(c1, y, 13, '#ecebe4', -120 + rnd() * 50, { label: 'HPF', labelColor: L, labelSize: 8 });
   button(c2 - 14, y - 8, 28, 15, 'white', [0, 2, 3, 19, 20, 21].includes(ch), 'IN', { size: 8 });
   // EQ
-  const bands = [['HF', '#c83a2c'], ['HMF', '#2f6fb3'], ['LMF', '#2f6fb3'], ['LF', '#3c7a3c']];
+  const bands = [['HF', '#c8302a'], ['HMF', '#e6c02e'], ['LMF', '#2f62b0'], ['LF', '#ecebe4']];
   rect(x + 4, CY + 256, STRIP - 8, 1, '#000', 'opacity="0.5"');
   text(cm, CY + 270, 'EQUALIZER', 8, '#a9a493', 'middle', 800, 'letter-spacing="1"');
   bands.forEach(([bn, col], bi) => {
     const yy = CY + 300 + bi * 62;
-    knob(c1, yy, 11, '#bdb7a6', -80 + rnd() * 160, { label: bn + ' FREQ', labelColor: L, labelSize: 7, ticks: true });
+    knob(c1, yy, 11, '#1d1d1f', -80 + rnd() * 160, { label: bn + ' FREQ', labelColor: L, labelSize: 7, ticks: true });
     knob(c2, yy, 14, col, (rnd() - 0.5) * 140, { label: 'GAIN', labelColor: L, labelSize: 7 });
   });
   const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
@@ -628,7 +644,7 @@ for (let ch = 0; ch < NCH; ch++) {
   // aux
   rect(x + 4, CY + 562, STRIP - 8, 1, '#000', 'opacity="0.5"');
   text(cm, CY + 576, 'AUX SENDS', 8, '#a9a493', 'middle', 800, 'letter-spacing="1"');
-  const auxCols = ['#e8c34a', '#e8c34a', '#e8e0cc', '#e8e0cc'];
+  const auxCols = ['#c8302a', '#c8302a', '#e6c02e', '#e6c02e'];
   for (let a = 0; a < 4; a++) {
     const ax = a % 2 === 0 ? c1 : c2, ay = CY + 604 + Math.floor(a / 2) * 56;
     const active = (a === 0 && ch < 24 && [1, 19, 20, 21, 15].includes(ch)) || (a === 1 && [19, 13, 14].includes(ch)) || (a >= 2 && ch < 24);
@@ -639,7 +655,7 @@ for (let ch = 0; ch < NCH; ch++) {
   button(x + 7, y, 34, 16, 'blue', [0, 1, 12, 19].includes(ch), 'INS', { size: 8 });
   button(x + 45, y, 34, 16, 'white', ch >= 2 && ch < 24 && ch % 5 === 0, 'PRE', { size: 8 });
   // pan
-  knob(cm, CY + 754, 16, '#e8e2d2', ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2), { label: 'PAN', labelColor: L, labelSize: 8 });
+  knob(cm, CY + 754, 16, '#1d1d1f', ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2), { label: 'PAN', labelColor: L, labelSize: 8, dark: true });
   // mute / solo
   y = CY + 800;
   button(x + 6, y, 35, 26, 'red', muted.has(ch), 'MUTE', { size: 8 });
@@ -647,8 +663,11 @@ for (let ch = 0; ch < NCH; ch++) {
   // fader bay
   rect(x, CY + 844, STRIP, 330, 'url(#faderBay)');
   rect(x, CY + 844, STRIP, 2, '#000', 'opacity="0.6"');
-  fader(x + 52, CY + 880, CY + 1130, faderPos[ch], { capW: 30, capH: 48, index: ret ? '#e8c34a' : '#ffffff' });
-  text(cm, CY + 1162, String(ch + 1), 13, '#e9e3d0', 'middle', 800);
+  rect(x, CY + 846, STRIP, 30, '#f3f1ea');
+  rect(x, CY + 846, 1, 30, '#bdb8ad');
+  text(cm, CY + 868, consoleNames[ch], consoleNames[ch].length > 7 ? 12 : 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+  fader(x + 52, CY + 900, CY + 1130, faderPos[ch], { capW: 30, capH: 48, index: ret ? '#e6c02e' : '#ffffff', capFill: 'url(#faderCapBlack)', scaleColor: '#1e1a1b' });
+  text(cm, CY + 1162, String(ch + 1), 13, '#1e1a1b', 'middle', 800);
 }
 // group dividers (every 8 channels)
 for (let g = 1; g < 4; g++) rect(SX0 + g * 8 * STRIP - 1, CY, 3, 1174, '#0a0a0b');
@@ -710,19 +729,23 @@ button(mx + 290, my + 18, 140, 22, 'amber', false, 'BOUNCE MIX → WAV', { size:
 // master fader bay
 rect(mx, CY + 844, MASTER_W, 330, 'url(#faderBay)');
 rect(mx, CY + 844, MASTER_W, 2, '#000', 'opacity="0.6"');
+rect(mx, CY + 846, MASTER_W, 30, '#f3f1ea');
+text(mx + MASTER_W / 2, CY + 867, 'GROUPS 1–8  ·  STEREO MASTER', 12, '#3a3436', 'middle', 800, 'letter-spacing="2"');
 for (let g = 0; g < 8; g++) {
   const gx = mx + 40 + g * 40;
-  fader(gx, CY + 880, CY + 1130, 0.22 + (g % 3) * 0.03, { capW: 24, capH: 40, scale: g === 0, capFill: 'url(#faderCapBlack)', index: '#e8c34a' });
-  text(gx, CY + 1162, `G${g + 1}`, 11, '#e9e3d0', 'middle', 800);
+  fader(gx, CY + 900, CY + 1130, 0.22 + (g % 3) * 0.03, { capW: 24, capH: 40, scale: g === 0, capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4], index: '#111', scaleColor: '#1e1a1b' });
+  text(gx, CY + 1162, `G${g + 1}`, 11, '#1e1a1b', 'middle', 800);
 }
 const mfx = mx + MASTER_W - 64;
-fader(mfx, CY + 880, CY + 1130, 0.22, { capW: 52, capH: 56, scale: true, capFill: 'url(#faderCapRed)', index: '#ffffff' });
-text(mfx, CY + 1162, 'STEREO', 11, '#e9e3d0', 'middle', 800, 'letter-spacing="1"');
+fader(mfx, CY + 900, CY + 1130, 0.22, { capW: 52, capH: 56, scale: true, capFill: 'url(#faderCapRed)', index: '#ffffff', scaleColor: '#1e1a1b' });
+text(mfx, CY + 1162, 'STEREO', 11, '#1e1a1b', 'middle', 800, 'letter-spacing="1"');
 
 // armrest
 const ary = CY + 1174;
-rect(CX + 34, ary, CW - 68, 70, 'url(#armrest)');
-rect(CX + 34, ary, CW - 68, 70, '#000', 'filter="url(#vinyl)" opacity="0.6"');
+rect(CX + 34, ary, CW - 68, 14, 'url(#oakH)');
+rect(CX + 34, ary, CW - 68, 14, '#000', 'filter="url(#woodgrainH)" opacity="0.5"');
+rect(CX + 34, ary + 14, CW - 68, 56, 'url(#armrest)');
+rect(CX + 34, ary + 14, CW - 68, 56, '#000', 'filter="url(#vinyl)" opacity="0.35"');
 rect(CX + 34, ary + 6, CW - 68, 2, '#fff', 'opacity="0.06"');
 for (let sxx = CX + 140; sxx < CX + CW - 80; sxx += 420) rect(sxx, ary + 4, 1, 64, '#000', 'opacity="0.4"');
 
@@ -744,7 +767,7 @@ for (let yy = RY + 10; yy < RY + RH; yy += 15.2) {
   rect(rr - 15, yy, 7, 5, '#151515', 'rx="1"');
 }
 text(RX + RW / 2, RY + 30, 'OUTBOARD RACK', 14, '#e9e3d0', 'middle', 800, 'letter-spacing="4"');
-text(RX + RW / 2, RY + 50, 'drag a unit to a channel insert or aux send', 11, '#8f8b7e', 'middle', 600);
+text(RX + RW / 2, RY + 50, 'drag a unit to a channel insert or aux send', 11, '#c9ccd8', 'middle', 600);
 const U = 50, UX = rl + 2, UW = rr - rl - 4;
 let uy = RY + 70;
 
@@ -863,7 +886,7 @@ for (let k = 0; k < 2; k++) {
 }
 // free plugin slots
 uy += 6;
-text(RX + RW / 2, uy + 4, 'PLUGIN SLOTS', 10, '#8f8b7e', 'middle', 800, 'letter-spacing="3"');
+text(RX + RW / 2, uy + 4, 'PLUGIN SLOTS', 10, '#c9ccd8', 'middle', 800, 'letter-spacing="3"');
 uy += 14;
 rackUnit(1, '#1a1b1e', (x, y, w, h) => {
   rect(x + 28, y + 6, w - 56, h - 12, '#26292e', 'rx="3"');
@@ -914,7 +937,7 @@ text(bx0 + 20, by0 + 34, 'PLUGINS', 14, '#e9e3d0', 'start', 800, 'letter-spacing
 button(bx0 + bw - 110, by0 + 16, 90, 28, 'amber', false, 'SCAN', { size: 11 });
 rect(bx0 + 20, by0 + 56, bw - 40, 34, '#0b0b0c', 'rx="4"');
 text(bx0 + 34, by0 + 78, 'Search plugins…', 13, '#6f6c62', 'start', 500);
-text(bx0 + 20, by0 + 118, 'BUILT-IN VINTAGE', 10, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(bx0 + 20, by0 + 118, 'BUILT-IN VINTAGE', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 const builtins = ['224 Digital Reverb', '1176LN Peak Limiter', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'];
 builtins.forEach((b, i) => {
   const ry = by0 + 130 + i * 40;
@@ -922,10 +945,10 @@ builtins.forEach((b, i) => {
   rect(bx0 + 30, ry + 9, 26, 16, '#3a3226', 'rx="2"');
   text(bx0 + 43, ry + 21, 'IN', 8, '#e8c34a', 'middle', 800);
   text(bx0 + 68, ry + 22, b, 13, '#e8e4d8', 'start', 600);
-  text(bx0 + bw - 34, ry + 22, i === 0 ? '1 in rack' : '2 in rack', 10, '#8f8b7e', 'end', 600);
+  text(bx0 + bw - 34, ry + 22, i === 0 ? '1 in rack' : '2 in rack', 10, '#c9ccd8', 'end', 600);
 });
 const tp = by0 + 350;
-text(bx0 + 20, tp, 'THIRD-PARTY · 14 FOUND', 10, '#8f8b7e', 'start', 800, 'letter-spacing="2"');
+text(bx0 + 20, tp, 'THIRD-PARTY · 14 FOUND', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
 const third = [['Plate Reverb', 'VST3'], ['Tape Echo', 'AU'], ['Bus Compressor', 'VST3'], ['Vintage EQ', 'AU'], ['Spring Reverb', 'VST3'], ['De-Esser', 'VST3'], ['Chorus Ensemble', 'AU'], ['Room Reverb', 'VST3'], ['Opto Leveler', 'AU'], ['Saturator', 'VST3'], ['Gate', 'AU'], ['Flanger', 'VST3']];
 third.forEach(([n, f], i) => {
   const ry = tp + 12 + i * 40;
