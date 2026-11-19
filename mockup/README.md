@@ -16,7 +16,7 @@ Full resolution: [`analog-studio-mockup-4k.png`](analog-studio-mockup-4k.png). A
 | Console (bottom) | 32 JH-600-style strips: scribble strip, 8 bus-assign buttons, mic/line, trim, pad, phase, HPF, 4-band EQ (freq + gain) with EQ IN, 4 aux sends, insert, pre, pan, mute, solo, long-throw fader. Channels 1–24 are tape returns; 25–32 (warm-tinted) are effect returns and live inputs |
 | Master section | Stereo VU pair, aux masters and returns, control-room source/dim/mono/cut, monitor level, cue/studio, talkback, oscillator, bounce-to-WAV, 8 group faders, stereo master fader |
 | Outboard rack (right side panel) | Lexicon 224, 2× UA 1176LN, 2× Yamaha SPX90, 2× Lexicon PCM41, 2× PCM42, three VST3/AU plugin slots, an insert patchbay with cables, and a plugin browser (scan, list, drag into a slot) |
-| Top bar | Session name and source file, audio interface, sample rate, buffer and DSP load; tabs for the rack, patchbay and plugins |
+| Top bar | Session name and source file; audio interface (TASCAM Studio Bridge, 24 in / 24 out), its MCU control link for transport and rec-ready, sample rate (48 kHz, the Studio Bridge's maximum), buffer and DSP load; tabs for the rack, patchbay and plugins |
 
 ## Reference photos applied
 

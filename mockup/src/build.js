@@ -330,11 +330,11 @@ text(42, 34, 'ANALOG STUDIO', 17, '#e9dcc0', 'start', 800, 'letter-spacing="5"')
 circle(304, 28, 5, '#ff3b2f', 'filter="url(#glow)"');
 text(420, 34, 'SESSION', 11, '#8b8778', 'start', 700, 'letter-spacing="2"');
 text(500, 34, 'Midnight Tapes — 24 trk · 2" · 30 IPS · loaded from midnight_tapes.mogg', 15, '#e8e4d8', 'start', 500);
-const statusItems = [['INTERFACE', 'Apogee Symphony'], ['RATE', '96 kHz'], ['BUFFER', '128 smp · 2.7 ms'], ['DSP', '18 %'], ['DISK', 'OK']];
-let sx = 2280;
+const statusItems = [['INTERFACE', 'TASCAM Studio Bridge · 24 in / 24 out'], ['CONTROL', 'MCU ● transport + rec ready'], ['RATE', '48 kHz'], ['BUFFER', '128 smp · 2.7 ms'], ['DSP', '18 %']];
+let sx = 1640;
 for (const [k, v] of statusItems) {
   text(sx, 34, k, 11, '#8b8778', 'start', 700, 'letter-spacing="2"');
-  text(sx + k.length * 9 + 14, 34, v, 15, '#e8e4d8', 'start', 600);
+  text(sx + k.length * 9 + 14, 34, v, 15, k === 'CONTROL' ? '#7ee08f' : '#e8e4d8', 'start', 600);
   sx += k.length * 9 + 14 + v.length * 8.6 + 46;
 }
 // rack tab (slide-out handle)
