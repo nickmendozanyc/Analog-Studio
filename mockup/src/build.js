@@ -266,12 +266,12 @@ p(`<defs>
   <linearGradient id="faderCapGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8e0a0"/><stop offset="0.15" stop-color="#3f8f3a"/><stop offset="1" stop-color="#1a3d18"/></linearGradient>
   <linearGradient id="faderCapWhite" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.15" stop-color="#e6e4dc"/><stop offset="1" stop-color="#8f8c84"/></linearGradient>
   <linearGradient id="faderCapRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f08a80"/><stop offset="0.15" stop-color="#b3261b"/><stop offset="1" stop-color="#4a0d08"/></linearGradient>
-  <linearGradient id="vuFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbfaf4"/><stop offset="0.6" stop-color="#f1efe6"/><stop offset="1" stop-color="#ddd9cc"/></linearGradient>
+  <linearGradient id="vuFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf1d2"/><stop offset="0.6" stop-color="#f4dfa8"/><stop offset="1" stop-color="#ddbd7c"/></linearGradient>
   <radialGradient id="vuGlow" cx="0.5" cy="0.95" r="0.9"><stop offset="0" stop-color="#fff" stop-opacity="0.0"/><stop offset="0.7" stop-color="#000" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></radialGradient>
   <linearGradient id="glass" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
   <linearGradient id="bezelHi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.18"/><stop offset="0.1" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.4"/></linearGradient>
-  <linearGradient id="deck" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#6a7290"/><stop offset="0.5" stop-color="#565d78"/><stop offset="1" stop-color="#474d64"/></linearGradient>
-  <linearGradient id="deckLower" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d5369"/><stop offset="1" stop-color="#3c4154"/></linearGradient>
+  <linearGradient id="deck" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#7a746d"/><stop offset="0.5" stop-color="#67625c"/><stop offset="1" stop-color="#57524d"/></linearGradient>
+  <linearGradient id="deckLower" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f5a55"/><stop offset="1" stop-color="#4c4844"/></linearGradient>
   <linearGradient id="console" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a6062"/><stop offset="0.5" stop-color="#5c5355"/><stop offset="1" stop-color="#4e4648"/></linearGradient>
   <linearGradient id="consoleAlt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a5556"/><stop offset="0.5" stop-color="#4d4849"/><stop offset="1" stop-color="#413c3d"/></linearGradient>
   <linearGradient id="consoleMaster" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#564d4f"/><stop offset="1" stop-color="#463f41"/></linearGradient>
@@ -351,7 +351,7 @@ text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 // =====================================================================
 const TX = 24, TY = 76, TW = 1360, TH = 816;
 p(`<g filter="url(#shadow)">`);
-rect(TX, TY, TW, TH, '#3a3f52', 'rx="10"');
+rect(TX, TY, TW, TH, '#3d3936', 'rx="10"');
 rect(TX, TY + TH - 18, TW, 18, 'url(#laminate)', 'rx="4"');
 rect(TX, TY + TH - 18, TW, 18, '#000', 'filter="url(#woodgrainH)" opacity="0.7" rx="4"');
 p(`</g>`);
@@ -388,7 +388,7 @@ function slotPath(cx, cy, rIn, rOut, w, ang, c) {
 function reel({ cx, cy, pack, rot, style }) {
   const st = REEL_STYLES[style];
   // motor plate + shadow
-  circle(cx, cy, R + 14, '#2c3040');
+  circle(cx, cy, R + 14, '#3a3633');
   circle(cx, cy, R + 14, 'url(#bezelHi)', 'opacity="0.5"');
   circle(cx + 8, cy + 14, R + 4, 'url(#kShadow)', 'opacity="0.8"');
   // back flange seen through the slots
@@ -413,7 +413,7 @@ function reel({ cx, cy, pack, rot, style }) {
   circle(cx, cy, hubR, '#131315');
   circle(cx, cy, hubR, 'url(#capHiDark)', 'opacity="0.7"');
   const holeR = R * 0.27;
-  circle(cx, cy, holeR, '#262a36');
+  circle(cx, cy, holeR, '#2b2826');
   circle(cx, cy, holeR, 'url(#kShadow)', 'opacity="0.9"');
   for (let k = 0; k < 3; k++) {
     const a0 = rot + 30 + k * 120;
@@ -452,9 +452,10 @@ reel(supply);
 reel(takeup);
 function guide(cx, cy, r = 18) {
   circle(cx + 3, cy + 5, r + 4, 'url(#kShadow)');
-  circle(cx, cy, r + 3, '#1c1d20');
-  circle(cx, cy, r, 'url(#chrome)');
-  circle(cx, cy, r * 0.35, '#2a2b2e');
+  circle(cx, cy, r + 3, '#0f0f10');
+  circle(cx, cy, r, '#1d1d1f');
+  circle(cx, cy, r, 'url(#capHiDark)');
+  circle(cx, cy, r * 0.45, 'url(#chrome)');
 }
 // tension arms
 for (const [ax, ay, pivotX] of [[...armL, TX + 270], [...armR, TX + TW - 270]]) {
@@ -475,87 +476,103 @@ const hbX = headX - 230, hbY = gy + 52;
 rect(hbX - 10, hbY - 4, 440, 76, '#000', 'rx="8" opacity="0.5" filter="url(#soft)"');
 rect(hbX, hbY - 2, 420, 66, '#24262a', 'rx="6"');
 rect(hbX, hbY - 2, 420, 66, 'url(#bezelHi)', 'rx="6"');
+// head cover: black housing, brushed silver lid (per photos)
+rect(headX - 196, hbY - 112, 392, 112, '#000', 'rx="6" opacity="0.55" filter="url(#soft)" transform="translate(6 10)"');
+rect(headX - 196, hbY - 112, 392, 106, '#141416', 'rx="6"');
+rect(headX - 184, hbY - 104, 368, 74, 'url(#silverPanel)', 'rx="3"');
+rect(headX - 184, hbY - 104, 368, 74, '#000', 'filter="url(#brushed)" opacity="0.18" rx="3"');
+for (let k = 0; k < 7; k++) rect(headX - 170 + k * 50, hbY - 24, 30, 10, '#2a2a2c', 'rx="2"');
+text(headX, hbY - 60, 'HEAD ASSEMBLY', 10, '#3a3633', 'middle', 800, 'letter-spacing="3"');
 const heads = [['ERASE', hbX + 70], ['RECORD', hbX + 210], ['REPRO', hbX + 350]];
 for (const [lab, hx] of heads) {
   rect(hx - 34, hbY - 10, 68, 28, 'url(#chrome)', 'rx="6"');
   rect(hx - 30, hbY - 6, 60, 6, '#2a2b2e', 'rx="2"');
   for (let k = 0; k < 6; k++) rect(hx - 27 + k * 10, hbY + 4, 6, 10, '#6b6f75', 'rx="1"');
-  text(hx, hbY + 46, lab, 11, '#e1e3ea', 'middle', 800, 'letter-spacing="1.5"');
+  text(hx, hbY + 46, lab, 11, '#ece7dc', 'middle', 800, 'letter-spacing="1.5"');
 }
 // head shield
 // capstan + pinch roller
 circle(capX + 30, gy + 52, 12, 'url(#chrome)');
 circle(capX + 30, gy + 52 + 37, 26, '#0e0e0f'); circle(capX + 30, gy + 89, 22, '#1b1b1d'); circle(capX + 30, gy + 89, 8, 'url(#chrome)');
-text(capX + 66, gy + 94, 'CAPSTAN', 9, '#e1e3ea', 'start', 800, 'letter-spacing="1.5"');
+text(capX + 66, gy + 94, 'CAPSTAN', 9, '#ece7dc', 'start', 800, 'letter-spacing="1.5"');
 // logo plate
 rect(headX - 120, TY + 40, 240, 70, '#0f1012', 'rx="4"');
 rect(headX - 120, TY + 40, 240, 70, 'url(#bezelHi)', 'rx="4"');
 text(headX - 62, TY + 88, 'MCI', 38, '#e9e3d0', 'middle', 900, 'font-style="italic" letter-spacing="2"');
 text(headX + 46, TY + 72, 'JH-24', 22, '#e9e3d0', 'middle', 800, 'letter-spacing="2"');
-text(headX + 46, TY + 94, '24 TRACK · 2"', 11, '#e1e3ea', 'middle', 700, 'letter-spacing="2"');
+text(headX + 46, TY + 94, '24 TRACK · 2"', 11, '#ece7dc', 'middle', 700, 'letter-spacing="2"');
 // tape timer / tach window between reels
 rect(headX - 90, TY + 150, 180, 58, '#0a0202', 'rx="4"');
 rect(headX - 90, TY + 150, 180, 58, 'url(#bezelHi)', 'rx="4"');
 seg7(headX - 76, TY + 162, 34, '03:42', '#ff3220');
-text(headX, TY + 228, 'TAPE TIME', 10, '#e1e3ea', 'middle', 800, 'letter-spacing="2"');
+text(headX, TY + 228, 'TAPE TIME', 10, '#ece7dc', 'middle', 800, 'letter-spacing="2"');
 // tension / status lamps
 const lamps = [['TENSION', 'green', true], ['SERVO', 'green', true], ['REC', 'red', true], ['VARI', 'amber', false]];
 lamps.forEach(([lab, col, on], i) => {
   const lx = headX - 100 + i * 52;
   button(lx, TY + 260, 36, 16, col, on);
-  text(lx + 18, TY + 292, lab, 9, '#e1e3ea', 'middle', 800, 'letter-spacing="1"');
+  text(lx + 18, TY + 292, lab, 9, '#ece7dc', 'middle', 800, 'letter-spacing="1"');
 });
 
 // transport controls on lower panel
 const ly0 = TY + 680;
-rect(TX + 28, ly0 + 30, 600, 86, 'url(#silverPanel)', 'rx="4"');
-rect(TX + 28, ly0 + 30, 600, 86, '#000', 'filter="url(#brushed)" opacity="0.15" rx="4"');
-text(TX + 40, ly0 + 22, 'TRANSPORT', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
-const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'yellow', false], ['▶', 'PLAY', 'green', true], ['●', 'RECORD', 'red', true]];
+rect(TX + 28, ly0 + 30, 610, 92, '#000', 'rx="5" opacity="0.5" filter="url(#soft)" transform="translate(3 6)"');
+rect(TX + 28, ly0 + 30, 610, 92, 'url(#silverPanel)', 'rx="5"');
+rect(TX + 28, ly0 + 30, 610, 92, '#000', 'filter="url(#brushed)" opacity="0.15" rx="5"');
+rect(TX + 34, ly0 + 36, 598, 80, 'none', 'rx="4" stroke="#6d6a66" stroke-width="1"');
+text(TX + 40, ly0 + 22, 'TRANSPORT', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
+// red lamp + two black knobs at the left of the strip, as on the deck
+circle(TX + 60, ly0 + 64, 11, '#c8231a', 'filter="url(#glow)"'); circle(TX + 60, ly0 + 64, 11, 'url(#capHi)');
+text(TX + 60, ly0 + 104, 'POWER', 8.5, '#2a2624', 'middle', 800);
+knob(TX + 108, ly0 + 64, 12, '#1d1d1f', -30, { ticks: false, dark: true });
+text(TX + 108, ly0 + 104, 'VARI', 8.5, '#2a2624', 'middle', 800);
+knob(TX + 152, ly0 + 64, 12, '#1d1d1f', 20, { ticks: false, dark: true });
+text(TX + 152, ly0 + 104, 'EDIT', 8.5, '#2a2624', 'middle', 800);
+const tbtns = [['◀◀', 'REW', 'white', false], ['▶▶', 'F FWD', 'white', false], ['■', 'STOP', 'grey', false], ['▶', 'PLAY', 'green', true], ['●', 'RECORD', 'red', true], ['▲', 'LIFT', 'blue', false], ['✂', 'EDIT', 'amber', false]];
 tbtns.forEach(([g, lab, col, on], i) => {
-  const bx = TX + 40 + i * 118;
-  button(bx, ly0 + 38, 96, 70, col, on, '', { pastel: true });
-  text(bx + 48, ly0 + 84, g, 26, '#1a1208', 'middle', 800);
-  text(bx + 48, ly0 + 128, lab, 11, '#e6e8f0', 'middle', 800, 'letter-spacing="1.5"');
+  const bx = TX + 186 + i * 63;
+  button(bx, ly0 + 44, 52, 46, col, on, '', { pastel: true });
+  text(bx + 26, ly0 + 74, g, 18, '#1a1208', 'middle', 800);
+  text(bx + 26, ly0 + 108, lab, 9, '#2a2624', 'middle', 800, 'letter-spacing="1"');
 });
 // speed
 const spX = TX + 660;
-text(spX, ly0 + 22, 'SPEED', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
+text(spX, ly0 + 22, 'SPEED', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
 button(spX, ly0 + 44, 64, 34, 'amber', false, '15 IPS', { size: 11 });
 button(spX + 74, ly0 + 44, 64, 34, 'amber', true, '30 IPS', { size: 11 });
-text(spX, ly0 + 104, 'EQ', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(spX, ly0 + 104, 'EQ', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 button(spX + 30, ly0 + 92, 52, 20, 'white', true, 'AES', { size: 9 });
 button(spX + 88, ly0 + 92, 52, 20, 'white', false, 'NAB', { size: 9 });
 // tape character
 const fxX = TX + 880;
-text(fxX, ly0 + 22, 'TAPE CHARACTER', 11, '#c9ccd8', 'start', 800, 'letter-spacing="3"');
+text(fxX, ly0 + 22, 'TAPE CHARACTER', 11, '#d9d3c7', 'start', 800, 'letter-spacing="3"');
 knob(fxX + 40, ly0 + 70, 20, '#c9a24a', 40, { label: 'SATURATION' });
 knob(fxX + 140, ly0 + 70, 20, '#c9a24a', -60, { label: 'WOW/FLUTTER' });
 knob(fxX + 240, ly0 + 70, 20, '#c9a24a', -90, { label: 'HISS' });
 button(fxX + 310, ly0 + 52, 120, 34, 'amber', false, 'BYPASS ALL', { size: 11 });
-text(fxX + 370, ly0 + 110, 'AMOUNT · GLOBAL BYPASS', 9, '#c9ccd8', 'middle', 700, 'letter-spacing="1"');
+text(fxX + 370, ly0 + 110, 'AMOUNT · GLOBAL BYPASS', 9, '#d9d3c7', 'middle', 700, 'letter-spacing="1"');
 
 // =====================================================================
 // AUTOLOCATOR REMOTE
 // =====================================================================
 const AX = 1408, AY = 96, AW = 400, AH = 776;
 p(`<g filter="url(#shadow)">`);
-rect(AX, AY, AW, AH, '#3a3f52', 'rx="10"');
+rect(AX, AY, AW, AH, '#3d3936', 'rx="10"');
 p(`</g>`);
 rect(AX + 8, AY + 8, AW - 16, AH - 16, 'url(#deck)', 'rx="6"');
 rect(AX + 8, AY + 8, AW - 16, AH - 16, '#000', 'filter="url(#brushed)" opacity="0.1" rx="6"');
 text(AX + 28, AY + 44, 'AUTOLOCATOR', 15, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(AX + AW - 28, AY + 44, 'AL-III', 13, '#e1e3ea', 'end', 800, 'letter-spacing="2"');
+text(AX + AW - 28, AY + 44, 'AL-III', 13, '#ece7dc', 'end', 800, 'letter-spacing="2"');
 // counter
 rect(AX + 24, AY + 64, AW - 48, 104, '#000', 'rx="6"');
 rect(AX + 30, AY + 70, AW - 60, 92, 'url(#displayBg)', 'rx="4"');
 seg7(AX + 46, AY + 86, 56, '03:42.1', '#ff3220');
 rect(AX + 30, AY + 70, AW - 60, 40, 'url(#glass)', 'rx="4"');
-text(AX + 40, AY + 186, 'MIN', 9, '#c9ccd8', 'start', 800);
-text(AX + 150, AY + 186, 'SEC', 9, '#c9ccd8', 'start', 800);
-text(AX + 286, AY + 186, 'TENTHS', 9, '#c9ccd8', 'start', 800);
+text(AX + 40, AY + 186, 'MIN', 9, '#d9d3c7', 'start', 800);
+text(AX + 150, AY + 186, 'SEC', 9, '#d9d3c7', 'start', 800);
+text(AX + 286, AY + 186, 'TENTHS', 9, '#d9d3c7', 'start', 800);
 // locate points
-text(AX + 28, AY + 222, 'LOCATE POINTS', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, AY + 222, 'LOCATE POINTS', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 const locs = [['1', 'INTRO', '00:00.0'], ['2', 'VERSE 1', '00:21.4'], ['3', 'CHORUS', '01:02.8'], ['4', 'SOLO', '02:47.3']];
 locs.forEach(([n, nm, tm], i) => {
   const ry = AY + 236 + i * 46;
@@ -569,17 +586,17 @@ const kx = AX + 28, ky = AY + 438;
 const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'CLR', '0', 'ENT'];
 keys.forEach((k, i) => {
   const c = i % 3, r = Math.floor(i / 3);
-  button(kx + c * 62, ky + r * 48, 54, 40, 'white', false, k, { size: 13 });
+  button(kx + c * 62, ky + r * 48, 54, 40, 'blue', false, k, { size: 13, pastel: true });
 });
 const sideKeys = [['STORE', 'amber', false], ['RECALL', 'amber', false], ['LOCATE', 'green', false], ['ZERO', 'white', false]];
 sideKeys.forEach(([k, col, on], i) => button(kx + 200, ky + i * 48, 144, 40, col, on, k, { size: 12 }));
 // punch + track arm group
 const py = ky + 206;
-text(AX + 28, py, 'PUNCH', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, py, 'PUNCH', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 button(AX + 28, py + 12, 106, 38, 'red', true, 'PUNCH IN', { size: 11 });
 button(AX + 144, py + 12, 106, 38, 'red', false, 'PUNCH OUT', { size: 11 });
 button(AX + 260, py + 12, 84, 38, 'amber', false, 'AUTO', { size: 11 });
-text(AX + 28, py + 78, 'TRACKS', 11, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(AX + 28, py + 78, 'TRACKS', 11, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 button(AX + 28, py + 90, 156, 34, 'red', false, 'ALL READY', { size: 11 });
 button(AX + 192, py + 90, 152, 34, 'white', false, 'ALL SAFE', { size: 11 });
 
@@ -588,12 +605,12 @@ button(AX + 192, py + 90, 152, 34, 'white', false, 'ALL SAFE', { size: 11 });
 // =====================================================================
 const MX = 1830, MY = 76, MW = 1440, MH = 816;
 p(`<g filter="url(#shadow)">`);
-rect(MX, MY, MW, MH, '#3a3f52', 'rx="10"');
+rect(MX, MY, MW, MH, '#3d3936', 'rx="10"');
 p(`</g>`);
 rect(MX + 8, MY + 8, MW - 16, MH - 16, 'url(#deck)', 'rx="6"');
 rect(MX + 8, MY + 8, MW - 16, MH - 16, '#000', 'filter="url(#brushed)" opacity="0.08" rx="6"');
 text(MX + 30, MY + 42, 'TAPE METER BRIDGE', 13, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
-text(MX + MW - 30, MY + 42, 'REPRO  ·  INPUT  ·  SYNC', 11, '#c9ccd8', 'end', 800, 'letter-spacing="2"');
+text(MX + MW - 30, MY + 42, 'REPRO  ·  INPUT  ·  SYNC', 11, '#d9d3c7', 'end', 800, 'letter-spacing="2"');
 button(MX + MW - 330, MY + 26, 66, 22, 'green', true, 'REPRO', { size: 9 });
 const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'TAMB'];
 const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + rnd() * 15));
@@ -601,20 +618,23 @@ const readyTracks = new Set([19, 20, 21]);
 for (let i = 0; i < 24; i++) {
   const c = i % 8, r = Math.floor(i / 8);
   const cx0 = MX + 24 + c * 174, cy0 = MY + 66 + r * 246;
-  rect(cx0, cy0, 166, 234, '#454b61', 'rx="4"');
+  rect(cx0, cy0, 166, 234, '#4c4743', 'rx="4"');
   rect(cx0, cy0, 166, 234, 'url(#bezelHi)', 'rx="4" opacity="0.6"');
-  vu(cx0 + 11, cy0 + 12, 144, 108, tapeDb[i], { label: String(i + 1), brand: 'MCI' });
+  const lampOn = readyTracks.has(i);
+  circle(cx0 + 148, cy0 + 11, 4.5, lampOn ? '#ff3b2f' : '#4a1612', lampOn ? 'filter="url(#glow)"' : '');
+  circle(cx0 + 134, cy0 + 11, 4.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
+  vu(cx0 + 11, cy0 + 24, 144, 100, tapeDb[i], { label: String(i + 1), brand: 'MCI' });
   // track number + name
   text(cx0 + 12, cy0 + 150, String(i + 1).padStart(2, '0'), 20, '#e9e3d0', 'start', 800);
   rect(cx0 + 50, cy0 + 132, 104, 24, 'url(#tapeMask)', 'rx="1" transform="rotate(-0.6 ' + (cx0 + 100) + ' ' + (cy0 + 144) + ')"');
   text(cx0 + 102, cy0 + 150, tapeNames[i], 13, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-  const ready = readyTracks.has(i);
+  const ready = lampOn;
   button(cx0 + 12, cy0 + 168, 68, 30, 'red', ready, 'READY', { size: 10 });
   button(cx0 + 86, cy0 + 168, 68, 30, 'white', !ready, 'SAFE', { size: 10 });
   // rec lamp
   circle(cx0 + 20, cy0 + 218, 5, ready ? '#ff3b2f' : '#3a1210', ready ? 'filter="url(#glow)"' : '');
-  text(cx0 + 32, cy0 + 222, ready ? 'REC' : 'IN ' + (i + 1), 10, ready ? '#ff8a7a' : '#c9ccd8', 'start', 800, 'letter-spacing="1"');
-  text(cx0 + 154, cy0 + 222, ready ? 'INPUT' : 'REPRO', 10, '#c9ccd8', 'end', 800, 'letter-spacing="1"');
+  text(cx0 + 32, cy0 + 222, ready ? 'REC' : 'IN ' + (i + 1), 10, ready ? '#ff8a7a' : '#d9d3c7', 'start', 800, 'letter-spacing="1"');
+  text(cx0 + 154, cy0 + 222, ready ? 'INPUT' : 'REPRO', 10, '#d9d3c7', 'end', 800, 'letter-spacing="1"');
 }
 
 // =====================================================================
@@ -805,7 +825,7 @@ for (let yy = RY + 10; yy < RY + RH; yy += 15.2) {
   rect(rr - 15, yy, 7, 5, '#151515', 'rx="1"');
 }
 text(RX + RW / 2, RY + 30, 'OUTBOARD RACK', 14, '#e9e3d0', 'middle', 800, 'letter-spacing="4"');
-text(RX + RW / 2, RY + 50, 'drag a unit to a channel insert or aux send', 11, '#c9ccd8', 'middle', 600);
+text(RX + RW / 2, RY + 50, 'drag a unit to a channel insert or aux send', 11, '#d9d3c7', 'middle', 600);
 const U = 50, UX = rl + 2, UW = rr - rl - 4;
 let uy = RY + 70;
 
@@ -924,7 +944,7 @@ for (let k = 0; k < 2; k++) {
 }
 // free plugin slots
 uy += 6;
-text(RX + RW / 2, uy + 4, 'PLUGIN SLOTS', 10, '#c9ccd8', 'middle', 800, 'letter-spacing="3"');
+text(RX + RW / 2, uy + 4, 'PLUGIN SLOTS', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="3"');
 uy += 14;
 rackUnit(1, '#1a1b1e', (x, y, w, h) => {
   rect(x + 28, y + 6, w - 56, h - 12, '#26292e', 'rx="3"');
@@ -975,7 +995,7 @@ text(bx0 + 20, by0 + 34, 'PLUGINS', 14, '#e9e3d0', 'start', 800, 'letter-spacing
 button(bx0 + bw - 110, by0 + 16, 90, 28, 'amber', false, 'SCAN', { size: 11 });
 rect(bx0 + 20, by0 + 56, bw - 40, 34, '#0b0b0c', 'rx="4"');
 text(bx0 + 34, by0 + 78, 'Search plugins…', 13, '#6f6c62', 'start', 500);
-text(bx0 + 20, by0 + 118, 'BUILT-IN VINTAGE', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(bx0 + 20, by0 + 118, 'BUILT-IN VINTAGE', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 const builtins = ['224 Digital Reverb', '1176LN Peak Limiter', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'];
 builtins.forEach((b, i) => {
   const ry = by0 + 130 + i * 40;
@@ -983,10 +1003,10 @@ builtins.forEach((b, i) => {
   rect(bx0 + 30, ry + 9, 26, 16, '#3a3226', 'rx="2"');
   text(bx0 + 43, ry + 21, 'IN', 8, '#e8c34a', 'middle', 800);
   text(bx0 + 68, ry + 22, b, 13, '#e8e4d8', 'start', 600);
-  text(bx0 + bw - 34, ry + 22, i === 0 ? '1 in rack' : '2 in rack', 10, '#c9ccd8', 'end', 600);
+  text(bx0 + bw - 34, ry + 22, i === 0 ? '1 in rack' : '2 in rack', 10, '#d9d3c7', 'end', 600);
 });
 const tp = by0 + 350;
-text(bx0 + 20, tp, 'THIRD-PARTY · 14 FOUND', 10, '#c9ccd8', 'start', 800, 'letter-spacing="2"');
+text(bx0 + 20, tp, 'THIRD-PARTY · 14 FOUND', 10, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
 const third = [['Plate Reverb', 'VST3'], ['Tape Echo', 'AU'], ['Bus Compressor', 'VST3'], ['Vintage EQ', 'AU'], ['Spring Reverb', 'VST3'], ['De-Esser', 'VST3'], ['Chorus Ensemble', 'AU'], ['Room Reverb', 'VST3'], ['Opto Leveler', 'AU'], ['Saturator', 'VST3'], ['Gate', 'AU'], ['Flanger', 'VST3']];
 third.forEach(([n, f], i) => {
   const ry = tp + 12 + i * 40;

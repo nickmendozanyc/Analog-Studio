@@ -20,13 +20,15 @@ Full resolution: [`analog-studio-mockup-4k.png`](analog-studio-mockup-4k.png). A
 
 ## Reference photos applied
 
-Corrected against the MCI listings on [SoundBroker](https://www.soundbroker.com/manufacturers/MCI/): JH-24 (with Autolocator III) and JH-636 photos.
+Corrected against your JH-24 photos and the MCI listings on [SoundBroker](https://www.soundbroker.com/manufacturers/MCI/): JH-24 (with Autolocator III) and JH-636 photos.
 
 | Element | Change |
 | --- | --- |
-| JH-24 deck, autolocator, meter bridge | Slate blue-grey finish (was dark anthracite); woodgrain laminate edge for the cabinet front |
-| Tape VU meters | Cool white faces in a 3 × 8 bridge (were amber) |
-| Transport | Coloured square caps on a brushed silver strip |
+| JH-24 deck, autolocator, meter bridge | Warm taupe-grey finish, from your JH-24 photos; woodgrain laminate edge for the cabinet front |
+| Tape VU meters | Warm cream, amber-backlit faces in a 3 × 8 bridge, with a record lamp and a status lamp above each meter |
+| Transport | Raised silver strip with small coloured square buttons (REW, F FWD, STOP, PLAY, RECORD, LIFT, EDIT), a red power lamp and two black knobs |
+| Head assembly | Tall black head cover with a brushed silver lid, flanked by black roller-guide posts |
+| Autolocator | Light-blue keypad keys, as on the AL-III |
 | Reels | From your photos: a silver Ampex 499 (full supply reel, left) and a red Quantegy GP9 (take-up, right). Solid flanges with two radial slots, a black hub with six screws, and the printed labels |
 | Console panel | Warm taupe-grey, as on the JH-636 (was blue-grey) |
 | Knob caps | Colour-coded by row: black trim, white HPF, red HF, yellow HMF, blue LMF, white LF, red/yellow aux, black pan |
