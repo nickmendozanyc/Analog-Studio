@@ -294,6 +294,8 @@ p(`<defs>
   <linearGradient id="topbar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e1f22"/><stop offset="1" stop-color="#121315"/></linearGradient>
   <radialGradient id="pack" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#2a1a10"/><stop offset="0.7" stop-color="#3b2516"/><stop offset="0.97" stop-color="#4a2f1c"/><stop offset="1" stop-color="#1e130b"/></radialGradient>
   <radialGradient id="flange" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#e9ebed"/><stop offset="0.45" stop-color="#b7bbc1"/><stop offset="0.8" stop-color="#8a8f96"/><stop offset="1" stop-color="#5c6066"/></radialGradient>
+  <radialGradient id="flangeRed" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#ff7a5c"/><stop offset="0.5" stop-color="#e2492f"/><stop offset="1" stop-color="#b3301d"/></radialGradient>
+  <radialGradient id="flangeSilver" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#f6f7f8"/><stop offset="0.5" stop-color="#d9dcdf"/><stop offset="1" stop-color="#a9adb2"/></radialGradient>
   <radialGradient id="flangeBack" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#585c62"/><stop offset="1" stop-color="#2c2f33"/></radialGradient>
   <radialGradient id="roomLight" cx="0.45" cy="0.2" r="0.9"><stop offset="0" stop-color="#ffdca8" stop-opacity="0.10"/><stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></radialGradient>
   <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.10"/><stop offset="0.4" stop-color="#fff" stop-opacity="0"/></linearGradient>
@@ -363,44 +365,80 @@ for (const [sx2, sy2] of [[TX + 24, TY + 24], [TX + TW - 24, TY + 24], [TX + 24,
 
 // reels
 const R = 240;
-const supply = { cx: TX + 300, cy: TY + 300, pack: 200, rot: 18 };
-const takeup = { cx: TX + TW - 300, cy: TY + 300, pack: 138, rot: 61 };
-function reel({ cx, cy, pack, rot }) {
-  // motor plate
-  circle(cx, cy, R + 14, '#1a1b1e');
+const supply = { cx: TX + 300, cy: TY + 300, pack: 200, rot: 18, style: 'gp9' };
+const takeup = { cx: TX + TW - 300, cy: TY + 300, pack: 138, rot: -27, style: 'a499' };
+// Reel styles from the user's reference photos: Quantegy GP9 (red anodized) and Ampex 499 (silver)
+const REEL_STYLES = {
+  gp9: { face: 'url(#flangeRed)', back: '#6e1c12', edge: '#7a2216', sheenOp: 0.18 },
+  a499: { face: 'url(#flangeSilver)', back: '#5a5d62', edge: '#55585d', sheenOp: 0.22 },
+};
+function slotPath(cx, cy, rIn, rOut, w, ang, c) {
+  // rounded radial slot, local coords: x across, y outward (negative = up), rotated by ang
+  const pts = [];
+  const rot = (x, y) => { const t = (ang) * Math.PI / 180; return [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)]; };
+  const hw = w / 2, y0 = -rOut, y1 = -rIn;
+  const seq = [['M', -hw + c, y0], ['L', hw - c, y0], ['A', hw, y0 + c], ['L', hw, y1 - c], ['A', hw - c, y1], ['L', -hw + c, y1], ['A', -hw, y1 - c], ['L', -hw, y0 + c], ['A', -hw + c, y0]];
+  let d = '';
+  for (const [cmd, x, y] of seq) {
+    const [X, Y] = rot(x, y);
+    d += cmd === 'A' ? `A${c} ${c} 0 0 1 ${X.toFixed(1)} ${Y.toFixed(1)} ` : `${cmd}${X.toFixed(1)} ${Y.toFixed(1)} `;
+  }
+  return d + 'Z ';
+}
+function reel({ cx, cy, pack, rot, style }) {
+  const st = REEL_STYLES[style];
+  // motor plate + shadow
+  circle(cx, cy, R + 14, '#2c3040');
   circle(cx, cy, R + 14, 'url(#bezelHi)', 'opacity="0.5"');
   circle(cx + 8, cy + 14, R + 4, 'url(#kShadow)', 'opacity="0.8"');
-  circle(cx, cy, R, 'url(#flangeBack)');
-  // tape pack with winding rings
+  // back flange seen through the slots
+  circle(cx, cy, R, st.back);
+  circle(cx, cy, R, 'url(#capHiDark)', 'opacity="0.6"');
+  // tape pack
   circle(cx, cy, pack, 'url(#pack)');
-  for (let r = 70; r < pack; r += 9) p(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#000" stroke-opacity="${0.08 + rnd() * 0.08}" stroke-width="1"/>`);
-  p(`<circle cx="${cx}" cy="${cy}" r="${pack}" fill="none" stroke="#6a4a30" stroke-opacity="0.6" stroke-width="1.5"/>`);
-  // front flange with 3 windows (evenodd)
+  for (let r = R * 0.38; r < pack; r += 7) p(`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="none" stroke="#000" stroke-opacity="${(0.08 + rnd() * 0.1).toFixed(2)}" stroke-width="1"/>`);
+  p(`<circle cx="${cx}" cy="${cy}" r="${pack}" fill="none" stroke="#7a5a3c" stroke-opacity="0.7" stroke-width="1.5"/>`);
+  // front flange: solid disc with two radial slots and the hub opening
+  const hubR = R * 0.36;
   let d = `M${cx - R} ${cy} A${R} ${R} 0 1 0 ${cx + R} ${cy} A${R} ${R} 0 1 0 ${cx - R} ${cy} Z `;
-  const r1 = R * 0.34, r2 = R * 0.88, span = 74;
+  d += `M${cx - hubR} ${cy} A${hubR} ${hubR} 0 1 0 ${cx + hubR} ${cy} A${hubR} ${hubR} 0 1 0 ${cx - hubR} ${cy} Z `;
+  for (const k of [0, 180]) d += slotPath(cx, cy, R * 0.5, R * 0.84, R * 0.17, rot + k, R * 0.035);
+  p(`<path d="${d}" fill="${st.face}" fill-rule="evenodd" stroke="${st.edge}" stroke-width="1.5"/>`);
+  p(`<path d="${d}" fill="#000" fill-rule="evenodd" filter="url(#brushed)" opacity="0.08"/>`);
+  p(`<circle cx="${cx}" cy="${cy}" r="${R - 2}" fill="none" stroke="#fff" stroke-opacity="${st.sheenOp + 0.1}" stroke-width="2.5"/>`);
+  p(`<circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#sheen)" opacity="0.9" pointer-events="none"/>`);
+  // slot inner edge shading
+  for (const k of [0, 180]) p(`<path d="${slotPath(cx, cy, R * 0.5, R * 0.84, R * 0.17, rot + k, R * 0.035)}" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="3"/>`);
+  // black plastic hub ring with key notches; spindle visible through the centre
+  circle(cx, cy, hubR, '#131315');
+  circle(cx, cy, hubR, 'url(#capHiDark)', 'opacity="0.7"');
+  const holeR = R * 0.27;
+  circle(cx, cy, holeR, '#262a36');
+  circle(cx, cy, holeR, 'url(#kShadow)', 'opacity="0.9"');
   for (let k = 0; k < 3; k++) {
-    const a0 = rot + k * 120 - span / 2, a1 = rot + k * 120 + span / 2;
-    const [x0, y0] = polar(cx, cy, r2, a0), [x1, y1] = polar(cx, cy, r2, a1);
-    const [x2, y2] = polar(cx, cy, r1, a1), [x3, y3] = polar(cx, cy, r1, a0);
-    d += `M${x0} ${y0} A${r2} ${r2} 0 0 1 ${x1} ${y1} L${x2} ${y2} A${r1} ${r1} 0 0 0 ${x3} ${y3} Z `;
+    const a0 = rot + 30 + k * 120;
+    const [x1, y1] = polar(cx, cy, holeR + 1, a0 - 6), [x2, y2] = polar(cx, cy, holeR - 12, a0 - 4), [x3, y3] = polar(cx, cy, holeR - 12, a0 + 4), [x4, y4] = polar(cx, cy, holeR + 1, a0 + 6);
+    p(`<path d="M${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} Z" fill="#131315"/>`);
   }
-  p(`<path d="${d}" fill="url(#flange)" fill-rule="evenodd" stroke="#2a2d31" stroke-width="1.5"/>`);
-  p(`<path d="${d}" fill="#000" fill-rule="evenodd" filter="url(#brushed)" opacity="0.12"/>`);
-  // spokes edge highlight
-  p(`<circle cx="${cx}" cy="${cy}" r="${R - 3}" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="2"/>`);
-  p(`<circle cx="${cx}" cy="${cy}" r="${R * 0.93}" fill="none" stroke="#000" stroke-opacity="0.2" stroke-width="1"/>`);
-  // hub
-  circle(cx, cy, 64, '#2b2d31');
-  circle(cx, cy, 58, 'url(#chrome)');
-  circle(cx, cy, 40, '#3b3e43');
-  for (let k = 0; k < 3; k++) {
-    const [hx, hy] = polar(cx, cy, 26, rot + 60 + k * 120);
-    circle(hx, hy, 8, '#121315');
+  // turntable spindle
+  circle(cx, cy, 30, '#1a1c22'); circle(cx, cy, 22, 'url(#chrome)'); circle(cx, cy, 8, '#2a2c30');
+  // 6 flange screws
+  for (let k = 0; k < 6; k++) { const [sx3, sy3] = polar(cx, cy, R * 0.42, rot + 30 + k * 60); circle(sx3, sy3 + 0.8, 4.2, '#000', 'opacity="0.5"'); circle(sx3, sy3, 3.6, '#1b1b1d'); }
+  // printed label between the slots
+  const [lx, ly] = polar(cx, cy, R * 0.66, rot + 90);
+  p(`<g transform="rotate(${rot} ${lx} ${ly})">`);
+  if (style === 'gp9') {
+    text(lx + 4, ly - 30, 'QUANTEGY', 15, '#1b1b1b', 'middle', 900, 'letter-spacing="0.5"');
+    p(`<ellipse cx="${lx - 4}" cy="${ly + 2}" rx="58" ry="20" fill="#f3f1ec" transform="rotate(-12 ${lx} ${ly})"/>`);
+    text(lx + 2, ly + 14, 'GP9', 40, '#3a3a3c', 'middle', 900, 'font-style="italic" letter-spacing="-1"');
+    text(lx + 2, ly + 34, 'GRAND MASTER PLATINUM', 8.5, '#1b1b1b', 'middle', 800);
+  } else {
+    text(lx, ly - 26, 'AMPEX', 18, '#141414', 'middle', 900, 'letter-spacing="1"');
+    text(lx, ly + 12, '499', 38, '#a9802f', 'middle', 900, 'letter-spacing="-1"');
+    text(lx, ly + 26, 'GRAND MASTER™ GOLD', 8.5, '#141414', 'middle', 800);
+    text(lx, ly + 38, 'Studio Mastering Audio Tape', 8, '#a9802f', 'middle', 600);
   }
-  circle(cx, cy, 14, 'url(#chrome)');
-  // label
-  const [lx, ly] = polar(cx, cy, R * 0.6, rot + 60);
-  p(`<g transform="rotate(${rot + 60} ${lx} ${ly})"><rect x="${lx - 40}" y="${ly - 12}" width="80" height="24" fill="#e9dfc6" rx="2" opacity="0.9"/><text x="${lx}" y="${ly + 5}" font-family="${SANS}" font-size="11" font-weight="800" text-anchor="middle" fill="#7a1d12">AMPEX 456</text></g>`);
+  p(`</g>`);
 }
 // tape path
 const gy = TY + 528;
