@@ -740,7 +740,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       p('</g>');
       // BUS level rotary below sends 5-6: feeds the assigned buses through the odd/even pan
       tx(x0 + 7, 899, 'BUS', 10, GOLD, 'start', 800); tx(x0 + 7, 911, 'LVL', 10, GOLD, 'start', 800);
-      KN(x0 + 52, 902, 14, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[0, '0']]);
+      KN(x0 + 52, 902, 14, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 60 : -150) : -150, [[60, '0']]);   // 0 dB at 2 o'clock
       tx(x0 + 33, 924, '∞', 8, WH, 'middle', 700); tx(x0 + 73, 924, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
