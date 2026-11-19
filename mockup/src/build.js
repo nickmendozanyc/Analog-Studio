@@ -688,10 +688,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         }
       }
       p('<g transform="translate(0 -26)">');
-      // bus feed: BUS level rotary feeding the assigned buses (through odd/even pan); INPUT / TAPE source select
-      KN(x0 + 23, 224, 14, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[-150, '∞'], [0, '0'], [150, '+10']]);
-      tx(x0 + 23, 255, 'BUS', 8, GOLD);
-      blk(x0 + 46, 208, 34, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 46, 228, 34, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
+      // INPUT / TAPE source select
+      blk(x0 + 4, 206, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 44, 206, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
+      p('<g transform="translate(0 -36)">');   // trim through sends move up into the space the mic controls left
       KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']]);
       tx(x0 + 22, 299, 'TRIM', 8, WH);
       KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']]);
@@ -737,6 +736,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       KN(x0 + 22, 868, 11, RED, 0, [[0, 'C'], [-150, '5'], [150, '6']]);
       blk(x0 + 4, 887, 30, 14, 'PRE'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-150, '∞'], [0, 'LVL'], [150, '+3']]);
       blk(x0 + 4, 905, 30, 14, '2MIX');
+      rect(x0 + 4, 924, 77, 1.1, GOLD);
+      p('</g>');
+      // BUS level rotary below sends 5-6: feeds the assigned buses through the odd/even pan
+      tx(x0 + 8, 904, 'BUS', 9, GOLD, 'start', 800); tx(x0 + 8, 915, 'LVL', 9, GOLD, 'start', 800);
+      KN(x0 + 56, 905, 11, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[-150, '∞'], [0, '0'], [150, '+10']]);
       rect(x0 + 4, 924, 77, 1.1, GOLD);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
