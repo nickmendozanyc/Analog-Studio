@@ -794,7 +794,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
   const lower = capture(() => {
     rect(0, 0, PW, FD, 'url(#faderBay)');
     rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
-    const top = 104, bot = 346;   // ~240 px travel on an 85 px strip (long-throw moving fader)
+    const top = 96, bot = 346;   // 250 px travel on an 85 px strip (long-throw moving fader)
     // automation modes (moving faders): demo states across the desk
     const AUTO = { off: ['OFF', '#8a8580'], read: ['READ', '#4fd46a'], write: ['WRITE', '#ff3b2f'], touch: ['TOUCH', '#ffb02e'], latch: ['LATCH', '#5aa0ff'], trim: ['TRIM', '#ffe14a'] };
     const modeOf = (ch) => (ch >= 24 ? 'off' : ch === 8 ? 'write' : ch === 11 ? 'touch' : ch === 14 ? 'latch' : ch === 19 ? 'trim' : 'read');
@@ -815,21 +815,27 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         circle(x0 + 44, ly, 2.5, on ? (k === 'SOLO' ? '#ffe14a' : '#ff3b2f') : '#4a1612', on ? 'filter="url(#glowSm)"' : '');
         text(x0 + 50, ly + 2.6, k, 7, WH2, 'start', 700);
       });
-      // automation mode key: mode LED, mode name, touch-sense LED
-      { const [nm, col] = AUTO[modeOf(ch)];
-        rect(x0 + 4, 44, 77, 15, '#000', 'rx="2" opacity="0.6"'); rect(x0 + 4, 42.5, 77, 15, '#151515', 'rx="2"'); rect(x0 + 4, 42.5, 77, 15, 'url(#btnOff)', 'rx="2"');
-        circle(x0 + 12, 50, 3, col, modeOf(ch) === 'off' ? 'opacity="0.5"' : 'filter="url(#glowSm)"');
-        text(x0 + 40, 54, nm, 9, modeOf(ch) === 'off' ? '#9a958c' : col, 'middle', 800, 'letter-spacing="0.5"');
-        circle(x0 + 73, 50, 2.6, touched(ch) ? '#7fd0ff' : '#18303e', touched(ch) ? 'filter="url(#glowSm)"' : ''); }
       // scribble strip
-      rect(x0 + 3, 62, STRIP - 6, 18, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 71)"`);
-      text(cm, 76, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      rect(x0 + 3, 48, STRIP - 6, 20, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 58)"`);
+      text(cm, 63, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
       for (const [lab, fr] of FMARK) {
         const yy = top + fr * (bot - top);
         p(`<line x1="${fx - 20}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="${WH2}" stroke-opacity="${fr === 0.2 ? 1 : 0.55}" stroke-width="${fr === 0.2 ? 1.6 : 1}"/>`);
         text(fx - 22, yy + 3, lab, 7.5, WH2, 'end', 700);
       }
       rect(fx - 3.5, top - 6, 7, bot - top + 12, '#050505', 'rx="3.5"'); rect(fx - 1, top - 4, 2, bot - top + 8, '#2a2a2a');
+      // automation: one small key per mode beside the fader; the active mode's key lights in its colour
+      { const m = modeOf(ch), kx = x0 + 71;
+        circle(kx + 6, top + 2, 2.6, touched(ch) ? '#7fd0ff' : '#18303e', touched(ch) ? 'filter="url(#glowSm)"' : '');   // touch-sense LED
+        [['off', 'O'], ['read', 'R'], ['write', 'W'], ['touch', 'T'], ['latch', 'L'], ['trim', 'Tr']].forEach(([k, l], n) => {
+          const ky = top + 14 + n * 22, on = k === m, col = AUTO[k][1];
+          rect(kx, ky + 1.2, 12, 15, '#000', 'rx="1.5" opacity="0.6"');
+          rect(kx, ky, 12, 15, on ? col : '#151515', `rx="1.5" ${on && k !== 'off' ? 'filter="url(#glowSm)"' : ''}`);
+          rect(kx, ky, 12, 15, on ? 'url(#btnLit)' : 'url(#btnOff)', 'rx="1.5"');
+          circle(kx + 6, ky + 4, 1.6, on ? '#fff' : col, on ? '' : 'opacity="0.45"');
+          text(kx + 6, ky + 13, l, l.length > 1 ? 6 : 7, on ? '#10140f' : '#cfc9bd', 'middle', 900);
+        });
+      }
       const cy = top + faderPos[ch] * (bot - top);
       p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
       CAP(fx, cy, 34, 48, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
