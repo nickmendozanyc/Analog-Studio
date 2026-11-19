@@ -689,8 +689,8 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       }
       p('<g transform="translate(0 -26)">');
       // INPUT / TAPE source select
-      blk(x0 + 4, 206, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 44, 206, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
-      p('<g transform="translate(0 -36)">');   // trim through sends move up into the space the mic controls left
+      blk(x0 + 4, 192, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 44, 192, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
+      p('<g transform="translate(0 -48)">');   // trim through sends move up into the space the mic controls left
       KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']]);
       tx(x0 + 22, 299, 'TRIM', 8, WH);
       KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']]);
@@ -739,9 +739,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       rect(x0 + 4, 924, 77, 1.1, GOLD);
       p('</g>');
       // BUS level rotary below sends 5-6: feeds the assigned buses through the odd/even pan
-      tx(x0 + 8, 904, 'BUS', 9, GOLD, 'start', 800); tx(x0 + 8, 915, 'LVL', 9, GOLD, 'start', 800);
-      KN(x0 + 56, 905, 11, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[-150, '∞'], [0, '0'], [150, '+10']]);
-      rect(x0 + 4, 924, 77, 1.1, GOLD);
+      tx(x0 + 7, 899, 'BUS', 10, GOLD, 'start', 800); tx(x0 + 7, 911, 'LVL', 10, GOLD, 'start', 800);
+      KN(x0 + 52, 902, 14, '#ecebe4', ch < 24 ? (readyTracks.has(ch) ? 0 : -150) : -150, [[0, '0']]);
+      tx(x0 + 33, 924, '∞', 8, WH, 'middle', 700); tx(x0 + 73, 924, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
       const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
