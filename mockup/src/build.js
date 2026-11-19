@@ -760,7 +760,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     text(mx + mw - 18, y, 'RETURNS', 14, '#c9c2b2', 'end', 800, 'letter-spacing="1"');
     for (let a = 0; a < 4; a++) {
       const kx = mx + 36 + a * 50, rx = mx + mw - 186 + a * 50;
-      if (a < 2) { const sx = mx + 46 + a * 64; ticks(sx, y + 34, 14); K(sx, y + 34, 14, '#ecd03a', 20 + a * 10); text(sx, y + 66, `SEND ${a + 1}`, 14, L, 'middle', 800); }
+      if (a < 3) { const sx = mx + 46 + a * 64; ticks(sx, y + 34, 14); K(sx, y + 34, 14, a < 2 ? '#ecd03a' : '#3f8fd9', 20 + a * 10); text(sx, y + 66, a < 2 ? `SEND ${a + 1}` : 'SEND 3-4', 14, L, 'middle', 800); }
+      if (a === 2) { // sends 3-4 mode: stereo effect send (FX) or Cue 1 (CUE)
+        rect(mx + 194, y + 17, 34, 15, '#000', 'rx="2" opacity="0.6"'); rect(mx + 194, y + 15.5, 34, 15, '#ffb02e', 'rx="2" filter="url(#glowSm)"'); rect(mx + 194, y + 15.5, 34, 15, 'url(#btnLit)', 'rx="2"'); text(mx + 211, y + 27, 'FX', 11, '#1a1208', 'middle', 800);
+        rect(mx + 194, y + 37, 34, 15, '#000', 'rx="2" opacity="0.6"'); rect(mx + 194, y + 35.5, 34, 15, '#151515', 'rx="2"'); rect(mx + 194, y + 35.5, 34, 15, 'url(#btnOff)', 'rx="2"'); text(mx + 211, y + 47, 'CUE', 10, '#ece6da', 'middle', 800);
+      }
       ticks(rx, y + 34, 14); K(rx, y + 34, 14, '#1d1d1f', -10 + a * 15, { dark: true });
       text(rx, y + 66, `R${a + 1}`, 14, L, 'middle', 800);
     }
