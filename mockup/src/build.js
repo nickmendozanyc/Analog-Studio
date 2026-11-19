@@ -794,7 +794,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
   const lower = capture(() => {
     rect(0, 0, PW, FD, 'url(#faderBay)');
     rect(0, 0, PW, FD, '#000', 'filter="url(#brushed)" opacity="0.06"');
-    const top = 96, bot = 346;   // 250 px travel on an 85 px strip (long-throw fader)
+    const top = 104, bot = 346;   // ~240 px travel on an 85 px strip (long-throw moving fader)
+    // automation modes (moving faders): demo states across the desk
+    const AUTO = { off: ['OFF', '#8a8580'], read: ['READ', '#4fd46a'], write: ['WRITE', '#ff3b2f'], touch: ['TOUCH', '#ffb02e'], latch: ['LATCH', '#5aa0ff'], trim: ['TRIM', '#ffe14a'] };
+    const modeOf = (ch) => (ch >= 24 ? 'off' : ch === 8 ? 'write' : ch === 11 ? 'touch' : ch === 14 ? 'latch' : ch === 19 ? 'trim' : 'read');
+    const touched = (ch) => ch === 11 || ch === 8;
     const WH2 = '#ece6da';
     const FMARK = [['10', 0], ['0', 0.2], ['10', 0.42], ['20', 0.6], ['40', 0.82], ['∞', 1]];
     for (let ch = 0; ch < NCH; ch++) {
@@ -811,9 +815,15 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         circle(x0 + 44, ly, 2.5, on ? (k === 'SOLO' ? '#ffe14a' : '#ff3b2f') : '#4a1612', on ? 'filter="url(#glowSm)"' : '');
         text(x0 + 50, ly + 2.6, k, 7, WH2, 'start', 700);
       });
+      // automation mode key: mode LED, mode name, touch-sense LED
+      { const [nm, col] = AUTO[modeOf(ch)];
+        rect(x0 + 4, 44, 77, 15, '#000', 'rx="2" opacity="0.6"'); rect(x0 + 4, 42.5, 77, 15, '#151515', 'rx="2"'); rect(x0 + 4, 42.5, 77, 15, 'url(#btnOff)', 'rx="2"');
+        circle(x0 + 12, 50, 3, col, modeOf(ch) === 'off' ? 'opacity="0.5"' : 'filter="url(#glowSm)"');
+        text(x0 + 40, 54, nm, 9, modeOf(ch) === 'off' ? '#9a958c' : col, 'middle', 800, 'letter-spacing="0.5"');
+        circle(x0 + 73, 50, 2.6, touched(ch) ? '#7fd0ff' : '#18303e', touched(ch) ? 'filter="url(#glowSm)"' : ''); }
       // scribble strip
-      rect(x0 + 3, 48, STRIP - 6, 20, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 58)"`);
-      text(cm, 63, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      rect(x0 + 3, 62, STRIP - 6, 18, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 71)"`);
+      text(cm, 76, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
       for (const [lab, fr] of FMARK) {
         const yy = top + fr * (bot - top);
         p(`<line x1="${fx - 20}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="${WH2}" stroke-opacity="${fr === 0.2 ? 1 : 0.55}" stroke-width="${fr === 0.2 ? 1.6 : 1}"/>`);
@@ -828,13 +838,23 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     const mx = MXL, mw = MWD;
     rect(mx, 0, 3, FD, '#000', 'opacity="0.4"');
     rect(mx, 0, mw, FD, 'url(#jh600)');
-    text(mx + mw / 2, 20, 'GROUPS 1–8 · STEREO', 13, '#d8c27c', 'middle', 800, 'letter-spacing="2"');
+    // global automation: set every channel and group at once; tape-locked data status
+    text(mx + 10, 18, 'AUTO', 10, '#d8c27c', 'start', 800, 'letter-spacing="1"');
+    Object.entries(AUTO).forEach(([k, [nm, col]], i) => {
+      const bx = mx + 50 + i * 55, on = k === 'read';
+      rect(bx, 6, 50, 18, '#000', 'rx="2" opacity="0.6"'); rect(bx, 4.5, 50, 18, on ? col : '#151515', `rx="2" ${on ? 'filter="url(#glow)"' : ''}`); rect(bx, 4.5, 50, 18, on ? 'url(#btnLit)' : 'url(#btnOff)', 'rx="2"');
+      text(bx + 25, 17.5, nm, 9, on ? '#10140f' : col, 'middle', 800);
+    });
+    circle(mx + 388, 38, 3.2, '#4fd46a', 'filter="url(#glowSm)"'); text(mx + 396, 42, 'TAPE SYNC', 9, '#ece6da', 'start', 800);
+    circle(mx + 388, 54, 3.2, '#ffb02e', 'filter="url(#glowSm)"'); text(mx + 396, 58, 'DATA 03:42', 9, '#ece6da', 'start', 800);
+    circle(mx + 388, 70, 3.2, '#ff3b2f', 'filter="url(#glowSm)"'); text(mx + 396, 74, 'PASS 4', 9, '#ece6da', 'start', 800);
     const gc = ['yellow', 'green', 'white', 'black'];
     for (let g = 0; g < 8; g++) {
       const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
       if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
       rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
       CAP(gx, cy, 30, 44, 18, gc[g % 4], '#111');
+      { const gm = g === 3 ? 'touch' : 'read'; circle(gx, 86, 3, AUTO[gm][1], 'filter="url(#glowSm)"'); }   // group automation mode LED
       // group mute (red) and solo (green) keys above each group fader
       for (const [k, yy, col, on] of [['M', 34, '#d63a2c', g === 5], ['S', 58, '#3fae5a', g === 1]]) {
         rect(gx - 14, yy + 2, 28, 20, '#000', 'rx="3" opacity="0.6"');
