@@ -185,10 +185,19 @@ function vu(x, y, w, h, db, opts = {}) {
   if (label) text(x + w * 0.92, y + h * 0.9, label, h * 0.085, '#3a3226', 'end', 800);
   // needle
   const a = vuAngle(db);
+  if (opts.needleId != null) {
+    // animatable needle: drawn upright, rotated by the page script (class vuN, data-i = meter index)
+    const [nx, ny] = polar(cx, cy, R * 0.9, 0), [bx, by] = polar(cx, cy, R * 0.3, 0);
+    p(`<g class="vuN" data-i="${opts.needleId}" data-cx="${cx}" data-cy="${cy}" transform="rotate(${a} ${cx} ${cy})">`);
+    p(`<line x1="${bx + 2}" y1="${by + 3}" x2="${nx + 2}" y2="${ny + 3}" stroke="#000" stroke-opacity="0.18" stroke-width="${Math.max(1.2, h * 0.016)}"/>`);
+    p(`<line x1="${bx}" y1="${by}" x2="${nx}" y2="${ny}" stroke="#111" stroke-width="${Math.max(1, h * 0.013)}" stroke-linecap="round"/>`);
+    p(`</g>`);
+  } else {
   const [nx, ny] = polar(cx, cy, R * 0.9, a);
   const [bx, by] = polar(cx, cy, R * 0.3, a);
   p(`<line x1="${bx + 2}" y1="${by + 3}" x2="${nx + 2}" y2="${ny + 3}" stroke="#000" stroke-opacity="0.18" stroke-width="${Math.max(1.2, h * 0.016)}"/>`);
   p(`<line x1="${bx}" y1="${by}" x2="${nx}" y2="${ny}" stroke="#111" stroke-width="${Math.max(1, h * 0.013)}" stroke-linecap="round"/>`);
+  }
   // pivot cover
   p(`<path d="M${x} ${y + h} L${x} ${y + h * 0.86} Q${cx} ${y + h * 0.74} ${x + w} ${y + h * 0.86} L${x + w} ${y + h} Z" fill="#1a1714"/>`);
   rect(x, y, w, h, 'url(#vuGlow)');
@@ -248,6 +257,72 @@ function ledLadder(x, y, n, w, h, level, horizontal = true) {
     const yy = horizontal ? y : y - i * (h + 3);
     rect(xx, yy, w, h, on ? c1 : c0, `rx="1" ${on ? 'filter="url(#glowSm)"' : ''}`);
   }
+}
+
+// Lexicon 224X remote, traced from the user's photos (photo coordinates 430..1070 x 62..1062), drawn at scale sc
+function remote224(ox, oy, sc, opts = {}) {
+      p(`<g transform="translate(${ox} ${oy}) scale(${sc}) translate(-430 -62)">`);
+  const T = (x, y, str, size, anchor = 'middle', w = 700, extra = '') => text(x, y, str, size, '#f2f4f8', anchor, w, extra);
+  p(`<defs><linearGradient id="l224blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cc4"/><stop offset="0.6" stop-color="#2f6db3"/><stop offset="1" stop-color="#245a98"/></linearGradient></defs>`);
+  rect(455, 84, 590, 962, 'url(#l224blue)');
+  rect(455, 84, 590, 962, '#000', 'filter="url(#brushed)" opacity="0.05"');
+  for (const x of [430, 1045]) { rect(x, 62, 25, 1000, '#111214', 'rx="4"'); rect(x + 4, 62, 4, 1000, '#fff', 'opacity="0.12"'); }
+  // logo + model
+  rect(500, 110, 134, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
+  T(567, 150, 'lexicon', 40, 'middle', 900, 'letter-spacing="-1"');
+  T(736, 150, '224X', 34, 'middle', 800); T(1002, 150, 'Digital Reverb', 30, 'end', 700, 'font-style="italic"');
+  // display window: headroom bars + red 3-digit readout
+  rect(515, 180, 475, 92, '#120404'); rect(515, 180, 260, 92, '#2a0705');
+  T(533, 212, 'L', 16); T(533, 247, 'R', 16);
+  [['24', 563], ['18', 598], ['12', 633], ['6', 668], ['0dB', 713]].forEach(([l, x]) => T(x, 233, l, 17, 'middle', 700));
+  for (let k = 0; k < 6; k++) for (const yy of [200, 242]) rect(552 + k * 35, yy, 22, 6, '#ff3a24', `opacity="${k < (yy === 200 ? 4 : 3) ? 0.9 : 0.12}" ${k < 3 ? 'filter="url(#glowSm)"' : ''}`);
+  T(748, 262, 'ovfl', 16);
+  rect(778, 186, 138, 80, '#1a0503');
+  if (opts.liveDisplay) p(`<text id="d224" x="905" y="252" text-anchor="end" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="62" fill="#ff3a24" filter="url(#glowSm)">2.6</text>`); else seg7(790, 198, 56, '2.6', '#ff3a24');
+  [['sec', 203, true], ['ms', 221, false], ['Hz', 239, false], ['kHz', 257, false]].forEach(([u, yy, on]) => { T(932, yy, u, 15, 'middle', 700); circle(966, yy - 5, 3.5, on ? '#ff3a24' : '#4a1612', `class="unit224" data-u="${u}" ${on ? 'filter="url(#glowSm)"' : ''}`); });
+  T(638, 291, 'HEADROOM-dB', 13, 'middle', 800); T(753, 307, 'PROGRAM', 17, 'middle', 800);
+  const cols = [550, 608, 666, 723, 780, 838, 897, 953];
+  cols.forEach((x, i) => T(x, 330, String(i + 1), 17, 'middle', 700));
+  // two rows of eight keys with red LEDs
+  for (const [y0, litIdx] of [[342, 0], [458, 6]]) {
+    rect(517, y0, 468, 90, '#141518');
+    cols.forEach((x, i) => {
+      rect(x - 25, y0 + 6, 50, 76, '#22252a'); rect(x - 25, y0 + 6, 50, 2, '#fff', 'opacity="0.12"');
+      circle(x, y0 + 22, 7, i === litIdx ? '#ff3a24' : '#5a1410', `class="led224" data-row="${y0 === 342 ? 0 : 1}" data-i="${i}" ${i === litIdx ? 'filter="url(#glow)"' : ''}`);
+      rect(x - 20, y0 + 40, 40, 36, '#2d3036', `class="key224" data-row="${y0 === 342 ? 0 : 1}" data-i="${i}"`); rect(x - 20, y0 + 40, 40, 36, 'url(#btnOff)', 'pointer-events="none"');
+    });
+  }
+  p(`<path d="M1008 372 Q1022 372 1022 390 L1022 418 M1008 512 Q1022 512 1022 494 L1022 466" fill="none" stroke="#f2f4f8" stroke-width="2.5"/>`);
+  T(1016, 438, "ext'd", 13, 'middle', 700); T(1016, 452, 'reg.', 13, 'middle', 700);
+  [['PAGE', 553], ['SET', 610], ['CALL', 666], ['SHIFT', 724], ['A', 780], ['B', 838], ['C', 895], ['D', 952]].forEach(([l, x]) => T(x, 568, l, 17, 'middle', 700));
+  T(553, 590, 'immed.', 13, 'middle', 700); T(718, 590, 'extended', 13, 'middle', 700);
+  p(`<path d="M610 578 Q610 586 618 586 L660 586 Q668 586 668 578 M690 586 L686 586" fill="none" stroke="#f2f4f8" stroke-width="2"/><path d="M780 586 L816 586 M916 586 L952 586" stroke="#f2f4f8" stroke-width="2"/>`);
+  T(866, 591, 'REGISTER', 17, 'middle', 700);
+  // six long sliders with white tick lines between the slots
+  const sl = [553, 632, 712, 791, 870, 950], pos = [0.92, 0.9, 0.55, 0.88, 0.7, 0.86];
+  sl.forEach((x, i) => {
+    rect(x - 4, 617, 8, 226, '#050505', 'rx="3"');
+    if (i < 5) for (const ty of [637, 688, 740, 791]) rect(x + 16, ty, sl[i + 1] - x - 32, 3, '#f2f4f8', 'opacity="0.92"');
+    const cy = 640 + pos[i] * 200;
+    p(`<g class="sl224" data-i="${i}" data-pos="${pos[i]}" transform="translate(0 ${cy - 640})">`);
+    rect(x - 33, 640 - 18, 70, 46, '#000', 'opacity="0.5" filter="url(#soft)"');
+    rect(x - 35, 640 - 22, 70, 44, '#0c0c0e', 'rx="3"'); rect(x - 35, 640 - 22, 70, 3, '#3a3b3f'); rect(x - 35, 640 - 22, 70, 44, 'url(#btnOff)', 'rx="3" opacity="0.6"');
+    p('</g>');
+  });
+  T(589, 882, 'REVERB-TIME', 15, 'middle', 800); T(555, 899, 'BASS', 15, 'middle', 800); T(634, 899, 'MID', 15, 'middle', 800);
+  T(712, 882, 'CROSS-', 15, 'middle', 800); T(712, 899, 'OVER', 15, 'middle', 800);
+  T(791, 882, 'TREBLE', 15, 'middle', 800); T(791, 899, 'DECAY', 15, 'middle', 800);
+  T(871, 893, 'DEPTH', 15, 'middle', 800);
+  T(949, 882, 'PRE-', 15, 'middle', 800); T(949, 899, 'DELAY', 15, 'middle', 800);
+  // bottom row: six keys with LEDs
+  rect(513, 905, 479, 82, '#0e0f11');
+  sl.forEach((x, i) => {
+    rect(x - 36, 910, 74, 72, '#191b1f'); rect(x - 36, 910, 74, 2, '#fff', 'opacity="0.1"');
+    circle(x, 926, 6.5, i === 0 ? '#ff3a24' : '#5a1410', `class="led224b" data-i="${i}" ${i === 0 ? 'filter="url(#glow)"' : ''}`);
+    rect(x - 36, 910, 74, 72, 'transparent', `class="key224b" data-i="${i}"`);
+    T([527, 606, 686, 766, 845, 922][i], 1012, String(i + 1), 17, 'middle', 700);
+  });
+  p('</g>');
 }
 
 // ---------- defs ----------
@@ -725,65 +800,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       { const sx = rx + RWd - 6, sy = ry + 60, d = `M${sx} ${sy} C${sx + 40} ${sy - 4} ${mx + mw - 30} ${sy - 30} ${mx + mw + 40} ${sy - 46}`;
         p(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="12" transform="translate(3 6)"/><path d="${d}" fill="none" stroke="#9fa3a8" stroke-width="10"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="2.5" transform="translate(-1 -2)"/>`);
         rect(sx - 6, sy - 20, 16, 40, '#c9ccd0', 'rx="3"'); }
-      p(`<g transform="translate(${rx} ${ry}) scale(${sc}) translate(-430 -62)">`);
-      const T = (x, y, str, size, anchor = 'middle', w = 700, extra = '') => text(x, y, str, size, '#f2f4f8', anchor, w, extra);
-      p(`<defs><linearGradient id="l224blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b7cc4"/><stop offset="0.6" stop-color="#2f6db3"/><stop offset="1" stop-color="#245a98"/></linearGradient></defs>`);
-      rect(455, 84, 590, 962, 'url(#l224blue)');
-      rect(455, 84, 590, 962, '#000', 'filter="url(#brushed)" opacity="0.05"');
-      for (const x of [430, 1045]) { rect(x, 62, 25, 1000, '#111214', 'rx="4"'); rect(x + 4, 62, 4, 1000, '#fff', 'opacity="0.12"'); }
-      // logo + model
-      rect(500, 110, 134, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
-      T(567, 150, 'lexicon', 40, 'middle', 900, 'letter-spacing="-1"');
-      T(736, 150, '224X', 34, 'middle', 800); T(1002, 150, 'Digital Reverb', 30, 'end', 700, 'font-style="italic"');
-      // display window: headroom bars + red 3-digit readout
-      rect(515, 180, 475, 92, '#120404'); rect(515, 180, 260, 92, '#2a0705');
-      T(533, 212, 'L', 16); T(533, 247, 'R', 16);
-      [['24', 563], ['18', 598], ['12', 633], ['6', 668], ['0dB', 713]].forEach(([l, x]) => T(x, 233, l, 17, 'middle', 700));
-      for (let k = 0; k < 6; k++) for (const yy of [200, 242]) rect(552 + k * 35, yy, 22, 6, '#ff3a24', `opacity="${k < (yy === 200 ? 4 : 3) ? 0.9 : 0.12}" ${k < 3 ? 'filter="url(#glowSm)"' : ''}`);
-      T(748, 262, 'ovfl', 16);
-      rect(778, 186, 138, 80, '#1a0503');
-      seg7(790, 198, 56, '2.6', '#ff3a24');
-      [['sec', 203, true], ['ms', 221, false], ['Hz', 239, false], ['kHz', 257, false]].forEach(([u, yy, on]) => { T(932, yy, u, 15, 'middle', 700); circle(966, yy - 5, 3.5, on ? '#ff3a24' : '#4a1612', on ? 'filter="url(#glowSm)"' : ''); });
-      T(638, 291, 'HEADROOM-dB', 13, 'middle', 800); T(753, 307, 'PROGRAM', 17, 'middle', 800);
-      const cols = [550, 608, 666, 723, 780, 838, 897, 953];
-      cols.forEach((x, i) => T(x, 330, String(i + 1), 17, 'middle', 700));
-      // two rows of eight keys with red LEDs
-      for (const [y0, litIdx] of [[342, 0], [458, 6]]) {
-        rect(517, y0, 468, 90, '#141518');
-        cols.forEach((x, i) => {
-          rect(x - 25, y0 + 6, 50, 76, '#22252a'); rect(x - 25, y0 + 6, 50, 2, '#fff', 'opacity="0.12"');
-          circle(x, y0 + 22, 7, i === litIdx ? '#ff3a24' : '#5a1410', i === litIdx ? 'filter="url(#glow)"' : '');
-          rect(x - 20, y0 + 40, 40, 36, '#2d3036'); rect(x - 20, y0 + 40, 40, 36, 'url(#btnOff)');
-        });
-      }
-      p(`<path d="M1008 372 Q1022 372 1022 390 L1022 418 M1008 512 Q1022 512 1022 494 L1022 466" fill="none" stroke="#f2f4f8" stroke-width="2.5"/>`);
-      T(1016, 438, "ext'd", 13, 'middle', 700); T(1016, 452, 'reg.', 13, 'middle', 700);
-      [['PAGE', 553], ['SET', 610], ['CALL', 666], ['SHIFT', 724], ['A', 780], ['B', 838], ['C', 895], ['D', 952]].forEach(([l, x]) => T(x, 568, l, 17, 'middle', 700));
-      T(553, 590, 'immed.', 13, 'middle', 700); T(718, 590, 'extended', 13, 'middle', 700);
-      p(`<path d="M610 578 Q610 586 618 586 L660 586 Q668 586 668 578 M690 586 L686 586" fill="none" stroke="#f2f4f8" stroke-width="2"/><path d="M780 586 L816 586 M916 586 L952 586" stroke="#f2f4f8" stroke-width="2"/>`);
-      T(866, 591, 'REGISTER', 17, 'middle', 700);
-      // six long sliders with white tick lines between the slots
-      const sl = [553, 632, 712, 791, 870, 950], pos = [0.92, 0.9, 0.55, 0.88, 0.7, 0.86];
-      sl.forEach((x, i) => {
-        rect(x - 4, 617, 8, 226, '#050505', 'rx="3"');
-        if (i < 5) for (const ty of [637, 688, 740, 791]) rect(x + 16, ty, sl[i + 1] - x - 32, 3, '#f2f4f8', 'opacity="0.92"');
-        const cy = 640 + pos[i] * 200;
-        rect(x - 33, cy - 18, 70, 46, '#000', 'opacity="0.5" filter="url(#soft)"');
-        rect(x - 35, cy - 22, 70, 44, '#0c0c0e', 'rx="3"'); rect(x - 35, cy - 22, 70, 3, '#3a3b3f'); rect(x - 35, cy - 22, 70, 44, 'url(#btnOff)', 'rx="3" opacity="0.6"');
-      });
-      T(589, 882, 'REVERB-TIME', 15, 'middle', 800); T(555, 899, 'BASS', 15, 'middle', 800); T(634, 899, 'MID', 15, 'middle', 800);
-      T(712, 882, 'CROSS-', 15, 'middle', 800); T(712, 899, 'OVER', 15, 'middle', 800);
-      T(791, 882, 'TREBLE', 15, 'middle', 800); T(791, 899, 'DECAY', 15, 'middle', 800);
-      T(871, 893, 'DEPTH', 15, 'middle', 800);
-      T(949, 882, 'PRE-', 15, 'middle', 800); T(949, 899, 'DELAY', 15, 'middle', 800);
-      // bottom row: six keys with LEDs
-      rect(513, 905, 479, 82, '#0e0f11');
-      sl.forEach((x, i) => {
-        rect(x - 36, 910, 74, 72, '#191b1f'); rect(x - 36, 910, 74, 2, '#fff', 'opacity="0.1"');
-        circle(x, 926, 6.5, i === 0 ? '#ff3a24' : '#5a1410', i === 0 ? 'filter="url(#glow)"' : '');
-        T([527, 606, 686, 766, 845, 922][i], 1012, String(i + 1), 17, 'middle', 700);
-      });
-      p('</g>');
+      remote224(rx, ry, sc);
     }
     // oak top trim
     rect(0, 0, PW, 6, 'url(#oakH)');
@@ -1035,7 +1052,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w / 2, 35, '+ drop a VST3 / AU plugin', 14, '#8a877c', 'middle', 700);
   });
   uy += 10;
-  const pbY = uy;
+  const pbY = uy; globalThis.RACK_PB_Y = RY + pbY;
   unit(2, 'url(#rackBlack)', (w, h) => {
     text(w / 2, 22, 'PATCHBAY · INSERTS', 14, '#cfcfcf', 'middle', 800, 'letter-spacing="2"');
     for (let row = 0; row < 2; row++) {
@@ -1116,16 +1133,108 @@ rect(0, 0, W, H, 'url(#vig)');
 
 p(`</svg>`);
 
+// =====================================================================
+// POP-UP VIEWS (opened by clicking the tape machine, the tape meter bridge, the 224 or the patchbay)
+// =====================================================================
+const OVH = 2104;   // view height below the 56 px title bar
+const meterView = capture(() => {
+  rect(0, 0, W, OVH, 'url(#deck)'); rect(0, 0, W, OVH, '#000', 'opacity="0.45"'); rect(0, 0, W, OVH, '#000', 'filter="url(#brushed)" opacity="0.06"');
+  for (let i = 0; i < 24; i++) {
+    const c = i % 8, r = Math.floor(i / 8), x = c * 480, y = 24 + r * 690, on = readyTracks.has(i);
+    rect(x + 10, y, 460, 660, '#2c2926', 'rx="10"'); rect(x + 10, y, 460, 660, 'url(#bezelHi)', 'rx="10" opacity="0.5"');
+    circle(x + 430, y + 30, 11, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+    circle(x + 396, y + 30, 11, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
+    rect(x + 24, y + 54, 432, 330, '#0a0908', 'rx="10"'); rect(x + 24, y + 54, 432, 330, 'url(#bezelHi)', 'rx="10"');
+    vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i, brand: 'MCI' });
+    text(x + 30, y + 452, String(i + 1).padStart(2, '0'), 46, '#ece7dc', 'start', 800);
+    rect(x + 112, y + 410, 344, 58, 'url(#tapeMask)', `rx="2" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 284} ${y + 439})"`);
+    text(x + 284, y + 452, tapeNames[i], 34, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+    button(x + 30, y + 500, 200, 72, 'red', on, 'READY', { size: 26 });
+    button(x + 250, y + 500, 200, 72, 'white', !on, 'SAFE', { size: 26 });
+    text(x + 240, y + 626, on ? 'RECORD READY · MONITORING INPUT' : 'SAFE · MONITORING REPRO', 20, on ? '#ff8a7a' : '#b8b1a5', 'middle', 800, 'letter-spacing="1.5"');
+  }
+});
+const lexView = capture(() => {
+  rect(0, 0, W, OVH, 'url(#wall)'); for (let x = 0; x < W; x += 96) { rect(x, 0, 94, OVH, 'url(#woodH)', 'opacity="0.3"'); rect(x + 94, 0, 2, OVH, '#000', 'opacity="0.6"'); }
+  rect(0, 0, W, OVH, '#000', 'opacity="0.35"');
+  // 224X mainframe (4U, 19"): black chassis with the blue name band
+  const fx = 1900, fy = 640, fw = 1760, fh = Math.round(1760 * 7 / 19);
+  rect(fx + 20, fy + 40, fw, fh, '#000', 'opacity="0.6" filter="url(#soft)"');
+  rect(fx, fy, fw, fh, '#161718', 'rx="6"'); rect(fx, fy, fw, 6, '#fff', 'opacity="0.1"');
+  for (let k = 0; k < 6; k++) rect(fx + 380 + k * 70, fy + 40, 40, 14, '#0b0b0c', 'rx="3"');
+  for (let k = 0; k < 6; k++) rect(fx + fw - 760 + k * 70, fy + 40, 40, 14, '#0b0b0c', 'rx="3"');
+  for (const [sx, sy] of [[fx + 40, fy + 50], [fx + fw - 40, fy + 50], [fx + 40, fy + fh - 50], [fx + fw - 40, fy + fh - 50], [fx + fw / 2, fy + 34], [fx + fw / 2, fy + fh - 34]]) screw(sx, sy, 12);
+  rect(fx + 220, fy + fh * 0.4, fw - 440, fh * 0.17, '#2f6db3');
+  rect(fx + 260, fy + fh * 0.4 + 20, 220, fh * 0.17 - 40, 'none', 'stroke="#f2f4f8" stroke-width="4"');
+  text(fx + 370, fy + fh * 0.4 + fh * 0.17 / 2 + 22, 'lexicon', 60, '#f2f4f8', 'middle', 900);
+  text(fx + fw - 260, fy + fh * 0.4 + fh * 0.17 / 2 + 22, 'Digital Reverberator', 56, '#f2f4f8', 'end', 700, 'font-style="italic"');
+  text(fx + fw - 860, fy + fh * 0.4 + fh * 0.17 / 2 + 22, '224X', 64, '#f2f4f8', 'end', 900);
+  circle(fx + 280, fy + fh * 0.78, 9, '#ff3b2f', 'filter="url(#glow)"'); text(fx + 280, fy + fh * 0.78 + 40, 'POWER', 18, '#cfcfcf', 'middle', 800);
+  circle(fx + 380, fy + fh * 0.78, 9, '#4a1612'); text(fx + 380, fy + fh * 0.78 + 40, 'OVL', 18, '#cfcfcf', 'middle', 800);
+  rect(fx + 460, fy + fh * 0.78 - 12, 26, 24, '#2a2b2e', 'rx="3"'); text(fx + 473, fy + fh * 0.78 + 40, 'RESET', 18, '#cfcfcf', 'middle', 800);
+  text(fx + fw - 640, fy + fh * 0.7, 'INPUT LEVEL', 18, '#cfcfcf', 'middle', 800); text(fx + fw - 440, fy + fh * 0.7, 'LEFT', 18, '#cfcfcf', 'middle', 800); text(fx + fw - 300, fy + fh * 0.7, 'RIGHT', 18, '#cfcfcf', 'middle', 800);
+  for (let k = 0; k < 4; k++) circle(fx + fw - 680 + k * 120, fy + fh * 0.8, 10, k % 2 ? '#2a2b2e' : '#ff3b2f', k % 2 ? '' : 'filter="url(#glow)"');
+  // DB25 cable from the remote to the mainframe
+  const d = `M${1500} ${520} C${1650} ${420} ${1780} ${700} ${fx} ${fy + fh * 0.62}`;
+  p(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="26" transform="translate(6 14)"/><path d="${d}" fill="none" stroke="#c4c7cb" stroke-width="22"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="5" transform="translate(-3 -4)"/>`);
+  rect(fx - 40, fy + fh * 0.62 - 34, 54, 68, '#d6d9dc', 'rx="6"');
+  // the remote, full size and working
+  rect(500 + 30, 210 + 40, 1024, 1600, '#000', 'opacity="0.55" filter="url(#soft)"');
+  remote224(500, 210, 1.6, { liveDisplay: true });
+  text(1012, 1900, 'Drag a slider to change it · press a lower key to show its value · press a program key to load a program', 26, '#d9d3c7', 'middle', 600);
+});
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
 const jh24 = require('./jh24.js')({ TX, TY, TW, TH });
-const html = `<!doctype html><html><head><meta charset="utf-8"><title>Analog Studio · 4K mockup</title>
-<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=block" rel="stylesheet">
-<style>html,body{margin:0;background:#000;}body>svg{display:block;}#stage{position:relative;width:3840px;height:2160px;}</style></head><body><div id="stage">
+// copy the live reel prototype next to the mockup so the tape machine view can load it
+const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
+if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
+const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px" title="${label}"><span>${label}</span></div>`;
+const overlay = (view, title, body, extra = '') => `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
+const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#000;overflow:hidden;height:100%}
+  #stage{position:absolute;left:0;top:0;width:3840px;height:2160px;transform-origin:0 0}
+  #stage>svg{display:block}
+  .hot{position:absolute;z-index:50;cursor:pointer;border-radius:10px;outline:0 solid rgba(255,214,140,0);transition:outline-color .15s, background .15s}
+  .hot span{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 16px;border-radius:6px;background:rgba(20,18,16,.85);color:#f1ece3;font:700 20px Archivo,Arial,sans-serif;letter-spacing:1px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
+  .hot:hover{outline:4px solid rgba(255,214,140,.75);background:rgba(255,214,140,.05)} .hot:hover span{opacity:1}
+  .overlay{position:absolute;inset:0;z-index:100;background:#0e0c0b}
+  .overlay[hidden]{display:none}
+  .ov-bar{height:56px;display:flex;align-items:center;gap:28px;padding:0 24px;background:linear-gradient(#1e1f22,#121315);border-bottom:1px solid #000;color:#e9dcc0;font:800 20px Archivo,Arial,sans-serif;letter-spacing:3px}
+  .ov-bar b{font-weight:800}
+  .ov-bar .ov-msg,.ov-bar .ov-param{flex:1;letter-spacing:.5px;font-weight:600;color:#cfc8b8}
+  .ov-bar button{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#efece4;border:0;border-radius:4px;padding:8px 16px;cursor:pointer}
+  .ov-bar button.ov-close{margin-left:auto}
+  .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
+  .ov-body iframe{width:100%;height:100%;border:0;display:block}
+</style></head><body><div id="stage">
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
-</div></body></html>`;
+${hot(24, 76, 1360, 590, 'tape', 'Open the JH-24')}
+${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
+${hot(3340, 130, 450, 176, '224', 'Open the Lexicon 224X')}
+${hot(2857, 1280, 296, 462, '224', 'Open the Lexicon 224X')}
+${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
+${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
+${overlay('tape', 'MCI JH-24 · 24 TRACK', '<iframe title="JH-24 tape machine" data-src="tape-machine.html"></iframe>')}
+${overlay('meters', 'JH-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
+${overlay('224', 'LEXICON 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
+${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
+</div>
+<script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))};</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8')}</script>
+</body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
+// artifact version: the same page without the document wrapper (the host adds it), title first
+{
+  const head = html.slice(html.indexOf('<link href='), html.indexOf('</head>'));
+  const body = html.slice(html.indexOf('<body>') + 6, html.lastIndexOf('</body>'));
+  fs.mkdirSync(path.join(dir, 'artifact'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'artifact', 'index.html'), `<title>Analog Studio Console</title>\n<meta name="viewport" content="width=device-width, initial-scale=1">\n${head}\n${body}`);
+  if (fs.existsSync(path.join(dir, 'tape-machine.html'))) fs.copyFileSync(path.join(dir, 'tape-machine.html'), path.join(dir, 'artifact', 'tape-machine.html'));
+}
 console.log('wrote', svg.length, 'bytes');

@@ -352,10 +352,10 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   cab.push(`<rect x="44" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="44" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
   cab.push(txt(92, FRONT + 29, 'MCI', 17, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="4"'));
   // drawer front: woodgrain laminate inside a dark frame, small model tag at right
-  cab.push(`<rect x="0" y="${WOODY}" width="${TW}" height="${TH - WOODY}" fill="#3a3633"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${TH - WOODY - 14}" fill="url(#lam)"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${TH - WOODY - 14}" fill="#000" filter="url(#grainV)"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${TH - WOODY - 14}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
+  cab.push(`<rect x="0" y="${WOODY}" width="${TW}" height="${Math.max(0, TH - WOODY)}" fill="#3a3633"/>`);
+  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="url(#lam)"/>`);
+  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="#000" filter="url(#grainV)"/>`);
+  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
   cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="36" fill="url(#shadeTop)"/>`);
   cab.push(`<rect x="${TW - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2725"/>`);
   cab.push(txt(TW - 87, TH - 17, 'JH-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));

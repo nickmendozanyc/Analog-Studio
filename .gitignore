@@ -3,3 +3,4 @@ node_modules/
 .DS_Store
 prototype/reels/node_modules/
 prototype/reels/dist/shot-*.png
+mockup/artifact/

@@ -71,6 +71,17 @@ These are planned behaviours. Exact timings and figures will be confirmed agains
 | Counter | Tape time derived from the idler (tach) roller; shown on the autolocator |
 | Autolocator (AL-III) | Store / recall locate points, zero, search-to-cue, auto punch in/out with pre-roll |
 
+## Interactive page and pop-up views
+
+`analog-studio-mockup.html` scales to fit any window (1:1 on a 4K screen). Hover shows what can be opened; click to open it full screen, and press Esc or ✕ to close.
+
+| Click | Opens |
+| --- | --- |
+| Tape machine | The live 3D JH-24 (the reel prototype), with working transport |
+| Tape meter bridge | All 24 meters large, with needles moving under VU ballistics, track names and READY / SAFE |
+| Lexicon 224 (rack unit or the remote on the console) | The 224X remote full size next to its mainframe: drag the six sliders, press a lower key to show that parameter on the display (sec / ms / Hz / kHz), press a program key to load a program |
+| Patchbay (rack unit or the PATCHBAY tab) | The full patch panel: 14 rows of output / input pairs (interface, console, buses, tape, inserts, sends, outboard, returns, direct outs). Drag from an output to an input to patch, click a cable to pull it; normalled pairs pass signal until patched. Starts with the session's patches; changes are kept in your browser |
+
 ## Rebuild
 
 ```sh

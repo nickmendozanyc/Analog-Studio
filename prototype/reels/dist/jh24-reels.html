@@ -237,7 +237,7 @@ class Transport {
     this.take += this.v * dt;
     this.angleS += (this.v / rs) * dt;
     this.angleT += (this.v / rt) * dt;
-    if (this.take >= this.total || this.take <= 0) {
+    if ((this.take >= this.total && this.v > 0) || (this.take <= 0 && this.v < 0)) {   // ran off a reel while moving toward it
       this.take = Math.max(0, Math.min(this.total, this.take));
       this.v = 0; this.mode = 'stop'; this.endOfTape = true;
     }

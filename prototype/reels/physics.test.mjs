@@ -93,3 +93,10 @@ test('a full reel is 2500 feet', () => {
   close(t.total / FT, 2500, 1e-9, 'reel length');
   close(t.supply / FT, 2500, 1e-9, 'all on the supply at the head');
 });
+
+test('a stopped transport at the head or tail is not end of tape', () => {
+  for (const at of [0, ROLL_FT * FT]) {
+    const t = new Transport({ onTakeup: at }); t.advance(1);
+    assert.equal(t.endOfTape, false, `at ${at} m`);
+  }
+});
