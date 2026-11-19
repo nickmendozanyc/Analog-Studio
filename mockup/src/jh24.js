@@ -189,7 +189,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SW = [-0.7, 0.7], SE = [0.7, 0.7];
   const sPack = { cx: supply.cx, cy: supply.cy, r: supply.pack }, tPack = { cx: takeup.cx, cy: takeup.cy, r: takeup.pack };
   const chain = [
-    [sPack, SE, null], [guideL, N, N], [capstan, S, S], [guideR, S, E], [tPack, E, null],
+    [sPack, SW, null], [guideL, N, N], [capstan, S, S], [guideR, S, E], [tPack, E, null],
   ];
   const tapeSegs = [];
   const contacts = [];

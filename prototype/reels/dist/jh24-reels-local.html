@@ -493,7 +493,7 @@ const tapeTex = canvasTex(512, 16, (g, w, h) => { for (let x = 0; x < w; x++) { 
 const tapeMat = new THREE.MeshStandardMaterial({ map: tapeTex, color: 0x5a4636, roughness: 0.5, metalness: 0.05, side: THREE.DoubleSide });
 const tapeMesh = new THREE.Mesh(tapeGeo, tapeMat); tapeMesh.castShadow = true; tapeMesh.receiveShadow = true; tapeMesh.frustumCulled = false; scene.add(tapeMesh);
 
-const N = [0, -1], S = [0, 1], E = [1, 0], SE = [0.7, 0.7];
+const N = [0, -1], S = [0, 1], E = [1, 0], SE = [0.7, 0.7], SW = [-0.7, 0.7];
 function tangent(A, B, sa, sb) {
   const dx = B.x - A.x, dz = B.z - A.z, D = Math.hypot(dx, dz);
   const ra = sa * A.r, rb = sb * B.r, k = (ra - rb) / D, ux = dx / D, uz = dz / D, h = Math.sqrt(Math.max(0, 1 - k * k));
@@ -509,7 +509,7 @@ function pickTangent(A, B, ha, hb) {
 }
 function tapePath(rS, rT, lift, pinchOut) {
   const sPack = { x: P.supply.x, z: P.supply.z, r: rS }, tPack = { x: P.takeup.x, z: P.takeup.z, r: rT };
-  const chain = [[sPack, SE, SE], [P.guideL, N, N]];
+  const chain = [[sPack, SW, SW], [P.guideL, N, N]];   // oxide-in: tape leaves the supply from its outer (left) side; both reels turn CCW in play
   if (lift > 0.02) {
     const zp = TF - 0.35 + 0.75 * lift;
     chain.push([{ x: P.pinL.x, z: zp, r: P.pinL.r }, S, S], [{ x: P.pinR.x, z: zp, r: P.pinR.r }, S, S]);
@@ -598,6 +598,7 @@ function frame(now) {
     reel.fm.userData.u.uAngle.value = a;
     reel.fm.userData.u.uBlur.value = Math.min(Math.PI * 2, Math.abs(w) * shutter);
     reel.knob.rotation.y = a;
+    reel.shaderAngle = a;
     reel.pack.scale.set(r, 1, r);
     // a hint of flange run-out, as on a real reel
     reel.g.rotation.x = 0.0016 * Math.sin(a); reel.g.rotation.z = 0.0016 * Math.cos(a);
@@ -627,7 +628,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-window.__jh24 = { tr, setMode, view, placeCamera };
+window.__jh24 = { tr, setMode, view, placeCamera, reels: [reelS, reelT] };
 </script>
 
 </body></html>

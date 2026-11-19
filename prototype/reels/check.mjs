@@ -20,7 +20,12 @@ await page.waitForFunction(() => window.__jh24, null, { timeout: 60000 });
 await page.waitForTimeout(1500);
 await page.screenshot({ path: `${out}/shot-stop.png` });
 await page.evaluate(() => window.__jh24.setMode('play'));
-await page.waitForTimeout(2500);
+await page.waitForTimeout(1500);
+const a0 = await page.evaluate(() => [window.__jh24.reels[0].shaderAngle, window.__jh24.reels[1].shaderAngle]);
+await page.waitForTimeout(1000);
+const a1 = await page.evaluate(() => [window.__jh24.reels[0].shaderAngle, window.__jh24.reels[1].shaderAngle]);
+// positive change = counter-clockwise seen from above
+console.log('play rotation (seen from above):', 'supply', a1[0] > a0[0] ? 'CCW' : 'CW', '| take-up', a1[1] > a0[1] ? 'CCW' : 'CW');
 await page.screenshot({ path: `${out}/shot-play.png` });
 await page.evaluate(() => { const j = window.__jh24; j.tr.locate(j.tr.total * 0.5); j.setMode('ff'); });
 await page.waitForTimeout(5000);
