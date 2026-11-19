@@ -7,7 +7,7 @@ const close = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a
 test('pack radius grows with the square root of tape length', () => {
   close(packRadius(0), TAPE.hubR, 1e-12, 'empty hub');
   const r = packRadius(ROLL_FT * FT);
-  assert.ok(r > TAPE.hubR && r < TAPE.flangeR, 'a full 1800 ft roll fits inside the flange');
+  assert.ok(r > TAPE.hubR && r < TAPE.flangeR, 'a full 2500 ft reel fits inside the flange');
   close(packRadius(capacity()), TAPE.flangeR, 1e-9, 'capacity fills the flange exactly');
 });
 
@@ -17,7 +17,7 @@ test('reel angular speed equals tape speed over pack radius', () => {
   close(t.v, 30 * IPS, 1e-4, 'play speed reached');
   close(t.wS, t.v / t.rS, 1e-12, 'supply');
   close(t.wT, t.v / t.rT, 1e-12, 'take-up');
-  assert.ok(t.wT > t.wS * 1.6, 'near-empty take-up spins about 1.7x faster than a full 1800 ft supply');
+  assert.ok(t.wT > t.wS * 1.8, 'near-empty take-up spins about twice as fast as a full 2500 ft supply');
 });
 
 test('play reaches speed quickly through the capstan', () => {
@@ -88,8 +88,8 @@ test('counter reads tape time at the selected speed', () => {
   assert.ok(t.counter > 9.8 && t.counter < 10.5, `about 10 s of tape (${t.counter.toFixed(2)})`);
 });
 
-test('a full roll is 1800 feet', () => {
+test('a full reel is 2500 feet', () => {
   const t = new Transport();
-  close(t.total / FT, 1800, 1e-9, 'roll length');
-  close(t.supply / FT, 1800, 1e-9, 'all on the supply at the head');
+  close(t.total / FT, 2500, 1e-9, 'reel length');
+  close(t.supply / FT, 2500, 1e-9, 'all on the supply at the head');
 });

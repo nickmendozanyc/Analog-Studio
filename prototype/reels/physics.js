@@ -16,7 +16,7 @@
 //  - Lifters hold the tape off the heads at wind speed; LIFT defeats them.
 //  - Tape running off a reel stops the transport.
 //
-// A full roll is 1800 ft. Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
+// A full reel is 2500 ft. Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
 
 export const TAPE = {
   thickness: 38.1e-6,   // 1.5 mil base + oxide (approx, typical of 456 / 499 / GP9)
@@ -39,7 +39,7 @@ export const MACHINE = {
 
 export const IPS = 0.0254; // m/s per inch-per-second
 export const FT = 0.3048;
-export const ROLL_FT = 1800; // feet of tape on a full roll
+export const ROLL_FT = 2500; // feet of tape on a full reel
 
 export const packRadius = (len, tape = TAPE) => Math.sqrt(tape.hubR * tape.hubR + Math.max(0, len) * tape.thickness / Math.PI);
 export const packMass = (len, tape = TAPE) => Math.max(0, len) * tape.thickness * tape.width * tape.density;
