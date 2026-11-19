@@ -828,13 +828,20 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     const mx = MXL, mw = MWD;
     rect(mx, 0, 3, FD, '#000', 'opacity="0.4"');
     rect(mx, 0, mw, FD, 'url(#jh600)');
-    text(mx + mw / 2, 34, 'GROUPS 1–8 · STEREO', 13, '#d8c27c', 'middle', 800, 'letter-spacing="2"');
+    text(mx + mw / 2, 20, 'GROUPS 1–8 · STEREO', 13, '#d8c27c', 'middle', 800, 'letter-spacing="2"');
     const gc = ['yellow', 'green', 'white', 'black'];
     for (let g = 0; g < 8; g++) {
       const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
       if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
       rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
       CAP(gx, cy, 30, 44, 18, gc[g % 4], '#111');
+      // group mute (red) and solo (green) keys above each group fader
+      for (const [k, yy, col, on] of [['M', 34, '#d63a2c', g === 5], ['S', 58, '#3fae5a', g === 1]]) {
+        rect(gx - 14, yy + 2, 28, 20, '#000', 'rx="3" opacity="0.6"');
+        rect(gx - 14, yy, 28, 20, col, `rx="3" ${on ? 'filter="url(#glow)"' : 'opacity="0.62"'}`);
+        rect(gx - 14, yy, 28, 20, on ? 'url(#btnLit)' : 'url(#btnOff)', 'rx="3"');
+        text(gx, yy + 15, k, 13, on ? '#fff' : '#f3eee4', 'middle', 900);
+      }
       text(gx, FD - 6, `G${g + 1}`, 12, '#ece6da', 'middle', 800);
     }
     const mfx = mx + mw - 54;
