@@ -555,7 +555,17 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
   const faderPos = consoleNames.map((n, i) => (i === 19 ? 0.2 : i === 31 ? 0.98 : 0.24 + rnd() * 0.2));
   const L = '#ece7dc';
   const upKnobs = [], fdCaps = [];
-  const K = (x, y, r, cap, ang, o = {}) => { upKnobs.push(knob3d(x, y, r, cap, ang, o)); };
+  // FLAT = true: the console is drawn as a flat front view (2D shaded knobs and caps) in the main SVG
+  const FLAT = true;
+  const K = (x, y, r, cap, ang, o = {}) => { if (FLAT) knob(x, y, r, cap, ang, { ticks: false, dark: o.dark }); else upKnobs.push(knob3d(x, y, r, cap, ang, o)); };
+  const CAP_SVG = { black: 'url(#faderCapBlack)', yellow: 'url(#faderCapYellow)', green: 'url(#faderCapGreen)', white: 'url(#faderCapWhite)', red: 'url(#faderCapRed)' };
+  const capFlat = (x, y, w, d, key, idx) => {
+    rect(x - w / 2 + 3, y - d / 2 + 8, w, d, '#000', 'rx="4" opacity="0.5" filter="url(#soft)"');
+    rect(x - w / 2, y - d / 2, w, d, CAP_SVG[key], 'rx="3"');
+    for (let i = -3; i <= 3; i++) { if (!i) continue; const yy = y + i * (d / 9); p(`<line x1="${x - w / 2 + 3}" y1="${yy}" x2="${x + w / 2 - 3}" y2="${yy}" stroke="#000" stroke-opacity="0.35"/><line x1="${x - w / 2 + 3}" y1="${yy + 1}" x2="${x + w / 2 - 3}" y2="${yy + 1}" stroke="#fff" stroke-opacity="0.12"/>`); }
+    rect(x - w / 2 + 2, y - 1.5, w - 4, 3, idx);
+  };
+  const CAP = (x, y, w, d, h, key, idx) => { if (FLAT) capFlat(x, y, w, d, key, idx); else fdCaps.push(cap3d(x, y, w, d, h, CAP_TOP[key], idx)); };
 
   // ---------------- knob panel texture ----------------
   const upper = capture(() => {
@@ -626,7 +636,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
     ['MIX', '2-TRK', 'CUE 1', 'CUE 2'].forEach((s2, i) => button(mx + 16 + i * 70, y + 18, 64, 30, 'white', i === 0, s2, { size: 14 }));
     [['DIM', 'amber'], ['MONO', 'amber'], ['CUT', 'red']].forEach(([s2, c], i) => button(mx + 16 + i * 70, y + 58, 64, 30, c, false, s2, { size: 14 }));
     ticks(mx + mw - 64, y + 70, 40, '#d9d3c2');
-    upKnobs.push(knob3d(mx + mw - 64, y + 70, 40, 'radial-gradient(circle, #2a2a2c, #0c0c0d)', 40, { dark: true, h: 30 }));
+    if (FLAT) bigKnob(mx + mw - 64, y + 70, 40, 40, { capColor: '#1c1c1e' }); else upKnobs.push(knob3d(mx + mw - 64, y + 70, 40, 'radial-gradient(circle, #2a2a2c, #0c0c0d)', 40, { dark: true, h: 30 }));
     text(mx + mw - 64, y + 142, 'MONITOR', 14, L, 'middle', 800, 'letter-spacing="1"');
     y = 488; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
     text(mx + 18, y + 6, 'CUE / STUDIO', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
@@ -672,7 +682,7 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       rect(fx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"'); rect(fx - 1, top - 6, 2, bot - top + 12, '#2a2a2a');
       const cy = top + faderPos[ch] * (bot - top);
       p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
-      fdCaps.push(cap3d(fx, cy, 30, 50, 20, CAP_TOP.black, ch >= 24 ? '#e6c02e' : '#ffffff'));
+      CAP(fx, cy, 30, 50, 20, 'black', ch >= 24 ? '#e6c02e' : '#ffffff');
       text(cm, 326, String(ch + 1), 16, '#1e1a1b', 'middle', 800);
       rect(x0, 36, 1, FD - 36, '#000', 'opacity="0.25"');
     }
@@ -684,13 +694,13 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
       const gx = mx + 44 + g * 40, cy = top + (0.22 + (g % 3) * 0.03) * (bot - top);
       if (g === 0) for (const [lab, fr] of MARKS) text(gx - 16, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
       rect(gx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-      fdCaps.push(cap3d(gx, cy, 24, 42, 18, CAP_TOP[gc[g % 4]], '#111'));
+      CAP(gx, cy, 24, 42, 18, gc[g % 4], '#111');
       text(gx, 326, `G${g + 1}`, 14, '#1e1a1b', 'middle', 800);
     }
     const mfx = mx + mw - 54;
     for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 5, lab, 14, '#1e1a1b', 'end', 700);
     rect(mfx - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-    fdCaps.push(cap3d(mfx, top + 0.22 * (bot - top), 54, 56, 22, CAP_TOP.red, '#ffffff'));
+    CAP(mfx, top + 0.22 * (bot - top), 54, 56, 22, 'red', '#ffffff');
     text(mfx, 326, 'STEREO', 14, '#1e1a1b', 'middle', 800, 'letter-spacing="1"');
   });
 
@@ -704,7 +714,21 @@ const CX = 12, CY = 916, CW = 3266, CH = 1244;
     <div style="${B3(`left:-34px;top:${FD}px;width:${PW + 68}px;height:78px;transform:translateZ(46px);background:${leather};border-radius:0 0 30px 30px`)}"></div>
     <div style="${B3(`left:-34px;top:${FD + 78 - 46}px;width:${PW + 68}px;height:46px;transform-origin:50% 100%;transform:rotateX(-90deg);background:linear-gradient(180deg,#3a1f12,#140a05)`)}"></div>
     <div style="${B3(`left:-34px;top:${FD - 46}px;width:${PW + 68}px;height:46px;transform-origin:50% 100%;transform:rotateX(-90deg);background:#1a0e07`)}"></div>`;
-  scenes3d.push(`<div style="position:absolute;left:${CX}px;top:${CY}px;width:${CW}px;height:${CH}px;perspective:6500px;perspective-origin:50% -45%;">
+  if (FLAT) {
+    // flat front view: knob panel, fader panel, oak cheeks, oak rail and leather armrest
+    const X = CX + 34, Y = CY;
+    rect(CX, CY - 8, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
+    rect(X, Y - 6, PW, 8, 'url(#oakH)');
+    p(`<g transform="translate(${X} ${Y})">${upper}</g>`);
+    p(`<g transform="translate(${X} ${Y + UD})">${lower.replace(/<rect x="0" y="0" width="${PW}" height="${FD}" fill="url\(#faderBay\)"\/>/, `<rect x="0" y="0" width="${PW}" height="${FD}" fill="url(#faderBay)"/>`)}</g>`);
+    rect(X, Y + UD, PW, 2, '#000', 'opacity="0.6"');
+    for (const wx of [CX, CX + CW - 34]) { rect(wx, CY - 6, 34, CH + 6, 'url(#wood)', 'rx="4"'); rect(wx, CY - 6, 34, CH + 6, '#000', 'filter="url(#woodgrain)" opacity="0.8" rx="4"'); }
+    const ary = Y + UD + FD;
+    rect(X, ary, PW, 10, 'url(#oakH)');
+    rect(X, ary + 10, PW, CY + CH - ary - 10, 'url(#armrest)');
+    rect(X, ary + 10, PW, CY + CH - ary - 10, '#000', 'filter="url(#vinyl)" opacity="0.35"');
+    rect(X, ary + 14, PW, 2, '#fff', 'opacity="0.08"');
+  } else scenes3d.push(`<div style="position:absolute;left:${CX}px;top:${CY}px;width:${CW}px;height:${CH}px;perspective:6500px;perspective-origin:50% -45%;">
     <div style="${B3(`left:34px;top:${YF - FD}px;width:${PW}px;height:${FD}px;transform-origin:50% 100%;transform:rotateX(54deg)`)}">
       ${svgWrap(PW, FD, lower)}
       ${fdCaps.join('')}
