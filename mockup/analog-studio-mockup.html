@@ -30,11 +30,15 @@
   #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
-  .tapesel{position:absolute;left:650px;top:8px;height:40px;display:flex;align-items:center;gap:14px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
+  .tapesel{position:absolute;left:632px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
   .tapesel label{display:flex;align-items:center;gap:8px}
-  .tapesel select{font:700 15px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:4px 6px;width:230px}
-  .tapesel #takeup-sel{width:160px}
-  .modes{position:absolute;left:1236px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
+  .tapesel button{font:900 13px Archivo,Arial;letter-spacing:1px;padding:6px 9px;border-radius:5px;border:1px solid #6b635b;background:#e9e3d3;color:#1d1a16;cursor:pointer}
+  .tapesel button.done{background:#7dff9a}
+  .tapesel .auto{font-size:13px;gap:5px}
+  .tapesel select{font:700 14px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:4px 5px;width:190px}
+  .tapesel #takeup-sel{width:122px}
+  .modes .lbl{display:none}
+  .modes{position:absolute;left:1300px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
   .modes .lbl{color:#8b8778;font-size:11px;font-weight:700;letter-spacing:2px;margin-right:4px}
   .modes button{width:112px;height:40px;border-radius:4px;border:1px solid #000;cursor:pointer;font:900 17px Archivo,Arial,sans-serif;letter-spacing:3px;color:#d8d0c0;background:linear-gradient(#3a3b3f,#232427);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.6)}
   .modes button:hover{color:#fff}
@@ -35415,7 +35419,7 @@
     <text x="314" y="97" text-anchor="end" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2">FRM</text>
     <text class="wc-src" x="165" y="97" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2" opacity="0"></text>
   </svg>
-<div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)"><option value="a456" title="Amtex 456 Grand Master">Amtex 456 · 320 nWb/m</option><option value="a499" title="Amtex 499 Gold Master" selected>Amtex 499 · 370 nWb/m</option><option value="gp9" title="Quantica GP9 Grand Master Platinum">Quantica GP9 · 400 nWb/m</option><option value="gp9_14" title="Quantica GP9 Grand Master Platinum on a 14&quot; reel">Quantica GP9 14&quot; · 400 nWb/m</option><option value="maxwell" title="Maxwell UD Studio">Maxwell UD · 320 nWb/m</option><option value="scotia" title="Scotia 250">Scotia 250 · 250 nWb/m</option><option value="atx" title="ATX Magnetics Master Tape">ATX Master · 400 nWb/m</option><option value="bafs" title="BAFS Studio Master 900 maxima">BAFS SM 900 · 370 nWb/m</option></select></label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side"><option value="a499">Amtex 499</option><option value="a456">Amtex 456</option><option value="gp9" selected>Quantica GP9</option><option value="gp14">Quantica GP9 14&quot;</option><option value="maxwell">Maxwell</option><option value="scotia">Scotia</option><option value="atx">ATX Magnetics</option><option value="bafs">BAFS Studio Master 900</option></select></label></div>
+<div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)"><option value="a456" title="Amtex 456 Grand Master">Amtex 456 · 320 nWb/m</option><option value="a499" title="Amtex 499 Gold Master" selected>Amtex 499 · 370 nWb/m</option><option value="gp9" title="Quantica GP9 Grand Master Platinum">Quantica GP9 · 400 nWb/m</option><option value="gp9_14" title="Quantica GP9 Grand Master Platinum on a 14&quot; reel">Quantica GP9 14&quot; · 400 nWb/m</option><option value="maxwell" title="Maxwell UD Studio">Maxwell UD · 320 nWb/m</option><option value="scotia" title="Scotia 250">Scotia 250 · 250 nWb/m</option><option value="atx" title="ATX Magnetics Master Tape">ATX Master · 400 nWb/m</option><option value="bafs" title="BAFS Studio Master 900 maxima">BAFS SM 900 · 370 nWb/m</option></select></label><button type="button" id="tape-align" title="Realign the machine for this tape: its operating level, then repro, sync, bias, record level and HF on every channel (manual section 7)">ALIGN</button><label class="auto" title="Realign automatically whenever a tape is threaded"><input type="checkbox" id="tape-auto" checked> AUTO</label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side"><option value="a499">Amtex 499</option><option value="a456">Amtex 456</option><option value="gp9" selected>Quantica GP9</option><option value="gp14">Quantica GP9 14&quot;</option><option value="maxwell">Maxwell</option><option value="scotia">Scotia</option><option value="atx">ATX Magnetics</option><option value="bafs">BAFS Studio Master 900</option></select></label></div>
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
@@ -97415,7 +97419,7 @@
     <label>ALIGNMENT TAPE <select id="el-mrl"><option value="off" selected>OFF</option><option value="1000">1 kHz level</option><option value="10000">10 kHz</option><option value="15000">15 kHz</option><option value="100">100 Hz</option><option value="50">50 Hz</option></select> <select id="el-mrl-std"><option value="NAB" selected>NAB tape</option><option value="IEC">IEC tape</option></select></label>
     <button type="button" id="el-align" class="t" title="Section 7: repro to the alignment tape, bias peak + overbias, record level and HF, on every channel">ALIGN ALL</button>
     <span class="sep"></span>
-    <label>OPERATING LEVEL <select id="el-ol"><option value="185">185 nWb/m</option><option value="250" selected>250 nWb/m</option><option value="320">320 nWb/m</option><option value="370">370 nWb/m</option></select></label>
+    <label>OPERATING LEVEL <select id="el-ol"><option value="185">185 nWb/m</option><option value="250">250 nWb/m</option><option value="320">320 nWb/m</option><option value="370" selected>370 nWb/m</option><option value="400">400 nWb/m</option></select></label>
     <button type="button" id="el-quior" class="t on" title="QUIOR: erase / bias delay and ramps on punch-in and punch-out (bias card jumper)">QUIOR</button>
     <button type="button" id="el-hiss" class="t on">TAPE HISS</button>
     <button type="button" id="el-wf" class="t on">WOW &amp; FLUTTER</button>
@@ -104842,7 +104846,8 @@ class ClockOut {
         EL.node = new AudioWorkletNode(EL.ctx, 'jh24-electronics', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
         EL.node.connect(EL.ctx.destination);
         EL.node.port.onmessage = (e) => elRecv(e.data);
-        EL.node.port.postMessage({ type: 'tape', key: TP.key, params: window.JH_TAPES[TP.key], align: true });
+        EL.node.port.postMessage({ type: 'opts', opLevel: TP.opLevel || window.JH_TAPES[TP.key].ol });
+        EL.node.port.postMessage({ type: 'tape', key: TP.key, params: window.JH_TAPES[TP.key], align: TP.aligned !== false });
         elPost({ type: 'getTrims' });
       }
       await EL.ctx.resume();
@@ -104925,8 +104930,8 @@ class ClockOut {
     ['el-osc-f', 'el-osc-db', 'el-osc-to'].forEach((id) => $(id).addEventListener('change', osc));
     const mrl = () => { const f = $('el-mrl').value; elPost({ type: 'alignTape', on: f !== 'off', f: +f || 1000, std: $('el-mrl-std').value }); if (f !== 'off') elMsg('Alignment tape loaded: press PLAY. Monitor on TAPE to align the repro, CUE to align sync (manual 7.3).'); };
     ['el-mrl', 'el-mrl-std'].forEach((id) => $(id).addEventListener('change', mrl));
-    $('el-align').addEventListener('click', () => { if (!EL.node) { elMsg('Power the electronics first.'); return; } elPost({ type: 'align' }); elMsg('All 24 channels aligned: repro, sync, bias (peak + overbias), record level and HF.'); });
-    $('el-ol').addEventListener('change', (e) => { elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
+    $('el-align').addEventListener('click', () => { if (!EL.node) { elMsg('Power the electronics first.'); return; } elPost({ type: 'align' }); TP.aligned = true; TP.alignedFor = window.JH_TAPES[TP.key].short; alignLamp(); elMsg(`All 24 channels aligned for ${window.JH_TAPES[TP.key].name}: repro, sync, bias (peak + overbias), record level and HF.`); });
+    $('el-ol').addEventListener('change', (e) => { TP.opLevel = +e.target.value; elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
     for (const [id, key] of [['el-quior', 'quior'], ['el-hiss', 'hiss'], ['el-wf', 'wf']]) $(id).addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'opts', [key]: on }); });
     $('el-load').addEventListener('click', () => $('el-file').click());
     $('el-file').addEventListener('change', async (e) => {
@@ -105020,7 +105025,7 @@ class ClockOut {
     }
     for (const rl of reels) if (rl.k === k) rl.smKey = '';   // redraw the exposure smear for the new windows
   }
-  const TP = { key: 'a499', store: {}, aligned: false };
+  const TP = { key: 'a499', store: {}, aligned: true, alignedFor: 'Amtex 499', opLevel: 370 };
   function threadTape(key) {
     const t = window.JH_TAPES[key]; if (!t || key === TP.key) return;
     AL.rep = false; AL.rehPunch = false; tr.command('stop');
@@ -105030,8 +105035,21 @@ class ClockOut {
     tr.locate(sv.take); tr.zero = sv.zero; SBX.stripes = sv.stripes;
     setReelSkin('s', t.reel);
     elPost({ type: 'tape', key, params: t });
-    elMsg(`${t.name} threaded (recommended ${t.ol} nWb/m). Realign for it: ALIGN ALL, or by hand with the alignment tape.`);
+    if (document.getElementById('tape-auto').checked) alignForTape();
+    else { TP.aligned = false; alignLamp(); elMsg(`${t.name} threaded, alignment left as it was (for ${TP.alignedFor || 'the previous tape'}). Press ALIGN, or align by hand with the alignment tape.`); }
   }
+  // realign for the threaded tape: its recommended operating level, then section 7 on every channel
+  function alignForTape() {
+    const t = window.JH_TAPES[TP.key], ol = document.getElementById('el-ol');
+    if (ol) ol.value = String(t.ol);
+    TP.opLevel = t.ol; TP.aligned = true; TP.alignedFor = t.short;
+    elPost({ type: 'opts', opLevel: t.ol }); elPost({ type: 'align' });
+    alignLamp();
+    elMsg(`Aligned for ${t.name} at ${t.ol} nWb/m: repro, sync, bias (peak + overbias for this tape), record level and HF on all 24 channels.`);
+  }
+  function alignLamp() { const b = document.getElementById('tape-align'); if (b) { b.classList.toggle('done', !!TP.aligned); b.textContent = TP.aligned ? 'ALIGNED' : 'ALIGN'; } }
+  const tapeAlignBtn = document.getElementById('tape-align');
+  if (tapeAlignBtn) tapeAlignBtn.addEventListener('click', alignForTape);
   const tapeSel = document.getElementById('tape-sel'), takeSel = document.getElementById('takeup-sel');
   if (tapeSel) tapeSel.addEventListener('change', () => threadTape(tapeSel.value));
   if (takeSel) takeSel.addEventListener('change', () => setReelSkin('t', takeSel.value));

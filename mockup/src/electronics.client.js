@@ -22,7 +22,8 @@
         EL.node = new AudioWorkletNode(EL.ctx, 'jh24-electronics', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
         EL.node.connect(EL.ctx.destination);
         EL.node.port.onmessage = (e) => elRecv(e.data);
-        EL.node.port.postMessage({ type: 'tape', key: TP.key, params: window.JH_TAPES[TP.key], align: true });
+        EL.node.port.postMessage({ type: 'opts', opLevel: TP.opLevel || window.JH_TAPES[TP.key].ol });
+        EL.node.port.postMessage({ type: 'tape', key: TP.key, params: window.JH_TAPES[TP.key], align: TP.aligned !== false });
         elPost({ type: 'getTrims' });
       }
       await EL.ctx.resume();
@@ -105,8 +106,8 @@
     ['el-osc-f', 'el-osc-db', 'el-osc-to'].forEach((id) => $(id).addEventListener('change', osc));
     const mrl = () => { const f = $('el-mrl').value; elPost({ type: 'alignTape', on: f !== 'off', f: +f || 1000, std: $('el-mrl-std').value }); if (f !== 'off') elMsg('Alignment tape loaded: press PLAY. Monitor on TAPE to align the repro, CUE to align sync (manual 7.3).'); };
     ['el-mrl', 'el-mrl-std'].forEach((id) => $(id).addEventListener('change', mrl));
-    $('el-align').addEventListener('click', () => { if (!EL.node) { elMsg('Power the electronics first.'); return; } elPost({ type: 'align' }); elMsg('All 24 channels aligned: repro, sync, bias (peak + overbias), record level and HF.'); });
-    $('el-ol').addEventListener('change', (e) => { elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
+    $('el-align').addEventListener('click', () => { if (!EL.node) { elMsg('Power the electronics first.'); return; } elPost({ type: 'align' }); TP.aligned = true; TP.alignedFor = window.JH_TAPES[TP.key].short; alignLamp(); elMsg(`All 24 channels aligned for ${window.JH_TAPES[TP.key].name}: repro, sync, bias (peak + overbias), record level and HF.`); });
+    $('el-ol').addEventListener('change', (e) => { TP.opLevel = +e.target.value; elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
     for (const [id, key] of [['el-quior', 'quior'], ['el-hiss', 'hiss'], ['el-wf', 'wf']]) $(id).addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'opts', [key]: on }); });
     $('el-load').addEventListener('click', () => $('el-file').click());
     $('el-file').addEventListener('change', async (e) => {
@@ -200,7 +201,7 @@
     }
     for (const rl of reels) if (rl.k === k) rl.smKey = '';   // redraw the exposure smear for the new windows
   }
-  const TP = { key: 'a499', store: {}, aligned: false };
+  const TP = { key: 'a499', store: {}, aligned: true, alignedFor: 'Amtex 499', opLevel: 370 };
   function threadTape(key) {
     const t = window.JH_TAPES[key]; if (!t || key === TP.key) return;
     AL.rep = false; AL.rehPunch = false; tr.command('stop');
@@ -210,8 +211,21 @@
     tr.locate(sv.take); tr.zero = sv.zero; SBX.stripes = sv.stripes;
     setReelSkin('s', t.reel);
     elPost({ type: 'tape', key, params: t });
-    elMsg(`${t.name} threaded (recommended ${t.ol} nWb/m). Realign for it: ALIGN ALL, or by hand with the alignment tape.`);
+    if (document.getElementById('tape-auto').checked) alignForTape();
+    else { TP.aligned = false; alignLamp(); elMsg(`${t.name} threaded, alignment left as it was (for ${TP.alignedFor || 'the previous tape'}). Press ALIGN, or align by hand with the alignment tape.`); }
   }
+  // realign for the threaded tape: its recommended operating level, then section 7 on every channel
+  function alignForTape() {
+    const t = window.JH_TAPES[TP.key], ol = document.getElementById('el-ol');
+    if (ol) ol.value = String(t.ol);
+    TP.opLevel = t.ol; TP.aligned = true; TP.alignedFor = t.short;
+    elPost({ type: 'opts', opLevel: t.ol }); elPost({ type: 'align' });
+    alignLamp();
+    elMsg(`Aligned for ${t.name} at ${t.ol} nWb/m: repro, sync, bias (peak + overbias for this tape), record level and HF on all 24 channels.`);
+  }
+  function alignLamp() { const b = document.getElementById('tape-align'); if (b) { b.classList.toggle('done', !!TP.aligned); b.textContent = TP.aligned ? 'ALIGNED' : 'ALIGN'; } }
+  const tapeAlignBtn = document.getElementById('tape-align');
+  if (tapeAlignBtn) tapeAlignBtn.addEventListener('click', alignForTape);
   const tapeSel = document.getElementById('tape-sel'), takeSel = document.getElementById('takeup-sel');
   if (tapeSel) tapeSel.addEventListener('change', () => threadTape(tapeSel.value));
   if (takeSel) takeSel.addEventListener('change', () => setReelSkin('t', takeSel.value));

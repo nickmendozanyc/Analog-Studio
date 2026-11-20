@@ -479,7 +479,7 @@ const elecView = (() => {
     <label>ALIGNMENT TAPE ${sel('el-mrl', [['off', 'OFF'], ['1000', '1 kHz level'], ['10000', '10 kHz'], ['15000', '15 kHz'], ['100', '100 Hz'], ['50', '50 Hz']], 'off')} ${sel('el-mrl-std', [['NAB', 'NAB tape'], ['IEC', 'IEC tape']], 'NAB')}</label>
     <button type="button" id="el-align" class="t" title="Section 7: repro to the alignment tape, bias peak + overbias, record level and HF, on every channel">ALIGN ALL</button>
     <span class="sep"></span>
-    <label>OPERATING LEVEL ${sel('el-ol', [['185', '185 nWb/m'], ['250', '250 nWb/m'], ['320', '320 nWb/m'], ['370', '370 nWb/m']], '250')}</label>
+    <label>OPERATING LEVEL ${sel('el-ol', [['185', '185 nWb/m'], ['250', '250 nWb/m'], ['320', '320 nWb/m'], ['370', '370 nWb/m'], ['400', '400 nWb/m']], '370')}</label>
     <button type="button" id="el-quior" class="t on" title="QUIOR: erase / bias delay and ramps on punch-in and punch-out (bias card jumper)">QUIOR</button>
     <button type="button" id="el-hiss" class="t on">TAPE HISS</button>
     <button type="button" id="el-wf" class="t on">WOW &amp; FLUTTER</button>
@@ -1568,11 +1568,15 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
-  .tapesel{position:absolute;left:650px;top:8px;height:40px;display:flex;align-items:center;gap:14px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
+  .tapesel{position:absolute;left:632px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
   .tapesel label{display:flex;align-items:center;gap:8px}
-  .tapesel select{font:700 15px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:4px 6px;width:230px}
-  .tapesel #takeup-sel{width:160px}
-  .modes{position:absolute;left:1236px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
+  .tapesel button{font:900 13px Archivo,Arial;letter-spacing:1px;padding:6px 9px;border-radius:5px;border:1px solid #6b635b;background:#e9e3d3;color:#1d1a16;cursor:pointer}
+  .tapesel button.done{background:#7dff9a}
+  .tapesel .auto{font-size:13px;gap:5px}
+  .tapesel select{font:700 14px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:4px 5px;width:190px}
+  .tapesel #takeup-sel{width:122px}
+  .modes .lbl{display:none}
+  .modes{position:absolute;left:1300px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
   .modes .lbl{color:#8b8778;font-size:11px;font-weight:700;letter-spacing:2px;margin-right:4px}
   .modes button{width:112px;height:40px;border-radius:4px;border:1px solid #000;cursor:pointer;font:900 17px Archivo,Arial,sans-serif;letter-spacing:3px;color:#d8d0c0;background:linear-gradient(#3a3b3f,#232427);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.6)}
   .modes button:hover{color:#fff}
@@ -1589,7 +1593,7 @@ ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
 ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
-<div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name.replace(/"/g, '&quot;')}"${k === 'a499' ? ' selected' : ''}>${t.short.replace(/"/g, '&quot;')} · ${t.ol} nWb/m</option>`).join('')}</select></label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n.replace(/"/g, '&quot;')}</option>`).join('')}</select></label></div>
+<div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name.replace(/"/g, '&quot;')}"${k === 'a499' ? ' selected' : ''}>${t.short.replace(/"/g, '&quot;')} · ${t.ol} nWb/m</option>`).join('')}</select></label><button type="button" id="tape-align" title="Realign the machine for this tape: its operating level, then repro, sync, bias, record level and HF on every channel (manual section 7)">ALIGN</button><label class="auto" title="Realign automatically whenever a tape is threaded"><input type="checkbox" id="tape-auto" checked> AUTO</label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n.replace(/"/g, '&quot;')}</option>`).join('')}</select></label></div>
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
