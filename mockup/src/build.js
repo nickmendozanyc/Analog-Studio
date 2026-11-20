@@ -771,7 +771,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     y = 320; rect(mx + 12, y - 14, mw - 24, 1.5, '#000', 'opacity="0.55"');
     text(mx + 18, y + 6, 'CONTROL ROOM', 14, '#c9c2b2', 'start', 800, 'letter-spacing="1"');
     ['MIX', '2-TRK', 'CUE 1', 'CUE 2'].forEach((s2, i) => button(mx + 16 + i * 70, y + 18, 64, 30, 'white', i === 0, s2, { size: 14 }));
-    [['DIM', 'amber'], ['MONO', 'amber'], ['CUT', 'red']].forEach(([s2, c], i) => button(mx + 16 + i * 70, y + 58, 64, 30, c, false, s2, { size: 14 }));
+    [['DIM', 'amber'], ['MONO', 'amber'], ['CUT', 'red'], ['ALT', 'white']].forEach(([s2, c], i) => button(mx + 16 + i * 70, y + 58, 64, 30, c, false, s2, { size: 14 }));
     ticks(mx + mw - 64, y + 70, 40, '#d9d3c2');
     if (FLAT) bigKnob(mx + mw - 64, y + 70, 40, 40, { capColor: '#1c1c1e' }); else upKnobs.push(knob3d(mx + mw - 64, y + 70, 40, 'radial-gradient(circle, #2a2a2c, #0c0c0d)', 40, { dark: true, h: 30 }));
     text(mx + mw - 64, y + 142, 'MONITOR', 14, L, 'middle', 800, 'letter-spacing="1"');
