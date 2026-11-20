@@ -534,6 +534,7 @@
     SBX.beatIx = run ? bi : -1;
     SBX.beatFlash = Math.max(0, SBX.beatFlash - dt);
     const clkRate = run ? w.bpm / 60 * 24 * ratio : 0, tbRate = run ? w.bpm / 60 * TBS[SBX.tbI] * ratio : 0;
+    if (SBX.clock) SBX.clock.update(now, { running: run, beats: w.beats * 4 / (w.den || 4), qps: w.bpm / 60 * ratio * 4 / (w.den || 4) });
     SBX.msgT = Math.max(0, SBX.msgT - dt); SBX.totalT = Math.max(0, SBX.totalT - dt); SBX.offT = Math.max(0, SBX.offT - dt); SBX.ledT = Math.max(0, SBX.ledT - dt);
     SBX.entryT = Math.max(0, SBX.entryT - dt); if (SBX.entry && SBX.entryT === 0) SBX.entry = '';
     // ---- rack readout
@@ -562,7 +563,7 @@
     const knobAt = (id, frac) => { const e = sbxEl(id); if (e) e.setAttribute('transform', `rotate(${(-150 + 300 * frac).toFixed(1)} ${e.dataset.cx} ${e.dataset.cy})`); };
     knobAt('sbx-k-tempo', (SBX.tempo - 40) / 210); knobAt('sbx-k-tb', SBX.tbI / 8); knobAt('sbx-k-metro', SBX.metro); knobAt('sbx-k-audio', SBX.audio);
     const rs = sbxEl('sbx-resp'); if (rs) rs.setAttribute('y', +rs.dataset.y0 + SBX.resp * +rs.dataset.step);
-    sbxSet('sbx-out', `OUTPUTS  MIDI CLOCK ${clkRate.toFixed(1)}/s  SONG POS ${Math.max(0, Math.floor(w.beats * 4))}  SYNC ${run ? 'RUN' : 'STOP'}`);
+    sbxSet('sbx-out', `OUTPUTS  MIDI CLOCK ${clkRate.toFixed(1)}/s (${SBX.clock ? SBX.clock.sent.clocks : 0} sent)  SONG POS ${Math.max(0, Math.floor(w.beats * 4))}  SYNC ${run ? 'RUN' : 'STOP'}`);
     sbxSet('sbx-out2', `TIME BASE ${TBS[SBX.tbI]}/q = ${tbRate.toFixed(1)}/s  SMPTE ${hms}:${frb.slice(0, 2)} @ ${FRS[SBX.frI][1]} fps`);
     const st = sbxEl('sbx-status'); if (st) st.textContent = SBX.locked ? `Locked to track 24 · ${(w.bpm * ratio).toFixed(1)} BPM at the tape's speed` : SBX.src === 'smpte' ? 'SMPTE EXT · roll the tape (Space) to lock' : 'SMPTE INT · internal clock and code generator';
   }
@@ -581,6 +582,45 @@
     });
   }
   window.SBX = SBX; window.SBX_PRESS = sbxPress;
+  // ---- track 24 from a tape transfer: decode its SMPTE and use it as the stripe on the loaded reel
+  function useDecoded(r, name) {
+    const NS = tr.nominalSpeed, fwd = r.segments.filter((s) => s.dir > 0);
+    if (!fwd.length) { sbxMsg('NO SMPTE FOUND ON THAT FILE', 4); sbxSet('sbx-file', `${name}: no timecode found`); return; }
+    SBX.stripes = fwd.map((s) => ({ take0: s.t0 * NS, take1: Math.min(tr.total, s.t1 * NS + 0.5 * NS), code0: s.code0, speed: NS / s.speed }));
+    SBX.frI = r.df ? 3 : Math.max(0, FRS.findIndex(([f]) => f === Math.round(r.fps)));
+    const first = fwd[0].code0, last = fwd[fwd.length - 1].code1, f = Math.round(r.fps);
+    if (SBX.offset < first || SBX.offset > last) SBX.offset = Math.ceil(first);
+    const t0 = tcString(framesToTc(Math.round(first * (r.df ? 30000 / 1001 : f)), f, r.df), r.df), t1 = tcString(framesToTc(Math.round(last * (r.df ? 30000 / 1001 : f)), f, r.df), r.df);
+    const sp = fwd.reduce((a, s) => a + s.speed * (s.t1 - s.t0), 0) / fwd.reduce((a, s) => a + (s.t1 - s.t0), 0);
+    sbxSet('sbx-file', `${name}: ${t0} → ${t1} · ${r.df ? '29.97 DF' : r.fps + ' fps'} · ${fwd.length} run${fwd.length > 1 ? 's' : ''} · speed ${(sp * 100).toFixed(2)} % · ${r.dropouts} dropouts`);
+    SBX.src = 'smpte'; sbxMsg(`TRACK 24 READ · ${t0}`, 4);
+  }
+  const sbxIn = document.getElementById('sbx-in');
+  if (sbxIn) sbxIn.addEventListener('change', async () => {
+    const f = sbxIn.files[0]; if (!f) return;
+    sbxSet('sbx-file', `reading ${f.name} …`);
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = await ac.decodeAudioData(await f.arrayBuffer());
+      const ch = buf.numberOfChannels >= 24 ? 23 : 0;   // a 24-channel interleaved file: track 24; otherwise the track 24 stem
+      useDecoded(decode(buf.getChannelData(ch), buf.sampleRate), f.name); ac.close();
+    } catch (e) { sbxSet('sbx-file', `${f.name}: could not read (${e.message})`); }
+    sbxIn.value = '';
+  });
+  window.SBX_USE_LTC = (samples, sr, name = 'track24') => useDecoded(decode(samples, sr), name);   // for tests
+  // ---- MIDI OUT: a real, steady MIDI clock to external gear (Web MIDI; the Mac app uses CoreMIDI)
+  let midiOut = null, midiAcc = null;
+  const midiSel = document.getElementById('sbx-midi');
+  SBX.clock = new ClockOut((bytes, t) => { if (midiOut) try { midiOut.send(bytes, t); } catch (e) {} SBX.midiFlash = 0.05; });
+  async function midiInit() {
+    if (!navigator.requestMIDIAccess) { if (midiSel) midiSel.options[0].text = 'MIDI OUT · not available in this browser'; return; }
+    try {
+      midiAcc = await navigator.requestMIDIAccess();
+      const fill = () => { const cur = midiSel.value; midiSel.length = 1; for (const o of midiAcc.outputs.values()) midiSel.add(new Option(`MIDI OUT · ${o.name}`, o.id)); midiSel.value = cur; };
+      fill(); midiAcc.onstatechange = fill;
+    } catch (e) { midiSel.options[0].text = 'MIDI OUT · access refused'; }
+  }
+  if (midiSel) { midiSel.addEventListener('focus', () => { if (!midiAcc) midiInit(); }, { once: true }); midiSel.addEventListener('change', () => { midiOut = midiAcc && midiSel.value ? midiAcc.outputs.get(midiSel.value) : null; sbxMsg(midiOut ? `MIDI OUT → ${midiOut.name}` : 'MIDI OUT OFF'); }); }
 
 
   // ---------------- tape machine view (iframe) mirrors this transport ----------------

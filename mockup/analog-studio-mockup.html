@@ -16,6 +16,8 @@
   .ov-bar button.ov-close{margin-left:auto}
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
+  .ov-pick{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#ffb02e;border:0;border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px}
+  select.ov-pick{background:#efece4}
   .modes{position:absolute;left:1236px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
   .modes .lbl{color:#8b8778;font-size:11px;font-weight:700;letter-spacing:2px;margin-right:4px}
   .modes button{width:112px;height:40px;border-radius:4px;border:1px solid #000;cursor:pointer;font:900 17px Archivo,Arial,sans-serif;letter-spacing:3px;color:#d8d0c0;background:linear-gradient(#3a3b3f,#232427);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.6)}
@@ -74504,7 +74506,7 @@
 <g id="al-mem" font-family="'JetBrains Mono', monospace"></g>
 <text x="1820" y="1833.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="28" fill="#d9d3c7" text-anchor="middle" font-weight="600" >Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD</text>
 <text x="1820" y="1883.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#a9a293" text-anchor="middle" font-weight="600" >Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate</text></svg></div></div>
-<div class="overlay" id="ov-sbx" data-view="sbx" hidden><div class="ov-bar"><b>ROWAN SBX-80 SYNC BOX</b><span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="sbxSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="#141210" />
+<div class="overlay" id="ov-sbx" data-view="sbx" hidden><div class="ov-bar"><b>ROWAN SBX-80 SYNC BOX</b><span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="sbxSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="#141210" />
 <rect x="76" y="100" width="2001.65" height="1755.6000000000001" fill="#000" opacity="0.55" filter="url(#soft)"/>
 <rect x="60" y="70" width="2001.65" height="1755.6000000000001" fill="#8e8b74" rx="8"/>
 <rect x="106.55000000000001" y="70" width="1912.5400000000002" height="1755.6000000000001" fill="#ebe8df" />
@@ -77602,6 +77604,195 @@ class Transport {
 
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
+<script>// LTC (SMPTE linear timecode) encoder / decoder for the SBX-80 sync engine.
+// Renderer- and platform-independent: works on Float32Array samples, so the same code reads track 24 of a tape transfer
+// in the browser mockup, in Node tests, and ports 1:1 to the C++ engine.
+//
+// LTC: 80-bit frames, biphase-mark coded (a transition at every bit-cell boundary, an extra one mid-cell for a 1),
+// least-significant bit first, ending with the sync word 0011 1111 1111 1101 (bits 64..79). Read backwards (tape
+// rewinding past the head) the sync word arrives reversed, which tells us the direction.
+//
+// The decoder is built for real transfers of old 2" tape: it tracks the bit rate adaptively (transfer speed error,
+// vari-speed, wow), ignores dropouts and freewheels across them, reads forward and reverse, and auto-detects
+// 24 / 25 / 30 fps and 29.97 drop-frame.
+
+const SYNC_FWD = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1];
+const SYNC_REV = [...SYNC_FWD].reverse();
+
+// --- timecode <-> seconds -------------------------------------------------------------------------------------
+function tcToFrames({ h, m, s, f }, fps, df) {
+  if (!df) return ((h * 60 + m) * 60 + s) * Math.round(fps) + f;
+  const tm = h * 60 + m;
+  return 108000 * h + 1800 * m + 30 * s + f - 2 * (tm - Math.floor(tm / 10));
+}
+function tcToSeconds(tc, fps, df) { return tcToFrames(tc, fps, df) / (df ? 30000 / 1001 : fps); }
+function framesToTc(n, fps, df) {
+  if (df) {   // SMPTE drop-frame: skip frames 0 and 1 at the start of every minute except multiples of 10
+    const d = Math.floor(n / 17982), mm = n % 17982;
+    n += 18 * d + (mm > 1 ? 2 * Math.floor((mm - 2) / 1798) : 0);
+    fps = 30;
+  }
+  const F = Math.round(fps);
+  return { h: Math.floor(n / (F * 3600)) % 24, m: Math.floor(n / (F * 60)) % 60, s: Math.floor(n / F) % 60, f: n % F };
+}
+const tcString = ({ h, m, s, f }, df = false) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}${df ? ';' : ':'}${String(f).padStart(2, '0')}`;
+
+// --- frame bits -----------------------------------------------------------------------------------------------
+function putBCD(bits, at, v, n) { for (let i = 0; i < n; i++) bits[at + i] = (v >> i) & 1; }
+function getBCD(bits, at, n) { let v = 0; for (let i = 0; i < n; i++) v |= bits[at + i] << i; return v; }
+function frameBits({ h, m, s, f }, df = false) {
+  const b = new Array(80).fill(0);
+  putBCD(b, 0, f % 10, 4); putBCD(b, 8, Math.floor(f / 10), 2); b[10] = df ? 1 : 0;
+  putBCD(b, 16, s % 10, 4); putBCD(b, 24, Math.floor(s / 10), 3);
+  putBCD(b, 32, m % 10, 4); putBCD(b, 40, Math.floor(m / 10), 3);
+  putBCD(b, 48, h % 10, 4); putBCD(b, 56, Math.floor(h / 10), 2);
+  // biphase polarity correction bit (bit 27 at 25 fps is different; 27 is used for 24/30) keeps each frame's
+  // transition count even, as real generators do
+  let ones = b.reduce((a, x) => a + x, 0) + SYNC_FWD.reduce((a, x) => a + x, 0);
+  if (ones % 2) b[27] = 1;
+  for (let i = 0; i < 16; i++) b[64 + i] = SYNC_FWD[i];
+  return b;
+}
+function parseBits(b) {
+  const f = getBCD(b, 0, 4) + 10 * getBCD(b, 8, 2), s = getBCD(b, 16, 4) + 10 * getBCD(b, 24, 3);
+  const m = getBCD(b, 32, 4) + 10 * getBCD(b, 40, 3), h = getBCD(b, 48, 4) + 10 * getBCD(b, 56, 2);
+  if (f > 29 || s > 59 || m > 59 || h > 23) return null;
+  return { h, m, s, f, df: !!b[10] };
+}
+
+// --- encoder (test signals and the box's SMPTE OUT) -------------------------------------------------------------
+// start: { h, m, s, f }; seconds of code; speed: playback speed factor (1.08 = 8 % fast); level 0..1
+function encode({ start, seconds, fps = 30, df = false, sampleRate = 48000, speed = 1, level = 0.5 }) {
+  const rate = df ? 30000 / 1001 : fps, bitDur = sampleRate / (rate * 80 * speed);
+  const nFrames = Math.ceil(seconds * rate);
+  const out = new Float32Array(Math.ceil(nFrames * 80 * bitDur) + 8);
+  let n0 = tcToFrames(start, fps, df), pol = 1, t = 0;
+  const half = (len) => { const a = Math.round(t), b = Math.round(t + len); for (let i = a; i < b && i < out.length; i++) out[i] = pol * level; t += len; };
+  for (let k = 0; k < nFrames; k++) {
+    const bits = frameBits(framesToTc(n0 + k, fps, df), df);
+    for (const bit of bits) { pol = -pol; if (bit) { half(bitDur / 2); pol = -pol; half(bitDur / 2); } else half(bitDur); }
+  }
+  // a touch of rise-time smoothing, like a real tape head
+  for (let i = 1; i < out.length; i++) out[i] = out[i - 1] + (out[i] - out[i - 1]) * 0.6;
+  return out;
+}
+
+// --- decoder ----------------------------------------------------------------------------------------------------
+// Returns { frames: [{ sample, tc, df, dir }], fps, df, segments, dropouts }.
+// sample is the index at the end of the frame's sync word (forward) or its start (reverse).
+function decode(x, sampleRate, opts = {}) {
+  const { fpsHint = null } = opts;
+  // DC removal + level detect for hysteresis
+  let dc = 0, env = 0; const N = x.length;
+  const y = new Float32Array(N);
+  for (let i = 0; i < N; i++) { dc += (x[i] - dc) * 0.001; y[i] = x[i] - dc; env = Math.max(env * 0.9995, Math.abs(y[i])); y[i] /= Math.max(env, 1e-4); }
+  // zero crossings with hysteresis -> transition times (interpolated)
+  const tr = []; let state = y[0] >= 0 ? 1 : -1;
+  for (let i = 1; i < N; i++) {
+    if (state > 0 && y[i] < -0.15) { state = -1; tr.push(i - 1 + y[i - 1] / (y[i - 1] - y[i] || 1)); }
+    else if (state < 0 && y[i] > 0.15) { state = 1; tr.push(i - 1 + y[i - 1] / (y[i - 1] - y[i] || 1)); }
+  }
+  if (tr.length < 200) return { frames: [], fps: null, df: false, segments: [], dropouts: 0 };
+  // initial bit period: the long intervals of the first stretch
+  const iv0 = []; for (let i = 1; i < Math.min(tr.length, 4000); i++) iv0.push(tr[i] - tr[i - 1]);
+  iv0.sort((a, b) => a - b); let T = iv0[Math.floor(iv0.length * 0.9)];
+  // intervals -> bits (two halves = 1, one full = 0), adaptive T; long gaps reset (dropout)
+  const frames = []; const bits = []; const bitAt = []; let pendingHalf = false, dropouts = 0;
+  const check = () => {
+    const L = bits.length; if (L < 80) return;
+    const tail = bits.slice(L - 16).join(''), fwd = SYNC_FWD.join(''), rev = SYNC_REV.join('');
+    if (tail === fwd) { const fb = bits.slice(L - 80); const tc = parseBits(fb); if (tc) frames.push({ sample: bitAt[L - 1], tc, df: tc.df, dir: 1 }); }
+    else if (bits.slice(L - 80, L - 64).join('') === rev) { const fb = bits.slice(L - 80).reverse(); const tc = parseBits(fb); if (tc) frames.push({ sample: bitAt[L - 80], tc, df: tc.df, dir: -1 }); }
+    if (L > 4000) { bits.splice(0, L - 200); bitAt.splice(0, L - 200); }
+  };
+  for (let i = 1; i < tr.length; i++) {
+    const d = tr[i] - tr[i - 1];
+    if (d > T * 3) { dropouts++; pendingHalf = false; bits.length = 0; bitAt.length = 0; continue; }   // signal lost
+    if (d < T * 0.75) {
+      if (pendingHalf) { bits.push(1); bitAt.push(tr[i]); pendingHalf = false; T += (2 * d - T) * 0.05; check(); } else pendingHalf = true;
+    } else {
+      if (pendingHalf) { pendingHalf = false; }   // a lone half: resync on the next full cell
+      bits.push(0); bitAt.push(tr[i]); T += (d - T) * 0.05; check();
+    }
+  }
+  // frame rate: highest frame number seen, drop-frame flag, else the measured frame period
+  let maxF = 0, dfVotes = 0; for (const fr of frames) { maxF = Math.max(maxF, fr.tc.f); if (fr.df) dfVotes++; }
+  const df = dfVotes > frames.length / 2;
+  let fps = fpsHint || (df ? 29.97 : maxF >= 29 ? 30 : maxF >= 24 ? 25 : 24);
+  if (!fpsHint && fps === 30 && !df) {   // 30 vs 29.97 non-drop: compare code time to file time over a clean run
+    const a = frames[0], b = frames[frames.length - 1];
+    const codeSec = (tcToFrames(b.tc, 30, false) - tcToFrames(a.tc, 30, false)) / 30, fileSec = (b.sample - a.sample) / sampleRate;
+    if (codeSec > 10 && Math.abs(fileSec / codeSec - 1.001) < 0.0004) fps = 29.97;
+  }
+  // continuous runs (segments): same direction, each frame one frame on from the last (allowing short dropouts)
+  const rate = df ? 30000 / 1001 : fps, segs = [];
+  let cur = null;
+  for (const fr of frames) {
+    const sec = tcToFrames(fr.tc, Math.round(fps), df) / rate;
+    if (cur && fr.dir === cur.dir) {
+      const dt = (fr.sample - cur.s1) / sampleRate, dc = (sec - cur.c1) * fr.dir;
+      if (dc > 0 && dc < 0.5 && Math.abs(dc - dt * cur.ratio) < 0.25) { cur.s1 = fr.sample; cur.c1 = sec; cur.n++; cur.ratio = Math.abs(cur.c1 - cur.c0) / Math.max(1e-6, (cur.s1 - cur.s0) / sampleRate); continue; }
+    }
+    cur = { dir: fr.dir, s0: fr.sample, s1: fr.sample, c0: sec, c1: sec, n: 1, ratio: 1 };
+    segs.push(cur);
+  }
+  const segments = segs.filter((s) => s.n >= 3).map((s) => ({ dir: s.dir, t0: s.s0 / sampleRate, t1: s.s1 / sampleRate, code0: s.c0, code1: s.c1, speed: s.ratio }));
+  return { frames, fps, df, segments, dropouts };
+}
+
+// code (seconds) at file time t (seconds), interpolating within segments and freewheeling up to `flywheel` seconds
+// past a segment's end (the SBX keeps counting through short dropouts).
+function codeAt(segments, t, flywheel = 0.5) {
+  for (const s of segments) {
+    if (t >= s.t0 - 1e-9 && t <= s.t1 + flywheel) return s.code0 + (t - s.t0) * s.speed * s.dir;
+  }
+  return null;
+}
+
+// Stable MIDI clock out for the SBX-80 sync engine.
+// The clock is generated from the tempo map, not from the incoming timecode, so it is as steady as a crystal: each
+// update() schedules 0xF8 ticks ahead of time with timestamps (Web MIDI / CoreMIDI both take a send time). A gentle
+// phase lock pulls the tick count toward the song position read off tape, so it follows vari-speed and transfer speed
+// error without jitter. On lock it sends Song Position Pointer + Continue (Start at bar 1), on loss of code it sends Stop.
+
+class ClockOut {
+  constructor(send, { lookahead = 0.06 } = {}) {
+    this.send = send;            // (bytes: number[], timeMs: number) => void
+    this.lookahead = lookahead;  // seconds scheduled ahead
+    this.running = false;
+    this.next = 0;               // time (ms) of the next tick
+    this.count = 0;              // ticks sent since bar 1 (24 per quarter note)
+    this.sent = { clocks: 0, spp: 0, start: 0, cont: 0, stop: 0 };
+  }
+  // now: ms clock; s: { running, beats (quarter notes from bar 1, may be negative in count-in), qps (quarter notes per second, already including tape speed) }
+  update(now, s) {
+    if (!s.running || s.qps <= 0 || s.beats < 0) {
+      if (this.running) { this.send([0xFC], now); this.sent.stop++; this.running = false; }
+      return;
+    }
+    const target = s.beats * 24, period = 1000 / (s.qps * 24);
+    if (!this.running) {
+      // start from the current position: Song Position (16ths) then Continue, or Start at the top
+      const sixteenths = Math.max(0, Math.round(s.beats * 4));
+      this.count = sixteenths * 6;
+      if (sixteenths === 0) { this.send([0xFA], now); this.sent.start++; }
+      else { this.send([0xF2, sixteenths & 0x7f, (sixteenths >> 7) & 0x7f], now); this.send([0xFB], now + 1); this.sent.spp++; this.sent.cont++; }
+      this.next = now + (this.count - target) * period + 2;
+      this.running = true;
+    }
+    // far off (locate, jump): stop and re-cue with Song Position
+    const err = target - this.count + (this.next - now) / period;
+    if (Math.abs(err) > 12) { this.send([0xFC], now); this.sent.stop++; this.running = false; return this.update(now, s); }
+    // phase lock: stretch / shrink the period by up to 2 % toward the tape's position
+    const p = period * (1 - Math.max(-0.02, Math.min(0.02, err * 0.02)));
+    if (this.next < now) this.next = now;
+    while (this.next < now + this.lookahead * 1000) {
+      this.send([0xF8], this.next); this.sent.clocks++; this.count++;
+      this.next += p;
+    }
+  }
+}
+</script>
 <script>// Analog Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
 (() => {
   const SVGNS = 'http://www.w3.org/2000/svg';
@@ -78138,6 +78329,7 @@ window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 *
     SBX.beatIx = run ? bi : -1;
     SBX.beatFlash = Math.max(0, SBX.beatFlash - dt);
     const clkRate = run ? w.bpm / 60 * 24 * ratio : 0, tbRate = run ? w.bpm / 60 * TBS[SBX.tbI] * ratio : 0;
+    if (SBX.clock) SBX.clock.update(now, { running: run, beats: w.beats * 4 / (w.den || 4), qps: w.bpm / 60 * ratio * 4 / (w.den || 4) });
     SBX.msgT = Math.max(0, SBX.msgT - dt); SBX.totalT = Math.max(0, SBX.totalT - dt); SBX.offT = Math.max(0, SBX.offT - dt); SBX.ledT = Math.max(0, SBX.ledT - dt);
     SBX.entryT = Math.max(0, SBX.entryT - dt); if (SBX.entry && SBX.entryT === 0) SBX.entry = '';
     // ---- rack readout
@@ -78166,7 +78358,7 @@ window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 *
     const knobAt = (id, frac) => { const e = sbxEl(id); if (e) e.setAttribute('transform', `rotate(${(-150 + 300 * frac).toFixed(1)} ${e.dataset.cx} ${e.dataset.cy})`); };
     knobAt('sbx-k-tempo', (SBX.tempo - 40) / 210); knobAt('sbx-k-tb', SBX.tbI / 8); knobAt('sbx-k-metro', SBX.metro); knobAt('sbx-k-audio', SBX.audio);
     const rs = sbxEl('sbx-resp'); if (rs) rs.setAttribute('y', +rs.dataset.y0 + SBX.resp * +rs.dataset.step);
-    sbxSet('sbx-out', `OUTPUTS  MIDI CLOCK ${clkRate.toFixed(1)}/s  SONG POS ${Math.max(0, Math.floor(w.beats * 4))}  SYNC ${run ? 'RUN' : 'STOP'}`);
+    sbxSet('sbx-out', `OUTPUTS  MIDI CLOCK ${clkRate.toFixed(1)}/s (${SBX.clock ? SBX.clock.sent.clocks : 0} sent)  SONG POS ${Math.max(0, Math.floor(w.beats * 4))}  SYNC ${run ? 'RUN' : 'STOP'}`);
     sbxSet('sbx-out2', `TIME BASE ${TBS[SBX.tbI]}/q = ${tbRate.toFixed(1)}/s  SMPTE ${hms}:${frb.slice(0, 2)} @ ${FRS[SBX.frI][1]} fps`);
     const st = sbxEl('sbx-status'); if (st) st.textContent = SBX.locked ? `Locked to track 24 · ${(w.bpm * ratio).toFixed(1)} BPM at the tape's speed` : SBX.src === 'smpte' ? 'SMPTE EXT · roll the tape (Space) to lock' : 'SMPTE INT · internal clock and code generator';
   }
@@ -78185,6 +78377,45 @@ window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 *
     });
   }
   window.SBX = SBX; window.SBX_PRESS = sbxPress;
+  // ---- track 24 from a tape transfer: decode its SMPTE and use it as the stripe on the loaded reel
+  function useDecoded(r, name) {
+    const NS = tr.nominalSpeed, fwd = r.segments.filter((s) => s.dir > 0);
+    if (!fwd.length) { sbxMsg('NO SMPTE FOUND ON THAT FILE', 4); sbxSet('sbx-file', `${name}: no timecode found`); return; }
+    SBX.stripes = fwd.map((s) => ({ take0: s.t0 * NS, take1: Math.min(tr.total, s.t1 * NS + 0.5 * NS), code0: s.code0, speed: NS / s.speed }));
+    SBX.frI = r.df ? 3 : Math.max(0, FRS.findIndex(([f]) => f === Math.round(r.fps)));
+    const first = fwd[0].code0, last = fwd[fwd.length - 1].code1, f = Math.round(r.fps);
+    if (SBX.offset < first || SBX.offset > last) SBX.offset = Math.ceil(first);
+    const t0 = tcString(framesToTc(Math.round(first * (r.df ? 30000 / 1001 : f)), f, r.df), r.df), t1 = tcString(framesToTc(Math.round(last * (r.df ? 30000 / 1001 : f)), f, r.df), r.df);
+    const sp = fwd.reduce((a, s) => a + s.speed * (s.t1 - s.t0), 0) / fwd.reduce((a, s) => a + (s.t1 - s.t0), 0);
+    sbxSet('sbx-file', `${name}: ${t0} → ${t1} · ${r.df ? '29.97 DF' : r.fps + ' fps'} · ${fwd.length} run${fwd.length > 1 ? 's' : ''} · speed ${(sp * 100).toFixed(2)} % · ${r.dropouts} dropouts`);
+    SBX.src = 'smpte'; sbxMsg(`TRACK 24 READ · ${t0}`, 4);
+  }
+  const sbxIn = document.getElementById('sbx-in');
+  if (sbxIn) sbxIn.addEventListener('change', async () => {
+    const f = sbxIn.files[0]; if (!f) return;
+    sbxSet('sbx-file', `reading ${f.name} …`);
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = await ac.decodeAudioData(await f.arrayBuffer());
+      const ch = buf.numberOfChannels >= 24 ? 23 : 0;   // a 24-channel interleaved file: track 24; otherwise the track 24 stem
+      useDecoded(decode(buf.getChannelData(ch), buf.sampleRate), f.name); ac.close();
+    } catch (e) { sbxSet('sbx-file', `${f.name}: could not read (${e.message})`); }
+    sbxIn.value = '';
+  });
+  window.SBX_USE_LTC = (samples, sr, name = 'track24') => useDecoded(decode(samples, sr), name);   // for tests
+  // ---- MIDI OUT: a real, steady MIDI clock to external gear (Web MIDI; the Mac app uses CoreMIDI)
+  let midiOut = null, midiAcc = null;
+  const midiSel = document.getElementById('sbx-midi');
+  SBX.clock = new ClockOut((bytes, t) => { if (midiOut) try { midiOut.send(bytes, t); } catch (e) {} SBX.midiFlash = 0.05; });
+  async function midiInit() {
+    if (!navigator.requestMIDIAccess) { if (midiSel) midiSel.options[0].text = 'MIDI OUT · not available in this browser'; return; }
+    try {
+      midiAcc = await navigator.requestMIDIAccess();
+      const fill = () => { const cur = midiSel.value; midiSel.length = 1; for (const o of midiAcc.outputs.values()) midiSel.add(new Option(`MIDI OUT · ${o.name}`, o.id)); midiSel.value = cur; };
+      fill(); midiAcc.onstatechange = fill;
+    } catch (e) { midiSel.options[0].text = 'MIDI OUT · access refused'; }
+  }
+  if (midiSel) { midiSel.addEventListener('focus', () => { if (!midiAcc) midiInit(); }, { once: true }); midiSel.addEventListener('change', () => { midiOut = midiAcc && midiSel.value ? midiAcc.outputs.get(midiSel.value) : null; sbxMsg(midiOut ? `MIDI OUT → ${midiOut.name}` : 'MIDI OUT OFF'); }); }
 
 
   // ---------------- tape machine view (iframe) mirrors this transport ----------------
