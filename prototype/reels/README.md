@@ -20,7 +20,7 @@ Controls: **Space** play / stop, **P** reverse play, **←** rewind, **→** fas
 
 ## Transport feel
 
-Every tape machine in the app shares one transport feel, modelled on the Stauder (Studer) A827's smooth servo transport: acceleration builds and fades along an S-curve with a long, gentle landing, so winds start and stop without a jolt. From a 1000 ft position it reaches wind speed in about 1.3 s and stops in about 1.4 s.
+Every tape machine in the app shares one transport feel, modelled on the Stauder (Studer) A827's smooth servo transport: acceleration builds and fades along an S-curve with a long, gentle landing, so winds start and stop without a jolt. Winds run at about 512 IPS (13 m/s); from a 1000 ft position the transport reaches wind speed in about 2 s and stops in about 2.2 s, and a full 2500 ft reel winds end to end in about a minute.
 
 ## How it works
 
