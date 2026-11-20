@@ -16,21 +16,19 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
   const names = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
 
-  // SSL knob (as the 611EQ / G+ photos): tall light-grey ribbed body, large coloured cap on top, white pointer line on the cap,
-  // scale dots printed round it on the panel. The body's side shows as a darker crescent below the cap (seen from the front).
-  let KS = 1;   // knob size factor: 1.4 on the channel strips, where SSL knobs fill the module width
-  const sk = (cx, cy, r0, col, ang = 0, lab = '', labY = null) => {
-    const r = r0 * KS;
-    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.2) * Math.cos(a)).toFixed(1), (cy + (r + 3.2) * Math.sin(a)).toFixed(1), 0.6, '#1e2022'); }
-    circle(cx + 1.2, cy + r * 0.38 + 1.4, r * 1.02, '#000', 'opacity="0.38"');        // cast shadow
-    circle(cx, cy + r * 0.3, r, '#8e9292');                                           // side of the body
-    p(`<circle cx="${cx}" cy="${(cy + r * 0.3).toFixed(1)}" r="${(r - 0.5).toFixed(1)}" fill="none" stroke="#6e7272" stroke-width="1" stroke-dasharray="0.8 1"/>`);
-    circle(cx, cy, r, '#c4c7c6');                                                     // ribbed top rim
-    p(`<circle cx="${cx}" cy="${cy}" r="${(r - 0.5).toFixed(1)}" fill="none" stroke="#9fa3a3" stroke-width="1" stroke-dasharray="0.8 1"/>`);
-    circle(cx, cy, r * 0.8, col);                                                     // coloured cap
-    circle(cx, cy, r * 0.8, 'url(#capHiDark)', 'opacity="0.55"');
+  // SSL knob (E-channel / 611EQ colours): fully coloured glossy dome on a dark skirt, pointer line from the centre,
+  // scale dots round it. Cream for filters / compressor / utility, red HF, green HMF + expander/gate, blue LMF, black LF.
+  const KCOL = { '#e9eaec': '#e7e2cf', '#d9dbde': '#e7e2cf', '#c9ccd1': '#e7e2cf', '#c8352a': '#c8262b', '#3f9a58': '#1d8a55', '#3577c2': '#2a8fc2', '#1e1f22': '#2c2d31', '#8a8f97': '#2c2d31', '#e0b23a': '#e2b43a' };
+  const sk = (cx, cy, r0, col0, ang = 0, lab = '', labY = null) => {
+    const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#e7e2cf' || col === '#e2b43a';
+    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.4) * Math.cos(a)).toFixed(1), (cy + (r + 3.4) * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
+    circle(cx + 1.3, cy + 2, r * 1.04, '#000', 'opacity="0.42"');                    // cast shadow
+    circle(cx, cy, r * 1.04, '#141416');                                               // dark skirt
+    circle(cx, cy, r * 0.9, col);                                                      // coloured dome
+    p(`<circle cx="${cx}" cy="${cy}" r="${(r * 0.9).toFixed(1)}" fill="url(#capHiDark)" opacity="0.6"/>`);
+    circle(cx - r * 0.28, cy - r * 0.32, r * 0.28, '#fff', 'opacity="0.22"');          // gloss
     const a = (ang - 90) * Math.PI / 180;
-    p(`<line x1="${(cx + r * 0.15 * Math.cos(a)).toFixed(1)}" y1="${(cy + r * 0.15 * Math.sin(a)).toFixed(1)}" x2="${(cx + r * 0.78 * Math.cos(a)).toFixed(1)}" y2="${(cy + r * 0.78 * Math.sin(a)).toFixed(1)}" stroke="${col === '#e9eaec' || col === '#d9dbde' || col === '#c9ccd1' || col === '#e0b23a' ? '#1e2022' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.15).toFixed(1)}" stroke-linecap="round"/>`);
+    p(`<line x1="${cx}" y1="${cy}" x2="${(cx + r * 0.86 * Math.cos(a)).toFixed(1)}" y2="${(cy + r * 0.86 * Math.sin(a)).toFixed(1)}" stroke="${light ? '#141416' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.16).toFixed(1)}" stroke-linecap="round"/>`);
     if (lab) text(cx, labY ?? cy + r + 9, lab, 6.5, INK2, 'middle', 700, 'letter-spacing="0.3"');
   };
   const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
@@ -81,10 +79,10 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       sk(R, 392, 8, '#e9eaec', ang()); lab(R, 407, 'THRESH');
       sk(L, 410, 8, '#e9eaec', ang()); lab(L, 425, 'RELEASE');
       rect(x0 + 6, 430, SW - 12, 1, LINE, 'opacity="0.7"');
-      sk(R, 446, 8, '#1e1f22', ang()); lab(R, 461, 'THRESH');
-      sk(L, 454, 8, '#1e1f22', ang()); lab(L, 469, 'RANGE');
+      sk(R, 446, 8, '#3f9a58', ang()); lab(R, 461, 'THRESH');
+      sk(L, 454, 8, '#3f9a58', ang()); lab(L, 469, 'RANGE');
       key(R - 11, 466, 22, 9, 'white', rnd() > 0.8, 'GATE', 4.6);
-      sk(L, 488, 8, '#1e1f22', ang()); lab(L, 503, 'RELEASE');
+      sk(L, 488, 8, '#3f9a58', ang()); lab(L, 503, 'RELEASE');
       const gr = Math.floor(rnd() * 4), gg = Math.floor(rnd() * 3);
       ['20', '14', '10', '6', '3'].forEach((v, k) => { const ly = 482 + k * 6; led(R - 6, ly, 4 - k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); led(R + 6, ly, 4 - k < gg, '#4fe07a'); lab(R, ly + 1.5, v, 3.4); });
       tall(x0 + 8, 510, 'CH', 'IN', i % 5 === 0); tall(x0 + 28, 510, 'CH', 'OUT', false); tall(x0 + 48, 510, 'MON', '', false);
