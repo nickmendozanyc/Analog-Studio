@@ -493,8 +493,8 @@ const elecView = (() => {
     <input id="el-file" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" multiple hidden>
   </div>
   <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
-  <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
   <div class="elm"><svg viewBox="0 0 ${MW} ${2 * ROW}" width="${MW}" height="${2 * ROW}">${meters}</svg></div>
+  <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
 </div>`;
 })();
 const elecCss = `
@@ -510,7 +510,7 @@ const elecCss = `
   #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
   #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
   #elec .drs{display:flex;gap:18px}
-  #elec .elm{margin-top:16px;background:linear-gradient(180deg,#2a2725,#1b1918);border:2px solid #0c0b0a;border-radius:8px;padding:10px 0 0}
+  #elec .elm{margin-bottom:16px;background:linear-gradient(180deg,#2a2725,#1b1918);border:2px solid #0c0b0a;border-radius:8px;padding:10px 0 0}
   #elec .elm svg{display:block}
   #elec .dr{flex:1 1 0;min-width:0;background:linear-gradient(180deg,#3a3633,#2a2725);border:2px solid #0c0b0a;border-radius:8px;padding:8px}
   #elec .drh{font:900 20px Archivo,Arial;letter-spacing:2.5px;color:#d9d2c2;margin:2px 4px 8px}
