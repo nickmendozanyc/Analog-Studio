@@ -10,7 +10,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
   // split console: channels 1-16, the master section, channels 17-32
   const MX = 24 + 16 * SW + GAP, MW = CW - 18 - 24 - N * SW - 2 * GAP;
   const stripX = (i) => (i < 16 ? 24 + i * SW : MX + MW + GAP + (i - 16) * SW);
-  const PANEL = '#a3a5a2', PANEL2 = '#6e716f', LINE = '#7d807e', INK = '#141516', INK2 = '#26282b';   // SSL grey panel, dark legends
+  // SSL G-Series greys (RAL): module panels RAL 7042 Traffic Grey A, frame RAL 7037 Dusty Grey, light panels RAL 7040 Window Grey
+  const RAL7042 = '#8f9695', RAL7037 = '#7d7f7d', RAL7040 = '#9da1aa';
+  const PANEL = RAL7042, PANEL2 = RAL7037, LINE = '#6f7574', INK = '#111213', INK2 = '#1e2022';
   const names = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
 
@@ -126,7 +128,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       key(R - 12, 1124, 26, 11, 'white', false, 'SOLO', 4.8); key(R - 12, 1138, 26, 11, 'white', i === 2, 'CUT', 4.8);
       p('</g>');
       // ---- fader panel: VCA group window, automation status keys, VCA fader (100 mm = 190 px), scribble strip
-      rect(x0 + 1, 1154, SW - 2, CH - 1158, '#cdcfcc'); rect(x0 + 1, 1154, SW - 2, 1.5, '#fff', 'opacity="0.5"');
+      rect(x0 + 1, 1154, SW - 2, CH - 1158, RAL7040); rect(x0 + 1, 1154, SW - 2, 1.5, '#fff', 'opacity="0.5"');
       rect(x0 + 6, 1160, 26, 12, '#0b0b0c', 'rx="2"');
       text(x0 + 19, 1169.5, `G${1 + Math.floor(i / 4) % 8}`, 7.5, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
       const modes = [['O', 'grey'], ['R', 'green'], ['W', 'red'], ['T', 'amber'], ['L', 'blue'], ['Tr', 'yellow']];
@@ -141,8 +143,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     // =================== VU meter bridge: SSL VU modules (black panel, 8 meters = 4 across x 2 rows, screws between rows) ===================
     // Meter face as on the user's SSL VU module photo: wide cream face, dB scale over the arc with a thick red 0..+3 band,
     // 0-100 % scale under it, "VU" in the corners. Needle angle follows a real VU (linear in voltage).
+    let svuN = 0;
     const sslVu = (vx, vy, vw, vh, db, num) => {
-      const id = `svu${num}`, cx = vx + vw / 2, cy = vy + vh * 2.25, R = vh * 1.95;
+      const id = `svu${svuN++}`, cx = vx + vw / 2, cy = vy + vh * 2.25, R = vh * 1.95;
       const ang = (d) => { const pct = Math.pow(10, d / 20) * 100; return (-31 + 60 * Math.min(pct, 141) / 141) * Math.PI / 180; };
       const pt = (a, r) => [(cx + r * Math.sin(a)).toFixed(1), (cy - r * Math.cos(a)).toFixed(1)];
       rect(vx - 2, vy - 2, vw + 4, vh + 4, '#050505', 'rx="2"');
@@ -219,7 +222,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     sect(sx2, 190, sw2, 'COMPUTER STATUS');
     ['MIX ON', 'MOTOR', 'SEARCH', 'TAPE TRK', 'REC SYNC', 'GROUP', 'MATCH', 'UPDATE', 'MERGE', 'RECALL'].forEach((l, k) => ckey(sx2 + (k % 2) * (sw2 / 2) + 3, 204 + Math.floor(k / 2) * 30, sw2 / 2 - 6, 22, l, 6.5, k === 0));
     // header plate and the square screen with live timecode; status keys beside it
-    rect(RX + 12, 474, 300, 22, '#d6d7d4', 'rx="2"');
+    rect(RX + 12, 474, 300, 22, RAL7040, 'rx="2"');
     text(RX + 20, 489, 'SLS', 9.5, '#2a2b2d', 'start', 900, 'font-style="italic"'); text(RX + 304, 489, 'Studio Computer', 9.5, '#2a2b2d', 'end', 700);
     rect(RX + 12, 500, 300, 250, '#3a3c3f', 'rx="5"');
     rect(RX + 26, 512, 272, 226, '#05070a', 'rx="10"');
@@ -233,18 +236,18 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10'].forEach((l, k) => text(tx2 + (k % 5) * (tw2 / 5) + tw2 / 10 - 2, 604 + Math.floor(k / 5) * 40, l, 7.5, '#2a2620', 'middle', 800));
     // cream keyboard
     const kb = ['1234567890-=', 'QWERTYUIOP[]', "ASDFGHJKL;'", 'ZXCVBNM,./'];
-    rect(RX + 12, 760, CC - 24, 190, '#7a7d7b', 'rx="6"');
+    rect(RX + 12, 760, CC - 24, 190, RAL7037, 'rx="6"');
     kb.forEach((row, r) => [...row].forEach((ch, c) => { const kx = (CC - 48) / 12.5, bx = RX + 22 + c * kx + r * 10; if (bx + kx > RX + CC - 16) return; keycap(bx, 768 + r * 36, kx - 6, 30, ch, 11); }));
     keycap(RX + 22 + 3 * ((CC - 48) / 12.5), 914, ((CC - 48) / 12.5) * 6, 26, '', 8);
     // function keypad (6 x 5), numeric keypad, round black keys
     const fk = [['PRINT', 'JOIN', 'NAME', 'REVISE', 'COPY', 'CANCEL'], ['LIST', 'GO TO', 'PLAY', 'CYCLE', 'DELETE', 'REPEAT'], ['TITLE', 'MIX', 'CUE', 'EVENT', 'DROP IN', '←'], ['SET UP', 'PRESET', 'REEL', 'TRACK', 'SYNC', '↑'], ['END', 'FROM', 'HERE', 'TO', 'AT', 'EXECUTE']];
-    rect(RX + 12, 958, 300, 186, '#7a7d7b', 'rx="6"');
+    rect(RX + 12, 958, 300, 186, RAL7037, 'rx="6"');
     fk.forEach((row, r) => row.forEach((l, c) => keycap(RX + 20 + c * 48.5, 966 + r * 35, 42, 28, l, l.length > 5 ? 6 : 7)));
-    rect(RX + 320, 958, 150, 186, '#7a7d7b', 'rx="6"');
+    rect(RX + 320, 958, 150, 186, RAL7037, 'rx="6"');
     [['7', '8', '9'], ['4', '5', '6'], ['1', '2', '3'], ['0', '.', 'ENT']].forEach((row, r) => row.forEach((l, c) => keycap(RX + 328 + c * 46, 966 + r * 44, 40, 36, l, l.length > 1 ? 7 : 11)));
     for (const [cx0, cy0] of [[RX + 505, 1000], [RX + 505, 1096]]) for (const [dx, dy] of [[0, -18], [-14, 0], [14, 0], [0, 18], [0, 0]]) { circle(cx0 + dx + 0.6, cy0 + dy + 1.4, 8.5, '#000', 'opacity="0.5"'); circle(cx0 + dx, cy0 + dy, 8.5, '#1b1c1e'); circle(cx0 + dx, cy0 + dy, 8.5, 'url(#capHiDark)'); }
     // group masters on the front fader panel, under the computer
-    rect(RX + 1, 1154, CC - 2, CH - 1158, '#cdcfcc'); rect(RX + 1, 1154, CC - 2, 1.5, '#fff', 'opacity="0.5"');
+    rect(RX + 1, 1154, CC - 2, CH - 1158, RAL7040); rect(RX + 1, 1154, CC - 2, 1.5, '#fff', 'opacity="0.5"');
     const gw = (CC - 24) / 8;
     for (let g = 0; g < 8; g++) {
       const gx = RX + 12 + g * gw + gw / 2;
@@ -258,7 +261,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     // ================= SL 651G master module: narrow strip, knobs on the left, a long key column on the right =================
     const M = MXM, MWd = MWM, KC = M + MWd - 78;
     rect(M, 178, MWd, CH - 182, PANEL, 'rx="4"');
-    rect(M + 6, 184, MWd - 12, 18, '#d6d7d4', 'rx="2"'); text(M + MWd / 2, 197, 'SLS 4000 G+ · MASTER', 8, '#2a2b2d', 'middle', 900, 'letter-spacing="2"');
+    rect(M + 6, 184, MWd - 12, 18, RAL7040, 'rx="2"'); text(M + MWd / 2, 197, 'SLS 4000 G+ · MASTER', 8, '#2a2b2d', 'middle', 900, 'letter-spacing="2"');
     const kl = (cx0, cy0, r, col, a, l) => { sk(cx0, cy0, r, col, a); text(cx0, cy0 + r + 9, l, 5.6, INK2, 'middle', 700); };
     const c4 = (k) => M + 26 + k * ((KC - M - 52) / 3);
     // bus compressor
@@ -283,7 +286,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     ckey(M + 10, 648, 70, 24, 'TALK', 8.5, false, 'red'); ckey(M + 86, 648, 60, 24, 'SLATE', 7); kl(M + 176, 660, 9, '#8a8f97', 0, 'OSC');
     ['100', '1k', '10k'].forEach((l, k) => ckey(M + 10 + k * 46, 680, 40, 16, l, 7, k === 1, 'green'));
     // master fader in its slot, with keys beside it (as on the master module in the photos)
-    rect(M + 8, 708, KC - M - 14, 300, '#8e918e', 'rx="4"'); rect(M + 8, 708, KC - M - 14, 2, '#000', 'opacity="0.25"');
+    rect(M + 8, 708, KC - M - 14, 300, RAL7037, 'rx="4"'); rect(M + 8, 708, KC - M - 14, 2, '#000', 'opacity="0.25"');
     text(M + 20, 724, 'MAIN', 8, INK, 'start', 900, 'letter-spacing="2"');
     fader(M + 74, 744, 934, 0.22, { capW: 30, capH: 44, scaleColor: '#2a2b2d', capFill: 'url(#faderCapWhite)' });
     text(M + 74, 960, 'STEREO', 7.5, INK, 'middle', 800);
@@ -295,14 +298,14 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     [['OFF', 'grey'], ['READ', 'green'], ['WRITE', 'red'], ['TOUCH', 'amber'], ['LATCH', 'blue'], ['TRIM', 'yellow']].forEach(([l, c], k) => ckey(M + 10 + (k % 3) * ((KC - M - 16) / 3), 1028 + Math.floor(k / 3) * 26, (KC - M - 16) / 3 - 6, 20, l, 7, k === 1, c));
     ckey(M + 10, 1084, KC - M - 20, 20, 'SLS MULTITRACK · ◀◀  ▶▶  ■  ▶  ●', 6.5);
     // the long column of cream keys down the right side: speakers, sources, cue / external selects
-    rect(KC - 2, 210, 74, 934, '#999c99', 'rx="3"');
+    rect(KC - 2, 210, 74, 934, RAL7040, 'rx="3"');
     text(KC + 35, 222, 'MONITOR', 6, INK, 'middle', 900, 'letter-spacing="1"');
     ['LARGE', 'SMALL', 'MINI', 'ALT', 'MIX', '2TR A', '2TR B', '2TR C', 'EXT 1', 'EXT 2', 'CUE 1', 'CUE 2', 'ST CUE', 'STUDIO', 'TB→CUE', 'TB→STU', 'SOLO', 'AFL', 'PFL', 'SPLIT'].forEach((l, k) => {
       const on = l === 'LARGE' || l === 'MIX';
       ckey(KC + 4, 230 + k * 44, 62, 30, l, 6.5, on, 'white');
     });
     // stereo VCA faders under the master module
-    rect(M + 1, 1154, MWd - 2, CH - 1158, '#cdcfcc'); rect(M + 1, 1154, MWd - 2, 1.5, '#fff', 'opacity="0.5"');
+    rect(M + 1, 1154, MWd - 2, CH - 1158, RAL7040); rect(M + 1, 1154, MWd - 2, 1.5, '#fff', 'opacity="0.5"');
     [['ST VCA 1', 'FRONT BUS'], ['ST VCA 2', 'REMIX BUS']].forEach(([l, n], k) => { const fx2 = M + 60 + k * 110; fader(fx2, 1192, 1376, 0.3, { capW: 26, capH: 38, scale: k === 0, scaleColor: '#2a2b2d', capFill: 'url(#faderCapWhite)' }); text(fx2, 1170, l, 7, INK, 'middle', 800); rect(fx2 - 34, 1394, 68, 22, '#f2eee2', 'rx="2"'); text(fx2, 1409, n, 8.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`); });
     p('</svg>');
   });
