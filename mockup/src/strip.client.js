@@ -184,7 +184,7 @@
   for (const key of Object.keys(ST)) { const m = /^(cmi|sls)(\d+)$/.exec(key); if (m) { ST[key].__init = false; applyCh(m[1], +m[2]); } }
   // section rectangles on the stage (same bands as the click targets)
   function panelsFor(con, ch, sec) {
-    if (con === 'cmi') { const x0 = 46 + ch * 85, B = { input: [950, 138], eq: [1088, 326], sends: [1414, 222] }; return sec === 'bus' ? [[x0, 804, 85, 146], [x0, 1636, 85, 66]] : [[x0, B[sec][0], 85, B[sec][1]]]; }
+    if (con === 'cmi') { const x0 = 46 + ch * 85, B = { input: [954, 134], eq: [1088, 326], sends: [1414, 220] }; return sec === 'bus' ? [[x0, 797, 85, 156], [x0, 1634, 85, 61]] : [[x0, B[sec][0], 85, B[sec][1]]]; }   // bus assign (all 24 keys) + BUS LVL, clear of the INPUT/TAPE and MUTE keys
     const x0 = ch < 16 ? 48 + ch * 72 : 24 + 2072 + (ch - 16) * 72, B2 = { bus: [870, 1000], input: [1000, 1072], dyn: [1072, 1262], eq: [1262, 1592], sends: [1592, 1712] }[sec];
     return [[x0, B2[0], 72, B2[1] - B2[0]]];
   }
@@ -288,8 +288,8 @@
   const SEC_LABEL = { input: 'INPUT', bus: 'BUS', dyn: 'DYNAMICS', eq: 'EQ', sends: 'SENDS' };
   function hitCMI(x, y) {
     const ch = Math.floor((x - 46) / 85); if (ch < 0 || ch > 31) return null;
-    const sec = y < 950 ? 'bus' : y < 1088 ? 'input' : y < 1402 ? 'eq' : y < 1636 ? 'sends' : y < 1700 ? 'bus' : null;
-    return sec && { con: 'cmi', ch, sec, x0: 46 + ch * 85, w: 85, band: sec === 'bus' && y > 1636 ? [1636, 1700] : { bus: [804, 950], input: [950, 1088], eq: [1088, 1402], sends: [1402, 1636] }[sec] };
+    const sec = y < 953 ? 'bus' : y < 1088 ? 'input' : y < 1402 ? 'eq' : y < 1634 ? 'sends' : y < 1696 ? 'bus' : null;
+    return sec && { con: 'cmi', ch, sec, x0: 46 + ch * 85, w: 85, band: sec === 'bus' && y > 1634 ? [1634, 1695] : { bus: [797, 953], input: [954, 1088], eq: [1088, 1402], sends: [1402, 1634] }[sec] };
   }
   function hitSLS(x, y) {
     const xx = x - 24; let ch = -1, x0 = 0;

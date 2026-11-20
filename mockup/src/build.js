@@ -868,7 +868,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       for (const sy of [6, UD - 6]) screw(cm, sy, 2.6);
       // bus assign: 24 round black keys in two columns, red LED beside each
       for (let i = 0; i < 12; i++) {
-        const y = 16 + i * 12.6;
+        const y = 12 + i * 12.6;   // clear of the INPUT / TAPE keys below
         for (const [k, bx, lx, nx, an] of [[2 * i + 1, x0 + 20, x0 + 32, x0 + 8, 'middle'], [2 * i + 2, x0 + 52, x0 + 64, x0 + 77, 'middle']]) {
           { const on = (busLit(ch).includes(k - 1)); p(`<g data-bid="bus${k}" data-ch="${ch}" data-on="${on ? 1 : 0}">`); rnd2(bx, y, 4.8, '#141414'); led(lx, y, false); p(`<g class="klit" opacity="${on ? 1 : 0}">`); led(lx, y, true); p('</g></g>'); }
           tx(nx, y + 2.8, String(k), 7.5, WH, an, 700);
@@ -876,7 +876,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       }
       p('<g transform="translate(0 -26)">');
       // INPUT / TAPE source select
-      blk(x0 + 4, 186, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e', 'src_in'); blk(x0 + 44, 186, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e', 'src_tape');
+      blk(x0 + 4, 187, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e', 'src_in'); blk(x0 + 44, 187, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e', 'src_tape');
       p('<g transform="translate(0 -58)">');   // trim through sends move up into the space the mic controls left
       KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-125, '-'], [125, '+']], false, 'trim');
       tx(x0 + 22, 299, 'TRIM', 8, WH);
