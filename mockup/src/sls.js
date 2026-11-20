@@ -2,7 +2,7 @@
 // Strip layout follows the SL 611G I/O module drawings in the SSL G Series operator's manual: routing matrix,
 // group output, channel input, dynamics, filters, G Series EQ, cues, monitor input + small fader, quad pans,
 // VCA fader with automation status (plus a short channel bargraph on top). Sized for the app: 32 channels plus the SL 651G-style master section in 3242 x 1446.
-// Routing shows the real 32 groups + quad bus; the app's audio routing is the same engine as the CMI room.
+// Routing: 24 groups + quad bus (the app's 24 multitrack buses, same engine as the CMI room); the real 611G has 32.
 
 module.exports = function buildSLS(h, { tapeNames }) {
   const { p, rect, text, circle, button, fader, capture } = h;
@@ -39,16 +39,18 @@ module.exports = function buildSLS(h, { tapeNames }) {
       rect(x0 + 1, 4, 1, CH - 8, '#fff', 'opacity="0.06"');
       const led = (lx, ly, on, col = '#ff3b2f') => circle(lx, ly, 2.2, on ? col : '#3a2420', on ? 'filter="url(#glowSm)"' : '');
       // ---- channel bargraph (meter bridge strip, shortened)
-      rect(x0 + 8, 8, SW - 16, 62, '#0b0b0c', 'rx="3"');
+      rect(x0 + 8, 8, SW - 16, 90, '#0b0b0c', 'rx="3"');
       text(x0 + 14, 20, String(i + 1), 8.5, INK, 'start', 800);
       const lvl = i < 24 ? 0.35 + rnd() * 0.5 : 0.2 + rnd() * 0.3;
-      for (let s = 0; s < 18; s++) {
-        const y = 64 - s * 2.9, on = s / 18 < lvl, col = s >= 16 ? '#ff3b2f' : s >= 13 ? '#ffd23a' : '#4fe07a';
-        rect(cx + 2, y, 16, 1.9, col, on ? '' : 'opacity="0.13"');
+      // meter scale (dB) and a 28-segment bar: room freed by the 24-group matrix
+      [['+10', 27], ['0', 22], ['-10', 17], ['-20', 12], ['-40', 4]].forEach(([l, s]) => text(cx - 1, 93 - s * 2.95 + 2, l, 5, '#8d939c', 'end', 700));
+      for (let s = 0; s < 28; s++) {
+        const y = 91 - s * 2.95, on = s / 28 < lvl, col = s >= 25 ? '#ff3b2f' : s >= 21 ? '#ffd23a' : '#4fe07a';
+        rect(cx + 2, y, 16, 2.0, col, on ? '' : 'opacity="0.13"');
       }
-      // ---- routing matrix: 32 groups (button + LED), quad bus LF RF LB RB, PAN pot (odd / even) and PAN key
-      for (let b = 0; b < 32; b++) {
-        const bx = x0 + 9 + (b % 4) * 17, by = 80 + Math.floor(b / 4) * 13;
+      // ---- routing matrix: 24 groups (the app's 24 multitrack buses), quad bus LF RF LB RB, PAN pot (odd / even) and PAN key
+      for (let b = 0; b < 24; b++) {
+        const bx = x0 + 9 + (b % 4) * 17, by = 106 + Math.floor(b / 4) * 13;
         const on = i < 24 && b === i;
         rect(bx, by, 14, 9, on ? '#ff5a3c' : '#5a5e66', `rx="1.5" ${on ? 'filter="url(#glowSm)"' : ''}`);
         text(bx + 7, by + 6.8, String(b + 1), 5.2, on ? '#1a0a05' : '#e3e5e8', 'middle', 800);
