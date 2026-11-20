@@ -8,9 +8,13 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const f = (n) => Number(n).toFixed(2);
 
 module.exports = function buildJH24({ TX, TY, TW, TH }) {
-  const DW = TW, DD = 720;            // deck size (deck units = px before tilt)
+  const DW = TW, DD = 720;            // original deck size (deck units = px before tilt)
+  // Layout for 14" reels: the reels sit 2" further apart and 2" further back, the transport 2" further forward.
+  // The deck grows to fit and is scaled back into the same screen space. (1" = 250 / 7 deck units.)
+  const IN = 250 / 7, DZ = 2 * IN, OX = 44, OY = 64;
+  const DW2 = DW + 2 * OX, DD2 = DD + OY + DZ, DSCALE = DW / DW2;
   const FRONT = 560;                  // screen y (scene coords) of the deck's front edge
-  const TILT = 54;                    // degrees the deck is tilted away from the viewer
+  const TILT = 59;                    // degrees the deck is tilted away from the viewer
   const out = [];
   const add = (s) => out.push(s);
 
@@ -53,17 +57,20 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const headX = DW / 2;
   const TAPE_Z0 = 26, TAPE_Z1 = 98;            // 2" tape = 72 units
   const R = 250, hubR = R * 0.36, holeR = R * 0.27;
-  const supply = { cx: 300, cy: 292, pack: 213, rot: 18, labelAt: 198, style: 'a499' };   // 2500 ft on a 10.5" reel, 03:42 in at 30 IPS
-  const takeup = { cx: DW - 300, cy: 292, pack: 145, rot: -27, style: 'gp9' };
+  const supply = { cx: 300 - 2 * IN, cy: 292 - 2 * IN, pack: 213, rot: 18, labelAt: 198, style: 'a499' };   // 2500 ft on a 10.5" reel, 03:42 in at 30 IPS
+  const takeup = { cx: DW - 300 + 2 * IN, cy: 292 - 2 * IN, pack: 145, rot: -27, style: 'gp9' };
   // Transport layout from the user's HJ-24 photos: tape runs across the FRONT of the head block.
-  const TAPE_Y = 548;                                         // tape line across the head faces
+  const TAPE_Y = 548 + DZ;                                         // tape line across the head faces
   const guideL = { cx: 440, cy: TAPE_Y + 24, r: 24 };         // tall black roller, in front of the tape
   const lifterPin = { cx: 410, cy: TAPE_Y - 18, r: 5 };       // thin chrome lifter pin
   const capstan = { cx: 905, cy: TAPE_Y - 20, r: 20 };        // black ribbed capstan, behind the tape
   const pinch = { cx: 917, cy: TAPE_Y + 13, r: 13 };          // slim cream pinch roller, in front
   const guideR = { cx: 1012, cy: TAPE_Y - 26, r: 26 };        // chunky black take-up guide, behind the tape
-  const head = { x: 478, y: 412, w: 384, d: 126, h: 140 };    // head assembly box
-  const STRIP = { x: 40, y: 606, w: DW - 80, d: 100, zFront: 14, slope: -8 };
+  // spring-loaded tension arms (as on the JH-24): chrome roller on a black arm from a pivot boss
+  const armL = { cx: 290, cy: TAPE_Y - 58, r: 18, px: 365, py: TAPE_Y + 41 };
+  const armR = { cx: 1128, cy: TAPE_Y - 66, r: 22, px: 1053, py: TAPE_Y + 37 };
+  const head = { x: 478, y: 412 + DZ, w: 384, d: 126, h: 140 };    // head assembly box
+  const STRIP = { x: 40, y: 606 + DZ, w: DW - 80, d: 100, zFront: 14, slope: -8 };
 
   // ---------- flat deck surface (plan-view SVG) ----------
   let deckSvg = '';
@@ -74,24 +81,25 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     <filter id="dsh2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
     <filter id="tex"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.10"/></feComponentTransfer></filter>
   </defs>`;
-  deckSvg += `<rect x="0" y="0" width="${DW}" height="${DD}" rx="10" fill="url(#rim)"/>`;
-  deckSvg += `<rect x="16" y="16" width="${DW - 32}" height="${DD - 30}" rx="6" fill="url(#dk)"/>`;
-  deckSvg += `<rect x="16" y="16" width="${DW - 32}" height="${DD - 30}" rx="6" filter="url(#tex)"/>`;
-  deckSvg += `<rect x="16.5" y="16.5" width="${DW - 33}" height="${DD - 31}" rx="6" fill="none" stroke="#2f2b28" stroke-width="2"/>`;
+  deckSvg += `<rect x="${-OX}" y="${-OY}" width="${DW2}" height="${DD2}" rx="10" fill="url(#rim)"/>`;
+  deckSvg += `<rect x="${16 - OX}" y="${16 - OY}" width="${DW2 - 32}" height="${DD2 - 30}" rx="6" fill="url(#dk)"/>`;
+  deckSvg += `<rect x="${16 - OX}" y="${16 - OY}" width="${DW2 - 32}" height="${DD2 - 30}" rx="6" filter="url(#tex)"/>`;
+  deckSvg += `<rect x="${16.5 - OX}" y="${16.5 - OY}" width="${DW2 - 33}" height="${DD2 - 31}" rx="6" fill="none" stroke="#2f2b28" stroke-width="2"/>`;
   // head plate seam
-  deckSvg += `<rect x="${headX - 330}" y="392" width="700" height="210" rx="10" fill="none" stroke="#4a4541" stroke-width="2.5"/><rect x="${headX - 328}" y="394" width="696" height="206" rx="9" fill="none" stroke="#fff" stroke-opacity="0.10"/>`;
+  deckSvg += `<rect x="${headX - 330}" y="${392 + DZ}" width="700" height="210" rx="10" fill="none" stroke="#4a4541" stroke-width="2.5"/><rect x="${headX - 328}" y="${394 + DZ}" width="696" height="206" rx="9" fill="none" stroke="#fff" stroke-opacity="0.10"/>`;
   // shadows (light from upper-front-left -> shadows fall back and right)
   for (const rl of [supply, takeup]) deckSvg += `<ellipse cx="${rl.cx + 30}" cy="${rl.cy - 14}" rx="${R + 18}" ry="${R + 10}" fill="#000" opacity="0.38" filter="url(#dsh)"/>`;
   deckSvg += `<rect x="${head.x + 26}" y="${head.y - 30}" width="${head.w + 30}" height="${head.d + 10}" rx="12" fill="#000" opacity="0.45" filter="url(#dsh)"/>`;
-  for (const c of [guideL, capstan, pinch, guideR, lifterPin]) deckSvg += `<ellipse cx="${c.cx + 22}" cy="${c.cy - 26}" rx="${c.r + 14}" ry="${c.r + 26}" fill="#000" opacity="0.4" filter="url(#dsh2)"/>`;
+  for (const c of [guideL, capstan, pinch, guideR, lifterPin, armL, armR]) deckSvg += `<ellipse cx="${c.cx + 22}" cy="${c.cy - 26}" rx="${c.r + 14}" ry="${c.r + 26}" fill="#000" opacity="0.4" filter="url(#dsh2)"/>`;
   // screws
   const screwSvg = (x, y, r = 5, a = 30) => `<circle cx="${x}" cy="${y + 0.8}" r="${r + 1}" fill="#000" opacity="0.45"/><circle cx="${x}" cy="${y}" r="${r}" fill="#a9a59e"/><line x1="${x - r * 0.75 * Math.cos(a)}" y1="${y - r * 0.75 * Math.sin(a)}" x2="${x + r * 0.75 * Math.cos(a)}" y2="${y + r * 0.75 * Math.sin(a)}" stroke="#3a3633" stroke-width="1.6"/>`;
-  for (const [x, y] of [[34, 34], [DW - 34, 34], [34, DD - 36], [DW - 34, DD - 36], [headX - 316, 406], [headX + 356, 406], [headX - 316, 588], [headX + 356, 588]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
+  for (const [x, y] of [[34 - OX, 34 - OY], [DW + OX - 34, 34 - OY], [34 - OX, DD + DZ - 36], [DW + OX - 34, DD + DZ - 36], [headX - 316, 406 + DZ], [headX + 356, 406 + DZ], [headX - 316, 588 + DZ], [headX + 356, 588 + DZ]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
   // engraved legends on the head plate
   // reel table hint rings
   for (const rl of [supply, takeup]) deckSvg += `<circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="#5f5a55" stroke="#3f3b37" stroke-width="2"/><circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="none" stroke="#fff" stroke-opacity="0.12" stroke-width="1" transform="translate(0 1.5)"/>`;
 
-  add(`<div class="jh-deck" style="${box(`left:0;top:${FRONT - DD}px;width:${DW}px;height:${DD}px;transform-origin:50% 100%;transform:rotateX(${TILT}deg)`)}">`);
+  add(`<div class="jh-deck" style="${box(`left:${-OX}px;top:${FRONT - DD2}px;width:${DW2}px;height:${DD2}px;transform-origin:50% 100%;transform:scale(${DSCALE}) rotateX(${TILT}deg)`)}">`);
+  add(`<div style="${box(`left:${OX}px;top:${OY}px;width:${DW}px;height:${DD}px`)}">`);
   add(svg(DW, DD, deckSvg));
 
   // ---------- reels ----------
@@ -189,7 +197,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SW = [-0.7, 0.7], SE = [0.7, 0.7];
   const sPack = { cx: supply.cx, cy: supply.cy, r: supply.pack }, tPack = { cx: takeup.cx, cy: takeup.cy, r: takeup.pack };
   const chain = [
-    [sPack, SW, null], [guideL, N, N], [capstan, S, S], [guideR, S, E], [tPack, E, null],
+    [sPack, SW, null], [armL, W, S], [guideL, N, N], [capstan, S, S], [guideR, S, S], [armR, S, E], [tPack, E, null],
   ];
   const tapeSegs = [];
   const contacts = [];
@@ -330,6 +338,19 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   side(armX, armY, armD, 0, armH, '#101012'); side(armX + armW, armY, armD, 0, armH, '#0a0a0b');
   cylinder(pinch.cx, pinch.cy, pinch.r + 5, 0, 10, BLK, '#151517', 2);
   cylinder(pinch.cx, pinch.cy, pinch.r, 10, 150, 'linear-gradient(90deg,#8f8672,#f3ecdb 32%,#d6ccb4 62%,#8a816c)', 'radial-gradient(circle at 40% 35%, #fffaf0, #cfc4ab 70%)');
+  // tension arms: pivot boss, black arm, chrome roller with flanges spanning the tape
+  const CHR = 'linear-gradient(90deg,#6d7178,#f7f8f9 35%,#8e9298 65%,#4a4d52)';
+  const CHR_TOP = 'radial-gradient(circle at 40% 35%, #fafafa, #9ea2a8 60%)';
+  for (const a of [armL, armR]) {
+    cylinder(a.px, a.py, 30, 0, 40, BLK, BLK_TOP, 2);
+    disc(a.px, a.py, 12, 40.5, CHR_TOP);
+    const L = Math.hypot(a.cx - a.px, a.cy - a.py), ang = Math.atan2(a.cy - a.py, a.cx - a.px) * 180 / Math.PI;
+    plate(a.px, a.py - 11, L, 22, 34, 'linear-gradient(180deg,#2a2a2d,#0c0c0d)', `transform-origin:0 50%;transform:translateZ(34px) rotateZ(${ang.toFixed(2)}deg)`);
+    cylinder(a.cx, a.cy, 6, 0, TAPE_Z0, CHR, CHR_TOP, 3);
+    cylinder(a.cx, a.cy, a.r + 9, TAPE_Z0 - 6, TAPE_Z0 - 2, CHR, CHR_TOP, 2);
+    cylinder(a.cx, a.cy, a.r, TAPE_Z0 - 2, TAPE_Z1 + 2, CHR, CHR_TOP, 2.2);
+    cylinder(a.cx, a.cy, a.r + 9, TAPE_Z1 + 2, TAPE_Z1 + 6, CHR, CHR_TOP, 2);
+  }
   // right take-up guide: chunky flared black base, tall ribbed black roller (tape wraps its front and right side)
   cylinder(guideR.cx, guideR.cy, guideR.r + 20, 0, 8, BLK, '#1a1a1c', 2);
   cylinder(guideR.cx, guideR.cy, guideR.r + 12, 8, 18, BLK, '#161618', 2);
@@ -338,6 +359,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   // the tape itself
   for (const [[x1, y1], [x2, y2]] of tapeSegs) wall(x1, y1, x2, y2, TAPE_Z0, TAPE_Z1, TAPE_BG);
   transportStrip();
+  add(`</div>`);
   add(`</div>`);
 
   // ---------- cabinet front (vertical, faces the operator) ----------

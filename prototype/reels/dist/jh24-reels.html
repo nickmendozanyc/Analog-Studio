@@ -315,7 +315,7 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture
 scene.environmentIntensity = 0.42;
 
 const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
-const view = { az: 0, el: 0.86, dist: 112, target: new THREE.Vector3(0, 3, 3) };
+const view = { az: 0, el: 0.86, dist: 124, target: new THREE.Vector3(0, 3, 2) };
 function placeCamera() {
   const { az, el, dist, target } = view;
   camera.position.set(target.x + dist * Math.sin(az) * Math.cos(el), target.y + dist * Math.sin(el), target.z + dist * Math.cos(az) * Math.cos(el));
@@ -358,22 +358,27 @@ const deckTex = canvasTex(1024, 1024, (g, w, h) => {
   g.putImageData(img, 0, 0);
 });
 const deckMat = new THREE.MeshStandardMaterial({ map: deckTex, roughness: 0.62, metalness: 0.04 });
-const deck = boxM(104, 4, 66, deckMat); deck.position.set(0, -2, 3); scene.add(deck);
+const IN = 2.54, DZ = 2 * IN;   // inches in cm; the transport sits 2" forward to clear 14" reels
+const deck = boxM(112, 4, 74, deckMat); deck.position.set(0, -2, 1); scene.add(deck);   // deck sized for 14" reels
 const rimMat = new THREE.MeshStandardMaterial({ color: 0x45413d, roughness: 0.5 });
-for (const [x, z, w, d] of [[0, -30.5, 108, 3], [0, 36.5, 108, 3], [-53, 3, 3, 70], [53, 3, 3, 70]]) { const b = boxM(w, 5.4, d, rimMat); b.position.set(x, -1.3, z); scene.add(b); }
-const front = boxM(108, 30, 2, new THREE.MeshStandardMaterial({ color: 0x3e3a37, roughness: 0.6 })); front.position.set(0, -19, 38); scene.add(front);
+for (const [x, z, w, d] of [[0, -36.5, 116, 3], [0, 38.5, 116, 3], [-57, 1, 3, 78], [57, 1, 3, 78]]) { const b = boxM(w, 5.4, d, rimMat); b.position.set(x, -1.3, z); scene.add(b); }
+const front = boxM(116, 30, 2, new THREE.MeshStandardMaterial({ color: 0x3e3a37, roughness: 0.6 })); front.position.set(0, -19, 40); scene.add(front);
 // head plate (removable plate around the head block)
-const plate = boxM(46, 0.25, 24, new THREE.MeshStandardMaterial({ color: 0x56514c, roughness: 0.55 })); plate.position.set(0, 0.12, 12); scene.add(plate);
+const plate = boxM(46, 0.25, 24, new THREE.MeshStandardMaterial({ color: 0x56514c, roughness: 0.55 })); plate.position.set(0, 0.12, 12 + DZ); scene.add(plate);
 
 // ---------- geometry of the transport (cm, x right, z toward the operator) ----------
-const TF = 16.45;                           // tape front line across the head faces
+// Layout for 14" reels: reel centres sit 2" further apart and 2" further back, and the head block, guides,
+// capstan and pinch roller sit 2" further forward, so a 14" flange clears the transport. (10.5" reels are used.)
+const TF = 16.45 + DZ;                      // tape front line across the head faces
 // tape lifters: two chrome pins push the tape 1/4" away from the heads during winds
 const LIFT_CM = 0.25 * 2.54, PIN_R = 0.3, PIN_REST = TF - 0.6;
 const pinZ = (lift) => PIN_REST + lift * (TF + LIFT_CM - PIN_R - PIN_REST);   // pin centre; tape contact = pinZ + PIN_R
 const Y0 = 3.2, TW = TAPE.width * CM;      // tape bottom height, tape width
 const YM = Y0 + TW / 2;
 const P = {
-  supply: { x: -21, z: -6 }, takeup: { x: 21, z: -6 },
+  supply: { x: -21 - 2 * IN, z: -6 - 2 * IN }, takeup: { x: 21 + 2 * IN, z: -6 - 2 * IN },
+  armL: { x: -23.5, z: TF - 3.5, r: 1.1, px: -19, pz: TF + 2.5 },   // supply tension arm: roller and pivot
+  armR: { x: 27, z: TF - 4, r: 1.3, px: 22.5, pz: TF + 2.2 },       // take-up tension arm: roller and pivot
   guideL: { x: -14.5, z: TF + 1.3, r: 1.3 },
   capstan: { x: 13.4, z: TF - 1.0, r: 1.0 },
   pinch: { x: 13.6, z: TF + 0.75, r: 0.75 },
@@ -383,7 +388,8 @@ const P = {
 
 // ---------- reels ----------
 // reels are drawn at a fixed size on the deck; REEL_SCALE maps real reel dimensions onto it
-const R = 17.78, REEL_SCALE = R / (TAPE.flangeR * CM), HUB = TAPE.hubR * CM * REEL_SCALE, FLANGE_GAP = 5.9, YB = 2.8, YF = YB + FLANGE_GAP;
+const R = 17.78, REEL_SCALE = R / (TAPE.flangeR * CM),   // reels keep their drawn size
+  HUB = TAPE.hubR * CM * REEL_SCALE, FLANGE_GAP = 5.9, YB = 2.8, YF = YB + FLANGE_GAP;
 function labelTexture(kind) {
   return canvasTex(1024, 1024, (g, w, h) => {
     g.clearRect(0, 0, w, h);
@@ -493,6 +499,18 @@ function post(at, r, h, mat, baseR) {
   scene.add(g); return g;
 }
 post(P.guideL, P.guideL.r, 11.5, blackPlastic, 2.4);
+// spring-loaded tension arms (as on the JH-24): a black arm from a pivot boss to a chrome roller
+function tensionArm(a) {
+  const g = new THREE.Group(); scene.add(g);
+  const boss = cyl(2.0, 3.0, blackPlastic, 32); boss.position.set(a.px, 1.5, a.pz); g.add(boss);
+  const cap = cyl(0.8, 0.3, chrome, 24); cap.position.set(a.px, 3.15, a.pz); g.add(cap);
+  const dx = a.x - a.px, dz = a.z - a.pz, L = Math.hypot(dx, dz);
+  const arm = boxM(L, 1.2, 1.6, blackPlastic); arm.position.set((a.x + a.px) / 2, 2.4, (a.z + a.pz) / 2); arm.rotation.y = -Math.atan2(dz, dx); g.add(arm);
+  const roller = cyl(a.r, TW + 1.4, chrome, 32); roller.position.set(a.x, Y0 + TW / 2, a.z); g.add(roller);
+  for (const y of [Y0 - 0.5, Y0 + TW + 0.5]) { const fl = cyl(a.r + 0.6, 0.25, chrome, 32); fl.position.set(a.x, y, a.z); g.add(fl); }
+  const post2 = cyl(0.35, Y0, chrome, 16); post2.position.set(a.x, Y0 / 2, a.z); g.add(post2);
+}
+tensionArm(P.armL); tensionArm(P.armR);
 post(P.guideR, P.guideR.r, 12.5, ribbed, 3.4);
 post(P.capstan, P.capstan.r, 12, ribbed, 2.6);
 const pins = [P.pinL, P.pinR].map((pn) => { const m = cyl(pn.r, 10, chrome, 16); m.position.set(pn.x, 1 + 5, PIN_REST); scene.add(m); return m; });
@@ -500,7 +518,7 @@ const pinchG = new THREE.Group(); scene.add(pinchG);
 const pinchRoller = cyl(P.pinch.r, 10.5, cream, 32); pinchRoller.position.y = 1 + 5.25; pinchG.add(pinchRoller);
 const pinchArm = boxM(5.5, 2.2, 2.4, blackPlastic); pinchArm.position.set(3.2, 1.1, 0.6); pinchG.add(pinchArm);
 // head block: black housing, brushed silver lid, three head stacks touching the tape
-const head = new THREE.Group(); scene.add(head);
+const head = new THREE.Group(); head.position.z = DZ; scene.add(head);
 const hb = boxM(22, 12, 9.6, new THREE.MeshStandardMaterial({ color: 0x141416, roughness: 0.42 })); hb.position.set(0, 6, 10.6); head.add(hb);
 const lidTex = canvasTex(512, 256, (g, w, h) => { g.fillStyle = '#c3c6ca'; g.fillRect(0, 0, w, h); for (let i = 0; i < 2000; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,255,255' : '0,0,0'},0.05)`; g.fillRect(Math.random() * w, Math.random() * h, 80, 1); } g.fillStyle = '#5c5f63'; for (let k = 0; k < 9; k++) g.fillRect(40 + k * 50, 50, 22, 156); });
 const lid = boxM(20.6, 0.3, 8.4, new THREE.MeshStandardMaterial({ map: lidTex, metalness: 0.85, roughness: 0.32 })); lid.position.set(0, 12.15, 10.6); head.add(lid);
@@ -512,7 +530,7 @@ for (const hx of [-7.5, 0, 7.5]) {
 }
 
 // ---------- 3D transport strip (lights follow the transport state) ----------
-const strip = new THREE.Group(); strip.position.set(0, 0, 28); strip.rotation.x = -0.14; scene.add(strip);
+const strip = new THREE.Group(); strip.position.set(0, 0, 31); strip.rotation.x = -0.14; scene.add(strip);
 const stripBody = boxM(84, 2, 7, new THREE.MeshStandardMaterial({ color: 0x5e5852, roughness: 0.55 })); stripBody.position.y = 1; strip.add(stripBody);
 const stripKeys = {};
 [['rew', 0xefece4], ['ff', 0xefece4], ['stop', 0xefece4], ['rplay', 0x3fc9a0], ['play', 0x3fc9a0], ['rec', 0xe0322a], ['lift', 0x3f7fd6], ['edit', 0xea8a2a]].forEach(([k, c], i) => {
@@ -532,7 +550,7 @@ const tapeTex = canvasTex(512, 16, (g, w, h) => { for (let x = 0; x < w; x++) { 
 const tapeMat = new THREE.MeshStandardMaterial({ map: tapeTex, color: 0x5a4636, roughness: 0.5, metalness: 0.05, side: THREE.DoubleSide });
 const tapeMesh = new THREE.Mesh(tapeGeo, tapeMat); tapeMesh.castShadow = true; tapeMesh.receiveShadow = true; tapeMesh.frustumCulled = false; scene.add(tapeMesh);
 
-const N = [0, -1], S = [0, 1], E = [1, 0], SE = [0.7, 0.7], SW = [-0.7, 0.7];
+const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SE = [0.7, 0.7], SW = [-0.7, 0.7];
 function tangent(A, B, sa, sb) {
   const dx = B.x - A.x, dz = B.z - A.z, D = Math.hypot(dx, dz);
   const ra = sa * A.r, rb = sb * B.r, k = (ra - rb) / D, ux = dx / D, uz = dz / D, h = Math.sqrt(Math.max(0, 1 - k * k));
@@ -548,12 +566,12 @@ function pickTangent(A, B, ha, hb) {
 }
 function tapePath(rS, rT, lift, pinchOut) {
   const sPack = { x: P.supply.x, z: P.supply.z, r: rS }, tPack = { x: P.takeup.x, z: P.takeup.z, r: rT };
-  const chain = [[sPack, SW, SW], [P.guideL, N, N]];   // oxide-in: tape leaves the supply from its outer (left) side; both reels turn CCW in play
+  const chain = [[sPack, SW, SW], [P.armL, W, S], [P.guideL, N, N]];   // oxide-in: tape leaves the supply from its outer (left) side; both reels turn CCW in play
   {
     const zp = pinZ(lift);
     if (zp + PIN_R > TF + 0.01) chain.push([{ x: P.pinL.x, z: zp, r: P.pinL.r }, S, S], [{ x: P.pinR.x, z: zp, r: P.pinR.r }, S, S]);
   }
-  chain.push([P.capstan, S, S], [P.guideR, S, E], [tPack, E, E]);
+  chain.push([P.capstan, S, S], [P.guideR, S, S], [P.armR, S, E], [tPack, E, E]);
   const pts = [];
   const contacts = [];
   for (let i = 0; i < chain.length - 1; i++) contacts.push(pickTangent(chain[i][0], chain[i + 1][0], chain[i][2], chain[i + 1][1]));
