@@ -718,7 +718,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
       // recessed meter window, wide like the HJ-24 bridge meters
       rect(x + 4, 26, w - 8, 118, '#0a0908', 'rx="6"');
       rect(x + 4, 26, w - 8, 118, 'url(#bezelHi)', 'rx="6"');
-      vu(x + 14, 34, w - 28, 102, tapeDb[i], { fontScale: 0.125 });
+      vu(x + 14, 34, w - 28, 102, -20, { fontScale: 0.125, needleId: i });   // live: the page drives the needle
       rect(x + 10, 30, w - 20, 10, '#000', 'opacity="0.35"');        // recess shadow, top
       rect(x + 10, 30, 6, 110, '#000', 'opacity="0.25"');            // recess shadow, left
       // number, masking-tape name, READY / SAFE
@@ -1463,7 +1463,7 @@ const a827Bridge = capture(() => {
   for (let i = 0; i < 24; i++) {
     const c = i % 8, r = Math.floor(i / 8), x = 52 + c * mw, y = 26 + r * 172;
     rect(x, y, mw - 14, mh + 34, '#141416', 'rx="4"');
-    vu(x + 8, y + 8, mw - 30, mh - 16, tapeDb[i], { faceFill: 'url(#a8amb)', bezel: '#0c0c0d', fontScale: 0.11 });
+    vu(x + 8, y + 8, mw - 30, mh - 16, -20, { faceFill: 'url(#a8amb)', bezel: '#0c0c0d', fontScale: 0.11, needleId: i });
     p(`<rect x="${x + 8}" y="${y + 8}" width="${mw - 30}" height="${mh - 16}" fill="#ffb547" opacity="0.12" filter="url(#glow)"/>`);
     text(x + (mw - 14) / 2, y + mh + 22, `–  ${i + 1}  –`, 16, '#d9dbde', 'middle', 800, 'letter-spacing="1"');
   }

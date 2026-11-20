@@ -56,6 +56,19 @@
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
   }
   function stopMeters() { cancelAnimationFrame(raf); raf = 0; }
+  // the meter bridges in the studio view (HJ-24 bridge in CMI, the A827's amber bridge in SLS): the real line-out
+  // levels of the tape machine when its electronics are on, needles at rest when off
+  const roomNeedles = { cmi: [], sls: [] };
+  document.querySelectorAll('.vuN').forEach((g) => { if (g.closest('.overlay')) return; const n = { g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45 }; (g.closest('#sls') ? roomNeedles.sls : roomNeedles.cmi).push(n); });
+  let roomLast = performance.now();
+  function roomMeters(now) {
+    const dt = Math.min(0.05, (now - roomLast) / 1000); roomLast = now;
+    const live = window.JH24_VU, k = 1 - Math.exp(-dt / 0.065);
+    for (const n of roomNeedles[document.body.dataset.studio === 'sls' ? 'sls' : 'cmi']) {
+      const a = n.a + (vuAngle(live ? live[n.i] ?? -40 : -40) - n.a) * k;
+      if (Math.abs(a - n.a) > 0.05 || n.a === -45 && a !== -45) { n.a = a; n.g.setAttribute('transform', `rotate(${a.toFixed(2)} ${n.cx} ${n.cy})`); } else n.a = a;
+    }
+  }
 
   // ---------------- Leximan 224X remote ----------------
   const ov224 = document.getElementById('ov-224');
@@ -775,6 +788,7 @@
     }
     if ((open && open.dataset.view === 'al') || document.body.dataset.studio !== 'sls') alRender(now);   // the studio-view face mirrors it too
     elecTick();
+    roomMeters(now);
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests
