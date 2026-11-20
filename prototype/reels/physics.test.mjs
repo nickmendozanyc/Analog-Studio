@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Transport, TRANSPORTS, TAPE, MACHINE, IPS, FT, ROLL_FT, VARI_RANGE, packRadius, capacity } from './physics.js';
+import { Transport, TAPE, MACHINE, IPS, FT, ROLL_FT, VARI_RANGE, packRadius, capacity } from './physics.js';
 
 const close = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b} (±${tol})`);
 
@@ -22,9 +22,9 @@ test('reel angular speed equals tape speed over pack radius', () => {
 
 test('play reaches speed quickly through the capstan', () => {
   const t = new Transport();
-  t.command('play'); t.advance(0.5);
+  t.command('play'); t.advance(1.5);
   assert.ok(t.capstanDriving, 'pinch roller engaged');
-  close(t.v, 30 * IPS, 0.01, 'at speed within half a second');
+  close(t.v, 30 * IPS, 0.01, 'at speed within 1.5 s, eased in smoothly');
 });
 
 test('15 IPS halves the play speed', () => {
@@ -34,8 +34,8 @@ test('15 IPS halves the play speed', () => {
 });
 
 test('winds are force limited: a full reel spools up more slowly than a balanced one', () => {
-  const full = new Transport(); full.command('ff'); full.advance(0.5);
-  const mid = new Transport({ onTakeup: (ROLL_FT / 2) * FT }); mid.command('ff'); mid.advance(0.5);
+  const full = new Transport(); full.command('ff'); full.advance(1.0);
+  const mid = new Transport({ onTakeup: (ROLL_FT / 2) * FT }); mid.command('ff'); mid.advance(1.0);
   assert.ok(full.v > 0.5, 'full reel is accelerating');
   assert.ok(mid.v > full.v, `balanced packs accelerate faster (${mid.v.toFixed(2)} > ${full.v.toFixed(2)})`);
   full.advance(4); close(full.v, MACHINE.windSpeed, 0.05, 'reaches wind speed');
@@ -117,26 +117,10 @@ test('vari-speed changes play speed but not the tape counter rate', () => {
   t.setVarispeed(5); close(t.varispeed, VARI_RANGE, 1e-12, 'clamped to the range');
 });
 
-test('the A827 profile ramps smoothly (jerk limited); the HJ-24 lurches', () => {
-  const peakJerk = (machine) => {
-    const t = new Transport({ machine, onTakeup: 1000 * FT }); let last = 0, peak = 0;
-    t.command('ff');
-    for (let i = 0; i < 4000; i++) { t.step(0.001); peak = Math.max(peak, Math.abs(t.acc - last) / 0.001); last = t.acc; }
-    t.command('stop');
-    for (let i = 0; i < 8000; i++) { t.step(0.001); if (t.acc) { peak = Math.max(peak, Math.abs(t.acc - last) / 0.001); } last = t.acc; }
-    return { peak, v: t.v };
-  };
-  const a = peakJerk('a827'), j = peakJerk('jh24');
-  assert.ok(a.peak <= TRANSPORTS.a827.jerk * 2.5, `A827 jerk stays within ${TRANSPORTS.a827.jerk} m/s^3 (${a.peak.toFixed(1)})`);
-  assert.ok(j.peak > 10 * a.peak, `HJ-24 changes acceleration far more abruptly (${j.peak.toFixed(0)} vs ${a.peak.toFixed(1)})`);
-  close(a.v, 0, 1e-6, 'A827 comes to rest');
-});
-
-test('both profiles reach wind and play speeds', () => {
-  for (const m of ['jh24', 'a827']) {
-    const t = new Transport({ machine: m, onTakeup: 1000 * FT });
-    t.command('ff'); t.advance(6); close(t.v, TRANSPORTS[m].windSpeed, 0.05, `${m} wind`);
-    t.command('play'); t.advance(8); close(t.v, 30 * IPS, 1e-3, `${m} play`);
-    assert.ok(t.capstanDriving, `${m} pinch engaged`);
-  }
+test('the transport ramps smoothly (jerk limited) and comes to rest', () => {
+  const t = new Transport({ onTakeup: 1000 * FT }); let last = 0, peak = 0;
+  t.command('ff');
+  for (let i = 0; i < 12000; i++) { if (i === 4000) t.command('stop'); t.step(0.001); peak = Math.max(peak, Math.abs(t.acc - last) / 0.001); last = t.acc; }
+  assert.ok(peak <= MACHINE.jerk * 2.5, `jerk stays near ${MACHINE.jerk} m/s^3 (${peak.toFixed(1)})`);
+  close(t.v, 0, 1e-9, 'at rest');
 });

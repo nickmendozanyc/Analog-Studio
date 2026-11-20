@@ -26,41 +26,25 @@ export const TAPE = {
   flangeR: 0.1334,      // 10.5" metal reel: 2500 ft of 2" tape on a 4.5" hub fills it
 };
 
-// Transport profiles: how each machine's motors and servos feel. Same physics, different character.
-//  jerk     how fast acceleration itself may change (m/s^3): low = smooth S-curve ramps, high = abrupt
+// Transport feel, shared by every tape machine in the app: the smooth, servo-controlled transport of the
+// Studer A827. Jerk-limited S-curve reel ramps with a long, gentle landing; soft capstan servo.
+//  jerk     how fast acceleration itself may change (m/s^3)
 //  landing  speed band (m/s) over which the reel servos ease off before reaching the target speed
 //  pinchTau time constant (s) of the pinch roller swinging in or out
-export const TRANSPORTS = {
-  jh24: {
-    name: 'CMI HJ-24',
-    emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
-    windSpeed: 9.0,           // m/s (~354 ips) (approx)
-    windForce: 42,            // N, reel-motor drive force at the tape (approx)
-    brakeForce: 64,           // N, braking force at the tape (approx)
-    jerk: 400,                // effectively unlimited: torque steps straight in, the classic HJ-24 lurch
-    landing: 0.4,
-    capstanTau: 0.11,         // s, capstan servo time constant (approx)
-    capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
-    pinchTau: 0.06,
-    pinchEngageWindow: 0.06,  // m/s, pinch roller engages within this of play speed
-    lifterSpeed: 1.6,         // m/s, lifters come in above this speed
-  },
-  a827: {
-    name: 'Stauder A827',
-    emptyReelInertia: 0.0065,
-    windSpeed: 10.0,          // fast winds (approx)
-    windForce: 50,            // strong, servo-controlled reel motors (approx)
-    brakeForce: 60,           // electronic braking, no mechanical grab (approx)
-    jerk: 22,                 // jerk-limited S-curve ramps: the A827's very smooth starts and stops (approx)
-    landing: 1.4,             // long, gentle approach to the target speed
-    capstanTau: 0.2,          // softer capstan servo (approx)
-    capstanSlew: 3.5,
-    pinchTau: 0.14,           // slower, quieter pinch-roller engagement
-    pinchEngageWindow: 0.04,
-    lifterSpeed: 1.6,
-  },
+export const MACHINE = {
+  name: 'Smooth servo transport',
+  emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
+  windSpeed: 10.0,          // m/s, fast winds (approx)
+  windForce: 50,            // N, servo-controlled reel motors (approx)
+  brakeForce: 60,           // N, electronic braking (approx)
+  jerk: 22,                 // m/s^3, S-curve ramps (approx)
+  landing: 1.4,             // m/s
+  capstanTau: 0.2,          // s, capstan servo time constant (approx)
+  capstanSlew: 3.5,         // m/s^2
+  pinchTau: 0.14,           // s
+  pinchEngageWindow: 0.04,  // m/s, pinch roller engages within this of play speed
+  lifterSpeed: 1.6,         // m/s, lifters come in above this speed
 };
-export const MACHINE = TRANSPORTS.jh24;
 
 export const IPS = 0.0254; // m/s per inch-per-second
 export const FT = 0.3048;
@@ -78,7 +62,7 @@ export const capacity = (tape = TAPE) => Math.PI * (tape.flangeR * tape.flangeR 
 
 export class Transport {
   constructor({ totalLength = ROLL_FT * FT, onTakeup = 0, speedIPS = 30, tape = TAPE, machine = MACHINE } = {}) {
-    this.tape = tape; this.m = typeof machine === 'string' ? TRANSPORTS[machine] : machine;
+    this.tape = tape; this.m = machine;
     this.acc = 0;                 // current reel-motor acceleration (m/s^2), jerk limited
     this.total = Math.min(totalLength, capacity(tape));
     this.take = Math.min(Math.max(onTakeup, 0), this.total);
@@ -110,7 +94,6 @@ export class Transport {
     this.mode = mode;
     if (mode !== 'stop') this.endOfTape = false;
   }
-  setMachine(key) { if (TRANSPORTS[key]) { this.m = TRANSPORTS[key]; this.acc = 0; } }
   setSpeed(ips) { if (SPEEDS_IPS.includes(ips)) this.speedIPS = ips; }
   setVarispeed(f) { this.varispeed = Math.max(-VARI_RANGE, Math.min(VARI_RANGE, f)); }
   setShuttle(x) { this.shuttle = Math.max(-1, Math.min(1, x)); if (x !== 0) this.mode = 'shuttle'; }

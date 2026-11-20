@@ -58,7 +58,6 @@
   <div class="counter" aria-live="off"><b id="ctr">00:00.0</b><span>tape time</span></div>
   <dl class="readouts">
     <dt>Transport</dt><dd><span id="st" class="state">STOP</span></dd>
-    <dt>Feel</dt><dd id="feel">CMI HJ-24</dd>
     <dt>Tape speed</dt><dd id="v">0.0 ips</dd>
     <dt>Vari-speed</dt><dd id="vs">off</dd>
     <dt>Supply reel</dt><dd id="rs">0 rpm</dd>
@@ -80,11 +79,6 @@
     <button class="key play" id="k-play" aria-pressed="false" title="Play (Space)">▶</button>
     <button class="key rec" id="k-rec" aria-pressed="false" title="Record (R)">●</button>
     <button class="key lift small" id="k-lift" aria-pressed="false" title="Defeat the tape lifters">LIFT</button>
-  </div>
-  <div class="group">
-    <span class="lbl">Feel</span>
-    <button class="key small" id="k-jh24" aria-pressed="true" title="CMI HJ-24 transport feel">HJ-24</button>
-    <button class="key small" id="k-a827" aria-pressed="false" title="Stauder A827 transport feel">A827</button>
   </div>
   <div class="group">
     <span class="lbl">IPS</span>
@@ -424,7 +418,6 @@ function setMode(m) { if (m !== 'shuttle') $('shuttle').value = 0; tr.command(m)
 $('k-rew').onclick = () => setMode('rew'); $('k-ff').onclick = () => setMode('ff'); $('k-stop').onclick = () => setMode('stop');
 $('k-play').onclick = () => setMode('play'); $('k-rec').onclick = () => setMode('rec');
 $('k-lift').onclick = () => { tr.liftDefeat = !tr.liftDefeat; };
-$('k-jh24').onclick = () => tr.setMachine('jh24'); $('k-a827').onclick = () => tr.setMachine('a827');
 $('k-7').onclick = () => tr.setSpeed(7.5); $('k-15').onclick = () => tr.setSpeed(15); $('k-30').onclick = () => tr.setSpeed(30);
 let variOn = false;
 const applyVari = () => { const pct = Number($('vari').value); tr.setVarispeed(variOn ? pct / 100 : 0); $('vari-out').textContent = variOn ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1)} % · ${tr.semitones >= 0 ? '+' : ''}${tr.semitones.toFixed(2)} st` : 'off'; };
@@ -485,7 +478,6 @@ function frame(now) {
   for (const [k, mat] of Object.entries(stripKeys)) mat.emissiveIntensity = (k === m || (k === 'play' && m === 'rec') || (k === 'lift' && tr.liftDefeat)) ? 0.9 : 0.0;
   for (const [k, el] of Object.entries(keysUI)) el.setAttribute('aria-pressed', String(k === m || (k === 'play' && m === 'rec')));
   $('k-lift').setAttribute('aria-pressed', String(tr.liftDefeat));
-  $('k-jh24').setAttribute('aria-pressed', String(tr.m.name === 'CMI HJ-24')); $('k-a827').setAttribute('aria-pressed', String(tr.m.name === 'Stauder A827'));
   $('k-7').setAttribute('aria-pressed', String(tr.speedIPS === 7.5)); $('k-vari').setAttribute('aria-pressed', String(variOn));
   $('k-15').setAttribute('aria-pressed', String(tr.speedIPS === 15)); $('k-30').setAttribute('aria-pressed', String(tr.speedIPS === 30));
   $('k-blur').setAttribute('aria-pressed', String(blurOn));
@@ -494,7 +486,6 @@ function frame(now) {
   const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE' })[m];
   st.className = 'state' + (m === 'rec' ? ' rec' : m !== 'stop' ? ' on' : '');
   $('v').textContent = `${(tr.v / IPS).toFixed(1)} ips`;
-  $('feel').textContent = tr.m.name;
   $('vs').textContent = tr.varispeed ? `${(tr.varispeed * 100).toFixed(1)} % · ${tr.semitones.toFixed(2)} st` : 'off';
   $('rs').textContent = `${Math.round(Math.abs(tr.wS) * 60 / (2 * Math.PI))} rpm`;
   $('rt').textContent = `${Math.round(Math.abs(tr.wT) * 60 / (2 * Math.PI))} rpm`;

@@ -20,7 +20,7 @@ Controls: **Space** play / stop, **←** rewind, **→** fast forward, **R** rec
 
 ## Transport feel
 
-The Feel keys switch the transport profile in `physics.js` (`TRANSPORTS`). The HJ-24 profile steps its reel torque straight in, so winds start and stop with a slight lurch. The Stauder A827 profile is jerk-limited: acceleration builds and fades along an S-curve with a long, gentle landing, the A827's famously smooth transport. From a 1000 ft position the HJ-24 reaches wind speed in about 0.7 s and stops in 0.5 s; the A827 takes about 1.3 s and 1.4 s, without any jolt. The visuals stay those of the HJ-24 for now.
+Every tape machine in the app shares one transport feel, modelled on the Stauder (Studer) A827's smooth servo transport: acceleration builds and fades along an S-curve with a long, gentle landing, so winds start and stop without a jolt. From a 1000 ft position it reaches wind speed in about 1.3 s and stops in about 1.4 s.
 
 ## How it works
 
