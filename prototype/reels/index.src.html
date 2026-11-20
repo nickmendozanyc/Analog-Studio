@@ -201,7 +201,7 @@ const pinZ = (lift) => PIN_REST + lift * (TF + LIFT_CM - PIN_R - PIN_REST);   //
 const Y0 = 3.2, TW = TAPE.width * CM;      // tape bottom height, tape width
 const YM = Y0 + TW / 2;
 const P = {
-  supply: { x: -21, z: -6 - 2 * IN }, takeup: { x: 21, z: -6 - 2 * IN },
+  supply: { x: -21 + IN, z: -6 - 2 * IN }, takeup: { x: 21 - IN, z: -6 - 2 * IN },
   armL: { x: -23.5, z: TF - 3.5, r: 1.1, px: -19, pz: TF + 2.5 },   // supply tension arm: roller and pivot
   armR: { x: 27, z: TF - 4, r: 1.3, px: 22.5, pz: TF + 2.2 },       // take-up tension arm: roller and pivot
   guideL: { x: -14.5, z: TF + 1.3, r: 1.3 },
