@@ -304,13 +304,18 @@
   for (const [id, hit] of [['strip-hot-cmi', hitCMI], ['strip-hot-sls', hitSLS]]) {
     const el = document.getElementById(id); if (!el) continue;
     const loc = (e) => { const r = stage.getBoundingClientRect(), k = r.width / 3840; return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
-    el.addEventListener('mousemove', (e) => {
-      const h = hit(...loc(e));
+    // hover highlight: at most once a frame, and only when the pointer enters another channel section (repainting
+    // the 4K stage on every mouse move used to stall the frame clock)
+    let pend = null, raf = 0, cur = '';
+    const paint = () => {
+      raf = 0; const h = pend && hit(...pend); const key = h ? `${h.ch}|${h.sec}|${h.band[0]}` : '';
+      if (key === cur) return; cur = key;
       if (!h) { hl.hidden = true; el.style.cursor = 'default'; return; }
       Object.assign(hl.style, { left: `${h.x0}px`, top: `${h.band[0]}px`, width: `${h.w}px`, height: `${h.band[1] - h.band[0]}px` });
       hl.querySelector('span').textContent = `CH ${h.ch + 1} · ${SEC_LABEL[h.sec]}`; hl.hidden = false; el.style.cursor = 'zoom-in';
-    });
-    el.addEventListener('mouseleave', () => { hl.hidden = true; });
+    };
+    el.addEventListener('mousemove', (e) => { pend = loc(e); if (!raf) raf = requestAnimationFrame(paint); });
+    el.addEventListener('mouseleave', () => { pend = null; cur = ''; hl.hidden = true; });
     el.addEventListener('click', (e) => { const h = hit(...loc(e)); if (h) { hl.hidden = true; openStrip(h.con, h.ch, h.sec); } });
   }
   const syncHot = () => { const sls = document.body.dataset.studio === 'sls'; const a = document.getElementById('strip-hot-cmi'), b = document.getElementById('strip-hot-sls'); if (a) a.hidden = sls; if (b) b.hidden = !sls; };

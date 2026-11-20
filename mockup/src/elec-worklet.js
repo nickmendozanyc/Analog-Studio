@@ -53,7 +53,8 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.align) { for (const c of m.ch) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); }
       this.sendTrims();
     }
-    else if (d.type === 'debug') this.port.postMessage({ type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0 });
+    else if (d.type === 'debugReset') this.vs = [];
+    else if (d.type === 'debug') this.port.postMessage({ locked: !!this.locked, type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0, vmin: this.vs ? Math.min(...this.vs) : 0, vmax: this.vs ? Math.max(...this.vs) : 0 });
   }
   sendTrims() { this.port.postMessage({ type: 'trims', trims: this.m.ch.map((c) => c.t) }); }
   process(inputs, outputs) {
@@ -66,7 +67,15 @@ class JH24Processor extends AudioWorkletProcessor {
       // a real locate moves the tape by far more than any timing slip between the two threads
       const err = T.take - m.take, jump = Math.abs(err) > Math.max(0.3, Math.abs(T.v) * 0.6);
       if (jump) { ctl.take = T.take; this.jumps = (this.jumps || 0) + 1; }
-      ctl.v = T.v + (jump ? 0 : Math.max(-0.1 * Math.abs(T.v) - 0.02, Math.min(0.1 * Math.abs(T.v) + 0.02, err * 1.5)));
+      const capstan = (T.mode === 'play' || T.mode === 'rec' || T.mode === 'rplay') && Math.abs(Math.abs(T.v) - T.ips * IPS * (1 + (T.vari || 0))) < 0.002 * T.ips * IPS;
+      if (capstan && !jump) {
+        // QUARTZ LOCK: the capstan runs at exactly the selected speed off the audio clock (the crystal). The screen's
+        // transport is only a reference for phase: a correction of at most ±0.02 %, far below wow & flutter
+        const ref = Math.sign(T.v) * T.ips * IPS * (1 + (T.vari || 0)), trim = Math.max(-0.0002, Math.min(0.0002, err * 0.02));
+        ctl.v = ref * (1 + trim * Math.sign(ref)); this.locked = true;
+      } else {
+        ctl.v = T.v + (jump ? 0 : Math.max(-0.1 * Math.abs(T.v) - 0.02, Math.min(0.1 * Math.abs(T.v) + 0.02, err * 1.5))); this.locked = false;
+      }
       ctl.lift = T.lift; ctl.mode = T.mode; ctl.ips = T.ips;
     }
     // line inputs: test oscillator to the chosen tracks, the computer's input to the ready tracks
@@ -78,6 +87,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (this.live.on && live && ready) for (let k = 0; k < n; k++) buf[k] += live[k];
     }
     o.ph = (o.ph + w * n) % (2 * Math.PI);
+    if (ctl.v != null && T && T.mode === 'play') { this.vs = this.vs || []; this.vs.push(ctl.v / (m.ips * IPS)); if (this.vs.length > 4000) this.vs.shift(); }
     m.process(this.inp, this.out, ctl);
     // alignment tape: reference-flux tones played at the repro / sync heads instead of the session tape
     if (this.align.on && Math.abs(m.v) > 0.3 * m.ips * IPS) {
@@ -105,7 +115,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
     }
     return true;
   }

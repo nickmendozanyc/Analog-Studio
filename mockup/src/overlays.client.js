@@ -763,7 +763,7 @@
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
-    const dt = Math.min(0.25, (now - last) / 1000); last = now;   // tape time keeps up with real time even on a slow frame
+    const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
     tr.advance(dt);
     drawConsoleReels();
     sbxTick(dt, now);

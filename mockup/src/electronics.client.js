@@ -47,7 +47,7 @@
     else if (d.type === 'reel') { const w = EL.waiting && EL.waiting[d.id]; if (w) { delete EL.waiting[d.id]; w(d); } }
     else if (d.type === 'loaded') { if (EL.quietLoads > 0) EL.quietLoads--; else elMsg(`Track ${d.track + 1} loaded onto the tape.`); }
     else if (d.type === 'vu') {
-      window.JH24_VU = EL.on ? d.db : null;
+      window.JH24_VU = EL.on ? d.db : null; EL.locked = d.locked; EL.aTake = d.take; EL.aTime = performance.now();
       if (elRoot && !elRoot.closest('.overlay').hidden) elRoot.querySelectorAll('.ch').forEach((c) => {
         const i = +c.dataset.ch, db = d.db[i], s = d.src[i];
         c.querySelector('.vub i').style.width = `${Math.max(0, Math.min(100, (db + 20) / 23 * 100)).toFixed(1)}%`;
@@ -60,7 +60,13 @@
   function elecTick() {
     tapeViewTick(); elTransportTick();
     if (!EL.node || !EL.on) return;
-    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
+    // quartz lock: the tape at the heads (the audio engine) is the master; the screen's transport follows it, so the
+    // reels, counters and autolocator show what you hear and nothing chases anything
+    if (EL.locked && tr.playingMode && EL.aTime) {
+      const est = EL.aTake + tr.v * (performance.now() - EL.aTime) / 1000, e = est - tr.take;
+      if (Math.abs(e) < 0.3) tr.take += e * 0.25;
+    }
+    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS, vari: tr.varispeed || 0 });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
     const key = `${AL.mon}|${[...AL.ready].join(',')}|${[...AL.inMon].join(',')}|${[...EL.cue].join(',')}`;
     if (key !== EL.statusKey) { EL.statusKey = key; elPost({ type: 'status', master, ready: [...AL.ready], cue: [...EL.cue], inputs: [...AL.inMon] }); }
@@ -183,6 +189,7 @@
     const m = tr.mode, names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
     elCtr.textContent = mmss(tr.counter); elMode.textContent = names[m] || m.toUpperCase(); elLoc.textContent = AL.entry ? AL.entry.padStart(4, '0').replace(/(..)(..)/, '$1:$2') : mmss(AL.loc);
     const on = { play: m === 'play' || m === 'rec', stop: m === 'stop', record: m === 'rec', ff: m === 'ff' || (m === 'locate' && tr.v > 0), rew: m === 'rew' || (m === 'locate' && tr.v < 0), loc: m === 'locate', 's7.5': tr.speedIPS === 7.5, s15: tr.speedIPS === 15, s30: tr.speedIPS === 30, lift: tr.liftDefeat, tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
+    const q = document.getElementById('el-quartz'); if (q) { const on = !!(EL.on && EL.locked && tr.playingMode); if (q._on !== on) { q._on = on; q.classList.toggle('on', on); q.lastChild.textContent = tr.varispeed ? 'VARI LOCK' : 'QUARTZ LOCK'; } }
     for (const [k, b] of Object.entries(elTk)) { const v = !!on[k]; if (b._on !== v) { b._on = v; b.classList.toggle('on', v); } }
   }
   function tapeViewTick() {

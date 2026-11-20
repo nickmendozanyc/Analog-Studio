@@ -496,6 +496,7 @@ const elecView = (() => {
     <div class="grp"><span class="gl">LOCATE</span><b id="el-loc">00:00</b><button type="button" class="tk b" data-tk="loc">LOC</button></div>
     <div class="grp"><span class="gl">IPS</span>${['7.5', '15', '30'].map((v) => `<button type="button" class="tk s" data-tk="s${v}">${v === '7.5' ? '7½' : v}</button>`).join('')}<button type="button" class="tk s" data-tk="lift">LIFT</button></div>
     <div class="grp"><span class="gl">MONITOR</span>${['tape', 'input', 'auto'].map((v) => `<button type="button" class="tk s" data-tk="${v}">${v.toUpperCase()}</button>`).join('')}</div>
+    <div class="ql" id="el-quartz" title="Capstan locked to the crystal reference (FIX). In VAR it is locked to the vari-speed setting"><i></i>QUARTZ LOCK</div>
     <div class="hint">space play / stop · , rewind · . fast forward · Z zero · R record</div>
   </div>
 </div>`;
@@ -525,6 +526,9 @@ const elecCss = `
   #elec .eltr .tk.w{background:#efece4}#elec .eltr .tk.y{background:#f4e9c8}#elec .eltr .tk.g{background:#3fc9a0}#elec .eltr .tk.r{background:#e0322a;color:#fff}#elec .eltr .tk.b{background:#3f7fd6;color:#fff}#elec .eltr .tk.s{background:#efece4;padding:12px 16px;font-size:17px}
   #elec .eltr .tk.on{box-shadow:0 0 18px 4px rgba(255,220,120,.85),0 5px 0 #1a1715;filter:brightness(1.15)}
   #elec .eltr .tk.r.on{box-shadow:0 0 22px 6px rgba(255,60,40,.9),0 5px 0 #1a1715}
+  #elec .eltr .ql{display:flex;align-items:center;gap:8px;font:900 14px Archivo,Arial;letter-spacing:2px;color:#e8e2d4}
+  #elec .eltr .ql i{width:14px;height:14px;border-radius:50%;background:#123d1c}
+  #elec .eltr .ql.on i{background:#3dff6a;box-shadow:0 0 12px #3dff6a}
   #elec .eltr .hint{margin-left:auto;font:600 15px Archivo,Arial;color:#e8e2d4;opacity:.8}
   #elec .drm{display:flex;gap:6px;margin-bottom:8px;padding:8px 0;background:#141211;border-radius:5px}
   #elec .drm .mt{flex:1;min-width:0}
@@ -1575,7 +1579,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .shot{position:absolute;z-index:50}
   .shot[hidden]{display:none}
   #strip-hot-sls{z-index:66}
-  #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
+  #strip-hl{position:absolute;z-index:67;pointer-events:none;will-change:transform;contain:layout paint;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
   #files-bar{position:absolute;z-index:72;font-family:Archivo,Arial,sans-serif}

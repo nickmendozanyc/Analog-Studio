@@ -33,7 +33,7 @@
   .shot{position:absolute;z-index:50}
   .shot[hidden]{display:none}
   #strip-hot-sls{z-index:66}
-  #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
+  #strip-hl{position:absolute;z-index:67;pointer-events:none;will-change:transform;contain:layout paint;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
   #files-bar{position:absolute;z-index:72;font-family:Archivo,Arial,sans-serif}
@@ -92,6 +92,9 @@
   #elec .eltr .tk.w{background:#efece4}#elec .eltr .tk.y{background:#f4e9c8}#elec .eltr .tk.g{background:#3fc9a0}#elec .eltr .tk.r{background:#e0322a;color:#fff}#elec .eltr .tk.b{background:#3f7fd6;color:#fff}#elec .eltr .tk.s{background:#efece4;padding:12px 16px;font-size:17px}
   #elec .eltr .tk.on{box-shadow:0 0 18px 4px rgba(255,220,120,.85),0 5px 0 #1a1715;filter:brightness(1.15)}
   #elec .eltr .tk.r.on{box-shadow:0 0 22px 6px rgba(255,60,40,.9),0 5px 0 #1a1715}
+  #elec .eltr .ql{display:flex;align-items:center;gap:8px;font:900 14px Archivo,Arial;letter-spacing:2px;color:#e8e2d4}
+  #elec .eltr .ql i{width:14px;height:14px;border-radius:50%;background:#123d1c}
+  #elec .eltr .ql.on i{background:#3dff6a;box-shadow:0 0 12px #3dff6a}
   #elec .eltr .hint{margin-left:auto;font:600 15px Archivo,Arial;color:#e8e2d4;opacity:.8}
   #elec .drm{display:flex;gap:6px;margin-bottom:8px;padding:8px 0;background:#141211;border-radius:5px}
   #elec .drm .mt{flex:1;min-width:0}
@@ -99103,6 +99106,7 @@
     <div class="grp"><span class="gl">LOCATE</span><b id="el-loc">00:00</b><button type="button" class="tk b" data-tk="loc">LOC</button></div>
     <div class="grp"><span class="gl">IPS</span><button type="button" class="tk s" data-tk="s7.5">7½</button><button type="button" class="tk s" data-tk="s15">15</button><button type="button" class="tk s" data-tk="s30">30</button><button type="button" class="tk s" data-tk="lift">LIFT</button></div>
     <div class="grp"><span class="gl">MONITOR</span><button type="button" class="tk s" data-tk="tape">TAPE</button><button type="button" class="tk s" data-tk="input">INPUT</button><button type="button" class="tk s" data-tk="auto">AUTO</button></div>
+    <div class="ql" id="el-quartz" title="Capstan locked to the crystal reference (FIX). In VAR it is locked to the vari-speed setting"><i></i>QUARTZ LOCK</div>
     <div class="hint">space play / stop · , rewind · . fast forward · Z zero · R record</div>
   </div>
 </div></div></div>
@@ -103900,7 +103904,8 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.align) { for (const c of m.ch) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); }
       this.sendTrims();
     }
-    else if (d.type === 'debug') this.port.postMessage({ type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0 });
+    else if (d.type === 'debugReset') this.vs = [];
+    else if (d.type === 'debug') this.port.postMessage({ locked: !!this.locked, type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0, vmin: this.vs ? Math.min(...this.vs) : 0, vmax: this.vs ? Math.max(...this.vs) : 0 });
   }
   sendTrims() { this.port.postMessage({ type: 'trims', trims: this.m.ch.map((c) => c.t) }); }
   process(inputs, outputs) {
@@ -103913,7 +103918,15 @@ class JH24Processor extends AudioWorkletProcessor {
       // a real locate moves the tape by far more than any timing slip between the two threads
       const err = T.take - m.take, jump = Math.abs(err) > Math.max(0.3, Math.abs(T.v) * 0.6);
       if (jump) { ctl.take = T.take; this.jumps = (this.jumps || 0) + 1; }
-      ctl.v = T.v + (jump ? 0 : Math.max(-0.1 * Math.abs(T.v) - 0.02, Math.min(0.1 * Math.abs(T.v) + 0.02, err * 1.5)));
+      const capstan = (T.mode === 'play' || T.mode === 'rec' || T.mode === 'rplay') && Math.abs(Math.abs(T.v) - T.ips * IPS * (1 + (T.vari || 0))) < 0.002 * T.ips * IPS;
+      if (capstan && !jump) {
+        // QUARTZ LOCK: the capstan runs at exactly the selected speed off the audio clock (the crystal). The screen's
+        // transport is only a reference for phase: a correction of at most ±0.02 %, far below wow & flutter
+        const ref = Math.sign(T.v) * T.ips * IPS * (1 + (T.vari || 0)), trim = Math.max(-0.0002, Math.min(0.0002, err * 0.02));
+        ctl.v = ref * (1 + trim * Math.sign(ref)); this.locked = true;
+      } else {
+        ctl.v = T.v + (jump ? 0 : Math.max(-0.1 * Math.abs(T.v) - 0.02, Math.min(0.1 * Math.abs(T.v) + 0.02, err * 1.5))); this.locked = false;
+      }
       ctl.lift = T.lift; ctl.mode = T.mode; ctl.ips = T.ips;
     }
     // line inputs: test oscillator to the chosen tracks, the computer's input to the ready tracks
@@ -103925,6 +103938,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (this.live.on && live && ready) for (let k = 0; k < n; k++) buf[k] += live[k];
     }
     o.ph = (o.ph + w * n) % (2 * Math.PI);
+    if (ctl.v != null && T && T.mode === 'play') { this.vs = this.vs || []; this.vs.push(ctl.v / (m.ips * IPS)); if (this.vs.length > 4000) this.vs.shift(); }
     m.process(this.inp, this.out, ctl);
     // alignment tape: reference-flux tones played at the repro / sync heads instead of the session tape
     if (this.align.on && Math.abs(m.v) > 0.3 * m.ips * IPS) {
@@ -103952,7 +103966,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
     }
     return true;
   }
@@ -105216,13 +105230,18 @@ class ClockOut {
   for (const [id, hit] of [['strip-hot-cmi', hitCMI], ['strip-hot-sls', hitSLS]]) {
     const el = document.getElementById(id); if (!el) continue;
     const loc = (e) => { const r = stage.getBoundingClientRect(), k = r.width / 3840; return [(e.clientX - r.left) / k, (e.clientY - r.top) / k]; };
-    el.addEventListener('mousemove', (e) => {
-      const h = hit(...loc(e));
+    // hover highlight: at most once a frame, and only when the pointer enters another channel section (repainting
+    // the 4K stage on every mouse move used to stall the frame clock)
+    let pend = null, raf = 0, cur = '';
+    const paint = () => {
+      raf = 0; const h = pend && hit(...pend); const key = h ? `${h.ch}|${h.sec}|${h.band[0]}` : '';
+      if (key === cur) return; cur = key;
       if (!h) { hl.hidden = true; el.style.cursor = 'default'; return; }
       Object.assign(hl.style, { left: `${h.x0}px`, top: `${h.band[0]}px`, width: `${h.w}px`, height: `${h.band[1] - h.band[0]}px` });
       hl.querySelector('span').textContent = `CH ${h.ch + 1} · ${SEC_LABEL[h.sec]}`; hl.hidden = false; el.style.cursor = 'zoom-in';
-    });
-    el.addEventListener('mouseleave', () => { hl.hidden = true; });
+    };
+    el.addEventListener('mousemove', (e) => { pend = loc(e); if (!raf) raf = requestAnimationFrame(paint); });
+    el.addEventListener('mouseleave', () => { pend = null; cur = ''; hl.hidden = true; });
     el.addEventListener('click', (e) => { const h = hit(...loc(e)); if (h) { hl.hidden = true; openStrip(h.con, h.ch, h.sec); } });
   }
   const syncHot = () => { const sls = document.body.dataset.studio === 'sls'; const a = document.getElementById('strip-hot-cmi'), b = document.getElementById('strip-hot-sls'); if (a) a.hidden = sls; if (b) b.hidden = !sls; };
@@ -105277,7 +105296,7 @@ class ClockOut {
     else if (d.type === 'reel') { const w = EL.waiting && EL.waiting[d.id]; if (w) { delete EL.waiting[d.id]; w(d); } }
     else if (d.type === 'loaded') { if (EL.quietLoads > 0) EL.quietLoads--; else elMsg(`Track ${d.track + 1} loaded onto the tape.`); }
     else if (d.type === 'vu') {
-      window.JH24_VU = EL.on ? d.db : null;
+      window.JH24_VU = EL.on ? d.db : null; EL.locked = d.locked; EL.aTake = d.take; EL.aTime = performance.now();
       if (elRoot && !elRoot.closest('.overlay').hidden) elRoot.querySelectorAll('.ch').forEach((c) => {
         const i = +c.dataset.ch, db = d.db[i], s = d.src[i];
         c.querySelector('.vub i').style.width = `${Math.max(0, Math.min(100, (db + 20) / 23 * 100)).toFixed(1)}%`;
@@ -105290,7 +105309,13 @@ class ClockOut {
   function elecTick() {
     tapeViewTick(); elTransportTick();
     if (!EL.node || !EL.on) return;
-    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
+    // quartz lock: the tape at the heads (the audio engine) is the master; the screen's transport follows it, so the
+    // reels, counters and autolocator show what you hear and nothing chases anything
+    if (EL.locked && tr.playingMode && EL.aTime) {
+      const est = EL.aTake + tr.v * (performance.now() - EL.aTime) / 1000, e = est - tr.take;
+      if (Math.abs(e) < 0.3) tr.take += e * 0.25;
+    }
+    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS, vari: tr.varispeed || 0 });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
     const key = `${AL.mon}|${[...AL.ready].join(',')}|${[...AL.inMon].join(',')}|${[...EL.cue].join(',')}`;
     if (key !== EL.statusKey) { EL.statusKey = key; elPost({ type: 'status', master, ready: [...AL.ready], cue: [...EL.cue], inputs: [...AL.inMon] }); }
@@ -105413,6 +105438,7 @@ class ClockOut {
     const m = tr.mode, names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
     elCtr.textContent = mmss(tr.counter); elMode.textContent = names[m] || m.toUpperCase(); elLoc.textContent = AL.entry ? AL.entry.padStart(4, '0').replace(/(..)(..)/, '$1:$2') : mmss(AL.loc);
     const on = { play: m === 'play' || m === 'rec', stop: m === 'stop', record: m === 'rec', ff: m === 'ff' || (m === 'locate' && tr.v > 0), rew: m === 'rew' || (m === 'locate' && tr.v < 0), loc: m === 'locate', 's7.5': tr.speedIPS === 7.5, s15: tr.speedIPS === 15, s30: tr.speedIPS === 30, lift: tr.liftDefeat, tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
+    const q = document.getElementById('el-quartz'); if (q) { const on = !!(EL.on && EL.locked && tr.playingMode); if (q._on !== on) { q._on = on; q.classList.toggle('on', on); q.lastChild.textContent = tr.varispeed ? 'VARI LOCK' : 'QUARTZ LOCK'; } }
     for (const [k, b] of Object.entries(elTk)) { const v = !!on[k]; if (b._on !== v) { b._on = v; b.classList.toggle('on', v); } }
   }
   function tapeViewTick() {
@@ -105658,7 +105684,7 @@ class ClockOut {
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
-    const dt = Math.min(0.25, (now - last) / 1000); last = now;   // tape time keeps up with real time even on a slow frame
+    const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
     tr.advance(dt);
     drawConsoleReels();
     sbxTick(dt, now);
