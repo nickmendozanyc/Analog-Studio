@@ -1,6 +1,6 @@
 # Studio v1 backup
 
-A snapshot of the Analog Studio studio environment, taken on 20 November 2026 before a major change in direction. The git tag `studio-v1` marks this exact state.
+A snapshot of the Analog Studio studio environment, taken on 20 November 2026 before a major change in direction. This exact state is commit `7c3028c` on the `claude/artifact-session-358pt5` branch (tagged `studio-v1` in the local clone).
 
 ## What the snapshot holds
 
@@ -14,9 +14,9 @@ A snapshot of the Analog Studio studio environment, taken on 20 November 2026 be
 ## Restore
 
 ```sh
-git fetch origin --tags
-git checkout studio-v1                    # look at the snapshot
-git switch -c restore-studio-v1 studio-v1 # or start new work from it
+git fetch origin claude/artifact-session-358pt5
+git checkout 7c3028c                    # look at the snapshot
+git switch -c restore-studio-v1 7c3028c # or start new work from it
 ```
 
 Rebuild the mockup with `node mockup/src/build.js && node mockup/src/render.js`; rebuild the reel prototype with `node prototype/reels/build.mjs` (tests: `node --test prototype/reels/physics.test.mjs`).
