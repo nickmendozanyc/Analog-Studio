@@ -1305,7 +1305,10 @@ ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" vie
 ${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
 </div>
-<script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))};</script>
+<script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))}; window.JH_LIVE = ${JSON.stringify(globalThis.JH_LIVE)};</script>
+<script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'reels', 'physics.js'), 'utf8').replace(/^export /gm, '')}
+// one transport for the whole studio: console reels, autolocator and the tape machine view all use it
+window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
 <script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);

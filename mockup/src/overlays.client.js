@@ -215,13 +215,49 @@
     const cnt = document.getElementById('pb-count'); if (cnt) cnt.textContent = `${patches.length} cable${patches.length === 1 ? '' : 's'}`;
   }
 
-  // ---------------- AutoLocator III ----------------
+  // ---------------- one transport for everything ----------------
+  // window.AS_TRANSPORT (physics.js) is stepped here every frame. The console reels, the AutoLocator III and the
+  // tape machine view (which reads the same object from its iframe) all follow it, so they stay in sync.
+  const tr = window.AS_TRANSPORT, LIVE = window.JH_LIVE;
+  const TAPE = tr.tape;
+  const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
+  const reels = ['s', 't'].map((k) => ({
+    k, d: LIVE[k], rotors: [...document.querySelectorAll(`.jh-rotor[data-reel="${k}"]`)],
+    packs: [...document.querySelectorAll(`.jh-pack-${k}`)], strand: document.getElementById(`jh-strand-${k}`), lastR: -1,
+  }));
+  // tangent between a pack (circle) and the roller the strand runs to, with the sides chosen at build time
+  function tangent(A, B, { sa, sb, sg }) {
+    const dx = B.cx - A.cx, dy = B.cy - A.cy, D = Math.hypot(dx, dy), ra = sa * A.r, rb = sb * B.r, k = (ra - rb) / D;
+    const ux = dx / D, uy = dy / D, h = Math.sqrt(Math.max(0, 1 - k * k)), nx = k * ux - sg * h * uy, ny = k * uy + sg * h * ux;
+    return [[A.cx + ra * nx, A.cy + ra * ny], [B.cx + rb * nx, B.cy + rb * ny]];
+  }
+  const f2 = (v) => v.toFixed(2);
+  function drawConsoleReels() {
+    for (const rl of reels) {
+      const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
+      for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
+      const r = packPx(rl.k === 's' ? tr.rS : tr.rT);
+      if (Math.abs(r - rl.lastR) < 0.25) continue;
+      rl.lastR = r;
+      const { cx, cy } = rl.d;
+      for (const el of rl.packs) {
+        el.style.left = `${f2(cx - r)}px`; el.style.top = `${f2(cy - r)}px`; el.style.width = el.style.height = `${f2(2 * r)}px`;
+        if (el.classList.contains('jh-packtop')) el.style.background = `radial-gradient(circle, transparent ${f2(LIVE.hubR - 1)}px, #2d2119 ${f2(LIVE.hubR)}px, #4a3727 ${f2(LIVE.hubR + 8)}px, #3a2b1f ${f2(r * 0.7)}px, #5a4532 ${f2(r - 3)}px, #1d150f ${f2(r)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`;
+      }
+      if (rl.strand) {
+        const pack = { cx, cy, r }, o = rl.d.other;
+        const [p1, p2] = rl.d.packFirst ? tangent(pack, o, rl.d.sig) : tangent(o, pack, rl.d.sig);
+        const L = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]), a = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180 / Math.PI;
+        Object.assign(rl.strand.style, { left: `${f2(p1[0])}px`, top: `${f2(p1[1])}px`, width: `${f2(L + 0.6)}px`, transform: `translateZ(${LIVE.TAPE_Z0}px) rotateZ(${f2(a)}deg) rotateX(90deg)` });
+      }
+    }
+  }
+
+  // ---------------- AutoLocator III (drives the transport) ----------------
   const alSvg = document.getElementById('alSvg');
-  const AL = { pos: 222, zero: 0, v: 0, mode: 'stop', target: 0, loc: 62, entry: '', apl: false, reh: false, rec: false, pending: null,
-    ready: new Set([19, 20, 21]), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
-  const AL_LEN = 1000;   // 2500 ft at 30 ips
+  const AL = { loc: 62, entry: '', apl: false, reh: false, rehPunch: false, pending: null, ready: new Set([19, 20, 21]), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
   const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', ' ': '' };
-  const fmt = (t) => { const a = Math.max(0, Math.abs(t)); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
+  const fmt = (t) => { const a = Math.abs(t); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
   function setSeg(id, digits) {
     const rs = alSvg.querySelectorAll(`#al-${id} rect`);
     [...digits].forEach((ch, d) => { const on = SEG[ch] || ''; 'abcdefg'.split('').forEach((k, i) => { const r = rs[d * 7 + i]; if (!r) return; if (on.includes(k)) { r.setAttribute('opacity', '1'); r.setAttribute('filter', 'url(#glowSm)'); } else { r.setAttribute('opacity', '0.09'); r.removeAttribute('filter'); } }); });
@@ -230,88 +266,82 @@
   const led = (n, on) => { const r = alSvg && alSvg.querySelector(`[data-led="${n}"]`); if (r) { r.setAttribute('opacity', on ? 1 : 0); if (on) r.setAttribute('filter', 'url(#glowSm)'); else r.removeAttribute('filter'); } };
   const alMsg = (t) => { const m = document.getElementById('al-msg'); if (m) m.textContent = t; };
   const show2 = (t) => `${t.slice(0, 2)}:${t.slice(2)}`;
+  const counterTake = (sec) => tr.zero + sec * tr.nominalSpeed;   // tape counter seconds -> tape position
   function drawMem() {
     const g = document.getElementById('al-mem'); if (!g) return;
     g.innerHTML = AL.mem.map((m, i) => {
       const y = 300 + 150 + i * 76, hi = i === AL.last;
-      return `${hi ? `<rect x="2920" y="${y - 50}" width="600" height="68" rx="6" fill="#ffd9a0"/>` : ''}<text x="2960" y="${y}" font-size="40" font-weight="800" fill="#2f2b28">${i}</text><text x="3480" y="${y}" font-size="44" font-weight="800" fill="${m == null ? '#b3ab9a' : '#b3261e'}" text-anchor="end">${m == null ? '--:--' : show2(fmt(m))}</text>`;
+      return `${hi ? `<rect x="2920" y="${y - 50}" width="600" height="68" rx="6" fill="#ffd9a0"/>` : ''}<text x="2960" y="${y}" font-size="40" font-weight="800" fill="#2f2b28">${i}</text><text x="3480" y="${y}" font-size="44" font-weight="800" fill="${m == null ? '#b3ab9a' : '#b3261e'}" text-anchor="end">${m == null ? '--:--' : (m < 0 ? '-' : '') + show2(fmt(m))}</text>`;
     }).join('');
   }
-  function locate(t, why) { AL.target = Math.max(0, Math.min(AL_LEN, t + AL.zero)); AL.mode = 'locate'; AL.rec = false; alMsg(`Locating ${why || ''} ${show2(fmt(t))}`); }
+  function locate(sec, why) { AL.rehPunch = false; tr.locateTo(counterTake(sec), AL.apl ? 'play' : 'stop'); alMsg(`Locating ${why || ''} ${show2(fmt(sec))}`); }
+  const recording = () => tr.mode === 'rec';
   function press(n) {
     const d = /^d(\d)$/.exec(n);
     if (d) {
       const k = +d[1];
-      if (AL.pending === 'sto') { AL.mem[k] = AL.pos - AL.zero; AL.last = k; AL.pending = null; alMsg(`Stored ${show2(fmt(AL.mem[k]))} in memory ${k}`); drawMem(); return; }
+      if (AL.pending === 'sto') { AL.mem[k] = tr.counter; AL.last = k; AL.pending = null; alMsg(`Stored ${show2(fmt(AL.mem[k]))} in memory ${k}`); drawMem(); return; }
       if (AL.pending === 'rcl') { AL.pending = null; if (AL.mem[k] == null) { alMsg(`Memory ${k} is empty`); return; } AL.loc = AL.mem[k]; AL.entry = ''; AL.last = k; drawMem(); alMsg(`Recalled memory ${k}: ${show2(fmt(AL.loc))} · press LOC`); return; }
-      AL.entry = (AL.entry + k).slice(-4); const e = AL.entry.padStart(4, '0'); AL.loc = Math.min(5999, +e.slice(0, 2) * 60 + Math.min(59, +e.slice(2))); return;
+      AL.entry = (AL.entry + k).slice(-4); const e = AL.entry.padStart(4, '0'); AL.loc = +e.slice(0, 2) * 60 + Math.min(59, +e.slice(2)); return;
     }
     switch (n) {
       case 'left': case 'right': AL.loc = Math.max(0, AL.loc + (n === 'left' ? -1 : 1)); AL.entry = ''; break;
       case 'sto': AL.pending = AL.pending === 'sto' ? null : 'sto'; alMsg(AL.pending ? 'STO: press a memory number 0–9' : 'Ready'); break;
       case 'rcl': AL.pending = AL.pending === 'rcl' ? null : 'rcl'; alMsg(AL.pending ? 'RCL: press a memory number 0–9' : 'Ready'); break;
-      case 'reh': AL.reh = !AL.reh; alMsg(AL.reh ? 'Rehearse: RECORD switches the monitors but does not record' : 'Rehearse off'); break;
-      case 'rsttape': AL.zero = AL.pos; alMsg('Tape position zeroed here'); break;
+      case 'reh': AL.reh = !AL.reh; AL.rehPunch = false; alMsg(AL.reh ? 'Rehearse: RECORD switches the monitors but does not record' : 'Rehearse off'); break;
+      case 'rsttape': tr.zero = tr.take; alMsg('Tape position zeroed here'); break;
       case 'rstloc': AL.entry = ''; AL.loc = 0; break;
       case 'loc': AL.entry = ''; locate(AL.loc); break;
       case 'loc0': locate(0, 'to zero'); break;
       case 'aplay': AL.apl = !AL.apl; alMsg(AL.apl ? 'Auto play after locate' : 'Auto play off'); break;
       case 'tape': case 'input': case 'auto': AL.mon = n; alMsg(`Monitor: ${n.toUpperCase()}`); break;
-      case 'rew': case 'ff': AL.mode = n; AL.rec = false; alMsg(n === 'ff' ? 'Fast forward' : 'Rewind'); break;
-      case 'stop': AL.mode = 'stop'; AL.rec = false; alMsg('Stop'); break;
-      case 'play': if (AL.rec) { AL.rec = false; alMsg('Punch out'); } else { AL.mode = 'play'; alMsg('Play'); } break;
+      case 'rew': case 'ff': AL.rehPunch = false; tr.command(n); alMsg(n === 'ff' ? 'Fast forward' : 'Rewind'); break;
+      case 'stop': AL.rehPunch = false; tr.command('stop'); alMsg('Stop'); break;
+      case 'play':
+        if (recording() || AL.rehPunch) { AL.rehPunch = false; tr.command('play'); alMsg('Punch out'); }
+        else { tr.command('play'); alMsg('Play'); }
+        break;
       case 'record':
         if (!AL.ready.size) { alMsg('No tracks ready: arm tracks with the black keys'); break; }
-        if (AL.mode !== 'play') AL.mode = 'play';
-        AL.rec = true; alMsg(AL.reh ? 'Rehearse punch in (not recording)' : `Recording on ${[...AL.ready].map((t) => t + 1).join(', ')}`); break;
+        if (AL.reh) { if (!tr.playingMode) tr.command('play'); AL.rehPunch = true; alMsg('Rehearse punch in (not recording)'); break; }
+        tr.command('rec'); alMsg(`Recording on ${[...AL.ready].sort((a, b) => a - b).map((t) => t + 1).join(', ')}`); break;
       default: {
         const r = /^(ready|input)(\d+)$/.exec(n); if (!r) break;
         const set = r[1] === 'ready' ? AL.ready : AL.inMon, t = +r[2];
         if (set.has(t)) set.delete(t); else set.add(t);
-        if (r[1] === 'ready' && AL.rec && !AL.reh) alMsg(`Track ${t + 1} ${set.has(t) ? 'punched in' : 'punched out'}`);
+        if (r[1] === 'ready' && recording()) alMsg(`Track ${t + 1} ${set.has(t) ? 'punched in' : 'punched out'}`);
       }
     }
   }
-  let alRaf = 0, alLast = 0;
-  function alTick(now) {
-    const dt = Math.min(0.05, (now - alLast) / 1000); alLast = now;
-    const WIND = 17, A = 9;
-    let want = 0;
-    if (AL.mode === 'play') want = 1 + (AL.varOn ? AL.vari : 0);
-    else if (AL.mode === 'ff') want = WIND; else if (AL.mode === 'rew') want = -WIND;
-    else if (AL.mode === 'locate') { const dd = AL.target - AL.pos; want = Math.sign(dd) * Math.min(WIND, Math.sqrt(2 * A * 0.8 * Math.abs(dd))); if (Math.abs(dd) < 0.05 && Math.abs(AL.v) < 1) { AL.pos = AL.target; AL.v = 0; AL.mode = AL.apl ? 'play' : 'stop'; alMsg(AL.apl ? 'Located · playing' : 'Located'); } }
-    const acc = AL.mode === 'play' ? 4 : A;
-    AL.v += Math.max(-acc * dt, Math.min(acc * dt, want - AL.v));
-    AL.pos += AL.v * dt;
-    if (AL.pos <= 0 || AL.pos >= AL_LEN) { AL.pos = Math.max(0, Math.min(AL_LEN, AL.pos)); if (AL.mode !== 'stop') alMsg(AL.pos <= 0 ? 'Head of tape' : 'End of tape'); AL.v = 0; AL.mode = 'stop'; AL.rec = false; }
-    const tp = AL.pos - AL.zero;
-    setSeg('tape', (tp < 0 ? '-' : '') + fmt(tp).slice(tp < 0 ? 1 : 0));
+  function alRender(now) {
+    const c = tr.counter;
+    setSeg('tape', c < -0.5 ? '-' + fmt(c).slice(1) : fmt(c));
     setSeg('loc', AL.entry ? AL.entry.padStart(4, ' ') : fmt(AL.loc));
-    const blink = Math.floor(now / 250) % 2 === 0, recording = AL.rec && AL.mode === 'play';
+    const blink = Math.floor(now / 250) % 2 === 0, rec = recording(), punch = rec || AL.rehPunch;
     for (let t = 0; t < 24; t++) {
       const r = AL.ready.has(t);
-      led(`r${t}`, r && (recording && !AL.reh ? true : blink));
-      const inp = AL.mon === 'input' || AL.inMon.has(t) || (AL.mon === 'auto' && r && (AL.mode === 'stop' || recording));
-      led(`i${t}`, inp);
+      led(`r${t}`, r && (rec ? true : blink));
+      led(`i${t}`, AL.mon === 'input' || AL.inMon.has(t) || (AL.mon === 'auto' && r && (tr.mode === 'stop' || punch)));
     }
-    led('ready', AL.ready.size > 0); led('rec', recording && (!AL.reh || blink)); led('cue', AL.mode === 'locate');
-    ['tape', 'input', 'auto'].forEach((m) => led(`m${m}`, AL.mon === m));
+    const m = tr.mode;
+    led('ready', AL.ready.size > 0); led('rec', rec || (AL.rehPunch && blink)); led('cue', m === 'locate');
+    ['tape', 'input', 'auto'].forEach((k) => led(`m${k}`, AL.mon === k));
     led('var', AL.varOn); led('fix', !AL.varOn);
-    lamp('play', AL.mode === 'play'); lamp('stop', AL.mode === 'stop'); lamp('ff', AL.mode === 'ff' || (AL.mode === 'locate' && AL.v > 0)); lamp('rew', AL.mode === 'rew' || (AL.mode === 'locate' && AL.v < 0));
-    lamp('record', recording); lamp('loc', AL.mode === 'locate'); lamp('aplay', AL.apl); lamp('reh', AL.reh); lamp('sto', AL.pending === 'sto'); lamp('rcl', AL.pending === 'rcl');
+    lamp('play', tr.playingMode && m !== 'rplay'); lamp('stop', m === 'stop'); lamp('ff', m === 'ff' || (m === 'locate' && tr.v > 0)); lamp('rew', m === 'rew' || (m === 'locate' && tr.v < 0));
+    lamp('record', rec); lamp('loc', m === 'locate'); lamp('aplay', AL.apl); lamp('reh', AL.reh); lamp('sto', AL.pending === 'sto'); lamp('rcl', AL.pending === 'rcl');
     const ptr = document.getElementById('al-vari-ptr'); if (ptr) ptr.setAttribute('transform', `rotate(${AL.varOn ? AL.vari * 675 : 0} 29 102)`);
-    alRaf = requestAnimationFrame(alTick);
+    if (tr.endOfTape && !AL.eotShown) { alMsg('Tape ran off the reel: press RWD'); AL.eotShown = true; } else if (!tr.endOfTape) AL.eotShown = false;
   }
-  function startAL() { drawMem(); alLast = performance.now(); cancelAnimationFrame(alRaf); alRaf = requestAnimationFrame(alTick); }
-  function stopAL() { cancelAnimationFrame(alRaf); alRaf = 0; }
+  function startAL() { drawMem(); }
+  function stopAL() {}
   if (alSvg) {
     alSvg.querySelectorAll('[data-al]').forEach((g) => {
       const n = g.dataset.al;
       if (n === 'vari') {
         let y0 = null, v0 = 0, moved = false;
         g.addEventListener('pointerdown', (e) => { y0 = e.clientY; v0 = AL.vari; moved = false; g.setPointerCapture(e.pointerId); });
-        g.addEventListener('pointermove', (e) => { if (y0 == null) return; const dy = y0 - e.clientY; if (Math.abs(dy) > 4) moved = true; if (moved) { AL.varOn = true; AL.vari = Math.max(-0.2, Math.min(0.2, v0 + dy / 600)); alMsg(`Vari-speed ${AL.vari >= 0 ? '+' : ''}${(AL.vari * 100).toFixed(1)} %`); } });
-        g.addEventListener('pointerup', () => { if (!moved) { AL.varOn = !AL.varOn; alMsg(AL.varOn ? `Vari-speed ${(AL.vari * 100).toFixed(1)} % · drag the knob` : 'Fixed speed'); } y0 = null; });
+        g.addEventListener('pointermove', (e) => { if (y0 == null) return; const dy = y0 - e.clientY; if (Math.abs(dy) > 4) moved = true; if (moved) { AL.varOn = true; AL.vari = Math.max(-0.2, Math.min(0.2, v0 + dy / 600)); tr.setVarispeed(AL.vari); alMsg(`Vari-speed ${AL.vari >= 0 ? '+' : ''}${(AL.vari * 100).toFixed(1)} %`); } });
+        g.addEventListener('pointerup', () => { if (!moved) { AL.varOn = !AL.varOn; tr.setVarispeed(AL.varOn ? AL.vari : 0); alMsg(AL.varOn ? `Vari-speed ${(AL.vari * 100).toFixed(1)} % · drag the knob` : 'Fixed speed'); } y0 = null; });
         return;
       }
       g.addEventListener('click', () => press(n));
@@ -320,9 +350,41 @@
       if (!open || open.dataset.view !== 'al') return;
       const k = e.key;
       if (/^\d$/.test(k)) press(`d${k}`);
-      else if (k === ' ') { e.preventDefault(); press(AL.mode === 'stop' ? 'play' : 'stop'); }
+      else if (k === ' ') { e.preventDefault(); press(tr.mode === 'stop' ? 'play' : 'stop'); }
       else if (k === 'ArrowLeft') press('rew'); else if (k === 'ArrowRight') press('ff');
       else if (k === 'l' || k === 'L' || k === 'Enter') press('loc'); else if (k === 'r' || k === 'R') press('record');
     });
   }
+
+  // ---------------- tape machine view (iframe) mirrors this transport ----------------
+  const STATE_KEYS = ['take', 'total', 'v', 'acc', 'mode', 'speedIPS', 'varispeed', 'shuttle', 'liftDefeat', 'pinch', 'lift', 'angleS', 'angleT', 'zero', 'endOfTape', 'locTarget'];
+  const tapeFrame = document.querySelector('#ov-tape iframe');
+  const CMDS = {
+    command: (m) => { if (['stop', 'play', 'rec', 'rplay', 'ff', 'rew', 'shuttle'].includes(m)) { AL.rehPunch = false; tr.command(m); } },
+    setSpeed: (ips) => tr.setSpeed(+ips), setVarispeed: (x) => { tr.setVarispeed(+x); AL.varOn = +x !== 0; if (AL.varOn) AL.vari = +x; },
+    setShuttle: (x) => tr.setShuttle(+x), locate: (pos) => tr.locate(+pos), setLift: (on) => { tr.liftDefeat = !!on; }, setZero: (z) => { tr.zero = +z; },
+  };
+  addEventListener('message', (e) => {
+    if (!tapeFrame || e.source !== tapeFrame.contentWindow) return;
+    const d = e.data;
+    if (d && d.as === 'cmd' && Object.prototype.hasOwnProperty.call(CMDS, d.fn)) CMDS[d.fn](...(d.args || []));
+  });
+  function postState() {
+    if (!tapeFrame || !open || open.dataset.view !== 'tape' || !tapeFrame.contentWindow) return;
+    const st = {}; for (const k of STATE_KEYS) st[k] = tr[k];
+    tapeFrame.contentWindow.postMessage({ as: 'state', s: st }, '*');
+  }
+
+  // ---------------- the studio clock ----------------
+  let last = performance.now();
+  function studio(now) {
+    const dt = Math.min(0.25, (now - last) / 1000); last = now;   // tape time keeps up with real time even on a slow frame
+    tr.advance(dt);
+    drawConsoleReels();
+    postState();
+    if (open && open.dataset.view === 'al') alRender(now);
+    requestAnimationFrame(studio);
+  }
+  window.AS_PRESS = press;   // for tests
+  requestAnimationFrame(studio);
 })();

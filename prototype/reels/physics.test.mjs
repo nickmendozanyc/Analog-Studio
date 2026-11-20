@@ -134,3 +134,20 @@ test('reverse play runs the tape backwards at play speed through the capstan', (
   assert.ok(t.wS < 0 && t.wT < 0, 'both reels turn the other way');
   t.command('play'); t.advance(4); close(t.v, 30 * IPS, 1e-3, 'back to forward play');
 });
+
+test('the autolocator winds to a cue point and stops on it', () => {
+  for (const [from, to] of [[0, 600], [800, 30], [300, 305], [300, 299.5]]) {
+    const t = new Transport({ onTakeup: from });
+    t.locateTo(to); let s = 0;
+    while (t.mode === 'locate' && s < 120) { t.advance(0.1); s += 0.1; }
+    assert.equal(t.mode, 'stop', `arrived from ${from} to ${to} in ${s.toFixed(1)} s`);
+    close(t.take, to, 0.01, 'parked on the cue point');
+    close(t.v, 0, 1e-9, 'at rest');
+  }
+});
+
+test('auto play after locate starts playing at the cue point', () => {
+  const t = new Transport({ onTakeup: 0 });
+  t.locateTo(200, 'play'); t.advance(60);
+  assert.equal(t.mode, 'play'); assert.ok(t.capstanDriving, 'playing through the capstan');
+});

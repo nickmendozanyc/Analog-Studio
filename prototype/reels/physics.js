@@ -44,6 +44,9 @@ export const MACHINE = {
   pinchTau: 0.14,           // s
   pinchEngageWindow: 0.04,  // m/s, pinch roller engages within this of play speed
   lifterSpeed: 1.6,         // m/s, lifters come in above this speed
+  locateDecel: 2.2,         // m/s^2, braking profile the autolocator follows into a cue point (approx)
+  locateGain: 1.6,          // 1/s, final creep onto the cue point (keeps the reel servo from hunting)
+  locateWindow: 0.008,      // m, close enough to the cue point to stop (about 1/3 inch, ~10 ms at 30 IPS)
 };
 
 export const IPS = 0.0254; // m/s per inch-per-second
@@ -67,7 +70,9 @@ export class Transport {
     this.total = Math.min(totalLength, capacity(tape));
     this.take = Math.min(Math.max(onTakeup, 0), this.total);
     this.v = 0;
-    this.mode = 'stop';           // stop | play | rec | ff | rew | shuttle
+    this.mode = 'stop';           // stop | play | rec | rplay | ff | rew | shuttle | locate
+    this.locTarget = 0;           // tape position (m on the take-up) the autolocator is heading for
+    this.locThen = 'stop';        // mode to enter on arrival (stop, or play for auto-play)
     this.speedIPS = speedIPS;     // 7.5 | 15 | 30
     this.varispeed = 0;           // fraction, -VARI_RANGE..+VARI_RANGE (0 = off)
     this.shuttle = 0;             // -1 .. 1
@@ -98,7 +103,10 @@ export class Transport {
   setSpeed(ips) { if (SPEEDS_IPS.includes(ips)) this.speedIPS = ips; }
   setVarispeed(f) { this.varispeed = Math.max(-VARI_RANGE, Math.min(VARI_RANGE, f)); }
   setShuttle(x) { this.shuttle = Math.max(-1, Math.min(1, x)); if (x !== 0) this.mode = 'shuttle'; }
-  locate(pos) { this.take = Math.max(0, Math.min(this.total, pos)); this.v = 0; this.mode = 'stop'; }
+  locate(pos) { this.take = Math.max(0, Math.min(this.total, pos)); this.v = 0; this.mode = 'stop'; }   // load the reel at a position (no motion)
+  // autolocator: wind to a tape position under servo control, then stop (or play)
+  locateTo(pos, then = 'stop') { this.locTarget = Math.max(0, Math.min(this.total, pos)); this.locThen = then; this.mode = 'locate'; this.endOfTape = false; }
+  get counterToTake() { return (sec) => this.zero + sec * this.nominalSpeed; }
 
   targetSpeed() {
     switch (this.mode) {
@@ -107,6 +115,7 @@ export class Transport {
       case 'ff': return this.m.windSpeed;
       case 'rew': return -this.m.windSpeed;
       case 'shuttle': return this.shuttle * this.m.windSpeed;
+      case 'locate': { const d = this.locTarget - this.take; return Math.sign(d) * Math.min(this.m.windSpeed, Math.sqrt(2 * (this.m.locateDecel ?? 2.2) * Math.abs(d)), (this.m.locateGain ?? 1.6) * Math.abs(d)); }   // braking curve, then an exponential creep onto the cue
       default: return 0;
     }
   }
@@ -151,6 +160,9 @@ export class Transport {
       if (settled || (diff >= 0 && dv >= diff) || (diff <= 0 && dv <= diff)) { this.v = goal; this.acc = 0; }
       else this.v += dv;
     }
+
+    // autolocator arrival
+    if (this.mode === 'locate' && Math.abs(this.locTarget - this.take) < (this.m.locateWindow ?? 0.004) && Math.abs(this.v) < 0.05) { this.v = 0; this.acc = 0; this.mode = this.locThen; }
 
     // lifters
     const liftWanted = !this.liftDefeat && Math.abs(this.v) > this.m.lifterSpeed && !this.capstanDriving;

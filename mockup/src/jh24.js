@@ -26,8 +26,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
 
   // ---------- 3D primitives (children of the deck) ----------
   const box = (style) => `position:absolute;transform-style:preserve-3d;${style}`;
-  function disc(cx, cy, r, z, bg, extra = '') {
-    add(`<div style="${box(`left:${f(cx - r)}px;top:${f(cy - r)}px;width:${f(2 * r)}px;height:${f(2 * r)}px;border-radius:50%;background:${bg};transform:translateZ(${f(z)}px);${extra}`)}"></div>`);
+  function disc(cx, cy, r, z, bg, extra = '', cls = '') {
+    add(`<div${cls ? ` class="${cls}" data-z="${f(z)}"` : ''} style="${box(`left:${f(cx - r)}px;top:${f(cy - r)}px;width:${f(2 * r)}px;height:${f(2 * r)}px;border-radius:50%;background:${bg};transform:translateZ(${f(z)}px);${extra}`)}"></div>`);
   }
   // solid cylinder from z0 to z1; side shading comes from a left-to-right gradient on each layer
   function cylinder(cx, cy, r, z0, z1, side, top, step = 2.2) {
@@ -38,9 +38,9 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     add(`<div style="${box(`left:${f(cx - r)}px;top:${f(cy - r)}px;width:${f(2 * r)}px;height:${f(2 * r)}px;border-radius:50%;box-sizing:border-box;border:${f(w)}px solid ${color};transform:translateZ(${f(z)}px)`)}"></div>`);
   }
   // vertical plane standing on the deck along the segment (x1,y1)->(x2,y2), from z0 to z1
-  function wall(x1, y1, x2, y2, z0, z1, bg) {
+  function wall(x1, y1, x2, y2, z0, z1, bg, id = '') {
     const L = Math.hypot(x2 - x1, y2 - y1), a = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-    add(`<div style="${box(`left:${f(x1)}px;top:${f(y1)}px;width:${f(L + 0.6)}px;height:${f(z1 - z0)}px;transform-origin:0 0;transform:translateZ(${f(z0)}px) rotateZ(${f(a)}deg) rotateX(90deg);background:${bg}`)}"></div>`);
+    add(`<div${id ? ` id="${id}"` : ''} style="${box(`left:${f(x1)}px;top:${f(y1)}px;width:${f(L + 0.6)}px;height:${f(z1 - z0)}px;transform-origin:0 0;transform:translateZ(${f(z0)}px) rotateZ(${f(a)}deg) rotateX(90deg);background:${bg}`)}"></div>`);
   }
   // horizontal plane at height z
   function plate(x, y, w, h, z, bg, extra = '') {
@@ -139,15 +139,20 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     const { cx, cy } = rl;
     // turntable + spindle
     cylinder(cx, cy, 92, 0, 18, 'linear-gradient(90deg,#2a2725,#55504b 40%,#1e1c1a)', '#3c3835', 3);
+    const key = rl === supply ? 's' : 't';
+    const rotor = () => add(`<div class="jh-rotor" data-reel="${key}" style="${box(`left:0;top:0;width:${DW}px;height:${DD}px;transform-origin:${f(cx)}px ${f(cy)}px`)}">`);
     // back flange (3 layers)
+    rotor();
     const flange = (z, bg) => add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${bg};clip-path:path(evenodd,'${d}')`)}"></div>`);
     flange(20, st.edge); flange(21.5, st.edge); flange(23, st.back);
+    add('</div>');
     // hub ring (black plastic) between the flanges
     for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
     // tape pack: outer wraps are matte black back-coating; top edge shows the wound edges
     const packMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px);mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px)`;
-    for (let z = TAPE_Z0; z < TAPE_Z1; z += 2.4) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#120e0b,#3a2c22 35%,#1a140f 70%,#0e0b09)', packMask);
-    disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #2d2119 ${f(hubR)}px, #4a3727 ${f(hubR + 8)}px, #3a2b1f ${f(rl.pack * 0.7)}px, #5a4532 ${f(rl.pack - 3)}px, #1d150f ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`);
+    for (let z = TAPE_Z0; z < TAPE_Z1; z += 2.4) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#120e0b,#3a2c22 35%,#1a140f 70%,#0e0b09)', packMask, `jh-pack jh-pack-${key}`);
+    disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #2d2119 ${f(hubR)}px, #4a3727 ${f(hubR + 8)}px, #3a2b1f ${f(rl.pack * 0.7)}px, #5a4532 ${f(rl.pack - 3)}px, #1d150f ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`, '', `jh-pack jh-pack-${key} jh-packtop`);
+    rotor();
     // front flange (3 layers, the top one with the finish)
     flange(100, st.edge); flange(101.5, st.edge);
     flange(103, st.face);
@@ -178,6 +183,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
     add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="44" cy="44" r="30" fill="url(#none)"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
+    add('</div>');
   }
 
   // ---------- tape path (tangent lines between rollers, wraps as arcs) ----------
@@ -195,10 +201,10 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   // pick the tangent whose contact points best match the hinted sides
   const pickTangent = (A, B, hintA, hintB) => {
     let best, bs = -1e9;
-    for (const sa of [1, -1]) for (const sb of [1, -1]) for (const [pa, pb] of tangent(A, B, sa, sb)) {
+    for (const sa of [1, -1]) for (const sb of [1, -1]) tangent(A, B, sa, sb).forEach(([pa, pb], j) => {
       const s = ((pa[0] - A.cx) * hintA[0] + (pa[1] - A.cy) * hintA[1]) / A.r + ((pb[0] - B.cx) * hintB[0] + (pb[1] - B.cy) * hintB[1]) / B.r;
-      if (s > bs) { bs = s; best = [pa, pb]; }
-    }
+      if (s > bs) { bs = s; best = [pa, pb]; best.sig = { sa, sb, sg: j === 0 ? 1 : -1 }; }
+    });
     return best;
   };
   const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SW = [-0.7, 0.7], SE = [0.7, 0.7];
@@ -226,6 +232,13 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     }
   }
   const TAPE_BG = 'linear-gradient(180deg,#3b2c21 0%,#2a1f17 30%,#33261c 55%,#1c1510 100%)';
+  // live data for the console page: reel centres, pack scale and the two strands that leave the packs
+  const sig0 = pickTangent(sPack, armL, SW, W).sig, sig5 = pickTangent(armR, tPack, E, E).sig;
+  globalThis.JH_LIVE = {
+    R, hubR, TAPE_Z0, TAPE_Z1,
+    s: { cx: supply.cx, cy: supply.cy, pack: supply.pack, other: armL, sig: sig0, packFirst: true },
+    t: { cx: takeup.cx, cy: takeup.cy, pack: takeup.pack, other: armR, sig: sig5, packFirst: false },
+  };
 
   // ---------- head assembly (box) ----------
   function headAssembly() {
@@ -364,7 +377,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   cylinder(guideR.cx, guideR.cy, guideR.r + 6, 18, 26, BLK, '#141416', 2);
   ribbed(guideR, 26, 156, guideR.r);
   // the tape itself
-  for (const [[x1, y1], [x2, y2]] of tapeSegs) wall(x1, y1, x2, y2, TAPE_Z0, TAPE_Z1, TAPE_BG);
+  tapeSegs.forEach(([[x1, y1], [x2, y2]], i) => wall(x1, y1, x2, y2, TAPE_Z0, TAPE_Z1, TAPE_BG, i === 0 ? 'jh-strand-s' : i === chain.length - 2 ? 'jh-strand-t' : ''));
   transportStrip();
   add(`</div>`);
   add(`</div>`);
