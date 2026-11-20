@@ -461,18 +461,14 @@ const elecView = (() => {
     ${card('rc', 'RECORD / CUE', `${trim('inCal', 'IN CAL')}${trim('calRec', 'CAL REC')}${trim('recHf', 'REC &lt; 30', 30)}${trim('recHf', 'REC &lt; 15', 15)}${trim('cueHf', 'CUE &lt; 30', 30)}${trim('cueHf', 'CUE &lt; 15', 15)}${trim('cueLf', 'CUE &gt; 30', 30)}${trim('cueLf', 'CUE &gt; 15', 15)}${trim('cueLvl', 'CUE LVL')}${trim('crossfeed', 'X-FEED')}`)}
     ${card('bias', 'BIAS', `${trim('bias', 'BIAS 30', 30)}${trim('bias', 'BIAS 15', 15)}`)}
   </div>`;
-  const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
+  const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drm">${Array.from({ length: 8 }, (_, k) => meter(d * 8 + k)).join('')}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
   const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
-  // the machine's 24 VU meters (as on the meter bridge), three rows of 8, reading the live line outputs
-  const MW = 3792, CW = 474, VW = 232, VH = 172, ROW = 222;   // three rows of eight, like the meter bridge
-  const meters = capture(() => {
-    for (let i = 0; i < 24; i++) {
-      const x = (i % 8) * CW + (CW - VW) / 2, y = Math.floor(i / 8) * ROW + 6;
-      vu(x, y, VW, VH, -20, { needleId: i, brand: 'CMI' });
-      text(x + 6, y + VH + 34, String(i + 1).padStart(2, '0'), 24, '#f2ead8', 'start', 900);
-      text(x + VW - 2, y + VH + 34, tapeNames[i], 20, '#cfc6b3', 'end', 700, 'letter-spacing="1"');
-    }
-  });
+  // the machine's 24 VU meters: each drawer's eight sit right above their channel cards
+  const meter = (i) => `<div class="mt"><svg viewBox="-6 -6 282 252">${capture(() => {
+    vu(0, 0, 270, 202, -20, { needleId: i, brand: 'CMI' });
+    text(4, 238, String(i + 1).padStart(2, '0'), 30, '#f2ead8', 'start', 900);
+    text(268, 238, tapeNames[i], 24, '#cfc6b3', 'end', 700, 'letter-spacing="1"');
+  })}</svg></div>`;
   return `<div id="elec">
   <div class="eltop">
     <button type="button" id="el-power" class="pw" title="JH-24D audio power supply: starts the audio engine">POWER</button>
@@ -493,7 +489,6 @@ const elecView = (() => {
     <input id="el-file" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" multiple hidden>
   </div>
   <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
-  <div class="elm"><svg viewBox="0 0 ${MW} ${3 * ROW}" width="${MW}" height="${3 * ROW}">${meters}</svg></div>
   <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
 </div>`;
 })();
@@ -510,8 +505,9 @@ const elecCss = `
   #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
   #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
   #elec .drs{display:flex;gap:18px}
-  #elec .elm{margin-bottom:16px;background:linear-gradient(180deg,#2a2725,#1b1918);border:2px solid #0c0b0a;border-radius:8px;padding:10px 0 0}
-  #elec .elm svg{display:block}
+  #elec .drm{display:flex;gap:6px;margin-bottom:8px;padding:8px 0;background:#141211;border-radius:5px}
+  #elec .drm .mt{flex:1;min-width:0}
+  #elec .drm svg{display:block;width:100%;height:auto}
   #elec .dr{flex:1 1 0;min-width:0;background:linear-gradient(180deg,#3a3633,#2a2725);border:2px solid #0c0b0a;border-radius:8px;padding:8px}
   #elec .drh{font:900 20px Archivo,Arial;letter-spacing:2.5px;color:#d9d2c2;margin:2px 4px 8px}
   #elec .drc{display:flex;gap:6px}
