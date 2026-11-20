@@ -1268,6 +1268,7 @@ if (globalThis.JH_CI !== TCI) throw new Error(`cabinet inset is ${globalThis.JH_
 // copy the live reel prototype next to the mockup so the tape machine view can load it
 const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
 if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
+const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture }, { tapeNames });
 const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px" title="${label}"><span>${label}</span></div>`;
 const overlay = (view, title, body, extra = '') => `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
@@ -1308,7 +1309,7 @@ ${scenes3d.join('\n')}
   <div class="sls-area" style="left:24px;top:20px;width:1500px;height:590px"><b>STAUDER A827</b><span>24-track tape machine · transport on one side, meter bridge on the other</span></div>
   <div class="sls-area" style="left:1548px;top:20px;width:420px;height:590px"><b>AUTOLOCATOR</b><span>A827 remote</span></div>
   <div class="sls-area" style="left:1992px;top:20px;width:1274px;height:590px"><b>STUDIO COMPUTER</b><span>SLS computer and meter bridge</span></div>
-  <div class="sls-area" style="left:24px;top:634px;width:3242px;height:1446px"><b>SLS 4000 G CONSOLE · 32 CHANNELS</b><span>Same routing and matrices as the CMI room. Layout in design: send the next details.</span></div>
+  ${slsConsole}
 </div>
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
 ${hot(AX, 76, Math.round(AW * ALK), 590, 'al', 'Open the AutoLocator III')}
