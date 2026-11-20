@@ -1290,7 +1290,7 @@ const a827Bridge = capture(() => {
   }
   p('</svg>');
 });
-const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture }, { tapeNames });
+const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture, vu }, { tapeNames, tapeDb });
 const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px" title="${label}"><span>${label}</span></div>`;
 const overlay = (view, title, body, extra = '') => `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
