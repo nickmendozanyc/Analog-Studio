@@ -37,8 +37,8 @@ export const MACHINE = {
   windSpeed: 13.0,          // m/s (~512 ips), 30 % faster winds (approx)
   windForce: 62,            // N, servo-controlled reel motors (approx)
   brakeForce: 70,           // N, electronic braking (approx)
-  stopDecel: 4.2,           // m/s^2, peak deceleration when STOP is pressed during a wind: the reels coast down gracefully (approx)
-  stopLanding: 5.5,         // m/s, speed band over which a stop from a wind eases off into a gentle final settle
+  stopDecel: 8,             // m/s^2, peak deceleration when STOP is pressed during a wind: about 2.5 s from full wind, eased at both ends (approx)
+  stopLanding: 3.2,         // m/s, speed band over which a stop from a wind eases off into a gentle final settle
   jerk: 12,                 // m/s^3, gentle S-curve ramps (approx)
   landing: 2.4,             // m/s
   capstanTau: 0.2,          // s, capstan servo time constant (approx)

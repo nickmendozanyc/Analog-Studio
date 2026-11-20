@@ -47,7 +47,7 @@ test('stop from wind coasts down gracefully: gentle deceleration and a soft sett
   let prev = t.v, maxDecel = 0;
   for (let k = 0; k < 800; k++) { t.advance(0.01); maxDecel = Math.max(maxDecel, (prev - t.v) / 0.01); prev = t.v; }
   assert.ok(maxDecel <= MACHINE.stopDecel + 0.05, `deceleration capped (${maxDecel.toFixed(2)} m/s^2)`);
-  close(t.v, 0, 1e-3, 'stopped within about 9 s');
+  close(t.v, 0, 1e-3, 'stopped');
 });
 
 test('the last stretch of a wind stop eases in (no abrupt halt near zero)', () => {
@@ -161,4 +161,11 @@ test('auto play after locate starts playing at the cue point', () => {
   const t = new Transport({ onTakeup: 0 });
   t.locateTo(200, 'play'); t.advance(60);
   assert.equal(t.mode, 'play'); assert.ok(t.capstanDriving, 'playing through the capstan');
+});
+
+test('a stop from full wind speed takes about 2.5 s', () => {
+  const t = new Transport(); t.locate(t.total / 2);
+  t.command('ff'); t.advance(10); t.command('stop');
+  let s = 0; while (Math.abs(t.v) > 0.01 && s < 10) { t.advance(0.01); s += 0.01; }
+  assert.ok(s > 2.2 && s < 2.8, `stopped in ${s.toFixed(2)} s`);
 });
