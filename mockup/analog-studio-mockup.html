@@ -100264,7 +100264,9 @@ class ClockOut {
     intRun: false, intT: 0, offset: 2, editMode: false, editBar: 0, seg: null, locked: false, beatIx: -1, beatFlash: 0, msg: '', msgT: 0,
     metro: 0.6, audio: 0.5, sigBuf: '', totalT: 0, offT: 0, song: 1, countIn: true, repeat: false, tapeOp: '', ledT: 0,
     bars: Array.from({ length: 160 }, () => ({ bpm: 96, num: 4, den: 4 })),
-    stripes: [{ take0: 0, take1: tr.total, code0: 0, speed: 30 * IPS }],   // the session reel came already striped
+    // the session reel came already striped, 01:00:00:00 at the counter's zero point (as session reels are), so the
+    // wall clock and the autolocator agree; re-zeroing the counter later doesn't move the code (it's on the tape)
+    stripes: [{ take0: 0, take1: tr.total, code0: -tr.zero / (30 * IPS), speed: 30 * IPS }],
   };
   try { const sv = JSON.parse(localStorage.getItem('as-sbx-map') || 'null'); if (sv && sv.bars) { SBX.bars = sv.bars; SBX.offset = sv.offset ?? 2; } } catch (e) {}
   const sbxMsg = (t, sec = 2.2) => { SBX.msg = t; SBX.msgT = sec; };
