@@ -209,24 +209,20 @@
     o += T(2120, ly0 + lh - 30, 'Drag a knob up / down or use the wheel · double-click resets · click a key · ← → steps channels', 22, '#9c9384', 'start', 700);
     return o;
   }
+  // the pop-up is a window around just the clicked section of that channel, magnified (the console's own drawing)
   function renderStrip() {
     if (!STRIP_SVG) return;
     const { con, ch, sec } = SP, sp = SPEC[con], ss = sp[sec];
     chState(con, ch); applyCh(con, ch);
-    let o = `<rect width="3840" height="2104" fill="#141210"/>`;
-    o += T(90, 92, `${sp.name}  ·  CHANNEL ${String(ch + 1).padStart(2, '0')}`, 44, '#efe8dc', 'start', 900, 'letter-spacing="3"');
-    o += `<rect x="90" y="112" width="300" height="56" rx="4" fill="#f2eee2"/>` + T(240, 152, NAMES[ch], 36, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', sans-serif"`);
-    o += `<g data-nav="-1" style="cursor:pointer"><rect x="420" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(468, 150, '◀', 30, '#efe8dc')}</g><g data-nav="1" style="cursor:pointer"><rect x="530" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(578, 150, '▶', 30, '#efe8dc')}</g>`;
-    ORDER[con].forEach((k, i) => { const on = k === sec, x = 700 + i * 300; o += `<g data-tab="${k}" style="cursor:pointer"><rect x="${x}" y="108" width="280" height="64" rx="6" fill="${on ? '#ffb02e' : '#2b2c30'}"/>${T(x + 140, 150, SPEC[con][k].title.split(' · ')[0], 26, on ? '#1a1208' : '#efe8dc', 'middle', 900, 'letter-spacing="2"')}</g>`; });
-    // magnified section(s) of the console itself
-    const rects = panelsFor(con, ch, sec), AW = 1900, AH = 1820, gap = 60;
+    const rects = panelsFor(con, ch, sec), pad = 26, gap = 36;
     const tw = rects.reduce((a, r) => a + r[2], 0), th = Math.max(...rects.map((r) => r[3]));
-    const sc = Math.min(AH / th, (AW - gap * (rects.length - 1)) / tw);
-    let px = 110 + (AW - (tw * sc + gap * (rects.length - 1))) / 2;
+    const sc = Math.min(4.4, 1720 / th, (1500 - gap * (rects.length - 1)) / tw);
+    const W = Math.round(tw * sc + gap * (rects.length - 1) + 2 * pad), H = Math.round(th * sc + 2 * pad);
+    STRIP_SVG.setAttribute('width', W); STRIP_SVG.setAttribute('height', H); STRIP_SVG.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    let o = `<rect width="${W}" height="${H}" fill="#141210"/>`, px = pad;
     PANELS = [];
     for (const [x, y, w, h] of rects) {
-      const pw = w * sc, ph = h * sc, py = 210 + (AH - ph) / 2, vx = con === 'cmi' ? x : x - 24, vy = con === 'cmi' ? y : y - 690;
-      o += `<rect x="${px - 14}" y="${py - 14}" width="${pw + 28}" height="${ph + 28}" rx="10" fill="#000" opacity="0.6"/>`;
+      const pw = w * sc, ph = h * sc, py = pad + (th * sc - ph) / 2, vx = con === 'cmi' ? x : x - 24, vy = con === 'cmi' ? y : y - 690;
       o += `<svg x="${px}" y="${py}" width="${pw}" height="${ph}" viewBox="${vx} ${vy} ${w} ${h}" style="overflow:hidden"><use href="#${con === 'cmi' ? 'room-svg' : 'sls-svg'}"/></svg>`;
       PANELS.push({ px, py, pw, ph, x, y, w, h, sc });
       px += pw + gap;
@@ -234,13 +230,23 @@
     // the controls inside those sections (positions from the console itself)
     const E = els(con, ch); CTRLS = [];
     const inP = (b) => rects.some(([x, y, w, h]) => b.x + b.w / 2 >= x && b.x + b.w / 2 <= x + w && b.y + b.h / 2 >= y && b.y + b.h / 2 <= y + h);
-    for (const el of E.k) { const b = stageBox(el.querySelector('.kptr') ? el : el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
+    for (const el of E.k) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
     for (const el of E.b) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'key', id: el.dataset.bid, el, ...b }); }
-    o += `<g id="strip-side">${sideSvg()}</g>`;
     STRIP_SVG.innerHTML = o;
-    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `${sp.name} · CH ${ch + 1} · ${NAMES[ch]} · ${ss.title}`;
+    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `CH ${ch + 1} · ${NAMES[ch]} · ${ss.title.split(' · ')[0]}`;
+    const ow = document.querySelector('#ov-strip .ov-win'); if (ow) ow.style.minWidth = '0';
+    showVal(null);
   }
-  const refreshSide = () => { const g = document.getElementById('strip-side'); if (g) g.innerHTML = sideSvg(); };
+  // the value of the control being touched, in the window's title bar
+  function showVal(c) {
+    const v = document.getElementById('strip-val'); if (!v) return;
+    if (!c) { v.textContent = '← → channels'; return; }
+    const { con, ch } = SP, s = chState(con, ch), d = DEF[con][c.id];
+    const lab = (d && d.label) || (/^bus\d+$/.test(c.id) ? (con === 'sls' ? 'GROUPS' : 'BUSES') : c.id.replace(/_/g, ' ').toUpperCase());
+    v.textContent = /^bus\d+$/.test(c.id) ? `${lab} ${s.bus.length ? s.bus.join(' · ') : 'none'}` : c.t === 'key' ? `${lab} ${s[c.id] ? 'IN' : 'OUT'}` : `${lab} ${fmtV(knobDef(con, c.id), s[c.id])}`;
+  }
+  let lastCtl = null;
+  const refreshSide = () => showVal(lastCtl);
   function openStrip(con, ch, sec) { SP.con = con; SP.ch = ch; SP.sec = sec; show('strip'); renderStrip(); }
   window.AS_OPEN_STRIP = openStrip;
   // popup point -> console control
@@ -261,6 +267,7 @@
       const nav = e.target.closest('[data-tab],[data-nav]');
       if (nav) { if (nav.dataset.tab) SP.sec = nav.dataset.tab; else SP.ch = (SP.ch + +nav.dataset.nav + 32) % 32; renderStrip(); return; }
       const c = hitCtrl(e); if (!c) return;
+      lastCtl = c;
       const s = chState(SP.con, SP.ch);
       if (c.t === 'knob') { const d = knobDef(SP.con, c.id); drag = { c, d, y: svgPt(STRIP_SVG, e).y, f: toFrac(d, s[c.id]) }; STRIP_SVG.setPointerCapture(e.pointerId); return; }
       if (/^bus\d+$/.test(c.id)) { const b = +c.id.slice(3); s.bus = s.bus.includes(b) ? s.bus.filter((x) => x !== b) : [...s.bus, b].sort((a, z) => a - z); }
@@ -273,8 +280,8 @@
       STRIP_SVG.style.cursor = hitCtrl(e) ? (hitCtrl(e).t === 'knob' ? 'ns-resize' : 'pointer') : 'default';
     });
     STRIP_SVG.addEventListener('pointerup', () => { if (drag) { drag = null; saveST2(); } });
-    STRIP_SVG.addEventListener('dblclick', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; chState(SP.con, SP.ch)[c.id] = knobDef(SP.con, c.id).def; applyCh(SP.con, SP.ch); saveST2(); refreshSide(); });
-    STRIP_SVG.addEventListener('wheel', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; e.preventDefault(); const s = chState(SP.con, SP.ch), d = knobDef(SP.con, c.id); s[c.id] = fromFrac(d, toFrac(d, s[c.id]) - Math.sign(e.deltaY) * 0.02); applyCh(SP.con, SP.ch); saveST2(); refreshSide(); }, { passive: false });
+    STRIP_SVG.addEventListener('dblclick', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; lastCtl = c; chState(SP.con, SP.ch)[c.id] = knobDef(SP.con, c.id).def; applyCh(SP.con, SP.ch); saveST2(); refreshSide(); });
+    STRIP_SVG.addEventListener('wheel', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; lastCtl = c; e.preventDefault(); const s = chState(SP.con, SP.ch), d = knobDef(SP.con, c.id); s[c.id] = fromFrac(d, toFrac(d, s[c.id]) - Math.sign(e.deltaY) * 0.02); applyCh(SP.con, SP.ch); saveST2(); refreshSide(); }, { passive: false });
     addEventListener('keydown', (e) => { if (open && open.dataset.view === 'strip' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { SP.ch = (SP.ch + (e.key === 'ArrowLeft' ? 31 : 1)) % 32; renderStrip(); } });
   }
   // ---- click targets on the consoles: work out channel and section from the click position ----

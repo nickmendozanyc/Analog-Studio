@@ -1409,6 +1409,7 @@ const alView = capture(() => {
   text(ox + AL_W * K / 2, oy + AL_H * K + 170, 'Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate', 26, '#a9a293', 'middle', 600);
 });
 const sbxView = require('./sbx.js')({ p, rect, text, circle, capture }, { W, OVH });
+const SBX_BOX = globalThis.SBX_BOX;   // the front panel's box: the pop-up shows just the machine
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
@@ -1535,7 +1536,9 @@ const a827Remote = capture(() => {
 });
 const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture, vu, remote224 }, { tapeNames, tapeDb });
 const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px" title="${label}"><span>${label}</span></div>`;
-const overlay = (view, title, body, extra = '') => `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
+const overlay = (view, title, body, extra = '', float = false) => float
+  ? `<div class="overlay float" id="ov-${view}" data-view="${view}" hidden><div class="ov-win"><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕</button></div><div class="ov-body">${body}</div></div></div>`
+  : `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
 <style>
@@ -1560,6 +1563,12 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .ov-bar button.ov-close{margin-left:auto}
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
+  .overlay.float{background:rgba(8,6,5,.5)}
+  .overlay.float .ov-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:12px;overflow:hidden;border:2px solid #000;background:#141210;box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
+  .overlay.float .ov-bar{height:auto;min-height:52px;flex-wrap:wrap;gap:14px 18px;padding:6px 16px;font-size:17px;letter-spacing:2px}
+  .overlay.float .ov-bar button.ov-close{padding:6px 12px}
+  .overlay.float .ov-body{position:relative;left:auto;top:auto;width:auto;height:auto}
+  .overlay.float .ov-body>svg{display:block}
   .ov-pick{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#ffb02e;border:0;border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px}
   select.ov-pick{background:#efece4}
   .shot{position:absolute;z-index:50}
@@ -1619,11 +1628,11 @@ ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id="tp-msg"></span>')}
 ${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
-${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>')}
-${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>')}
-${overlay('strip', 'CHANNEL', '<svg id="stripSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none;touch-action:none"></svg>', '<span class="ov-msg" id="strip-title"></span>')}
+${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
+${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
+${overlay('strip', 'CHANNEL', '<svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg>', '<span class="ov-msg" id="strip-title"></span><span class="ov-msg" id="strip-val"></span>', true)}
 ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
-${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
+${overlay('224', 'LEXIMAN 224X', `<svg width="${Math.round(1070 * 0.95)}" height="${Math.round(1640 * 0.95)}" viewBox="480 190 1070 1640" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>', true)}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
 </div>
 <script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))}; window.JH_LIVE = ${JSON.stringify(globalThis.JH_LIVE)}; window.A8_LIVE = ${JSON.stringify(globalThis.A8_LIVE)};</script>

@@ -22,6 +22,12 @@
   .ov-bar button.ov-close{margin-left:auto}
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
+  .overlay.float{background:rgba(8,6,5,.5)}
+  .overlay.float .ov-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:12px;overflow:hidden;border:2px solid #000;background:#141210;box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
+  .overlay.float .ov-bar{height:auto;min-height:52px;flex-wrap:wrap;gap:14px 18px;padding:6px 16px;font-size:17px;letter-spacing:2px}
+  .overlay.float .ov-bar button.ov-close{padding:6px 12px}
+  .overlay.float .ov-body{position:relative;left:auto;top:auto;width:auto;height:auto}
+  .overlay.float .ov-body>svg{display:block}
   .ov-pick{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#ffb02e;border:0;border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px}
   select.ov-pick{background:#efece4}
   .shot{position:absolute;z-index:50}
@@ -99095,7 +99101,7 @@
     <div class="hint">space play / stop · , rewind · . fast forward · Z zero · R record</div>
   </div>
 </div></div></div>
-<div class="overlay" id="ov-al" data-view="al" hidden><div class="ov-bar"><b>CMI AUTOLOCATOR III</b><span class="ov-msg" id="al-msg">Ready</span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="alSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
+<div class="overlay float" id="ov-al" data-view="al" hidden><div class="ov-win"><div class="ov-bar"><b>CMI AUTOLOCATOR III</b><span class="ov-msg" id="al-msg">Ready</span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><svg id="alSvg" width="1648" height="1424" viewBox="874 124 1915.9999999999998 1655.9999999999998" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
 <rect x="0" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
 <rect x="94" y="0" width="2" height="2104" fill="#000" opacity="0.6"/>
 <rect x="96" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
@@ -100028,8 +100034,8 @@
 <text x="3220" y="358" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="34" fill="#efe9da" text-anchor="middle" font-weight="800" letter-spacing="3">LOCATE MEMORIES</text>
 <g id="al-mem" font-family="'JetBrains Mono', monospace"></g>
 <text x="1820" y="1833.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="28" fill="#d9d3c7" text-anchor="middle" font-weight="600" >Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD</text>
-<text x="1820" y="1883.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#a9a293" text-anchor="middle" font-weight="600" >Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate</text></svg></div></div>
-<div class="overlay" id="ov-sbx" data-view="sbx" hidden><div class="ov-bar"><b>ROWAN SBX-80 SYNC BOX</b><span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="sbxSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="#141210" />
+<text x="1820" y="1883.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#a9a293" text-anchor="middle" font-weight="600" >Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate</text></svg></div></div></div>
+<div class="overlay float" id="ov-sbx" data-view="sbx" hidden><div class="ov-win"><div class="ov-bar"><b>ROWAN SBX-80 SYNC BOX</b><span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select><button class="ov-close" type="button">✕</button></div><div class="ov-body"><svg id="sbxSvg" width="1681" height="1491" viewBox="46 56 2050 1818" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="#141210" />
 <rect x="76" y="100" width="2001.65" height="1755.6000000000001" fill="#000" opacity="0.55" filter="url(#soft)"/>
 <rect x="60" y="70" width="2001.65" height="1755.6000000000001" fill="#8e8b74" rx="8"/>
 <rect x="106.55000000000001" y="70" width="1912.5400000000002" height="1755.6000000000001" fill="#ebe8df" />
@@ -100505,169 +100511,8 @@
 </g>
 <text x="500" y="1637" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#f1f2f4" text-anchor="middle" font-weight="800" letter-spacing="0.4">TAP</text>
 <text x="665" y="1637" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#f1f2f4" text-anchor="middle" font-weight="800" letter-spacing="0.4">SUB TAP</text>
-<text id="sbx-msg" x="133.15" y="1759.1000000000001" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#55606f">MANUAL</text>
-<text x="2160" y="80" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="22" fill="#9c9384" text-anchor="start" font-weight="800" letter-spacing="4">REAR PANEL</text>
-<rect x="2172" y="239" width="1505" height="440" fill="#000" opacity="0.5" filter="url(#soft)"/>
-<rect x="2160" y="215" width="1505" height="440" fill="#8e8b74" rx="6"/>
-<rect x="2200" y="215" width="1430" height="435" fill="#e6e2d7" />
-<rect x="2200" y="540" width="1430" height="3" fill="#000" opacity="0.15"/>
-<rect x="2405" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2423" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2441" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2459" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2477" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2495" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2585" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2603" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2621" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2639" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2657" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2675" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2765" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2783" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2801" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2819" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2837" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<rect x="2855" y="580" width="7" height="50" fill="#2a2622" rx="2"/>
-<polyline points="2360,265 2360,257 2445,257 2445,265" fill="none" stroke="#2b2d31" stroke-width="1.5"/>
-<rect x="2366.5" y="248" width="72" height="18" fill="#e6e2d7" />
-<text x="2403" y="262" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >REMOTE</text>
-<text x="2402" y="275" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >(DP-2)</text>
-<polyline points="2515,265 2515,257 2610,257 2610,265" fill="none" stroke="#2b2d31" stroke-width="1.5"/>
-<rect x="2531.5" y="248" width="62" height="18" fill="#e6e2d7" />
-<text x="2563" y="262" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >INPUT</text>
-<polyline points="2695,265 2695,257 2865,257 2865,265" fill="none" stroke="#2b2d31" stroke-width="1.5"/>
-<rect x="2744" y="248" width="72" height="18" fill="#e6e2d7" />
-<text x="2780" y="262" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >OUTPUT</text>
-<polyline points="2345,411 2345,403 2575,403 2575,411" fill="none" stroke="#2b2d31" stroke-width="1.5"/>
-<rect x="2434" y="394" width="52" height="18" fill="#e6e2d7" />
-<text x="2460" y="408" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >MIDI</text>
-<polyline points="2695,411 2695,403 2825,403 2825,411" fill="none" stroke="#2b2d31" stroke-width="1.5"/>
-<rect x="2734" y="394" width="52" height="18" fill="#e6e2d7" />
-<text x="2760" y="408" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >SYNC</text>
-<text x="2362" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >START</text>
-<circle cx="2362" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2362" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2362" cy="357" r="7" fill="#2c2c2e" />
-<text x="2442" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >STOP</text>
-<text x="2442" y="321" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >/CONT</text>
-<circle cx="2442" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2442" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2442" cy="357" r="7" fill="#2c2c2e" />
-<text x="2529" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >AUDIO</text>
-<text x="2529" y="321" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >IN</text>
-<circle cx="2529" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2529" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2529" cy="357" r="7" fill="#2c2c2e" />
-<text x="2608" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >SMPTE</text>
-<text x="2608" y="321" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >/LOAD</text>
-<circle cx="2608" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2608" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2608" cy="357" r="7" fill="#2c2c2e" />
-<text x="2695" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >SMPTE</text>
-<text x="2695" y="321" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >/SAVE</text>
-<circle cx="2695" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2695" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2695" cy="357" r="7" fill="#2c2c2e" />
-<text x="2777" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >TIME</text>
-<text x="2777" y="321" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >BASE</text>
-<circle cx="2777" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2777" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2777" cy="357" r="7" fill="#2c2c2e" />
-<text x="2862" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >METRONOME</text>
-<circle cx="2862" cy="357" r="25" fill="#1b1b1d" />
-<circle cx="2862" cy="357" r="18" fill="#0b0b0c" />
-<circle cx="2862" cy="357" r="7" fill="#2c2c2e" />
-<text x="2360" y="425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >IN</text>
-<circle cx="2360" cy="475" r="34" fill="#1b1b1d" />
-<circle cx="2360" cy="475" r="27" fill="#0e0e0f" />
-<circle cx="2348.7416697508024" cy="481.5" r="3" fill="#8f8f8f" />
-<circle cx="2353.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2360" cy="488" r="3" fill="#8f8f8f" />
-<circle cx="2366.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2371.2583302491976" cy="481.5" r="3" fill="#8f8f8f" />
-<rect x="2356" y="445" width="8" height="7" fill="#6a6a6a" />
-<text x="2460" y="425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >OUT</text>
-<circle cx="2460" cy="475" r="34" fill="#1b1b1d" />
-<circle cx="2460" cy="475" r="27" fill="#0e0e0f" />
-<circle cx="2448.7416697508024" cy="481.5" r="3" fill="#8f8f8f" />
-<circle cx="2453.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2460" cy="488" r="3" fill="#8f8f8f" />
-<circle cx="2466.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2471.2583302491976" cy="481.5" r="3" fill="#8f8f8f" />
-<rect x="2456" y="445" width="8" height="7" fill="#6a6a6a" />
-<text x="2560" y="425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >OUT</text>
-<circle cx="2560" cy="475" r="34" fill="#1b1b1d" />
-<circle cx="2560" cy="475" r="27" fill="#0e0e0f" />
-<circle cx="2548.7416697508024" cy="481.5" r="3" fill="#8f8f8f" />
-<circle cx="2553.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2560" cy="488" r="3" fill="#8f8f8f" />
-<circle cx="2566.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2571.2583302491976" cy="481.5" r="3" fill="#8f8f8f" />
-<rect x="2556" y="445" width="8" height="7" fill="#6a6a6a" />
-<text x="2700" y="425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >OUT</text>
-<circle cx="2700" cy="475" r="34" fill="#1b1b1d" />
-<circle cx="2700" cy="475" r="27" fill="#0e0e0f" />
-<circle cx="2688.7416697508024" cy="481.5" r="3" fill="#8f8f8f" />
-<circle cx="2693.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2700" cy="488" r="3" fill="#8f8f8f" />
-<circle cx="2706.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2711.2583302491976" cy="481.5" r="3" fill="#8f8f8f" />
-<rect x="2696" y="445" width="8" height="7" fill="#6a6a6a" />
-<text x="2827" y="425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="middle" font-weight="800" >OUT</text>
-<circle cx="2827" cy="475" r="34" fill="#1b1b1d" />
-<circle cx="2827" cy="475" r="27" fill="#0e0e0f" />
-<circle cx="2815.7416697508024" cy="481.5" r="3" fill="#8f8f8f" />
-<circle cx="2820.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2827" cy="488" r="3" fill="#8f8f8f" />
-<circle cx="2833.5" cy="486.2583302491977" r="3" fill="#8f8f8f" />
-<circle cx="2838.2583302491976" cy="481.5" r="3" fill="#8f8f8f" />
-<rect x="2823" y="445" width="8" height="7" fill="#6a6a6a" />
-<rect x="2900" y="410" width="253" height="117" fill="#151516" rx="3"/>
-<rect x="2885" y="215" width="225" height="80" fill="#151516" />
-<text x="2997" y="233" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#c9c9c9" text-anchor="middle" font-weight="800" >Complies with the limits</text>
-<text x="2997" y="251" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#c9c9c9" text-anchor="middle" font-weight="800" >for a Class B computing device</text>
-<text x="2997" y="269" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#c9c9c9" text-anchor="middle" font-weight="800" >pursuant to Subpart J</text>
-<text x="2997" y="287" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#c9c9c9" text-anchor="middle" font-weight="800" >of Part 15 of FCC Rules</text>
-<rect x="3127" y="241" width="168" height="139" fill="none" stroke="#2b2d31" stroke-width="2"/>
-<text x="3141" y="267" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#2b2d31" text-anchor="start" font-weight="800" >WARNING:</text>
-<text x="3141" y="287" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="start" font-weight="800" >SHOCK HAZARD</text>
-<text x="3141" y="307" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="start" font-weight="800" >-DO NOT OPEN</text>
-<text x="3141" y="327" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#2b2d31" text-anchor="start" font-weight="800" >AVIS: RISQUE</text>
-<text x="3141" y="347" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="start" font-weight="800" >DE CHOC ELECTRIQUE</text>
-<text x="3141" y="367" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#2b2d31" text-anchor="start" font-weight="800" >-NE PAS OUVRIR</text>
-<rect x="3173" y="475" width="158" height="52" fill="#d9dde2" />
-<text x="3252" y="492" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#2b2d31" text-anchor="middle" font-weight="800" >The SMPTE code of</text>
-<text x="3252" y="507" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#2b2d31" text-anchor="middle" font-weight="800" >this SBX-80 is set</text>
-<text x="3252" y="522" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#2b2d31" text-anchor="middle" font-weight="800" >to 30 frames/sec.</text>
-<text x="3490" y="271" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#2b2d31" text-anchor="middle" font-weight="800" >POWER</text>
-<text x="3465" y="293" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#2b2d31" text-anchor="middle" font-weight="800" >ON</text>
-<text x="3511" y="293" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#2b2d31" text-anchor="middle" font-weight="800" >OFF</text>
-<rect x="3443" y="303" width="92" height="50" fill="#1b1b1d" rx="3"/>
-<rect x="3455" y="311" width="40" height="34" fill="#3a3a3c" rx="2"/>
-<text x="3497" y="413" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#2b2d31" text-anchor="middle" font-weight="800" >AC</text>
-<rect x="3355" y="423" width="210" height="82" fill="#1b1b1d" rx="8"/>
-<rect x="3395" y="437" width="130" height="54" fill="#0b0b0c" rx="4"/>
-<rect x="3435" y="450" width="8" height="26" fill="#9a9a9a" />
-<rect x="3477" y="450" width="8" height="26" fill="#9a9a9a" />
-<text x="2160" y="700" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="22" fill="#9c9384" text-anchor="start" font-weight="800" letter-spacing="4">IN THIS STUDIO</text>
-<text x="2160" y="748" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >STRIPE  Set SMPTE to INT (the box generates code), arm track 24 on the autolocator (black key 24), then</text>
-<text x="2160" y="778" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >PLAY + RECORD the tape machine: SMPTE/SAVE prints to track 24 and the SMPTE REC light comes on.</text>
-<text x="2160" y="808" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >Re-striping part of the tape continues the code.</text>
-<text x="2160" y="850" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >LOCK  Set SMPTE to EXT and play the tape. SMPTE/LOAD reads track 24; MIDI OUT sends a steady clock and</text>
-<text x="2160" y="880" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >song position, SYNC OUT drives DIN-sync machines, TIME BASE clocks the rest. Vari-speed bends the clock</text>
-<text x="2160" y="910" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >with the tape.</text>
-<text x="2160" y="952" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >TEMPO  TEMPO knob, START/TAP or the keypad (BPM, ENTER). TIME SIGN then two digits sets the meter. EDIT</text>
-<text x="2160" y="982" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >+ BEAT BACK / FWD steps measures; INS / DEL / COPY edit the map. MANUAL plays the knob tempo instead of</text>
-<text x="2160" y="1012" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >the map.</text>
-<text x="2160" y="1054" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >TAP IN  Locked to the tape, press RECORD and tap along: each tap writes the tempo from that measure on,</text>
-<text x="2160" y="1084" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >so the machines follow the drummer.</text>
-<text x="2160" y="1126" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >SMPTE OFFSET + SET  Type a number and press a SET key (HR MIN SEC FRM BIT) to set where bar 1 falls;</text>
-<text x="2160" y="1156" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >SMPTE OFFSET alone takes the tape position. TAPE picks SAVE / VERIFY / LOAD, ENTER runs it. REPEAT loops</text>
-<text x="2160" y="1186" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="21" fill="#d9d3c7" text-anchor="start" font-weight="600" >the song. T taps while this view is open.</text>
-<text id="sbx-out" x="2160" y="1258" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#7dffd6">OUTPUTS</text>
-<text id="sbx-out2" x="2160" y="1292" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#7dffd6"></text></svg></div></div>
-<div class="overlay" id="ov-strip" data-view="strip" hidden><div class="ov-bar"><b>CHANNEL</b><span class="ov-msg" id="strip-title"></span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="stripSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none;touch-action:none"></svg></div></div>
+<text id="sbx-msg" x="133.15" y="1759.1000000000001" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#55606f">MANUAL</text></svg></div></div></div>
+<div class="overlay float" id="ov-strip" data-view="strip" hidden><div class="ov-win"><div class="ov-bar"><b>CHANNEL</b><span class="ov-msg" id="strip-title"></span><span class="ov-msg" id="strip-val"></span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg></div></div></div>
 <div class="overlay" id="ov-meters" data-view="meters" hidden><div class="ov-bar"><b>HJ-24 METER BRIDGE</b><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block"><rect x="0" y="0" width="3840" height="2104" fill="url(#deck)" />
 <rect x="0" y="0" width="3840" height="2104" fill="#000" opacity="0.45"/>
 <rect x="0" y="0" width="3840" height="2104" fill="#000" filter="url(#brushed)" opacity="0.06"/>
@@ -102543,7 +102388,7 @@
 <rect x="3610" y="1904" width="200" height="72" fill="url(#btnLit)" rx="2"/>
 <text x="3710" y="1949.36" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#1a1208" text-anchor="middle" font-weight="800" >SAFE</text>
 <text x="3600" y="2030" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="20" fill="#b8b1a5" text-anchor="middle" font-weight="800" letter-spacing="1.5">SAFE · MONITORING REPRO</text></svg></div></div>
-<div class="overlay" id="ov-224" data-view="224" hidden><div class="ov-bar"><b>LEXIMAN 224X DIGITAL REVERB</b><span class="ov-param">BASS RT</span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
+<div class="overlay float" id="ov-224" data-view="224" hidden><div class="ov-win"><div class="ov-bar"><b>LEXIMAN 224X</b><span class="ov-param">BASS RT</span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><svg width="1017" height="1558" viewBox="480 190 1070 1640" style="display:block"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
 <rect x="0" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
 <rect x="94" y="0" width="2" height="2104" fill="#000" opacity="0.6"/>
 <rect x="96" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
@@ -102934,7 +102779,7 @@
 <rect x="914" y="910" width="74" height="72" fill="transparent" class="key224b" data-i="5"/>
 <text x="922" y="1012" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#f2f4f8" text-anchor="middle" font-weight="700" >6</text>
 </g>
-<text x="1012" y="1900" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#d9d3c7" text-anchor="middle" font-weight="600" >Drag a slider to change it · press a lower key to show its value · press a program key to load a program</text></svg></div></div>
+<text x="1012" y="1900" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#d9d3c7" text-anchor="middle" font-weight="600" >Drag a slider to change it · press a lower key to show its value · press a program key to load a program</text></svg></div></div></div>
 <div class="overlay" id="ov-patchbay" data-view="patchbay" hidden><div class="ov-bar"><b>PATCHBAY</b><span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="pbSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;background:#0b0a09;touch-action:none"></svg></div></div>
 </div>
 <script>window.TAPE_DB = [-13.8,-11.3,-5.2,-10.9,-1.8,-12.5,-13.2,-2.1,-4.3,-1.7,-5.5,-7.9,-4.3,-8.2,-2.8,-2.8,-6,-10.6,-8.1,1.2,-10.8,-30,-2.2,-7.5]; window.JH_LIVE = {"R":250,"hubR":90,"TAPE_Z0":26,"TAPE_Z1":98,"s":{"cx":335.7142857142857,"cy":220.57142857142856,"pack":213,"other":{"cx":290,"cy":561.4285714285714,"r":18,"px":365,"py":660.4285714285714},"sig":{"sa":1,"sb":1,"sg":1},"packFirst":true},"t":{"cx":1024.2857142857142,"cy":220.57142857142856,"pack":145,"other":{"cx":1128,"cy":553.4285714285714,"r":22,"px":1053,"py":656.4285714285714},"sig":{"sa":1,"sb":1,"sg":1},"packFirst":false}}; window.A8_LIVE = undefined;</script>
@@ -103781,6 +103626,8 @@ class ClockOut {
   function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
   document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', hide));
+  // floating windows close when you click the dimmed studio around them
+  document.querySelectorAll('.overlay.float').forEach((o) => o.addEventListener('pointerdown', (e) => { if (e.target === o) hide(); }));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
   const svgPt = (svg, e, ref = svg) => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(ref.getScreenCTM().inverse()); };
 
@@ -104722,24 +104569,20 @@ class ClockOut {
     o += T(2120, ly0 + lh - 30, 'Drag a knob up / down or use the wheel · double-click resets · click a key · ← → steps channels', 22, '#9c9384', 'start', 700);
     return o;
   }
+  // the pop-up is a window around just the clicked section of that channel, magnified (the console's own drawing)
   function renderStrip() {
     if (!STRIP_SVG) return;
     const { con, ch, sec } = SP, sp = SPEC[con], ss = sp[sec];
     chState(con, ch); applyCh(con, ch);
-    let o = `<rect width="3840" height="2104" fill="#141210"/>`;
-    o += T(90, 92, `${sp.name}  ·  CHANNEL ${String(ch + 1).padStart(2, '0')}`, 44, '#efe8dc', 'start', 900, 'letter-spacing="3"');
-    o += `<rect x="90" y="112" width="300" height="56" rx="4" fill="#f2eee2"/>` + T(240, 152, NAMES[ch], 36, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', sans-serif"`);
-    o += `<g data-nav="-1" style="cursor:pointer"><rect x="420" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(468, 150, '◀', 30, '#efe8dc')}</g><g data-nav="1" style="cursor:pointer"><rect x="530" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(578, 150, '▶', 30, '#efe8dc')}</g>`;
-    ORDER[con].forEach((k, i) => { const on = k === sec, x = 700 + i * 300; o += `<g data-tab="${k}" style="cursor:pointer"><rect x="${x}" y="108" width="280" height="64" rx="6" fill="${on ? '#ffb02e' : '#2b2c30'}"/>${T(x + 140, 150, SPEC[con][k].title.split(' · ')[0], 26, on ? '#1a1208' : '#efe8dc', 'middle', 900, 'letter-spacing="2"')}</g>`; });
-    // magnified section(s) of the console itself
-    const rects = panelsFor(con, ch, sec), AW = 1900, AH = 1820, gap = 60;
+    const rects = panelsFor(con, ch, sec), pad = 26, gap = 36;
     const tw = rects.reduce((a, r) => a + r[2], 0), th = Math.max(...rects.map((r) => r[3]));
-    const sc = Math.min(AH / th, (AW - gap * (rects.length - 1)) / tw);
-    let px = 110 + (AW - (tw * sc + gap * (rects.length - 1))) / 2;
+    const sc = Math.min(4.4, 1720 / th, (1500 - gap * (rects.length - 1)) / tw);
+    const W = Math.round(tw * sc + gap * (rects.length - 1) + 2 * pad), H = Math.round(th * sc + 2 * pad);
+    STRIP_SVG.setAttribute('width', W); STRIP_SVG.setAttribute('height', H); STRIP_SVG.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    let o = `<rect width="${W}" height="${H}" fill="#141210"/>`, px = pad;
     PANELS = [];
     for (const [x, y, w, h] of rects) {
-      const pw = w * sc, ph = h * sc, py = 210 + (AH - ph) / 2, vx = con === 'cmi' ? x : x - 24, vy = con === 'cmi' ? y : y - 690;
-      o += `<rect x="${px - 14}" y="${py - 14}" width="${pw + 28}" height="${ph + 28}" rx="10" fill="#000" opacity="0.6"/>`;
+      const pw = w * sc, ph = h * sc, py = pad + (th * sc - ph) / 2, vx = con === 'cmi' ? x : x - 24, vy = con === 'cmi' ? y : y - 690;
       o += `<svg x="${px}" y="${py}" width="${pw}" height="${ph}" viewBox="${vx} ${vy} ${w} ${h}" style="overflow:hidden"><use href="#${con === 'cmi' ? 'room-svg' : 'sls-svg'}"/></svg>`;
       PANELS.push({ px, py, pw, ph, x, y, w, h, sc });
       px += pw + gap;
@@ -104747,13 +104590,23 @@ class ClockOut {
     // the controls inside those sections (positions from the console itself)
     const E = els(con, ch); CTRLS = [];
     const inP = (b) => rects.some(([x, y, w, h]) => b.x + b.w / 2 >= x && b.x + b.w / 2 <= x + w && b.y + b.h / 2 >= y && b.y + b.h / 2 <= y + h);
-    for (const el of E.k) { const b = stageBox(el.querySelector('.kptr') ? el : el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
+    for (const el of E.k) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
     for (const el of E.b) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'key', id: el.dataset.bid, el, ...b }); }
-    o += `<g id="strip-side">${sideSvg()}</g>`;
     STRIP_SVG.innerHTML = o;
-    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `${sp.name} · CH ${ch + 1} · ${NAMES[ch]} · ${ss.title}`;
+    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `CH ${ch + 1} · ${NAMES[ch]} · ${ss.title.split(' · ')[0]}`;
+    const ow = document.querySelector('#ov-strip .ov-win'); if (ow) ow.style.minWidth = '0';
+    showVal(null);
   }
-  const refreshSide = () => { const g = document.getElementById('strip-side'); if (g) g.innerHTML = sideSvg(); };
+  // the value of the control being touched, in the window's title bar
+  function showVal(c) {
+    const v = document.getElementById('strip-val'); if (!v) return;
+    if (!c) { v.textContent = '← → channels'; return; }
+    const { con, ch } = SP, s = chState(con, ch), d = DEF[con][c.id];
+    const lab = (d && d.label) || (/^bus\d+$/.test(c.id) ? (con === 'sls' ? 'GROUPS' : 'BUSES') : c.id.replace(/_/g, ' ').toUpperCase());
+    v.textContent = /^bus\d+$/.test(c.id) ? `${lab} ${s.bus.length ? s.bus.join(' · ') : 'none'}` : c.t === 'key' ? `${lab} ${s[c.id] ? 'IN' : 'OUT'}` : `${lab} ${fmtV(knobDef(con, c.id), s[c.id])}`;
+  }
+  let lastCtl = null;
+  const refreshSide = () => showVal(lastCtl);
   function openStrip(con, ch, sec) { SP.con = con; SP.ch = ch; SP.sec = sec; show('strip'); renderStrip(); }
   window.AS_OPEN_STRIP = openStrip;
   // popup point -> console control
@@ -104774,6 +104627,7 @@ class ClockOut {
       const nav = e.target.closest('[data-tab],[data-nav]');
       if (nav) { if (nav.dataset.tab) SP.sec = nav.dataset.tab; else SP.ch = (SP.ch + +nav.dataset.nav + 32) % 32; renderStrip(); return; }
       const c = hitCtrl(e); if (!c) return;
+      lastCtl = c;
       const s = chState(SP.con, SP.ch);
       if (c.t === 'knob') { const d = knobDef(SP.con, c.id); drag = { c, d, y: svgPt(STRIP_SVG, e).y, f: toFrac(d, s[c.id]) }; STRIP_SVG.setPointerCapture(e.pointerId); return; }
       if (/^bus\d+$/.test(c.id)) { const b = +c.id.slice(3); s.bus = s.bus.includes(b) ? s.bus.filter((x) => x !== b) : [...s.bus, b].sort((a, z) => a - z); }
@@ -104786,8 +104640,8 @@ class ClockOut {
       STRIP_SVG.style.cursor = hitCtrl(e) ? (hitCtrl(e).t === 'knob' ? 'ns-resize' : 'pointer') : 'default';
     });
     STRIP_SVG.addEventListener('pointerup', () => { if (drag) { drag = null; saveST2(); } });
-    STRIP_SVG.addEventListener('dblclick', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; chState(SP.con, SP.ch)[c.id] = knobDef(SP.con, c.id).def; applyCh(SP.con, SP.ch); saveST2(); refreshSide(); });
-    STRIP_SVG.addEventListener('wheel', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; e.preventDefault(); const s = chState(SP.con, SP.ch), d = knobDef(SP.con, c.id); s[c.id] = fromFrac(d, toFrac(d, s[c.id]) - Math.sign(e.deltaY) * 0.02); applyCh(SP.con, SP.ch); saveST2(); refreshSide(); }, { passive: false });
+    STRIP_SVG.addEventListener('dblclick', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; lastCtl = c; chState(SP.con, SP.ch)[c.id] = knobDef(SP.con, c.id).def; applyCh(SP.con, SP.ch); saveST2(); refreshSide(); });
+    STRIP_SVG.addEventListener('wheel', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; lastCtl = c; e.preventDefault(); const s = chState(SP.con, SP.ch), d = knobDef(SP.con, c.id); s[c.id] = fromFrac(d, toFrac(d, s[c.id]) - Math.sign(e.deltaY) * 0.02); applyCh(SP.con, SP.ch); saveST2(); refreshSide(); }, { passive: false });
     addEventListener('keydown', (e) => { if (open && open.dataset.view === 'strip' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { SP.ch = (SP.ch + (e.key === 'ArrowLeft' ? 31 : 1)) % 32; renderStrip(); } });
   }
   // ---- click targets on the consoles: work out channel and section from the click position ----

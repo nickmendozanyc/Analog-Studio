@@ -39,6 +39,7 @@ module.exports = function buildSBX(h, { W, OVH }) {
     p('</g>');
   };
 
+  globalThis.SBX_BOX = [Math.round(X(55) - 14), Math.round(Y(75) - 14), Math.round(X(1560) - X(55) + 48), Math.round(Y(1395) - Y(75) + 62)];
   return capture(() => {
     rect(0, 0, W, OVH, '#141210');
     // ======================= FRONT =======================
@@ -128,45 +129,6 @@ module.exports = function buildSBX(h, { W, OVH }) {
     lbl(386, 1253, 'TAP', 14); lbl(510, 1253, 'SUB TAP', 14);
     p(`<text id="sbx-msg" x="${X(110)}" y="${Y(1345)}" font-family="${MONO}" font-size="22" font-weight="700" fill="#55606f">MANUAL</text>`);
 
-    // ======================= REAR (photo 2) =======================
-    const RX0 = 2160, RY0 = 110, RXf = (px) => RX0 + (px - 55), RYf = (py) => RY0 + (py - 75);
-    const rl = (px, py, t, size = 14, fill = '#2b2d31', anchor = 'middle') => text(RXf(px).toFixed(0), RYf(py).toFixed(0), t, size, fill, anchor, 800);
-    text(RX0, RY0 - 30, 'REAR PANEL', 22, '#9c9384', 'start', 800, 'letter-spacing="4"');
-    rect(RXf(55) + 12, RYf(180) + 24, RXf(1560) - RXf(55), RYf(620) - RYf(180), '#000', 'opacity="0.5" filter="url(#soft)"');
-    rect(RXf(55), RYf(180), RXf(1560) - RXf(55), RYf(620) - RYf(180), CHEEK, 'rx="6"');
-    rect(RXf(95), RYf(180), RXf(1525) - RXf(95), RYf(615) - RYf(180), '#e6e2d7');
-    rect(RXf(95), RYf(505), RXf(1525) - RXf(95), 3, '#000', 'opacity="0.15"');
-    for (const vx of [300, 480, 660]) for (let k = 0; k < 6; k++) rect(RXf(vx + k * 18), RYf(545), 7, 50, '#2a2622', 'rx="2"');
-    const jack = (px, py) => { circle(RXf(px), RYf(py), 25, '#1b1b1d'); circle(RXf(px), RYf(py), 18, '#0b0b0c'); circle(RXf(px), RYf(py), 7, '#2c2c2e'); };
-    const din = (px, py) => { circle(RXf(px), RYf(py), 34, '#1b1b1d'); circle(RXf(px), RYf(py), 27, '#0e0e0f'); for (let k = 0; k < 5; k++) { const a = (210 + k * 30) * Math.PI / 180; circle(RXf(px) + 13 * Math.cos(a), RYf(py) - 13 * Math.sin(a), 3, '#8f8f8f'); } rect(RXf(px) - 4, RYf(py) - 30, 8, 7, '#6a6a6a'); };
-    const br = (x1, x2, py, t) => { p(`<polyline points="${RXf(x1)},${RYf(py) + 8} ${RXf(x1)},${RYf(py)} ${RXf(x2)},${RYf(py)} ${RXf(x2)},${RYf(py) + 8}" fill="none" stroke="#2b2d31" stroke-width="1.5"/>`); rect(RXf((x1 + x2) / 2) - t.length * 5 - 6, RYf(py) - 9, t.length * 10 + 12, 18, '#e6e2d7'); rl((x1 + x2) / 2, py + 5, t); };
-    br(255, 340, 222, 'REMOTE'); rl(297, 240, '(DP-2)'); br(410, 505, 222, 'INPUT'); br(590, 760, 222, 'OUTPUT'); br(240, 470, 368, 'MIDI'); br(590, 720, 368, 'SYNC');
-    [['START', '', 257], ['STOP', '/CONT', 337], ['AUDIO', 'IN', 424], ['SMPTE', '/LOAD', 503], ['SMPTE', '/SAVE', 590], ['TIME', 'BASE', 672], ['METRONOME', '', 757]].forEach(([a, b, px]) => { rl(px, 272, a); if (b) rl(px, 286, b); jack(px, 322); });
-    [['IN', 255], ['OUT', 355], ['OUT', 455], ['OUT', 595], ['OUT', 722]].forEach(([l, px]) => { rl(px, 390, l); din(px, 440); });
-    rect(RXf(795), RYf(375), RXf(1048) - RXf(795), RYf(492) - RYf(375), '#151516', 'rx="3"');
-    rect(RXf(780), RYf(180), RXf(1005) - RXf(780), RYf(260) - RYf(180), '#151516');
-    ['Complies with the limits', 'for a Class B computing device', 'pursuant to Subpart J', 'of Part 15 of FCC Rules'].forEach((t, k) => rl(892, 198 + k * 18, t, 11, '#c9c9c9'));
-    rect(RXf(1022), RYf(206), RXf(1190) - RXf(1022), RYf(345) - RYf(206), 'none', 'stroke="#2b2d31" stroke-width="2"');
-    ['WARNING:', 'SHOCK HAZARD', '-DO NOT OPEN', 'AVIS: RISQUE', 'DE CHOC ELECTRIQUE', '-NE PAS OUVRIR'].forEach((t, k) => rl(1036, 232 + k * 20, t, k === 0 || k === 3 ? 17 : 14, '#2b2d31', 'start'));
-    rect(RXf(1068), RYf(440), RXf(1226) - RXf(1068), RYf(492) - RYf(440), '#d9dde2');
-    ['The SMPTE code of', 'this SBX-80 is set', 'to 30 frames/sec.'].forEach((t, k) => rl(1147, 457 + k * 15, t, 12));
-    rl(1385, 236, 'POWER', 15); rl(1360, 258, 'ON', 13); rl(1406, 258, 'OFF', 13);
-    rect(RXf(1338), RYf(268), RXf(1430) - RXf(1338), RYf(318) - RYf(268), '#1b1b1d', 'rx="3"'); rect(RXf(1350), RYf(276), 40, 34, '#3a3a3c', 'rx="2"');
-    rl(1392, 378, 'AC', 15); rect(RXf(1250), RYf(388), RXf(1460) - RXf(1250), RYf(470) - RYf(388), '#1b1b1d', 'rx="8"'); rect(RXf(1290), RYf(402), RXf(1420) - RXf(1290), RYf(456) - RYf(402), '#0b0b0c', 'rx="4"'); rect(RXf(1330), RYf(415), 8, 26, '#9a9a9a'); rect(RXf(1372), RYf(415), 8, 26, '#9a9a9a');
-    // ======================= how it's used here =======================
-    const wrap = (s, n) => { const out = []; let line = ''; for (const w of s.split(' ')) { if ((line + ' ' + w).trim().length > n) { out.push(line.trim()); line = w; } else line += ' ' + w; } if (line.trim()) out.push(line.trim()); return out; };
-    const hy = 700;
-    text(RX0, hy, 'IN THIS STUDIO', 22, '#9c9384', 'start', 800, 'letter-spacing="4"');
-    const steps = [
-      'STRIPE  Set SMPTE to INT (the box generates code), arm track 24 on the autolocator (black key 24), then PLAY + RECORD the tape machine: SMPTE/SAVE prints to track 24 and the SMPTE REC light comes on. Re-striping part of the tape continues the code.',
-      'LOCK  Set SMPTE to EXT and play the tape. SMPTE/LOAD reads track 24; MIDI OUT sends a steady clock and song position, SYNC OUT drives DIN-sync machines, TIME BASE clocks the rest. Vari-speed bends the clock with the tape.',
-      'TEMPO  TEMPO knob, START/TAP or the keypad (BPM, ENTER). TIME SIGN then two digits sets the meter. EDIT + BEAT BACK / FWD steps measures; INS / DEL / COPY edit the map. MANUAL plays the knob tempo instead of the map.',
-      'TAP IN  Locked to the tape, press RECORD and tap along: each tap writes the tempo from that measure on, so the machines follow the drummer.',
-      'SMPTE OFFSET + SET  Type a number and press a SET key (HR MIN SEC FRM BIT) to set where bar 1 falls; SMPTE OFFSET alone takes the tape position. TAPE picks SAVE / VERIFY / LOAD, ENTER runs it. REPEAT loops the song. T taps while this view is open.',
-    ];
-    let ly = hy + 48;
-    steps.forEach((s) => { wrap(s, 104).forEach((l) => { text(RX0, ly, l, 21, '#d9d3c7', 'start', 600); ly += 30; }); ly += 12; });
-    p(`<text id="sbx-out" x="${RX0}" y="${ly + 30}" font-family="${MONO}" font-size="22" font-weight="700" fill="${VFD}">OUTPUTS</text>`);
-    p(`<text id="sbx-out2" x="${RX0}" y="${ly + 64}" font-family="${MONO}" font-size="22" font-weight="700" fill="${VFD}"></text>`);
+    // (rear panel and notes left out: the pop-up shows just the machine)
   });
 };

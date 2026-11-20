@@ -27,6 +27,8 @@
   function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
   document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', hide));
+  // floating windows close when you click the dimmed studio around them
+  document.querySelectorAll('.overlay.float').forEach((o) => o.addEventListener('pointerdown', (e) => { if (e.target === o) hide(); }));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
   const svgPt = (svg, e, ref = svg) => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(ref.getScreenCTM().inverse()); };
 
