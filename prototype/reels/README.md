@@ -18,6 +18,10 @@ Controls: **Space** play / stop, **←** rewind, **→** fast forward, **R** rec
 5. Toggle motion blur (B) at wind speed: with blur the slots and labels smear the way they do to the eye; without it they strobe.
 6. The frame-rate readout should hold your display's refresh rate (60 or 120 fps).
 
+## Transport feel
+
+The Feel keys switch the transport profile in `physics.js` (`TRANSPORTS`). The JH-24 profile steps its reel torque straight in, so winds start and stop with a slight lurch. The Studer A827 profile is jerk-limited: acceleration builds and fades along an S-curve with a long, gentle landing, the A827's famously smooth transport. From a 1000 ft position the JH-24 reaches wind speed in about 0.7 s and stops in 0.5 s; the A827 takes about 1.3 s and 1.4 s, without any jolt. The visuals stay those of the JH-24 for now.
+
 ## How it works
 
 - `physics.js`: renderer-independent transport model in SI units: pack radius from tape length, reel speed = tape speed ÷ pack radius, force-limited reel motors with the inertia of each pack, capstan servo for play, pinch-roller engagement near play speed, lifters, end of tape. It is written to port directly to the C++ engine.

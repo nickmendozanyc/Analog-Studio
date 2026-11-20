@@ -26,16 +26,41 @@ export const TAPE = {
   flangeR: 0.1334,      // 10.5" metal reel: 2500 ft of 2" tape on a 4.5" hub fills it
 };
 
-export const MACHINE = {
-  emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
-  windSpeed: 9.0,           // m/s (~354 ips) (approx)
-  windForce: 42,            // N, reel-motor drive force at the tape (approx)
-  brakeForce: 64,           // N, braking force at the tape (approx)
-  capstanTau: 0.11,         // s, capstan servo time constant (approx)
-  capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
-  pinchEngageWindow: 0.06,  // m/s, pinch roller engages within this of play speed
-  lifterSpeed: 1.6,         // m/s, lifters come in above this speed
+// Transport profiles: how each machine's motors and servos feel. Same physics, different character.
+//  jerk     how fast acceleration itself may change (m/s^3): low = smooth S-curve ramps, high = abrupt
+//  landing  speed band (m/s) over which the reel servos ease off before reaching the target speed
+//  pinchTau time constant (s) of the pinch roller swinging in or out
+export const TRANSPORTS = {
+  jh24: {
+    name: 'MCI JH-24',
+    emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
+    windSpeed: 9.0,           // m/s (~354 ips) (approx)
+    windForce: 42,            // N, reel-motor drive force at the tape (approx)
+    brakeForce: 64,           // N, braking force at the tape (approx)
+    jerk: 400,                // effectively unlimited: torque steps straight in, the classic JH-24 lurch
+    landing: 0.4,
+    capstanTau: 0.11,         // s, capstan servo time constant (approx)
+    capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
+    pinchTau: 0.06,
+    pinchEngageWindow: 0.06,  // m/s, pinch roller engages within this of play speed
+    lifterSpeed: 1.6,         // m/s, lifters come in above this speed
+  },
+  a827: {
+    name: 'Studer A827',
+    emptyReelInertia: 0.0065,
+    windSpeed: 10.0,          // fast winds (approx)
+    windForce: 50,            // strong, servo-controlled reel motors (approx)
+    brakeForce: 60,           // electronic braking, no mechanical grab (approx)
+    jerk: 22,                 // jerk-limited S-curve ramps: the A827's very smooth starts and stops (approx)
+    landing: 1.4,             // long, gentle approach to the target speed
+    capstanTau: 0.2,          // softer capstan servo (approx)
+    capstanSlew: 3.5,
+    pinchTau: 0.14,           // slower, quieter pinch-roller engagement
+    pinchEngageWindow: 0.04,
+    lifterSpeed: 1.6,
+  },
 };
+export const MACHINE = TRANSPORTS.jh24;
 
 export const IPS = 0.0254; // m/s per inch-per-second
 export const FT = 0.3048;
@@ -53,7 +78,8 @@ export const capacity = (tape = TAPE) => Math.PI * (tape.flangeR * tape.flangeR 
 
 export class Transport {
   constructor({ totalLength = ROLL_FT * FT, onTakeup = 0, speedIPS = 30, tape = TAPE, machine = MACHINE } = {}) {
-    this.tape = tape; this.m = machine;
+    this.tape = tape; this.m = typeof machine === 'string' ? TRANSPORTS[machine] : machine;
+    this.acc = 0;                 // current reel-motor acceleration (m/s^2), jerk limited
     this.total = Math.min(totalLength, capacity(tape));
     this.take = Math.min(Math.max(onTakeup, 0), this.total);
     this.v = 0;
@@ -84,6 +110,7 @@ export class Transport {
     this.mode = mode;
     if (mode !== 'stop') this.endOfTape = false;
   }
+  setMachine(key) { if (TRANSPORTS[key]) { this.m = TRANSPORTS[key]; this.acc = 0; } }
   setSpeed(ips) { if (SPEEDS_IPS.includes(ips)) this.speedIPS = ips; }
   setVarispeed(f) { this.varispeed = Math.max(-VARI_RANGE, Math.min(VARI_RANGE, f)); }
   setShuttle(x) { this.shuttle = Math.max(-1, Math.min(1, x)); if (x !== 0) this.mode = 'shuttle'; }
@@ -110,13 +137,14 @@ export class Transport {
     const playing = this.mode === 'play' || this.mode === 'rec';
     const nearPlay = Math.abs(this.v - this.playSpeed) < this.m.pinchEngageWindow;
     const pinchWanted = playing && (this.pinch > 0.5 || nearPlay);
-    this.pinch += ((pinchWanted ? 1 : 0) - this.pinch) * Math.min(1, dt / 0.06);
+    this.pinch += ((pinchWanted ? 1 : 0) - this.pinch) * Math.min(1, dt / (this.m.pinchTau ?? 0.06));
 
     if (playing && this.pinch > 0.5) {
       // capstan servo: first-order approach to play speed, slew limited
       const dv = (target - this.v) * Math.min(1, dt / this.m.capstanTau);
       const lim = this.m.capstanSlew * dt;
       this.v += Math.max(-lim, Math.min(lim, dv));
+      this.acc = 0;
     } else {
       // reel motors: force limited; braking when the speed magnitude must fall
       const goal = playing ? this.playSpeed : target;
@@ -124,10 +152,18 @@ export class Transport {
       const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
       const F = braking ? this.m.brakeForce : this.m.windForce;
       const aMax = F / this.effectiveMass();
-      // soft landing: ease off in the last 0.4 m/s so the reels settle instead of snapping
-      const a = aMax * Math.min(1, Math.abs(diff) / 0.4 + 0.08);
-      const dvMax = a * dt;
-      this.v += Math.max(-dvMax, Math.min(dvMax, diff));
+      // soft landing: ease off within the machine's landing band so the reels settle instead of snapping
+      const land = this.m.landing ?? 0.4;
+      const jerk = this.m.jerk ?? 400;
+      // never carry more acceleration than can be shed (at the jerk limit) before reaching the target
+      const aDes = Math.sign(diff) * Math.min(aMax * Math.min(1, Math.abs(diff) / land + 0.08), Math.max(2 * jerk * dt, Math.sqrt(2 * jerk * Math.abs(diff)) - 1.5 * jerk * dt));   // floor keeps it creeping in to lock-on
+      // jerk limit: acceleration itself changes no faster than the machine allows (S-curve ramps)
+      const dj = jerk * dt;
+      this.acc += Math.max(-dj, Math.min(dj, aDes - this.acc));
+      const dv = this.acc * dt;
+      const settled = Math.abs(diff) < 3e-4 && Math.abs(this.acc) <= 2 * dj;   // within a hair of the target: lock on
+      if (settled || (diff >= 0 && dv >= diff) || (diff <= 0 && dv <= diff)) { this.v = goal; this.acc = 0; }
+      else this.v += dv;
     }
 
     // lifters
