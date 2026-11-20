@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Transport, TAPE, MACHINE, IPS, FT, ROLL_FT, packRadius, capacity } from './physics.js';
+import { Transport, TAPE, MACHINE, IPS, FT, ROLL_FT, VARI_RANGE, packRadius, capacity } from './physics.js';
 
 const close = (a, b, tol, msg) => assert.ok(Math.abs(a - b) <= tol, `${msg}: ${a} vs ${b} (±${tol})`);
 
@@ -99,4 +99,20 @@ test('a stopped transport at the head or tail is not end of tape', () => {
     const t = new Transport({ onTakeup: at }); t.advance(1);
     assert.equal(t.endOfTape, false, `at ${at} m`);
   }
+});
+
+test('7.5 IPS runs at a quarter of 30 IPS', () => {
+  const t = new Transport({ speedIPS: 7.5 });
+  t.command('play'); t.advance(2);
+  close(t.v, 7.5 * IPS, 1e-3, '7.5 ips');
+});
+
+test('vari-speed changes play speed but not the tape counter rate', () => {
+  const t = new Transport({ speedIPS: 30 });
+  t.setVarispeed(0.1); t.command('play'); t.advance(3);
+  close(t.v, 33 * IPS, 1e-3, '+10 % plays at 33 ips');
+  close(t.semitones, 12 * Math.log2(1.1), 1e-9, 'about +1.65 semitones');
+  const c0 = t.counter; t.advance(1);
+  close(t.counter - c0, 1.1, 0.01, 'counter advances 1.1 s of tape per second');
+  t.setVarispeed(5); close(t.varispeed, VARI_RANGE, 1e-12, 'clamped to the range');
 });

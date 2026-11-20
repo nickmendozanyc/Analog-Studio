@@ -289,11 +289,11 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     const ry = 22;
     btn(stepB + 22, ry, 36, 28, '#3f7fd6', false, '▲', 'LIFT');
     btn(stepB + 72, ry, 36, 28, '#ea8a2a', false, '✂', 'EDIT');
-    btn(stepB + 136, ry + 2, 32, 24, '#efece4', false, '15', ''); btn(stepB + 172, ry + 2, 32, 24, '#ffb02e', true, '30', ''); s.push(txt(stepB + 170, ry + 44, 'IPS', 7.5, '#e9e4da'));
-    btn(stepB + 224, ry + 2, 32, 24, '#fff6e0', true, '', ''); s.push(txt(stepB + 240, ry + 18, 'AES', 8, '#1a1208'));
-    btn(stepB + 260, ry + 2, 32, 24, '#efece4', false, '', ''); s.push(txt(stepB + 276, ry + 18, 'NAB', 8, '#1a1208'));
-    s.push(txt(stepB + 258, ry + 44, 'EQ', 7.5, '#e9e4da'));
-    knobS(stepB + 330, ry + 14, 10, 40, 'SAT'); knobS(stepB + 370, ry + 14, 10, -60, 'W/F'); knobS(stepB + 410, ry + 14, 10, -90, 'HISS');
+    btn(stepB + 124, ry + 2, 32, 24, '#efece4', false, '7½', ''); btn(stepB + 160, ry + 2, 32, 24, '#efece4', false, '15', ''); btn(stepB + 196, ry + 2, 32, 24, '#ffb02e', true, '30', ''); s.push(txt(stepB + 176, ry + 44, 'IPS', 7.5, '#e9e4da'));
+    btn(stepB + 244, ry + 2, 32, 24, '#fff6e0', true, '', ''); s.push(txt(stepB + 260, ry + 18, 'AES', 8, '#1a1208'));
+    btn(stepB + 280, ry + 2, 32, 24, '#efece4', false, '', ''); s.push(txt(stepB + 296, ry + 18, 'NAB', 8, '#1a1208'));
+    s.push(txt(stepB + 278, ry + 44, 'EQ', 7.5, '#e9e4da'));
+    knobS(stepB + 342, ry + 14, 10, 40, 'SAT'); knobS(stepB + 378, ry + 14, 10, -60, 'W/F'); knobS(stepB + 414, ry + 14, 10, -90, 'HISS');
     btn(stepB + 440, ry + 2, 32, 24, '#e8a840', false, '', 'BYPASS');
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform-origin:50% 100%;transform:translateZ(${zFront}px) rotateX(${slope}deg)`)}">${svg(w, d, s.join(''))}</div>`);
     const zBack = zFront + d * Math.sin(-slope * Math.PI / 180);

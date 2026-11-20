@@ -40,6 +40,8 @@ export const MACHINE = {
 export const IPS = 0.0254; // m/s per inch-per-second
 export const FT = 0.3048;
 export const ROLL_FT = 2500; // feet of tape on a full reel
+export const SPEEDS_IPS = [7.5, 15, 30];
+export const VARI_RANGE = 0.2;  // vari-speed range: ±20 % (about ±3 semitones)
 
 export const packRadius = (len, tape = TAPE) => Math.sqrt(tape.hubR * tape.hubR + Math.max(0, len) * tape.thickness / Math.PI);
 export const packMass = (len, tape = TAPE) => Math.max(0, len) * tape.thickness * tape.width * tape.density;
@@ -56,7 +58,8 @@ export class Transport {
     this.take = Math.min(Math.max(onTakeup, 0), this.total);
     this.v = 0;
     this.mode = 'stop';           // stop | play | rec | ff | rew | shuttle
-    this.speedIPS = speedIPS;     // 15 | 30
+    this.speedIPS = speedIPS;     // 7.5 | 15 | 30
+    this.varispeed = 0;           // fraction, -VARI_RANGE..+VARI_RANGE (0 = off)
     this.shuttle = 0;             // -1 .. 1
     this.liftDefeat = false;
     this.pinch = 0;               // 0 = retracted, 1 = engaged (smoothed for animation)
@@ -70,8 +73,10 @@ export class Transport {
   get rT() { return packRadius(this.take, this.tape); }
   get wS() { return this.v / this.rS; }      // rad/s (supply pays out when v > 0)
   get wT() { return this.v / this.rT; }
-  get playSpeed() { return this.speedIPS * IPS; }
-  get counter() { return (this.take - this.zero) / this.playSpeed; } // seconds of tape at the selected speed
+  get nominalSpeed() { return this.speedIPS * IPS; }
+  get playSpeed() { return this.nominalSpeed * (1 + this.varispeed); }
+  get semitones() { return 12 * Math.log2(1 + this.varispeed); }   // pitch shift heard from vari-speed
+  get counter() { return (this.take - this.zero) / this.nominalSpeed; } // tape time at the selected speed (vari-speed does not change it)
   get capstanDriving() { return (this.mode === 'play' || this.mode === 'rec') && this.pinch > 0.98; }
 
   command(mode) {
@@ -79,7 +84,8 @@ export class Transport {
     this.mode = mode;
     if (mode !== 'stop') this.endOfTape = false;
   }
-  setSpeed(ips) { this.speedIPS = ips; }
+  setSpeed(ips) { if (SPEEDS_IPS.includes(ips)) this.speedIPS = ips; }
+  setVarispeed(f) { this.varispeed = Math.max(-VARI_RANGE, Math.min(VARI_RANGE, f)); }
   setShuttle(x) { this.shuttle = Math.max(-1, Math.min(1, x)); if (x !== 0) this.mode = 'shuttle'; }
   locate(pos) { this.take = Math.max(0, Math.min(this.total, pos)); this.v = 0; this.mode = 'stop'; }
 
