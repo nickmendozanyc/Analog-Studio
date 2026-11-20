@@ -223,7 +223,7 @@
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
   // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
-    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)],
+    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
   })));
   // A827 front panel: live tape timer and key lamps
@@ -271,18 +271,43 @@
     return [[A.cx + ra * nx, A.cy + ra * ny], [B.cx + rb * nx, B.cy + rb * ny]];
   }
   const f2 = (v) => v.toFixed(2);
+  // conic gradients for one reel's exposure smear (reel frame; angles clockwise from the top, as CSS conic-gradient)
+  function smearBg(el, S, dir) {
+    const d = el.dataset, slots = d.slots.split(',').map(Number), sw = +d.slotw, la = +d.lab, lw = +d.labw, lk = +d.labk;
+    const cov = (th, a, wd) => {   // fraction of the exposure that point th spent under a feature of width wd centred at a
+      let u = ((th - a) * dir % 360 + 540) % 360 - 180;   // along the trail, -180..180
+      if (u < -wd / 2 - 1) u += 360;
+      const lo = Math.max(u - wd / 2, 0), hi = Math.min(u + wd / 2, S);
+      return Math.max(0, hi - lo) / Math.max(S, 1e-3);
+    };
+    const N = 180, hole = [], lab = [];
+    for (let i = 0; i <= N; i++) {
+      const th = i * 360 / N;
+      const ch = Math.min(1, slots.reduce((a, s) => a + cov(th, s, sw), 0));
+      hole.push(`rgba(${d.hole},${(ch * 0.97).toFixed(3)}) ${th.toFixed(1)}deg`);
+      lab.push(`rgba(${d.labc},${(Math.min(1, cov(th, la, lw)) * lk).toFixed(3)}) ${th.toFixed(1)}deg`);
+    }
+    return `conic-gradient(${hole.join(',')}), conic-gradient(${lab.join(',')}), ${d.avg}`;
+  }
   function drawConsoleReels() {
     for (const rl of reels) {
       const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
-      // motion blur: at wind speed the flange slots and label smear into bands (fades in above play speed)
-      const w = Math.abs(tr.v / (rl.k === 's' ? tr.rS : tr.rT));   // rad/s
-      // natural ramp: slots start to strobe and smear past ~2 rev/s, a full smear from ~10 rev/s
-      const op = Math.min(1, Math.max(0, (w - 12) / 50)), ops = op * op * (3 - 2 * op);
-      if (Math.abs(ops - rl.blurOp) > 0.01 || (ops === 0) !== (rl.blurOp === 0)) {
-        rl.blurOp = ops; for (const b of rl.blurs) b.style.opacity = ops.toFixed(3);
-        const px = Math.min(4, ops * 5);   // the moving label softens as it smears
-        for (const l of rl.labs) l.style.filter = px > 0.2 ? `blur(${px.toFixed(1)}px)` : '';
+      // motion blur, modelled as a camera exposure of ~1/30 s: in that time the reel turns S degrees, so each slot and the
+      // label drag an arc S long behind them (coverage = how long each point spent under them). Short arcs at play
+      // speed, long arcs while spooling up, and past a full turn a uniform smear (the static ring disc takes over).
+      const w = (rl.k === 's' ? tr.v / tr.rS : tr.v / tr.rT);   // rad/s, signed
+      const S = Math.min(360, Math.abs(w) / 30 * 180 / Math.PI), dir = w >= 0 ? 1 : -1;
+      // below ~25° (play speed) the real reel shows and the label stays readable
+      const o1 = Math.min(1, Math.max(0, (S - 22) / 30)), o2 = Math.min(1, Math.max(0, (S - 250) / 110)), ease = (x) => x * x * (3 - 2 * x);
+      const key = `${Math.round(S)}|${dir}`;
+      if (o1 > 0 && key !== rl.smKey) { rl.smKey = key; for (const el of rl.smears) if (el.dataset.slots) el.style.background = smearBg(el, Math.max(1, Math.round(S)), dir); }
+      const opKey = `${ease(o1).toFixed(2)}|${ease(o2).toFixed(2)}`;
+      if (opKey !== rl.smOp) {
+        rl.smOp = opKey;
+        for (const el of rl.smears) el.style.opacity = ease(o1).toFixed(3);
+        for (const el of rl.lights) el.style.opacity = ease(o1).toFixed(3);
+        for (const b of rl.blurs) b.style.opacity = ease(o2).toFixed(3);
       }
       const r = packPx(rl.k === 's' ? tr.rS : tr.rT);
       if (Math.abs(r - rl.lastR) < 0.25) continue;

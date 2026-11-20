@@ -120,7 +120,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     gp9: {
       face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
       edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b', ink: '#1b1b1b',
-      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)',
+      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.8,
     },
   };
   const slot = (cx, cy, rIn, rOut, w, ang, c) => {
@@ -148,7 +148,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     rotor();
     const flange = (z, bg) => add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${bg};clip-path:path(evenodd,'${d}')`)}"></div>`);
     flange(20, st.edge); flange(21.5, st.edge); flange(23, st.back);
-    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:radial-gradient(circle, transparent ${f(R * 0.47)}px, rgba(0,0,0,0.12) ${f(R * 0.51)}px, rgba(0,0,0,0.1) ${f(R * 0.83)}px, transparent ${f(R * 0.87)}px), ${st.back}`)}"></div>`);   // back flange smears too
+    add(`<div class="jh-smear" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:radial-gradient(circle, transparent ${f(R * 0.47)}px, rgba(0,0,0,0.12) ${f(R * 0.51)}px, rgba(0,0,0,0.1) ${f(R * 0.83)}px, transparent ${f(R * 0.87)}px), ${st.back}`)}"></div>`);   // back flange smears too
     add('</div>');
     // hub ring (black plastic) between the flanges
     for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
@@ -182,6 +182,13 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     lab.push(`<path d="${d}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2"/>`);
     lab.push(`<circle cx="${c}" cy="${c}" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>`);
     lab.push(`<circle cx="${c}" cy="${c}" r="${hubR}" fill="none" stroke="#0d0d0e" stroke-width="8"/>`);
+    // exposure smear (rotates with the reel): each slot and the label drag an arc behind them whose length is the angle
+    // the reel turns during one exposure; the client writes the conic gradients from the reel speed
+    const faceLayers = (() => { const out = []; let d = 0, cur = ''; for (const ch of st.face) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && d === 0) { out.push(cur.trim()); cur = ''; } else cur += ch; } out.push(cur.trim()); return out; })();
+    const faceAvg = faceLayers[faceLayers.length - 1], faceLight = faceLayers.filter((l) => !l.startsWith('repeating') && l !== faceAvg).join(', ');
+    const bandMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px);mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px)`;
+    const slotW = 2 * Math.atan((R * 0.17 / 2) / (R * 0.67)) * 180 / Math.PI, labW = 2 * Math.atan(58 / (R * 0.62)) * 180 / Math.PI;
+    add(`<div class="jh-smear" data-reel="${key}" data-slots="${f(rl.rot)},${f(rl.rot + 180)}" data-slotw="${f(slotW)}" data-lab="${f((rl.labelAt ?? rl.rot) + 90)}" data-labw="${f(labW)}" data-hole="${st.holeRGB || '24,16,11'}" data-labc="${st.labRGB || '150,120,64'}" data-labk="${st.labK || 0.4}" data-avg="${faceAvg}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.7px);background:${faceAvg};${bandMask}`)}"></div>`);
     add(`<div class="jh-lab" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, lab.join(''))}</div>`);
     // motion blur (fast winds): what a spinning reel really looks like. Lighting and the flange finish stay put (they
     // belong to the room light), the brushed texture goes smooth, and the two slots, the label and the screws smear into
@@ -193,13 +200,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       `radial-gradient(circle, transparent ${pr(0.47)}px, ${band(st.smearSlot || 'rgba(26,18,12,A)', 0.48, 0.86, 0.13, 0.11)}, transparent ${pr(0.87)}px)`,   // slots: ~8 % of the circle is see-through
       `radial-gradient(circle, transparent ${pr(0.49)}px, ${band(st.smearLabel || 'rgba(150,118,62,A)', 0.5, 0.76, 0.16, 0.14)}, transparent ${pr(0.77)}px)`,   // the printed label
     ].join(', ');
-    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${smear}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`)}"></div>`);
+    const ringDisc = `<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${smear}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`)}"></div>`;   // added after the rotor closes: it must not turn
     // black hold-down knob on the spindle
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
     add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 5px, #3a3a3d 7.5px, #17171a 13px, #141416 28px, rgba(14,14,15,0.7) 31px, rgba(14,14,15,0.32) 37px, rgba(14,14,15,0) 41px)`)}"></div>`);
+    const staticAfter = `<div class="jh-light" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.75px);background:radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${faceLight};${bandMask}`)}"></div>${ringDisc.replace(/^add\(|\)$/g, '')}`;
     add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="44" cy="44" r="30" fill="url(#none)"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
     add('</div>');
+    add(staticAfter);   // non-rotating blur layers
   }
 
   // ---------- tape path (tangent lines between rollers, wraps as arcs) ----------
