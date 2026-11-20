@@ -5,7 +5,7 @@
 // Routing: 24 groups + quad bus (the app's 24 multitrack buses, same engine as the CMI room); the real 611G has 32.
 
 module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
-  const { p, rect, text, circle, button, fader, capture, vu } = h;
+  const { p, rect, text, circle, button, fader, capture, vu, remote224 } = h;
   const CW = 3242, CH = 1446, N = 32, SW = 72, GAP = 6;
   // split console: channels 1-16, the master section, channels 17-32
   const MX = 24 + 16 * SW + GAP, MW = CW - 18 - 24 - N * SW - 2 * GAP;
@@ -152,109 +152,125 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       }
     }
 
-    // =================== centre section: master facilities (left) + Studio Computer (right) ===================
-    // From the user's photo of a 4000 G centre section and the operator's manual (section 4).
-    const x = MX, w = MW, LW = 250, RX = x + LW + 8, RW = w - LW - 8;
+    // =================== centre section, laid out from the user's G+ photos ===================
+    // Studio Computer on the left (next to channel 16), the SL 651G master module as a narrow strip on the right
+    // (next to channel 17). Faders continue along the front: group masters under the computer, stereo VCAs under the master.
+    const x = MX, w = MW, CC = 540, RX = x, MXM = x + CC + 8, MWM = w - CC - 8;
     rect(x, 4, w, CH - 8, PANEL2, 'rx="4"');
-    // ---------- left column: master facilities ----------
-    rect(x, 4, LW, CH - 8, PANEL, 'rx="4"'); const lc = x + LW / 2;
-    // meter bridge over the master facilities: main L / R VU meters and the bus compression meter
-    rect(x, 4, LW, 104, '#16171a', 'rx="3"');
-    [['MAIN L', -4], ['MAIN R', -5]].forEach(([l, db], k) => { vu(x + 10 + k * 76, 14, 68, 56, db, { brand: '' }); text(x + 44 + k * 76, 88, l, 7.5, '#d9d6cc', 'middle', 800); });
-    rect(x + 164, 14, 66, 56, '#efe6cc', 'rx="3"');
-    { const gx = x + 197, gy = 78; for (let k = 0; k <= 8; k++) { const a = (-45 + k * 11.25) * Math.PI / 180; p(`<line x1="${(gx + 40 * Math.sin(a)).toFixed(1)}" y1="${(gy - 40 * Math.cos(a)).toFixed(1)}" x2="${(gx + 46 * Math.sin(a)).toFixed(1)}" y2="${(gy - 46 * Math.cos(a)).toFixed(1)}" stroke="#2a2520" stroke-width="1.1"/>`); }
-      p(`<line x1="${gx}" y1="76" x2="${gx + 16}" y2="38" stroke="#b3261b" stroke-width="1.6"/>`); }
-    text(x + 197, 88, 'COMP', 7.5, '#d9d6cc', 'middle', 800);
-    text(x + 120, 102, 'SLS 4000 G', 7, '#c9a54a', 'middle', 900, 'letter-spacing="3"');
-    // quad / stereo bus compressor
-    sect(x + 6, 114, LW - 12, 'BUS COMPRESSOR');
-    [['THRESH', '#e6e7e9', -30], ['RATIO', '#e6e7e9', -60], ['ATTACK', '#e6e7e9', -40], ['RELEASE', '#e6e7e9', 60]].forEach(([lab, col, a], k) => sk(x + 32 + k * 58, 144, 13, col, a, lab, 166));
-    sk(x + 32, 190, 13, '#c8352a', 20, 'MAKE-UP', 212); key(x + 64, 180, 52, 18, 'red', true, 'IN', 7.5); key(x + 122, 180, 52, 18, 'white', false, 'S/C', 7.5);
-    text(x + LW - 14, 196, 'SLS', 15, INK, 'end', 900, 'font-style="italic" letter-spacing="2"');
-    // status: RECORD / REPLAY / MIX, VCAs to monitor, input flip
-    sect(x + 6, 222, LW - 12, 'STATUS');
-    [['RECORD', 'red', false], ['REPLAY', 'white', false], ['MIX', 'green', true]].forEach(([l, c, on], k) => key(x + 12 + k * 74, 236, 68, 22, c, on, l, 8));
-    [['VCA→MON', false], ['CH FLIP', false], ['AFL', false]].forEach(([l, on], k) => key(x + 12 + k * 74, 264, 68, 16, 'white', on, l, 6.5));
-    // cue masters + echo returns
-    sect(x + 6, 290, LW - 12, 'CUES · RETURNS');
-    ['ST', '1', '2', '3', '4'].forEach((l, k) => sk(x + 26 + k * 47, 316, 11, k ? '#d9dbde' : '#e0b23a', -20 + k * 12, `CUE ${l}`, 336));
-    ['RTN 1', 'RTN 2', 'RTN 3', 'RTN 4'].forEach((l, k) => sk(x + 36 + k * 56, 360, 10, '#8a8f97', 10 * k, l, 378));
-    // monitoring: speakers, sources, big monitor level, dim / mono / cut
-    sect(x + 6, 388, LW - 12, 'MONITORS');
-    ['LARGE', 'SMALL', 'MINI'].forEach((l, k) => key(x + 12, 400 + k * 24, 58, 19, 'amber', k === 0, l, 7));
-    ['MIX', '2TR A', '2TR B'].forEach((l, k) => key(x + LW - 70, 400 + k * 24, 58, 19, 'white', k === 0, l, 7));
-    sk(lc, 448, 34, '#d9dbde', 40, 'MONITOR LEVEL', 496);
-    ['DIM', 'MONO', 'CUT', 'ALT'].forEach((l, k) => key(x + 12 + k * 56, 504, 50, 18, k === 2 ? 'red' : 'white', false, l, 7));
-    // communications: talkback, slate, oscillator
-    sect(x + 6, 530, LW - 12, 'COMMUNICATIONS');
-    key(x + 12, 542, 74, 26, 'red', false, 'TALK', 9); key(x + 92, 542, 60, 26, 'white', false, 'SLATE', 7.5); sk(x + 186, 555, 10, '#8a8f97', 0, 'TB', 574);
-    ['100', '1k', '10k'].forEach((l, k) => key(x + 12 + k * 44, 584, 40, 18, 'green', k === 1, l, 7)); sk(x + 186, 593, 10, '#8a8f97', -30, 'OSC', 612);
-    // group (VCA) masters: 8 faders with M / S
-    // local (split) aux sends panel, as in the G Series centre section
-    sect(x + 6, 622, LW - 12, 'LOCAL AUX SENDS');
-    ['ST', '1', '2', '3', '4', '5'].forEach((l, k) => { const kx = x + 30 + (k % 3) * 90, ky = 664 + Math.floor(k / 3) * 120; sk(kx, ky, 15, k ? '#d9dbde' : '#e0b23a', -30 + k * 14, `AUX ${l}`, ky + 28); key(kx - 20, ky + 40, 40, 16, 'white', k === 1, 'SPLIT', 6.5); });
-    [['FOLDBACK A', false], ['FOLDBACK B', false], ['AUX TO CUE', true]].forEach(([l, on], k) => key(x + 12 + k * 74, 920, 68, 20, 'white', on, l, 6));
-    ['CUE 1', 'CUE 2', 'STUDIO'].forEach((l, k) => sk(x + 46 + k * 74, 980, 13, '#8a8f97', 10 - k * 20, l, 1002));
-    ['PHONES A', 'PHONES B'].forEach((l, k) => key(x + 12 + k * 110, 1022, 104, 20, 'amber', false, l, 7));
-    rect(x + 1, 1154, LW - 2, CH - 1158, '#cdcfcc');
-    sect(x + 6, 1100, LW - 12, 'GROUP MASTERS');
-    const gw = (LW - 20) / 8;
-    for (let g = 0; g < 8; g++) {
-      const gx = x + 10 + g * gw + gw / 2;
-      key(gx - 11, 1118, 22, 14, 'red', g === 5, 'M', 7);
-      key(gx - 11, 1136, 22, 14, 'green', g === 1, 'S', 7);
-      fader(gx, 1186, 1376, 0.3 + (g % 3) * 0.05, { capW: 22, capH: 38, scale: false, capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4] });
-      text(gx, 1404, `G${g + 1}`, 9, INK, 'middle', 800);
-    }
-    // ---------- right column: Studio Computer (layout from the user's G+ photos) ----------
-    rect(RX, 4, RW, CH - 8, PANEL, 'rx="4"');
-    const SCW = 330, sx0 = RX + 10;
-    rect(sx0, 12, SCW, 24, '#d6d7d4', 'rx="2"');
-    text(sx0 + 8, 28, 'SLS', 10, '#2a2b2d', 'start', 900, 'font-style="italic"'); text(sx0 + SCW - 8, 28, 'Studio Computer', 10, '#2a2b2d', 'end', 700);
-    // screen: cyan on black, live timecode
-    rect(sx0, 40, SCW, 250, '#3a3c3f', 'rx="6"');
-    rect(sx0 + 12, 50, SCW - 24, 230, '#05070a', 'rx="10"');
-    const scx = sx0 + SCW / 2;
-    p(`<text id="sls-tc" x="${scx}" y="96" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#38e6e6" text-anchor="middle" letter-spacing="2">01:00:03:42:00</text>`);
-    text(scx, 152, 'SLS', 32, '#38e6e6', 'middle', 800, 'font-style="italic"');
-    text(scx, 178, 'Studio Computer', 14, '#38e6e6', 'middle', 600);
-    p(`<text id="sls-cmd" x="${sx0 + 24}" y="258" font-family="'JetBrains Mono', monospace" font-size="11" fill="#2fc4c4">MIX · TITLE "MIDNIGHT TAPES" · PASS 4</text>`);
-    // beside the screen: computer status keys and the round black machine keys
-    const px0 = sx0 + SCW + 12, PW2 = RX + RW - 10 - px0;
-    sect(px0, 14, PW2, 'COMPUTER STATUS');
-    ['MIX ON', 'MOTOR', 'SEARCH', 'TAPE TRACK', 'REC SYNC', 'GROUP'].forEach((l, k) => key(px0 + (k % 2) * (PW2 / 2) + 4, 28 + Math.floor(k / 2) * 28, PW2 / 2 - 8, 22, 'white', k === 0, l, 6.5));
-    sect(px0, 116, PW2, 'MACHINE');
-    for (const [cx0, cy0] of [[px0 + PW2 * 0.3, 176], [px0 + PW2 * 0.72, 176], [px0 + PW2 * 0.3, 248], [px0 + PW2 * 0.72, 248]]) {
-      for (const [dx, dy] of [[0, -18], [-18, 0], [18, 0], [0, 18], [0, 0]]) { circle(cx0 + dx + 0.6, cy0 + dy + 1.4, 9.5, '#000', 'opacity="0.5"'); circle(cx0 + dx, cy0 + dy, 9.5, '#1b1c1e'); circle(cx0 + dx, cy0 + dy, 9.5, 'url(#capHiDark)'); }
-    }
-    // function keypad (cream) beside a numeric keypad
     const keycap = (bx, by, bw, bh, l, size) => { rect(bx + 1, by + 3, bw, bh, '#000', 'opacity="0.45" rx="3"'); rect(bx, by, bw, bh, '#d8d1b6', 'rx="3"'); rect(bx, by, bw, bh * 0.35, '#fff', 'opacity="0.25" rx="3"'); if (l) text(bx + bw / 2, by + bh / 2 + size * 0.35, l, size, '#2a2620', 'middle', 800); };
+    const ckey = (bx, by, bw, bh, l, size = 6.5, on = false, col = 'white') => key(bx, by, bw, bh, col, on, l, size);
+    // ---- meter bridge over the centre: SLS badge, main L / R, compression meter
+    rect(x, 4, w, 172, '#16171a', 'rx="3"'); rect(x, 4, w, 2, '#fff', 'opacity="0.08"');
+    text(x + 30, 84, 'SLS', 46, '#c9a54a', 'start', 900, 'font-style="italic" letter-spacing="2"');
+    for (let k = 0; k < 9; k++) rect(x + 16, 46 + k * 5, 60 - k * 5, 2, '#c9a54a', 'opacity="0.8"');
+    text(x + 32, 110, '4000 G · 32 CHANNEL', 11, '#c9a54a', 'start', 800, 'letter-spacing="3"');
+    [['MAIN L', -4], ['MAIN R', -5]].forEach(([l, db], k) => { vu(x + 330 + k * 160, 14, 148, 82, db, { brand: '' }); text(x + 404 + k * 160, 116, l, 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); });
+    rect(MXM + 120, 14, 150, 82, '#efe6cc', 'rx="4"');
+    { const gx = MXM + 195, gy = 108; for (let k = 0; k <= 10; k++) { const a = (-50 + k * 10) * Math.PI / 180; p(`<line x1="${(gx + 66 * Math.sin(a)).toFixed(1)}" y1="${(gy - 66 * Math.cos(a)).toFixed(1)}" x2="${(gx + 76 * Math.sin(a)).toFixed(1)}" y2="${(gy - 76 * Math.cos(a)).toFixed(1)}" stroke="#2a2520" stroke-width="1.3"/>`); }
+      text(gx, 70, 'COMPRESSION', 8, '#2a2520', 'middle', 800, 'letter-spacing="1"'); p(`<line x1="${gx}" y1="104" x2="${gx + 30}" y2="40" stroke="#b3261b" stroke-width="2"/>`); text(gx, 116, 'BUS COMP', 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); }
+
+    // ================= Studio Computer column =================
+    rect(RX, 178, CC, CH - 182, PANEL, 'rx="4"');
+    // outboard remotes sitting on the console, as in the photos: Leximan 224X remote + a machine controller with jog wheel
+    rect(RX + 12, 186, 180, 276, '#000', 'opacity="0.35" rx="6"');
+    remote224(RX + 14, 184, 0.27);
+    const jx = RX + 206, jy = 186;
+    rect(jx + 3, jy + 4, 170, 272, '#000', 'opacity="0.4" rx="8"'); rect(jx, jy, 170, 272, '#1d1e21', 'rx="8"'); rect(jx, jy, 170, 3, '#fff', 'opacity="0.1"');
+    rect(jx + 16, jy + 16, 138, 54, '#0a1418', 'rx="3"');
+    p(`<text x="${jx + 85}" y="${jy + 50}" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="700" fill="#5fd7e6" text-anchor="middle">LOC 01:02</text>`);
+    for (let k = 0; k < 8; k++) { const bx = jx + 18 + (k % 4) * 35, by = jy + 82 + Math.floor(k / 4) * 22; rect(bx, by, 28, 15, '#3a3c40', 'rx="3"'); rect(bx, by, 28, 5, '#fff', 'opacity="0.1" rx="3"'); }
+    circle(jx + 85, jy + 194, 52, '#0c0c0d'); circle(jx + 85, jy + 194, 48, '#e9eaec'); circle(jx + 85, jy + 194, 48, 'url(#capHiDark)'); circle(jx + 108, jy + 178, 9, '#b9bcc2');
+    text(jx + 85, jy + 266, 'MACHINE CONTROL', 7.5, '#9aa0a8', 'middle', 800, 'letter-spacing="1.5"');
+    // computer status keys (two rows of five) to the right of the remotes
+    const sx2 = RX + 392, sw2 = CC - 404;
+    sect(sx2, 190, sw2, 'COMPUTER STATUS');
+    ['MIX ON', 'MOTOR', 'SEARCH', 'TAPE TRK', 'REC SYNC', 'GROUP', 'MATCH', 'UPDATE', 'MERGE', 'RECALL'].forEach((l, k) => ckey(sx2 + (k % 2) * (sw2 / 2) + 3, 204 + Math.floor(k / 2) * 30, sw2 / 2 - 6, 22, l, 6.5, k === 0));
+    // header plate and the square screen with live timecode; status keys beside it
+    rect(RX + 12, 474, 300, 22, '#d6d7d4', 'rx="2"');
+    text(RX + 20, 489, 'SLS', 9.5, '#2a2b2d', 'start', 900, 'font-style="italic"'); text(RX + 304, 489, 'Studio Computer', 9.5, '#2a2b2d', 'end', 700);
+    rect(RX + 12, 500, 300, 250, '#3a3c3f', 'rx="5"');
+    rect(RX + 26, 512, 272, 226, '#05070a', 'rx="10"');
+    const scx = RX + 162;
+    p(`<text id="sls-tc" x="${scx}" y="556" font-family="'JetBrains Mono', monospace" font-size="21" font-weight="700" fill="#38e6e6" text-anchor="middle" letter-spacing="2">01:00:03:42:00</text>`);
+    text(scx, 612, 'SLS', 32, '#38e6e6', 'middle', 800, 'font-style="italic"');
+    text(scx, 638, 'Studio Computer', 13, '#38e6e6', 'middle', 600);
+    p(`<text id="sls-cmd" x="${RX + 40}" y="716" font-family="'JetBrains Mono', monospace" font-size="10" fill="#2fc4c4">MIX · "MIDNIGHT TAPES" · PASS 4</text>`);
+    const tx2 = RX + 324, tw2 = CC - 336;
+    for (let k = 0; k < 10; k++) keycap(tx2 + (k % 5) * (tw2 / 5) + 2, 586 + Math.floor(k / 5) * 40, tw2 / 5 - 8, 30, '', 6);
+    ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10'].forEach((l, k) => text(tx2 + (k % 5) * (tw2 / 5) + tw2 / 10 - 2, 604 + Math.floor(k / 5) * 40, l, 7.5, '#2a2620', 'middle', 800));
+    // cream keyboard
+    const kb = ['1234567890-=', 'QWERTYUIOP[]', "ASDFGHJKL;'", 'ZXCVBNM,./'];
+    rect(RX + 12, 760, CC - 24, 190, '#7a7d7b', 'rx="6"');
+    kb.forEach((row, r) => [...row].forEach((ch, c) => { const kx = (CC - 48) / 12.5, bx = RX + 22 + c * kx + r * 10; if (bx + kx > RX + CC - 16) return; keycap(bx, 768 + r * 36, kx - 6, 30, ch, 11); }));
+    keycap(RX + 22 + 3 * ((CC - 48) / 12.5), 914, ((CC - 48) / 12.5) * 6, 26, '', 8);
+    // function keypad (6 x 5), numeric keypad, round black keys
     const fk = [['PRINT', 'JOIN', 'NAME', 'REVISE', 'COPY', 'CANCEL'], ['LIST', 'GO TO', 'PLAY', 'CYCLE', 'DELETE', 'REPEAT'], ['TITLE', 'MIX', 'CUE', 'EVENT', 'DROP IN', '←'], ['SET UP', 'PRESET', 'REEL', 'TRACK', 'SYNC', '↑'], ['END', 'FROM', 'HERE', 'TO', 'AT', 'EXECUTE']];
-    const FW2 = Math.round((RW - 30) * 0.62), NX = RX + 10 + FW2 + 10, NW = RX + RW - 10 - NX;
-    rect(RX + 10, 300, FW2, 186, '#7a7d7b', 'rx="6"');
-    fk.forEach((row, r) => row.forEach((l, c) => { const kw = (FW2 - 16) / 6; keycap(RX + 18 + c * kw, 308 + r * 35, kw - 6, 28, l, l.length > 5 ? 6.5 : 7.5); }));
-    rect(NX, 300, NW, 186, '#7a7d7b', 'rx="6"');
-    [['7', '8', '9', '–'], ['4', '5', '6', '+'], ['1', '2', '3', '.'], ['0', '00', ':', 'ENTER']].forEach((row, r) => row.forEach((l, c) => { const kw = (NW - 16) / 4; keycap(NX + 8 + c * kw, 308 + r * 44, kw - 6, 36, l, l.length > 2 ? 6.5 : 11); }));
-    // alphanumeric keyboard
-    const kb = ['!"#$%&*()-+=', '1234567890-=', 'QWERTYUIOP[]', 'ASDFGHJKL;\'', 'ZXCVBNM,./'];
-    rect(RX + 10, 496, RW - 20, 220, '#7a7d7b', 'rx="6"');
-    kb.forEach((row, r) => [...row].forEach((ch, c) => { const kx = (RW - 40) / 12, bx = RX + 20 + c * kx + r * 8; if (bx + kx > RX + RW - 14) return; keycap(bx, 504 + r * 40, kx - 6, 32, ch, 11); }));
-    keycap(RX + 20 + 2 * ((RW - 40) / 12), 504 + 5 * 40 - 14, (RW - 40) / 12 * 7, 0, '', 8);
-    // multitrack remote, automation, main fader
-    sect(RX + 6, 726, RW - 12, 'MULTITRACK REMOTE');
-    [['◀◀', 'white'], ['▶▶', 'white'], ['■', 'green'], ['PLAY', 'white'], ['REC', 'red']].forEach(([l, c], k) => key(RX + 14 + k * ((RW - 28) / 5), 740, (RW - 28) / 5 - 10, 30, c, k === 2, l, l.length > 2 ? 8 : 12));
-    sect(RX + 6, 782, RW - 12, 'AUTOMATION');
-    [['OFF', 'grey'], ['READ', 'green'], ['WRITE', 'red'], ['TOUCH', 'amber'], ['LATCH', 'blue'], ['TRIM', 'yellow']].forEach(([l, c], k) => key(RX + 12 + k * ((RW - 24) / 6), 796, (RW - 24) / 6 - 8, 22, c, k === 1, l, 7.5));
-    ['MASTER CUT', 'MONO CHECK', 'FADER START', 'ALL SAFE'].forEach((l, k) => key(RX + 12 + k * ((RW - 24) / 4), 830, (RW - 24) / 4 - 8, 22, k ? 'white' : 'red', false, l, 7));
-    rect(RX + 1, 1154, RW - 2, CH - 1158, '#cdcfcc');
-    sect(RX + 6, 1158, RW - 12, 'MAIN');
-    const mfx = RX + RW / 2;
-    fader(mfx, 1186, 1376, 0.22, { capW: 34, capH: 48, scaleColor: '#2a2b2d', capFill: 'url(#faderCapRed)' });
-    text(mfx, 1402, 'STEREO', 9, INK, 'middle', 800);
-    rect(RX + 14, 1200, 120, 60, '#0b0b0c', 'rx="3"');
-    text(RX + 74, 1226, 'MIX', 9, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`); text(RX + 74, 1244, 'PASS 4', 9, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
-    rect(x + 6, 1414, w - 12, 22, '#2a2b2d', 'rx="3"');
-    text(x + w / 2, 1429, 'SLS 4000 G · 32 CHANNEL MASTER STUDIO SYSTEM', 9, '#d9d3c7', 'middle', 800, 'letter-spacing="2"');
+    rect(RX + 12, 958, 300, 186, '#7a7d7b', 'rx="6"');
+    fk.forEach((row, r) => row.forEach((l, c) => keycap(RX + 20 + c * 48.5, 966 + r * 35, 42, 28, l, l.length > 5 ? 6 : 7)));
+    rect(RX + 320, 958, 150, 186, '#7a7d7b', 'rx="6"');
+    [['7', '8', '9'], ['4', '5', '6'], ['1', '2', '3'], ['0', '.', 'ENT']].forEach((row, r) => row.forEach((l, c) => keycap(RX + 328 + c * 46, 966 + r * 44, 40, 36, l, l.length > 1 ? 7 : 11)));
+    for (const [cx0, cy0] of [[RX + 505, 1000], [RX + 505, 1096]]) for (const [dx, dy] of [[0, -18], [-14, 0], [14, 0], [0, 18], [0, 0]]) { circle(cx0 + dx + 0.6, cy0 + dy + 1.4, 8.5, '#000', 'opacity="0.5"'); circle(cx0 + dx, cy0 + dy, 8.5, '#1b1c1e'); circle(cx0 + dx, cy0 + dy, 8.5, 'url(#capHiDark)'); }
+    // group masters on the front fader panel, under the computer
+    rect(RX + 1, 1154, CC - 2, CH - 1158, '#cdcfcc'); rect(RX + 1, 1154, CC - 2, 1.5, '#fff', 'opacity="0.5"');
+    const gw = (CC - 24) / 8;
+    for (let g = 0; g < 8; g++) {
+      const gx = RX + 12 + g * gw + gw / 2;
+      key(gx - 22, 1162, 20, 13, 'red', g === 5, 'M', 7); key(gx + 2, 1162, 20, 13, 'green', g === 1, 'S', 7);
+      fader(gx, 1192, 1376, 0.3 + (g % 3) * 0.05, { capW: 26, capH: 38, scale: g === 0, scaleColor: '#2a2b2d', capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4] });
+      rect(gx - 28, 1394, 56, 22, '#f2eee2', 'rx="2"');
+      text(gx, 1409, ['DRUMS', 'BASS', 'KEYS', 'GTRS', 'VOCALS', 'BGVS', 'FX', 'PERC'][g], 8.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`);
+      text(gx, 1432, `G${g + 1}`, 8.5, INK2, 'middle', 800);
+    }
+
+    // ================= SL 651G master module: narrow strip, knobs on the left, a long key column on the right =================
+    const M = MXM, MWd = MWM, KC = M + MWd - 78;
+    rect(M, 178, MWd, CH - 182, PANEL, 'rx="4"');
+    rect(M + 6, 184, MWd - 12, 18, '#d6d7d4', 'rx="2"'); text(M + MWd / 2, 197, 'SLS 4000 G+ · MASTER', 8, '#2a2b2d', 'middle', 900, 'letter-spacing="2"');
+    const kl = (cx0, cy0, r, col, a, l) => { sk(cx0, cy0, r, col, a); text(cx0, cy0 + r + 9, l, 5.6, INK2, 'middle', 700); };
+    const c4 = (k) => M + 26 + k * ((KC - M - 52) / 3);
+    // bus compressor
+    sect(M + 6, 210, KC - M - 10, 'BUS COMPRESSOR');
+    [['THRESH', -30], ['RATIO', -60], ['ATTACK', -40], ['RELEASE', 60]].forEach(([l, a], k) => kl(c4(k), 236, 10, '#e9eaec', a, l));
+    kl(c4(0), 278, 10, '#c8352a', 20, 'MAKE-UP'); ckey(c4(1) - 18, 270, 36, 16, 'IN', 7, true, 'red'); ckey(c4(2) - 18, 270, 36, 16, 'S/C', 7); ckey(c4(3) - 18, 270, 36, 16, 'LINK', 6.5);
+    // cue masters and echo returns
+    sect(M + 6, 300, KC - M - 10, 'CUES · RETURNS');
+    [['ST CUE', '#e0b23a'], ['CUE 1', '#e9eaec'], ['CUE 2', '#e9eaec'], ['CUE 3', '#e9eaec']].forEach(([l, col], k) => kl(c4(k), 326, 9.5, col, -20 + k * 15, l));
+    [['CUE 4', '#e9eaec'], ['RTN 1', '#d9dbde'], ['RTN 2', '#d9dbde'], ['RTN 3', '#d9dbde']].forEach(([l, col], k) => kl(c4(k), 366, 9.5, col, 10 * k, l));
+    [['RTN 4', '#d9dbde'], ['EXT A', '#3577c2'], ['EXT B', '#3577c2'], ['TB LVL', '#c8352a']].forEach(([l, col], k) => kl(c4(k), 406, 9.5, col, -10 * k, l));
+    // status
+    sect(M + 6, 428, KC - M - 10, 'STATUS');
+    [['RECORD', 'red', false], ['REPLAY', 'white', false], ['MIX', 'green', true]].forEach(([l, c, on], k) => ckey(M + 10 + k * ((KC - M - 16) / 3), 440, (KC - M - 16) / 3 - 6, 20, l, 7, on, c));
+    [['VCA→MON', false], ['CH FLIP', false], ['AFL', false]].forEach(([l, on], k) => ckey(M + 10 + k * ((KC - M - 16) / 3), 464, (KC - M - 16) / 3 - 6, 16, l, 6, on));
+    // monitor level (large knob), dim / mono / cut
+    sect(M + 6, 490, KC - M - 10, 'MONITORS');
+    sk(M + (KC - M) / 2, 548, 36, '#d9dbde', 40); text(M + (KC - M) / 2, 600, 'MONITOR LEVEL', 6.5, INK2, 'middle', 800);
+    [['DIM', 'white'], ['MONO', 'white'], ['CUT', 'red']].forEach(([l, c], k) => ckey(M + 10 + k * ((KC - M - 16) / 3), 610, (KC - M - 16) / 3 - 6, 18, l, 7, false, c));
+    // communications
+    sect(M + 6, 636, KC - M - 10, 'COMMUNICATIONS');
+    ckey(M + 10, 648, 70, 24, 'TALK', 8.5, false, 'red'); ckey(M + 86, 648, 60, 24, 'SLATE', 7); kl(M + 176, 660, 9, '#8a8f97', 0, 'OSC');
+    ['100', '1k', '10k'].forEach((l, k) => ckey(M + 10 + k * 46, 680, 40, 16, l, 7, k === 1, 'green'));
+    // master fader in its slot, with keys beside it (as on the master module in the photos)
+    rect(M + 8, 708, KC - M - 14, 300, '#8e918e', 'rx="4"'); rect(M + 8, 708, KC - M - 14, 2, '#000', 'opacity="0.25"');
+    text(M + 20, 724, 'MAIN', 8, INK, 'start', 900, 'letter-spacing="2"');
+    fader(M + 74, 744, 934, 0.22, { capW: 30, capH: 44, scaleColor: '#2a2b2d', capFill: 'url(#faderCapWhite)' });
+    text(M + 74, 960, 'STEREO', 7.5, INK, 'middle', 800);
+    [['MASTER CUT', 'red'], ['MONO CHK', 'white'], ['FDR START', 'white'], ['ALL SAFE', 'white'], ['STATUS LOCK', 'white']].forEach(([l, c], k) => ckey(M + 124, 740 + k * 30, KC - M - 136, 22, l, 6.5, false, c));
+    rect(M + 124, 900, KC - M - 136, 46, '#0b0b0c', 'rx="3"');
+    text(M + 124 + (KC - M - 136) / 2, 920, 'MIX', 8.5, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`); text(M + 124 + (KC - M - 136) / 2, 936, 'PASS 4', 8.5, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
+    // automation modes
+    sect(M + 6, 1016, KC - M - 10, 'AUTOMATION');
+    [['OFF', 'grey'], ['READ', 'green'], ['WRITE', 'red'], ['TOUCH', 'amber'], ['LATCH', 'blue'], ['TRIM', 'yellow']].forEach(([l, c], k) => ckey(M + 10 + (k % 3) * ((KC - M - 16) / 3), 1028 + Math.floor(k / 3) * 26, (KC - M - 16) / 3 - 6, 20, l, 7, k === 1, c));
+    ckey(M + 10, 1084, KC - M - 20, 20, 'SLS MULTITRACK · ◀◀  ▶▶  ■  ▶  ●', 6.5);
+    // the long column of cream keys down the right side: speakers, sources, cue / external selects
+    rect(KC - 2, 210, 74, 934, '#999c99', 'rx="3"');
+    text(KC + 35, 222, 'MONITOR', 6, INK, 'middle', 900, 'letter-spacing="1"');
+    ['LARGE', 'SMALL', 'MINI', 'ALT', 'MIX', '2TR A', '2TR B', '2TR C', 'EXT 1', 'EXT 2', 'CUE 1', 'CUE 2', 'ST CUE', 'STUDIO', 'TB→CUE', 'TB→STU', 'SOLO', 'AFL', 'PFL', 'SPLIT'].forEach((l, k) => {
+      const on = l === 'LARGE' || l === 'MIX';
+      ckey(KC + 4, 230 + k * 44, 62, 30, l, 6.5, on, 'white');
+    });
+    // stereo VCA faders under the master module
+    rect(M + 1, 1154, MWd - 2, CH - 1158, '#cdcfcc'); rect(M + 1, 1154, MWd - 2, 1.5, '#fff', 'opacity="0.5"');
+    [['ST VCA 1', 'FRONT BUS'], ['ST VCA 2', 'REMIX BUS']].forEach(([l, n], k) => { const fx2 = M + 60 + k * 110; fader(fx2, 1192, 1376, 0.3, { capW: 26, capH: 38, scale: k === 0, scaleColor: '#2a2b2d', capFill: 'url(#faderCapWhite)' }); text(fx2, 1170, l, 7, INK, 'middle', 800); rect(fx2 - 34, 1394, 68, 22, '#f2eee2', 'rx="2"'); text(fx2, 1409, n, 8.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`); });
     p('</svg>');
   });
 };
