@@ -2,8 +2,12 @@
 
 The user supplied the SL4000G Console Service Manual (335 pages, in four parts) as the reference for the
 SLS studio (SSL G-Series console). The manual is SSL's copyrighted material and this repository is public,
-so the PDFs are NOT committed here. They live only in the session that received them; re-upload them when
-the SLS work starts (Part1 p001-099, Part2 p100-198, Part3 p199-297, Part4 p298-335).
+so the PDFs are NOT committed here. Get it again from the public source the user found it at:
+
+- https://funkwerkes.com/web/wp-content/techdocs/MixedProAudio/SSL-4000G-Console-Service-Manual-v1_1.pdf
+
+(The cloud environment must allow the host `funkwerkes.com`.) Or re-upload the user's split copy
+(Part1 p001-099, Part2 p100-198, Part3 p199-297, Part4 p298-335).
 
 Rough page map (manual page numbers; first mention, approximate):
 
