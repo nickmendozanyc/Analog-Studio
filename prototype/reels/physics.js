@@ -87,7 +87,8 @@ export class Transport {
   get playSpeed() { return this.nominalSpeed * (1 + this.varispeed); }
   get semitones() { return 12 * Math.log2(1 + this.varispeed); }   // pitch shift heard from vari-speed
   get counter() { return (this.take - this.zero) / this.nominalSpeed; } // tape time at the selected speed (vari-speed does not change it)
-  get capstanDriving() { return (this.mode === 'play' || this.mode === 'rec') && this.pinch > 0.98; }
+  get playingMode() { return this.mode === 'play' || this.mode === 'rec' || this.mode === 'rplay'; }   // capstan modes
+  get capstanDriving() { return this.playingMode && this.pinch > 0.98; }
 
   command(mode) {
     if (mode === 'rec' && this.mode !== 'play' && this.mode !== 'rec') mode = 'rec'; // REC from stop = PLAY + REC
@@ -102,6 +103,7 @@ export class Transport {
   targetSpeed() {
     switch (this.mode) {
       case 'play': case 'rec': return this.playSpeed;
+      case 'rplay': return -this.playSpeed;   // reverse play: the capstan pulls the tape back toward the supply reel
       case 'ff': return this.m.windSpeed;
       case 'rew': return -this.m.windSpeed;
       case 'shuttle': return this.shuttle * this.m.windSpeed;
@@ -117,8 +119,9 @@ export class Transport {
   // advance by dt seconds (call with small steps, e.g. 1 ms)
   step(dt) {
     const target = this.targetSpeed();
-    const playing = this.mode === 'play' || this.mode === 'rec';
-    const nearPlay = Math.abs(this.v - this.playSpeed) < this.m.pinchEngageWindow;
+    const playing = this.playingMode;
+    const playTarget = this.mode === 'rplay' ? -this.playSpeed : this.playSpeed;
+    const nearPlay = Math.abs(this.v - playTarget) < this.m.pinchEngageWindow;
     const pinchWanted = playing && (this.pinch > 0.5 || nearPlay);
     this.pinch += ((pinchWanted ? 1 : 0) - this.pinch) * Math.min(1, dt / (this.m.pinchTau ?? 0.06));
 
@@ -130,7 +133,7 @@ export class Transport {
       this.acc = 0;
     } else {
       // reel motors: force limited; braking when the speed magnitude must fall
-      const goal = playing ? this.playSpeed : target;
+      const goal = playing ? playTarget : target;
       const diff = goal - this.v;
       const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
       const F = braking ? this.m.brakeForce : this.m.windForce;

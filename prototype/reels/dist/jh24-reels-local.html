@@ -70,7 +70,7 @@
 </div>
 
 <div class="hint" id="hint">
-  <kbd>Space</kbd> play / stop · <kbd>←</kbd> rewind · <kbd>→</kbd> fast forward · <kbd>R</kbd> record · <kbd>S</kbd> stop · <kbd>B</kbd> motion blur. Drag to look around, scroll to zoom.
+  <kbd>Space</kbd> play / stop · <kbd>P</kbd> reverse play · <kbd>←</kbd> rewind · <kbd>→</kbd> fast forward · <kbd>R</kbd> record · <kbd>S</kbd> stop · <kbd>B</kbd> motion blur. Drag to look around, scroll to zoom.
 </div>
 
 <div class="strip" role="toolbar" aria-label="Transport">
@@ -78,6 +78,7 @@
     <button class="key" id="k-rew" aria-pressed="false" title="Rewind (←)">◀◀</button>
     <button class="key" id="k-ff" aria-pressed="false" title="Fast forward (→)">▶▶</button>
     <button class="key" id="k-stop" aria-pressed="true" title="Stop (S)">■</button>
+    <button class="key play" id="k-rplay" aria-pressed="false" title="Reverse play (P)" aria-label="Reverse play">◀</button>
     <button class="key play" id="k-play" aria-pressed="false" title="Play (Space)">▶</button>
     <button class="key rec" id="k-rec" aria-pressed="false" title="Record (R)">●</button>
     <button class="key lift small" id="k-lift" aria-pressed="false" title="Defeat the tape lifters">LIFT</button>
@@ -200,7 +201,8 @@ class Transport {
   get playSpeed() { return this.nominalSpeed * (1 + this.varispeed); }
   get semitones() { return 12 * Math.log2(1 + this.varispeed); }   // pitch shift heard from vari-speed
   get counter() { return (this.take - this.zero) / this.nominalSpeed; } // tape time at the selected speed (vari-speed does not change it)
-  get capstanDriving() { return (this.mode === 'play' || this.mode === 'rec') && this.pinch > 0.98; }
+  get playingMode() { return this.mode === 'play' || this.mode === 'rec' || this.mode === 'rplay'; }   // capstan modes
+  get capstanDriving() { return this.playingMode && this.pinch > 0.98; }
 
   command(mode) {
     if (mode === 'rec' && this.mode !== 'play' && this.mode !== 'rec') mode = 'rec'; // REC from stop = PLAY + REC
@@ -215,6 +217,7 @@ class Transport {
   targetSpeed() {
     switch (this.mode) {
       case 'play': case 'rec': return this.playSpeed;
+      case 'rplay': return -this.playSpeed;   // reverse play: the capstan pulls the tape back toward the supply reel
       case 'ff': return this.m.windSpeed;
       case 'rew': return -this.m.windSpeed;
       case 'shuttle': return this.shuttle * this.m.windSpeed;
@@ -230,8 +233,9 @@ class Transport {
   // advance by dt seconds (call with small steps, e.g. 1 ms)
   step(dt) {
     const target = this.targetSpeed();
-    const playing = this.mode === 'play' || this.mode === 'rec';
-    const nearPlay = Math.abs(this.v - this.playSpeed) < this.m.pinchEngageWindow;
+    const playing = this.playingMode;
+    const playTarget = this.mode === 'rplay' ? -this.playSpeed : this.playSpeed;
+    const nearPlay = Math.abs(this.v - playTarget) < this.m.pinchEngageWindow;
     const pinchWanted = playing && (this.pinch > 0.5 || nearPlay);
     this.pinch += ((pinchWanted ? 1 : 0) - this.pinch) * Math.min(1, dt / (this.m.pinchTau ?? 0.06));
 
@@ -243,7 +247,7 @@ class Transport {
       this.acc = 0;
     } else {
       // reel motors: force limited; braking when the speed magnitude must fall
-      const goal = playing ? this.playSpeed : target;
+      const goal = playing ? playTarget : target;
       const diff = goal - this.v;
       const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
       const F = braking ? this.m.brakeForce : this.m.windForce;
@@ -513,9 +517,9 @@ for (const hx of [-7.5, 0, 7.5]) {
 const strip = new THREE.Group(); strip.position.set(0, 0, 28); strip.rotation.x = -0.14; scene.add(strip);
 const stripBody = boxM(84, 2, 7, new THREE.MeshStandardMaterial({ color: 0x5e5852, roughness: 0.55 })); stripBody.position.y = 1; strip.add(stripBody);
 const stripKeys = {};
-[['rew', 0xefece4], ['ff', 0xefece4], ['stop', 0xefece4], ['play', 0x3fc9a0], ['rec', 0xe0322a], ['lift', 0x3f7fd6], ['edit', 0xea8a2a]].forEach(([k, c], i) => {
+[['rew', 0xefece4], ['ff', 0xefece4], ['stop', 0xefece4], ['rplay', 0x3fc9a0], ['play', 0x3fc9a0], ['rec', 0xe0322a], ['lift', 0x3f7fd6], ['edit', 0xea8a2a]].forEach(([k, c], i) => {
   const m = new THREE.MeshStandardMaterial({ color: c, roughness: 0.35, emissive: c, emissiveIntensity: 0 });
-  const b = boxM(3, 0.8, 2.6, m); b.position.set(-12 + i * 4.2, 2.3, 0); strip.add(b); stripKeys[k] = m;
+  const b = boxM(3, 0.8, 2.6, m); b.position.set(-14 + i * 4.2, 2.3, 0); strip.add(b); stripKeys[k] = m;
 });
 
 // ---------- tape ribbon (2" tape standing on edge, rebuilt every frame) ----------
@@ -590,10 +594,10 @@ const cross2 = (a, b) => a[0] * b[1] - a[1] * b[0];
 const tr = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 0, speedIPS: 30 });
 let blurOn = true;
 const $ = (id) => document.getElementById(id);
-const keysUI = { rew: $('k-rew'), ff: $('k-ff'), stop: $('k-stop'), play: $('k-play'), rec: $('k-rec') };
+const keysUI = { rew: $('k-rew'), ff: $('k-ff'), stop: $('k-stop'), rplay: $('k-rplay'), play: $('k-play'), rec: $('k-rec') };
 function setMode(m) { if (m !== 'shuttle') $('shuttle').value = 0; tr.command(m); }
 $('k-rew').onclick = () => setMode('rew'); $('k-ff').onclick = () => setMode('ff'); $('k-stop').onclick = () => setMode('stop');
-$('k-play').onclick = () => setMode('play'); $('k-rec').onclick = () => setMode('rec');
+$('k-rplay').onclick = () => setMode('rplay'); $('k-play').onclick = () => setMode('play'); $('k-rec').onclick = () => setMode('rec');
 $('k-lift').onclick = () => { tr.liftDefeat = !tr.liftDefeat; };
 $('k-7').onclick = () => tr.setSpeed(7.5); $('k-15').onclick = () => tr.setSpeed(15); $('k-30').onclick = () => tr.setSpeed(30);
 let variOn = false;
@@ -609,7 +613,8 @@ $('k-blur').onclick = () => { blurOn = !blurOn; };
 window.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT') return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { e.preventDefault(); setMode(tr.mode === 'play' || tr.mode === 'rec' ? 'stop' : 'play'); }
+  if (k === ' ') { e.preventDefault(); setMode(tr.playingMode ? 'stop' : 'play'); }
+  else if (k === 'p') setMode(tr.mode === 'rplay' ? 'stop' : 'rplay');
   else if (k === 'arrowleft') setMode('rew'); else if (k === 'arrowright') setMode('ff');
   else if (k === 's') setMode('stop'); else if (k === 'r') setMode('rec'); else if (k === 'b') blurOn = !blurOn;
 });
@@ -660,7 +665,7 @@ function frame(now) {
   $('k-blur').setAttribute('aria-pressed', String(blurOn));
   // readouts
   $('ctr').textContent = fmtTime(tr.counter);
-  const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE' })[m];
+  const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REVERSE PLAY', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE' })[m];
   st.className = 'state' + (m === 'rec' ? ' rec' : m !== 'stop' ? ' on' : '');
   $('v').textContent = `${(tr.v / IPS).toFixed(1)} ips`;
   $('vs').textContent = tr.varispeed ? `${(tr.varispeed * 100).toFixed(1)} % · ${tr.semitones.toFixed(2)} st` : 'off';

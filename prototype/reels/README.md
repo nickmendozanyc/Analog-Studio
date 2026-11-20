@@ -7,7 +7,7 @@ A first, runnable test of how the reels and tape move. A full reel is 2500 ft. I
 - **Easiest:** open the published page link (it runs in Safari or Chrome; on Apple Silicon, WebGL is drawn through Metal).
 - **Locally:** open `dist/jh24-reels-local.html` in a browser. It loads three.js from the jsDelivr CDN, so it needs internet access.
 
-Controls: **Space** play / stop, **←** rewind, **→** fast forward, **R** record, **S** stop, **B** motion blur on/off. Drag to look around, scroll to zoom. The strip also has LIFT (lifter defeat), 7.5 / 15 / 30 IPS, VARI (vari-speed on/off with a ±20 % slider; the readout shows percent and semitones), a shuttle slider, and Head / Middle / Tail to load the reel at different points.
+Controls: **Space** play / stop, **P** reverse play, **←** rewind, **→** fast forward, **R** record, **S** stop, **B** motion blur on/off. Drag to look around, scroll to zoom. The strip also has LIFT (lifter defeat), 7.5 / 15 / 30 IPS, VARI (vari-speed on/off with a ±20 % slider; the readout shows percent and semitones), a shuttle slider, and Head / Middle / Tail to load the reel at different points.
 
 ## What to judge
 

@@ -283,8 +283,9 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     // transport keys: white, white, white, green, red in a black bezel
     const ty = 42;
     [['◀◀', 'REW'], ['▶▶', 'F FWD'], ['■', 'STOP']].forEach(([g, l], i) => btn(330 + i * 54, ty, 40, 30, '#efece4', false, g, l));
-    btn(492, ty, 40, 30, '#3fc9a0', true, '▶', 'PLAY');
-    btn(556, ty - 4, 44, 30, '#e0322a', true, '●', 'REC', true);
+    btn(492, ty, 40, 30, '#3fc9a0', false, '◀', 'REV PLAY');
+    btn(546, ty, 40, 30, '#3fc9a0', true, '▶', 'PLAY');
+    btn(610, ty - 4, 44, 30, '#e0322a', true, '●', 'REC', true);
     // stepped-back section: blue, orange, then speed / EQ and the app's tape-character trims
     const ry = 22;
     btn(stepB + 22, ry, 36, 28, '#3f7fd6', false, '▲', 'LIFT');

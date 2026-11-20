@@ -124,3 +124,15 @@ test('the transport ramps smoothly (jerk limited) and comes to rest', () => {
   assert.ok(peak <= MACHINE.jerk * 2.5, `jerk stays near ${MACHINE.jerk} m/s^3 (${peak.toFixed(1)})`);
   close(t.v, 0, 1e-9, 'at rest');
 });
+
+test('reverse play runs the tape backwards at play speed through the capstan', () => {
+  const t = new Transport({ onTakeup: 1000 * FT });
+  const c0 = t.counter;
+  t.command('rplay'); t.advance(3);
+  assert.ok(t.capstanDriving, 'pinch engaged in reverse');
+  close(t.v, -30 * IPS, 1e-3, 'reverse at 30 ips');
+  assert.ok(t.counter < c0, 'counter runs backwards');
+  assert.ok(t.lift < 0.01, 'tape stays on the heads');
+  assert.ok(t.wS < 0 && t.wT < 0, 'both reels turn the other way');
+  t.command('play'); t.advance(4); close(t.v, 30 * IPS, 1e-3, 'back to forward play');
+});
