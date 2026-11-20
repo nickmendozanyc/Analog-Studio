@@ -37,6 +37,8 @@ export const MACHINE = {
   windSpeed: 13.0,          // m/s (~512 ips), 30 % faster winds (approx)
   windForce: 62,            // N, servo-controlled reel motors (approx)
   brakeForce: 70,           // N, electronic braking (approx)
+  stopDecel: 4.2,           // m/s^2, peak deceleration when STOP is pressed during a wind: the reels coast down gracefully (approx)
+  stopLanding: 5.5,         // m/s, speed band over which a stop from a wind eases off into a gentle final settle
   jerk: 12,                 // m/s^3, gentle S-curve ramps (approx)
   landing: 2.4,             // m/s
   capstanTau: 0.2,          // s, capstan servo time constant (approx)
@@ -146,9 +148,11 @@ export class Transport {
       const diff = goal - this.v;
       const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
       const F = braking ? this.m.brakeForce : this.m.windForce;
-      const aMax = F / this.effectiveMass();
+      // STOP from a wind: a long, graceful brake (capped deceleration, wide landing band) instead of a hard stop
+      const windStop = this.mode === 'stop' && braking;
+      const aMax = windStop ? Math.min(F / this.effectiveMass(), this.m.stopDecel ?? Infinity) : F / this.effectiveMass();
       // soft landing: ease off within the machine's landing band so the reels settle instead of snapping
-      const land = this.m.landing ?? 0.4;
+      const land = windStop ? (this.m.stopLanding ?? this.m.landing ?? 0.4) : (this.m.landing ?? 0.4);
       const jerk = this.m.jerk ?? 400;
       // never carry more acceleration than can be shed (at the jerk limit) before reaching the target
       const aDes = Math.sign(diff) * Math.min(aMax * Math.min(1, Math.abs(diff) / land + 0.08), Math.max(2 * jerk * dt, Math.sqrt(2 * jerk * Math.abs(diff)) - 1.5 * jerk * dt));   // floor keeps it creeping in to lock-on

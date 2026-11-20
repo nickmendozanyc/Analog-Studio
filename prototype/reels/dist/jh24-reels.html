@@ -149,6 +149,8 @@ const MACHINE = {
   windSpeed: 13.0,          // m/s (~512 ips), 30 % faster winds (approx)
   windForce: 62,            // N, servo-controlled reel motors (approx)
   brakeForce: 70,           // N, electronic braking (approx)
+  stopDecel: 4.2,           // m/s^2, peak deceleration when STOP is pressed during a wind: the reels coast down gracefully (approx)
+  stopLanding: 5.5,         // m/s, speed band over which a stop from a wind eases off into a gentle final settle
   jerk: 12,                 // m/s^3, gentle S-curve ramps (approx)
   landing: 2.4,             // m/s
   capstanTau: 0.2,          // s, capstan servo time constant (approx)
@@ -258,9 +260,11 @@ class Transport {
       const diff = goal - this.v;
       const braking = Math.abs(goal) < Math.abs(this.v) || Math.sign(goal) !== Math.sign(this.v);
       const F = braking ? this.m.brakeForce : this.m.windForce;
-      const aMax = F / this.effectiveMass();
+      // STOP from a wind: a long, graceful brake (capped deceleration, wide landing band) instead of a hard stop
+      const windStop = this.mode === 'stop' && braking;
+      const aMax = windStop ? Math.min(F / this.effectiveMass(), this.m.stopDecel ?? Infinity) : F / this.effectiveMass();
       // soft landing: ease off within the machine's landing band so the reels settle instead of snapping
-      const land = this.m.landing ?? 0.4;
+      const land = windStop ? (this.m.stopLanding ?? this.m.landing ?? 0.4) : (this.m.landing ?? 0.4);
       const jerk = this.m.jerk ?? 400;
       // never carry more acceleration than can be shed (at the jerk limit) before reaching the target
       const aDes = Math.sign(diff) * Math.min(aMax * Math.min(1, Math.abs(diff) / land + 0.08), Math.max(2 * jerk * dt, Math.sqrt(2 * jerk * Math.abs(diff)) - 1.5 * jerk * dt));   // floor keeps it creeping in to lock-on
@@ -558,8 +562,8 @@ tapeGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
 tapeGeo.setAttribute('normal', new THREE.BufferAttribute(tNor, 3));
 tapeGeo.setAttribute('uv', new THREE.BufferAttribute(tUv, 2));
 const idx = []; for (let i = 0; i < MAXP - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } tapeGeo.setIndex(idx);
-const tapeTex = canvasTex(512, 16, (g, w, h) => { for (let x = 0; x < w; x++) { const k = 42 + Math.random() * 22; g.fillStyle = `rgb(${k + 10},${k},${k - 8})`; g.fillRect(x, 0, 1, h); } }, true);
-const tapeMat = new THREE.MeshStandardMaterial({ map: tapeTex, color: 0x5a4636, roughness: 0.5, metalness: 0.05, side: THREE.DoubleSide });
+const tapeTex = canvasTex(512, 16, (g, w, h) => { for (let x = 0; x < w; x++) { const k = 30 + Math.random() * 16; g.fillStyle = `rgb(${k + 8},${k - 2},${k - 10})`; g.fillRect(x, 0, 1, h); } }, true);
+const tapeMat = new THREE.MeshStandardMaterial({ map: tapeTex, color: 0x3a2618, roughness: 0.5, metalness: 0.05, side: THREE.DoubleSide });
 const tapeMesh = new THREE.Mesh(tapeGeo, tapeMat); tapeMesh.castShadow = true; tapeMesh.receiveShadow = true; tapeMesh.frustumCulled = false; scene.add(tapeMesh);
 
 const N = [0, -1], S = [0, 1], E = [1, 0], W = [-1, 0], SE = [0.7, 0.7], SW = [-0.7, 0.7];

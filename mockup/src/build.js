@@ -118,12 +118,12 @@ function button(x, y, w, h, color = 'grey', lit = false, label = '', opts = {}) 
 // Long-throw fader. pos: 0 (top, +10dB) .. 1 (bottom, -inf)
 const FADER_MARKS = [['+10', 0], ['5', 0.1], ['0', 0.22], ['5', 0.34], ['10', 0.46], ['20', 0.62], ['30', 0.74], ['40', 0.84], ['60', 0.93], ['∞', 1]];
 function fader(cx, top, bottom, pos, opts = {}) {
-  const { capW = 30, capH = 50, index = '#ffffff', scale = true, scaleColor = '#cfcabd', capFill = 'url(#faderCap)' } = opts;
+  const { capW = 30, capH = 50, index = '#ffffff', scale = true, scaleColor = '#cfcabd', capFill = 'url(#faderCap)', scaleSize = 8, scaleGap = 9 } = opts;
   if (scale) {
     for (const [lab, f] of FADER_MARKS) {
       const y = top + f * (bottom - top);
-      p(`<line x1="${cx - capW / 2 - 9}" y1="${y}" x2="${cx - 6}" y2="${y}" stroke="${scaleColor}" stroke-opacity="${lab === '0' && f === 0.22 ? 1 : 0.55}" stroke-width="${lab === '0' && f === 0.22 ? 1.6 : 1}"/>`);
-      text(cx - capW / 2 - 11, y + 3, lab, 8, scaleColor, 'end', 600);
+      p(`<line x1="${cx - capW / 2 - scaleGap}" y1="${y}" x2="${cx - 6}" y2="${y}" stroke="${scaleColor}" stroke-opacity="${lab === '0' && f === 0.22 ? 1 : 0.55}" stroke-width="${lab === '0' && f === 0.22 ? 1.6 : 1}"/>`);
+      text(cx - capW / 2 - scaleGap - 2 * scaleSize / 8, y + scaleSize * 0.36, lab, scaleSize, scaleColor, 'end', 600);
     }
   }
   rect(cx - 3.5, top - 6, 7, bottom - top + 12, '#050505', 'rx="3.5"');
@@ -270,7 +270,7 @@ function remote224(ox, oy, sc, opts = {}) {
   rect(455, 84, 590, 962, '#000', 'filter="url(#brushed)" opacity="0.05"');
   for (const x of [430, 1045]) { rect(x, 62, 25, 1000, '#111214', 'rx="4"'); rect(x + 4, 62, 4, 1000, '#fff', 'opacity="0.12"'); }
   // logo + model
-  rect(500, 110, 134, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
+  rect(486, 110, 162, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
   T(567, 150, 'leximan', 40, 'middle', 900, 'letter-spacing="-1"');
   T(736, 150, '224X', 34, 'middle', 800); T(1002, 150, 'Digital Reverb', 30, 'end', 700, 'font-style="italic"');
   // display window: headroom bars + red 3-digit readout
@@ -733,7 +733,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     // printed knob scale: tick marks plus numerals at given angles
     const scale = (cx, cy, r, marks, col = WH) => {
       for (let i = 0; i <= 10; i++) { const a = -150 + i * 30; const [x1, y1] = polar(cx, cy, r * 1.22, a), [x2, y2] = polar(cx, cy, r * 1.38, a); p(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${GOLD}" stroke-width="0.9"/>`); }
-      for (const [a, lab] of marks) { const [mx2, my2] = polar(cx, cy, r * 1.72, a); tx(mx2, my2 + 2.8, lab, 7.5, col, 'middle', 700); }
+      const FS = 6.8, tw = (t) => [...t].reduce((w, c) => w + (c === '.' ? 0.3 : /[A-Z∞]/.test(c) ? 0.7 : 0.58), 0) * FS;
+      for (const [a, lab] of marks) {   // numerals clear of the tick ring: ring + gap + the label's half-extent along that direction
+        const sa = Math.sin(a * Math.PI / 180), ca = Math.cos(a * Math.PI / 180), d = r * 1.38 + 0.8 + 2.4 * Math.abs(sa * ca) + Math.abs(sa) * tw(lab) / 2 + Math.abs(ca) * FS * 0.36;
+        tx(cx + d * sa, cy - d * ca + FS * 0.36, lab, FS, col, 'middle', 700);
+      }
     };
     const KN = (cx, cy, r, col, ang, marks, dark = false, kid) => { scale(cx, cy, r, marks); K(cx, cy, r, col, ang, { dark, kid }); };
     const BLUE = '#3f8fd9', SAGE = '#7fa392', RED = '#e3452f', YEL = '#ecd03a', BLK = '#1a1a1c';
@@ -756,10 +760,10 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       // INPUT / TAPE source select
       blk(x0 + 4, 186, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e', 'src_in'); blk(x0 + 44, 186, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e', 'src_tape');
       p('<g transform="translate(0 -58)">');   // trim through sends move up into the space the mic controls left
-      KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']], false, 'trim');
+      KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-125, '-'], [125, '+']], false, 'trim');
       tx(x0 + 22, 299, 'TRIM', 8, WH);
       KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']], false, 'oddeven');
-      tx(x0 + 60, 314, 'ODD·EVEN', 7, WH, 'middle', 700);
+      tx(x0 + 60, 317, 'ODD·EVEN', 6.6, WH, 'middle', 700);
       // pan toggle, direct out level + LED
       rect(x0 + 13, 330, 14, 8, '#0d0d0d', 'rx="4"'); rect(x0 + 17, 320, 6, 14, 'url(#chrome)', 'rx="3"');
       tx(x0 + 20, 348, 'PAN', 7.5, GOLD);
@@ -772,13 +776,13 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       const bands = [
         ['HI', BLUE, [[-150, '4.6'], [-100, '6'], [-50, '8'], [0, '11'], [50, '13'], [100, '14'], [150, '16']], 'KHz'],
         ['MID', SAGE, [[-150, '.18'], [-100, '.25'], [-50, '.5'], [-10, '1.5'], [30, '2'], [80, '4'], [120, '8'], [150, '10']], 'KHz'],
-        ['LOW', RED, [[-150, '30'], [-60, '75'], [20, '150'], [90, '200'], [150, '250']], 'Hz'],
+        ['LOW', RED, [[-150, '30'], [-60, '75'], [5, '150'], [60, '200'], [150, '250']], 'Hz'],
       ];
       bands.forEach(([bn, col, fm, unit], bi) => {
         const by = 384 + bi * 82;
         tx(x0 + 8, by + 13, bn, 10, WH, 'start', 800);
         if (bi === 0) circle(x0 + 30, by + 9, 2.4, '#0a0a0a');
-        KN(x0 + 58, by + 28, 11, col, -100 + rnd() * 200, fm, false, ['hf_f', 'mf_f', 'lf_f'][bi]);
+        KN(x0 + 58 - (bi === 2 ? 2 : 0), by + 28, 11, col, -100 + rnd() * 200, fm, false, ['hf_f', 'mf_f', 'lf_f'][bi]);
         KN(x0 + 25, by + 62, 11, col, (rnd() - 0.5) * 140, GAIN14, false, ['hf_g', 'mf_g', 'lf_g'][bi]);
       });
       // EQ in, filters, phase, channel
@@ -791,15 +795,15 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       const sendHead = (y, nm) => { rect(x0 + 4, y, 77, 1.1, GOLD); tx(x0 + 80, y + 12, 'SEND', 9, GOLD, 'end', 800); tx(x0 + 80, y + 23, nm, 9, GOLD, 'end', 800); };
       const lv = (on) => (on ? -40 + rnd() * 120 : -150);
       sendHead(702, '1-2');
-      KN(x0 + 22, 722, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-150, '∞'], [0, '1'], [150, '+3']], false, 's1');
-      blk(x0 + 4, 741, 30, 14, 'PRE', false, '#ff3b2f', 's12pre'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-150, '∞'], [0, '2'], [150, '+3']], false, 's2');
-      blk(x0 + 4, 759, 30, 14, 'WET', false, '#ff3b2f', 's12wet');
+      KN(x0 + 23.5, 725, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-122, '∞'], [0, '1'], [122, '+3']], false, 's1');
+      blk(x0 + 4, 742.5, 30, 14, 'PRE', false, '#ff3b2f', 's12pre'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-135, '∞'], [0, '2'], [135, '+3']], false, 's2');
+      blk(x0 + 4, 760.5, 30, 14, 'WET', false, '#ff3b2f', 's12wet');
       sendHead(778, '3-4');
-      KN(x0 + 22, 798, 11, BLUE, 0, [[0, 'C'], [-150, '3'], [150, '4']], false, 's34p');
-      blk(x0 + 4, 817, 30, 14, 'PRE', false, '#ff3b2f', 's34pre'); KN(x0 + 56, 828, 11, BLUE, lv(ch < 24), [[-150, '∞'], [0, 'LVL'], [150, '+3']], false, 's34');
+      KN(x0 + 22, 801, 11, BLUE, 0, [[0, 'C'], [-125, '3'], [125, '4']], false, 's34p');
+      blk(x0 + 4, 817, 30, 14, 'PRE', false, '#ff3b2f', 's34pre'); KN(x0 + 56, 828, 11, BLUE, lv(ch < 24), [[-135, '∞'], [0, 'LVL'], [135, '+3']], false, 's34');
       sendHead(848, '5-6');
-      KN(x0 + 22, 868, 11, RED, 0, [[0, 'C'], [-150, '5'], [150, '6']], false, 's56p');
-      blk(x0 + 4, 887, 30, 14, 'PRE', false, '#ff3b2f', 's56pre'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-150, '∞'], [0, 'LVL'], [150, '+3']], false, 's56');
+      KN(x0 + 22, 871, 11, RED, 0, [[0, 'C'], [-125, '5'], [125, '6']], false, 's56p');
+      blk(x0 + 4, 887, 30, 14, 'PRE', false, '#ff3b2f', 's56pre'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-135, '∞'], [0, 'LVL'], [135, '+3']], false, 's56');
       blk(x0 + 4, 905, 30, 14, '2MIX', false, '#ff3b2f', 's562mix');
       rect(x0 + 4, 924, 77, 1.1, GOLD);
       p('</g>');
@@ -808,9 +812,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       KN(x0 + 50, 897, 18, '#1d1d1f', 60, [[60, '0']], true, 'buslvl');   // black; normally set to 0 dB (2 o'clock)
       tx(x0 + 27, 926, '∞', 8, WH, 'middle', 700); tx(x0 + 74, 926, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
-      blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));
+      blk(x0 + 4, 928, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 928, 36, 18, String(ch + 1), soloed.has(ch));
       const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
-      KN(x0 + 42, 970, 12, BLK, pan, [[0, 'C'], [-150, 'L'], [150, 'R']], true);
+      KN(x0 + 42, 972, 12, BLK, pan, [[0, 'C'], [-122, 'L'], [122, 'R']], true);
       p('</g>');
     }
     for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');

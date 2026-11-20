@@ -39,12 +39,23 @@ test('a full reel carries more inertia; the servo ramps winds the same way regar
   const t = new Transport(); t.command('ff'); t.advance(6); close(t.v, MACHINE.windSpeed, 0.05, 'reaches wind speed');
 });
 
-test('stop from wind brakes over a visible time, not instantly', () => {
+test('stop from wind coasts down gracefully: gentle deceleration and a soft settle, no snap', () => {
   const t = new Transport({ onTakeup: 1000 * FT });
   t.command('ff'); t.advance(5);
-  t.command('stop'); t.advance(0.2);
-  assert.ok(t.v > 1, 'still moving 0.2 s after STOP');
-  t.advance(4); close(t.v, 0, 1e-3, 'stopped');
+  t.command('stop'); t.advance(1);
+  assert.ok(t.v > 6, 'still winding well 1 s after STOP');
+  let prev = t.v, maxDecel = 0;
+  for (let k = 0; k < 800; k++) { t.advance(0.01); maxDecel = Math.max(maxDecel, (prev - t.v) / 0.01); prev = t.v; }
+  assert.ok(maxDecel <= MACHINE.stopDecel + 0.05, `deceleration capped (${maxDecel.toFixed(2)} m/s^2)`);
+  close(t.v, 0, 1e-3, 'stopped within about 9 s');
+});
+
+test('the last stretch of a wind stop eases in (no abrupt halt near zero)', () => {
+  const t = new Transport(); t.locate(t.total / 2);
+  t.command('rew'); t.advance(6); t.command('stop');
+  while (Math.abs(t.v) > 0.5) t.advance(0.001);
+  const v0 = Math.abs(t.v); t.advance(0.25);
+  assert.ok(Math.abs(t.v) > 0.05 && Math.abs(t.v) < v0, 'still easing 0.25 s after dropping below 0.5 m/s');
 });
 
 test('PLAY during a wind brakes first, then the pinch roller engages near play speed', () => {

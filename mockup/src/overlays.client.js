@@ -223,7 +223,7 @@
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
   // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
-    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)],
+    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
   })));
   // A827 front panel: live tape timer and key lamps
@@ -275,13 +275,17 @@
     for (const rl of reels) {
       const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
+      // motion blur: at wind speed the flange slots and label smear into bands (fades in above play speed)
+      const w = Math.abs(tr.v / (rl.k === 's' ? tr.rS : tr.rT));   // rad/s
+      const op = Math.min(1, Math.max(0, (w - 14) / 30)), ops = op * op * (3 - 2 * op);
+      if (Math.abs(ops - rl.blurOp) > 0.01 || (ops === 0) !== (rl.blurOp === 0)) { rl.blurOp = ops; for (const b of rl.blurs) b.style.opacity = ops.toFixed(3); }
       const r = packPx(rl.k === 's' ? tr.rS : tr.rT);
       if (Math.abs(r - rl.lastR) < 0.25) continue;
       rl.lastR = r;
       const { cx, cy } = rl.d;
       for (const el of rl.packs) {
         el.style.left = `${f2(cx - r)}px`; el.style.top = `${f2(cy - r)}px`; el.style.width = el.style.height = `${f2(2 * r)}px`;
-        if (el.classList.contains('jh-packtop')) el.style.background = `radial-gradient(circle, transparent ${f2(LIVE.hubR - 1)}px, #2d2119 ${f2(LIVE.hubR)}px, #4a3727 ${f2(LIVE.hubR + 8)}px, #3a2b1f ${f2(r * 0.7)}px, #5a4532 ${f2(r - 3)}px, #1d150f ${f2(r)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`;
+        if (el.classList.contains('jh-packtop')) el.style.background = `radial-gradient(circle, transparent ${f2(LIVE.hubR - 1)}px, #1a110b ${f2(LIVE.hubR)}px, #2a1b11 ${f2(LIVE.hubR + 8)}px, #21150d ${f2(r * 0.7)}px, #332216 ${f2(r - 3)}px, #110b07 ${f2(r)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`;
       }
       if (rl.strand) {
         const pack = { cx, cy, r }, o = rl.d.other;

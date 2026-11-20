@@ -25,7 +25,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     const kid = TAG; TAG = null;
     if (kid) p(`<g data-kid="${kid}" data-ch="${CHN}" data-a0="${ang.toFixed(1)}" data-cx="${cx}" data-cy="${cy}">`);
     const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#cfd0cb' || col === '#e2b43a';
-    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.4) * Math.cos(a)).toFixed(1), (cy + (r + 3.4) * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
+    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180, dr = r + (KS < 1.3 ? 2.6 : 3.4); circle((cx + dr * Math.cos(a)).toFixed(1), (cy + dr * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
     circle(cx + 1.3, cy + 2, r * 1.02, '#000', 'opacity="0.45"');                     // cast shadow
     circle(cx, cy, r, '#efefea');                                                      // white body
     p(`<circle cx="${cx}" cy="${cy}" r="${(r - 0.7).toFixed(1)}" fill="none" stroke="#b9bab4" stroke-width="1.3" stroke-dasharray="0.9 1.1"/>`);   // knurling
@@ -75,19 +75,19 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
         const bx = x0 + 13 + (b % 4) * 15.5, by = 140 + Math.floor(b / 4) * 12.5, on = i < 24 && b === i;
         p(`<g data-bid="bus${b + 1}" data-ch="${i}" data-on="${on ? 1 : 0}">`); ledT(bx + 3.5, by - 5.5, on);
         circle(bx + 0.5, by + 1, 4.6, '#000', 'opacity="0.45"'); circle(bx, by, 4.6, '#d9d6cc'); circle(bx, by, 4.6, 'url(#capHiDark)'); p('</g>');
-        lab(bx - 6.5, by - 3.5, String(b + 1), 3.8, 'end');
+        lab(bx - 5.8, by + 3, String(b + 1), 3.2, 'end');
       }
       p('<g transform="translate(0 -14)">');   // quad row, group output and channel input moved up under the tighter matrix
       ['LF', 'RF', 'LB', 'RB'].forEach((q, k) => { const bx = x0 + 13 + k * 15.5, on = i >= 24 && k < 2; p(`<g data-bid="q_${q.toLowerCase()}" data-ch="${i}" data-on="${on ? 1 : 0}">`); ledT(bx + 3.5, 223.5, on, '#ffb02e'); circle(bx + 0.5, 230, 4.6, '#000', 'opacity="0.45"'); circle(bx, 229, 4.6, '#d9d6cc'); p('</g>'); lab(bx, 241, q, 3.9); });
-      tg('rpan'); sk(L, 256, 7, '#d9dbde', ang()); lab(L - 9, 270, 'ODD', 3.8); lab(L + 9, 270, 'EVEN', 3.8);
+      tg('rpan'); sk(L, 256, 7, '#d9dbde', ang()); lab(L - 9, 273.5, 'ODD', 3.6); lab(L + 9, 273.5, 'EVEN', 3.6);
       tg('panbus'); key(R - 10, 250, 22, 12, 'white', i >= 24, 'PAN', 5);
       // ---- group output: TRIM (pull for solo isolate), FLOAT, DIRECT
       sect(x0 + 4, 276, SW - 8, '');
-      tg('gtrim'); sk(L, 294, 7, '#d9dbde', 140); lab(L, 309, 'TRIM');
+      tg('gtrim'); sk(L, 294, 7, '#d9dbde', 140); lab(L, 311.8, 'TRIM', 4.2);
       tg('float'); key(R - 12, 282, 26, 10, 'white', false, 'FLOAT', 4.6); tg('direct'); key(R - 12, 296, 26, 10, 'white', false, 'DIRECT', 4.2);
       // ---- channel input: LINE trim (+ green LED), FLIP, SUB GP, phase
       sect(x0 + 4, 314, SW - 8, '');
-      tg('line'); sk(L, 332, 7, '#d9dbde', ang()); lab(L, 347, 'LINE'); led(L + 10, 322, true, '#4fe07a');
+      tg('line'); sk(L, 332, 7, '#d9dbde', ang()); lab(L, 349.6, 'LINE', 4.2); led(L + 10, 322, true, '#4fe07a');
       tg('flip'); key(R - 12, 318, 26, 9, 'white', false, 'FLIP', 4.6); tg('subgp'); key(R - 12, 330, 26, 9, 'white', false, 'SUB GP', 4.1); tg('phase'); key(R - 12, 342, 26, 9, 'white', false, 'Ø', 6);
       p('</g>');
       // ---- dynamics, filters and equaliser laid out like the user's SSL 4000 E channel strip picture:
@@ -97,21 +97,29 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       const kn = (kx, yl, r0, col, scale, l1, l2) => {
         const ky = Y(yl), r = r0 * KS;
         sk(kx, ky, r0, col, ang());
-        scale.forEach((t, k) => { if (!t) return; const a = (-150 + k * 300 / (scale.length - 1) - 90) * Math.PI / 180; text((kx + (r + 4.6) * Math.cos(a)).toFixed(1), (ky + (r + 4.6) * Math.sin(a) + 1.3).toFixed(1), t, 3.3, INK2, 'middle', 700); });
-        if (l1) text(kx, ky + r + 8.5, l1, 4.2, INK, 'middle', 800);
-        if (l2) text(kx, ky + r + 14, l2, 4.5, INK, 'middle', 900);
+        // numerals sit outside the dot ring: distance = dot ring + gap + the label's half-extent along that direction
+        const boxes = [], FS = 3.1, tw = (t) => [...t].reduce((w, c) => w + (c === '.' ? 0.3 : /[A-Z∞]/.test(c) ? 0.7 : /[a-z]/.test(c) ? 0.58 : 0.58), 0) * FS;
+        scale.forEach((t, k) => { if (!t) return; const a = (-150 + k * 300 / (scale.length - 1) - 90) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+          const d = r + 2.6 + 0.65 + 0.55 + Math.abs(ca) * tw(t) / 2 + Math.abs(sa) * FS * 0.36;
+          const tx = Math.min(Math.max(kx + d * ca, x0 + 2.2 + tw(t) / 2), x0 + SW - 2.2 - tw(t) / 2);   // never past the module edge
+          text(tx.toFixed(1), (ky + d * sa + FS * 0.36).toFixed(1), t, FS, INK2, 'middle', 700);
+          boxes.push({ l: tx - tw(t) / 2, r: tx + tw(t) / 2, b: ky + d * sa + FS * 0.36 }); });
+        let base = ky + r + 8.5;
+        if (l1) { const hw = tw(l1) * 4.2 / FS / 2 + 1.2; for (const q of boxes) if (q.r > kx - hw && q.l < kx + hw) base = Math.max(base, q.b + 0.7 + 3.1); text(kx, base, l1, 4.2, INK, 'middle', 800); }
+        if (l2) text(kx, base + 5.5, l2, 4.5, INK, 'middle', 900);
+        return base;
       };
-      const ttl = (yl, t, tx = x0 + 6) => text(tx, Y(yl) + 3, t, 6, INK, 'start', 900, 'letter-spacing="0.3"');
+      const ttl = (yl, t, tx = x0 + 6, sz = 6) => text(tx, Y(yl) + 3, t, sz, INK, 'start', 900, 'letter-spacing="0.3"');
       const divider = (yl1, yl2, xm = cx + 4) => p(`<polyline points="${x0 + 4},${Y(yl1)} ${xm - 6},${Y(yl1)} ${xm + 6},${Y(yl2)} ${x0 + SW - 4},${Y(yl2)}" fill="none" stroke="${LINE}" stroke-width="1"/>`);
       const tall3 = (yl, keys) => keys.forEach(([a1, a2, on, lc, bid], k) => { const kx = x0 + 9 + k * 19; p(`<g data-bid="${bid}" data-ch="${i}" data-on="${on ? 1 : 0}">`); key(kx, Y(yl), 16, 17, 'white', false, '', 4); text(kx + 8, Y(yl) + 7.5, a1, 3.7, INK2, 'middle', 700); text(kx + 8, Y(yl) + 13, a2, 3.7, INK2, 'middle', 700); ledT(kx + 8, Y(yl) + 21.5, on, lc); p('</g>'); });
       const kL = x0 + 17, kR = x0 + SW - 17;
       const GAIN = ['-15', '12', '9', '6', '3', '0', '3', '6', '9', '12', '+15'];
       // DYNAMICS
-      sect(x0 + 4, Y(-4), SW - 8, ''); ttl(4, 'DYNAMICS');
+      sect(x0 + 4, Y(-4), SW - 8, ''); ttl(4, 'DYNAMICS', x0 + 6, 5.2);
       tg('link'); key(kR - 12, Y(4), 24, 9, 'white', false, 'LINK', 4.6);
       tg('c_ratio'); kn(kL, 30, 7.5, '#e9eaec', ['1', '2', '3', '5', '8', '20', '∞'], 'RATIO', 'COMPRESS');
       tg('c_thr'); kn(kR, 48, 7.5, '#e9eaec', ['+10', '+5', '0', '-5', '-10', '-15', '-20'], 'THRESHOLD');
-      tg('c_rel'); kn(kL, 82, 7.5, '#e9eaec', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(98), 'F.ATK', 3.3, INK2, 'middle', 700);
+      tg('c_rel'); text(kL, kn(kL, 82, 7.5, '#e9eaec', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE') + 4.2, 'F.ATK', 3.3, INK2, 'middle', 700);
       divider(98, 90, cx + 2);
       tg('g_thr'); kn(kR, 110, 7.5, '#3f9a58', ['-30', '-25', '-20', '-12', '-4', '+5', '+10'], 'THRESHOLD');
       tg('g_rng'); kn(kL, 132, 7.5, '#3f9a58', ['0', '5', '10', '20', '30', '35', '40'], 'RANGE', 'EXPAND');
@@ -119,18 +127,18 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       ['EX', 'G1', 'G2'].forEach((l, k) => { led(kR - 9 + k * 9, Y(152), k === 0, '#ffd23a'); text(kR - 9 + k * 9, Y(158), l, 3.2, INK2, 'middle', 700); });
       const gr = Math.floor(rnd() * 4), gg = Math.floor(rnd() * 3);
       ['20', '14', '10', '6', '3'].forEach((v, k) => { const ly = Y(166 + k * 9); led(kR - 7, ly, 4 - k < gg, '#4fe07a'); text(kR, ly + 1.4, v, 3.3, INK2, 'middle', 700); led(kR + 7, ly, 4 - k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); });
-      tg('g_rel'); kn(kL, 182, 7.5, '#3f9a58', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(198), 'F.ATK', 3.3, INK2, 'middle', 700);
+      tg('g_rel'); text(kL, kn(kL, 182, 7.5, '#3f9a58', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE') + 4.2, 'F.ATK', 3.3, INK2, 'middle', 700);
       text(cx, Y(212), 'DYNAMICS', 3.7, INK, 'middle', 800);
       tall3(216, [['DYN', 'IN', i % 5 === 0, '#4fe07a', 'dyn_in'], ['EXP', 'IN', false, '#ff3b2f', 'exp_in'], ['CMP', 'IN', i % 5 === 0, '#ffd23a', 'cmp_in']]);
       // FILTERS
       sect(x0 + 4, Y(246), SW - 8, ''); ttl(254, 'FILTERS');
       tg('fdyn'); key(x0 + 6, Y(262), 24, 9, 'white', false, 'DYN SC', 3.8);
       tg('lpf'); kn(kR, 270, 7, '#c9ccd1', ['OUT', '12', '8', '5', '4', '3.5', '3'], 'kHz');
-      tg('hpf'); kn(kL, 298, 7, '#c9ccd1', ['OUT', '20', '70', '120', '200', '300', '350'], 'Hz');
+      tg('hpf'); kn(kL + 1.5, 298, 7, '#c9ccd1', ['OUT', '20', '70', '120', '200', '300', '350'], 'Hz');
       tg('prefilt'); key(kR - 13, Y(302), 26, 9, 'white', false, 'PRE DYN', 3.7);
       // EQUALISER
       sect(x0 + 4, Y(322), SW - 8, '');
-      ttl(330, 'HF'); tg('hf_bell'); key(kR - 12, Y(324), 24, 9, 'white', false, 'BELL', 4.6);
+      ttl(326.5, 'HF', x0 + 4); tg('hf_bell'); key(kR - 12, Y(324), 24, 9, 'white', false, 'BELL', 4.6);
       tg('hf_g'); kn(kL, 350, 7.5, '#c8352a', GAIN, 'dB');
       tg('hf_f'); kn(kR, 370, 6.8, '#c8352a', ['1.5', '2', '5', '8', '10', '14', '16'], 'kHz');
       divider(388, 398, cx - 4);
@@ -146,17 +154,16 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       tg('lm_q'); kn(kL, 548, 6.5, '#3577c2', ['3', '2', '1.5', '1', '.5'], '');
       divider(566, 556, cx + 4);
       ttl(572, 'LF', x0 + 6);
-      tg('lf_f'); kn(kR, 576, 6.8, '#1e1f22', ['30', '50', '100', '200', '300', '450'], 'Hz');
+      tg('lf_f'); kn(kR - 3.5, 576, 6.8, '#1e1f22', ['30', '50', '100', '200', '300', '450'], 'Hz');
       tg('lf_g'); kn(kL, 602, 7.5, '#1e1f22', GAIN, 'dB');
       tg('lf_bell'); key(kR - 12, Y(608), 24, 9, 'white', false, 'BELL', 4.6);
-      text(cx, Y(624), 'EQUALIZER', 3.7, INK, 'middle', 800);
-      tall3(628, [['EQ', 'IN', i % 3 !== 2, '#4fe07a', 'eq_in'], ['DYN', 'SC', false, '#ff3b2f', 'eqdynsc'], ['PRE', 'DYN', false, '#ffd23a', 'eqpredyn']]);
-      led(cx + 12, Y(656), i === 19); text(cx + 8, Y(656) + 1.4, 'OVERLOAD', 3.5, INK, 'end', 800);
+            tall3(628, [['EQ', 'IN', i % 3 !== 2, '#4fe07a', 'eq_in'], ['DYN', 'SC', false, '#ff3b2f', 'eqdynsc'], ['PRE', 'DYN', false, '#ffd23a', 'eqpredyn']]);
+      led(kR + 9, Y(623), i === 19); text(kR + 5.5, Y(623) + 1.3, 'OVERLOAD', 3.5, INK, 'end', 800);
       KS = 1.4;
       // ---- cues: stereo pan, stereo send and sends 1-4, each with PRE and SMALL FADER keys
       sect(x0 + 4, 888, SW - 8, 'CUES');
-      tg('stp'); sk(kL, 905, 5.5, '#e0b23a', ang()); lab(kL - 11, 913, 'L', 3.8); lab(kL + 11, 913, 'R', 3.8);
-      const send = (ky, col, l) => { const id = l === 'ST' ? 'st' : `c${l}`; tg(id); sk(kL, ky, 6.2, col, ang()); lab(kL - 13, ky - 6, l, 4.2, 'start'); tg(`${id}_pre`); key(kR - 15, ky - 8.5, 30, 7.5, 'white', false, 'PRE', 4); tg(`${id}_sm`); key(kR - 15, ky + 0.5, 30, 7.5, 'white', false, 'SM FDR', 3.6); };
+      tg('stp'); sk(kL, 905, 5.5, '#e0b23a', ang()); lab(kL - 13.5, 911, 'L', 3.8); lab(kL + 13.5, 911, 'R', 3.8);
+      const send = (ky, col, l) => { const id = l === 'ST' ? 'st' : `c${l}`; tg(id); sk(kL, ky, 6.2, col, ang()); lab(kL - 15.6, ky - 7.6, l, 3.8, 'start'); tg(`${id}_pre`); key(kR - 15, ky - 8.5, 30, 7.5, 'white', false, 'PRE', 4); tg(`${id}_sm`); key(kR - 15, ky + 0.5, 30, 7.5, 'white', false, 'SM FDR', 3.6); };
       send(925, '#e0b23a', 'ST'); send(944, '#e9eaec', '1'); send(963, '#e9eaec', '2'); send(982, '#e9eaec', '3'); send(1001, '#e9eaec', '4');
       // ---- monitor input: READY GROUP, READY TAPE (square keys), RECORD (large red, track number)
       sect(x0 + 4, 1016, SW - 8, '');
@@ -170,9 +177,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       key(x0 + 32, 1062, 34, 8, 'white', false, 'INPUT', 4.2); key(x0 + 32, 1072, 34, 8, 'white', false, 'OUTPUT', 4); led(x0 + 29, 1071, false, '#4fe07a');
       key(x0 + 38, 1084, 28, 9, 'white', false, 'SOLO', 4.4); led(x0 + 34, 1088.5, false, '#ffd23a');
       key(x0 + 38, 1096, 28, 9, 'white', false, 'CUT', 4.6); led(x0 + 34, 1100.5, false);
-      sk(x0 + 46, 1114, 5.5, '#d9dbde', 0); lab(x0 + 38, 1116, 'F', 3.8); lab(x0 + 54, 1116, 'B', 3.8); key(x0 + 58, 1108, 10, 8, 'white', false, 'IN', 3.6);
+      sk(x0 + 46, 1114, 4.2, '#d9dbde', 0); lab(x0 + 37, 1115.5, 'F', 3.8); lab(x0 + 55, 1115.5, 'B', 3.8); key(x0 + 59, 1108, 9.5, 8, 'white', false, 'IN', 3.4);
       // ---- large pan, SOLO and CUT at the foot of the module
-      sk(L, 1136, 9, '#d9dbde', -20 + rnd() * 40); lab(L - 13, 1146, 'L', 4.2); lab(L + 13, 1146, 'R', 4.2);
+      sk(L, 1136, 9, '#d9dbde', -20 + rnd() * 40); lab(L - 14, 1153, 'L', 4.2); lab(L + 14, 1153, 'R', 4.2);
       key(R - 12, 1124, 26, 11, 'white', false, 'SOLO', 4.8); key(R - 12, 1138, 26, 11, 'white', i === 2, 'CUT', 4.8);
       p('</g>');
       // ---- fader panel: VCA group window, automation status keys, VCA fader (100 mm = 190 px), scribble strip
@@ -182,7 +189,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       const modes = [['O', 'grey'], ['R', 'green'], ['W', 'red'], ['T', 'amber'], ['L', 'blue'], ['Tr', 'yellow']];
       const m = i % 9 === 4 ? 2 : i % 7 === 3 ? 3 : 1;
       modes.forEach(([lb, col], k) => key(x0 + SW - 17, 1186 + k * 16, 12, 12, col, k === m, lb, 5.4));
-      fader(x0 + 28, 1186, 1376, 0.3 + rnd() * 0.25, { capW: 22, capH: 34, scaleColor: '#2a2b2d', capFill: 'url(#faderCapWhite)' });
+      fader(x0 + 28, 1186, 1376, 0.3 + rnd() * 0.25, { capW: 22, capH: 34, scaleColor: '#2a2b2d', scaleSize: 5, scaleGap: 5.5, capFill: 'url(#faderCapWhite)' });
       rect(x0 + 4, 1394, SW - 8, 22, '#f2eee2', 'rx="2"');
       text(cx, 1409.5, names[i], 8.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`);
       text(cx, 1432, String(i + 1), 8.5, INK2, 'middle', 800);
@@ -246,9 +253,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     const ckey = (bx, by, bw, bh, l, size = 6.5, on = false, col = 'white') => key(bx, by, bw, bh, col, on, l, size);
     // ---- meter bridge over the centre: SLS badge, main L / R, compression meter
     rect(x, 4, w, 172, '#16171a', 'rx="3"'); rect(x, 4, w, 2, '#fff', 'opacity="0.08"');
-    text(x + 30, 84, 'SLS', 46, '#c9a54a', 'start', 900, 'font-style="italic" letter-spacing="2"');
+    text(x + 84, 84, 'SLS', 46, '#c9a54a', 'start', 900, 'font-style="italic" letter-spacing="2"');
     for (let k = 0; k < 9; k++) rect(x + 16, 46 + k * 5, 60 - k * 5, 2, '#c9a54a', 'opacity="0.8"');
-    text(x + 32, 110, '4000 G · 32 CHANNEL', 11, '#c9a54a', 'start', 800, 'letter-spacing="3"');
+    text(x + 18, 110, '4000 G · 32 CHANNEL', 11, '#c9a54a', 'start', 800, 'letter-spacing="3"');
     [['MAIN L', -4], ['MAIN R', -5]].forEach(([l, db], k) => { sslVu(x + 330 + k * 160, 20, 148, 70, db, ''); text(x + 404 + k * 160, 112, l, 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); });
     rect(MXM + 120, 14, 150, 82, '#efe6cc', 'rx="4"');
     { const gx = MXM + 195, gy = 108; for (let k = 0; k <= 10; k++) { const a = (-50 + k * 10) * Math.PI / 180; p(`<line x1="${(gx + 66 * Math.sin(a)).toFixed(1)}" y1="${(gy - 66 * Math.cos(a)).toFixed(1)}" x2="${(gx + 76 * Math.sin(a)).toFixed(1)}" y2="${(gy - 76 * Math.cos(a)).toFixed(1)}" stroke="#2a2520" stroke-width="1.3"/>`); }

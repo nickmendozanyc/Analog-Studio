@@ -120,6 +120,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     gp9: {
       face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
       edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b', ink: '#1b1b1b',
+      avg: '#d6452b', blurSlot: 'rgba(205,66,40,0.93)', blurLabel: 'rgba(220,120,100,0.97)',
     },
   };
   const slot = (cx, cy, rIn, rOut, w, ang, c) => {
@@ -152,8 +153,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
     // tape pack: outer wraps are matte black back-coating; top edge shows the wound edges
     const packMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px);mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px)`;
-    for (let z = TAPE_Z0; z < TAPE_Z1; z += 2.4) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#120e0b,#3a2c22 35%,#1a140f 70%,#0e0b09)', packMask, `jh-pack jh-pack-${key}`);
-    disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #2d2119 ${f(hubR)}px, #4a3727 ${f(hubR + 8)}px, #3a2b1f ${f(rl.pack * 0.7)}px, #5a4532 ${f(rl.pack - 3)}px, #1d150f ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`, '', `jh-pack jh-pack-${key} jh-packtop`);
+    for (let z = TAPE_Z0; z < TAPE_Z1; z += 2.4) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#0b0705,#24160e 35%,#110b07 70%,#080504)', packMask, `jh-pack jh-pack-${key}`);
+    disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #1a110b ${f(hubR)}px, #2a1b11 ${f(hubR + 8)}px, #21150d ${f(rl.pack * 0.7)}px, #332216 ${f(rl.pack - 3)}px, #110b07 ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`, '', `jh-pack jh-pack-${key} jh-packtop`);
     rotor();
     // front flange (3 layers, the top one with the finish)
     flange(100, st.edge); flange(101.5, st.edge);
@@ -181,9 +182,13 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     lab.push(`<circle cx="${c}" cy="${c}" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>`);
     lab.push(`<circle cx="${c}" cy="${c}" r="${hubR}" fill="none" stroke="#0d0d0e" stroke-width="8"/>`);
     add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, lab.join(''))}</div>`);
+    // motion blur (fast winds): the spinning flange smears into concentric bands; faded in with reel speed
+    const avg = st.avg || '#b9bcc1', pr = (x) => f(R * x);
+    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);background:radial-gradient(circle, transparent ${f(hubR - 1)}px, #0d0d0e ${f(hubR)}px, #0d0d0e ${f(hubR + 4)}px, ${avg} ${f(hubR + 7)}px, ${avg} ${pr(0.39)}px, rgba(20,20,20,0.55) ${pr(0.42)}px, ${avg} ${pr(0.45)}px, ${st.blurSlot || 'rgba(185,188,193,0.93)'} ${pr(0.5)}px, ${st.blurLabel || 'rgba(200,198,190,0.97)'} ${pr(0.62)}px, ${st.blurSlot || 'rgba(185,188,193,0.93)'} ${pr(0.84)}px, ${avg} ${pr(0.86)}px, ${avg} ${pr(0.97)}px, rgba(255,255,255,0.6) ${pr(0.985)}px, ${avg} ${f(R - 0.5)}px, transparent ${f(R)}px)`)}"></div>`);
     // black hold-down knob on the spindle
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
+    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 6px, #2a2a2c 8px, #141416 29px, rgba(14,14,15,0.75) 31px, rgba(14,14,15,0.35) 38px, transparent 40px)`)}"></div>`);
     add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="44" cy="44" r="30" fill="url(#none)"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
     add('</div>');
   }
@@ -233,7 +238,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       tapeSegs.push([[C.cx + C.r * Math.cos(t0), C.cy + C.r * Math.sin(t0)], [C.cx + C.r * Math.cos(t1), C.cy + C.r * Math.sin(t1)]]);
     }
   }
-  const TAPE_BG = 'linear-gradient(180deg,#3b2c21 0%,#2a1f17 30%,#33261c 55%,#1c1510 100%)';
+  const TAPE_BG = 'linear-gradient(180deg,#26180f 0%,#180f09 30%,#1f140c 55%,#0f0905 100%)';
   // live data for the console page: reel centres, pack scale and the two strands that leave the packs
   const sig0 = pickTangent(sPack, armL, SW, W).sig, sig5 = pickTangent(armR, tPack, E, E).sig;
   globalThis[A8 ? 'A8_LIVE' : 'JH_LIVE'] = {
