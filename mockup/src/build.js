@@ -1105,15 +1105,18 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   });
   // Rowan SBX-80 sync box (1U): two-tone grey, orange legends, green VFD readouts that follow the sync engine
   globalThis.RACK_SBX_Y = RY + uy;
-  unit(1, '#3c3e42', (w, h) => {
-    rect(0, h * 0.62, w, h * 0.38, '#8b8d90');
-    text(22, 24, 'Rowan', 16, '#f0a040', 'start', 900, 'font-style="italic"');
-    text(22, 44, 'SBX-80 SYNC BOX', 10, '#f0a040', 'start', 800, 'letter-spacing="1"');
-    rect(138, 7, 196, 30, '#061513', 'rx="2"'); rect(138, 7, 196, 10, '#fff', 'opacity="0.04" rx="2"');
-    p(`<text id="rk-sbx-l" x="146" y="29" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" filter="url(#glowSm)">01 017 3</text>`);
-    p(`<text id="rk-sbx-r" x="326" y="29" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" text-anchor="end" filter="url(#glowSm)">96.0</text>`);
-    [['LOCK', 'rk-sbx-lock', '#4fe07a'], ['BEAT', 'rk-sbx-beat', '#ff6a3c']].forEach(([l, id, c], k) => { circle(354 + k * 34, 16, 4, '#2a2020'); p(`<circle id="${id}" cx="${354 + k * 34}" cy="16" r="4" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); text(354 + k * 34, 32, l, 8, '#f0a040', 'middle', 800); });
-    text(w - 20, 49, 'MIDI · DIN SYNC · SMPTE', 8, '#2a2b2d', 'end', 800, 'letter-spacing="1"');
+  unit(1, '#ebe8de', (w, h) => {
+    rect(0, 0, 10, h, '#8c8768'); rect(w - 10, 0, 10, h, '#8c8768');
+    rect(128, 4, 230, h - 8, '#556986', 'rx="3"');
+    rect(20, 9, 13, 10, 'none', 'stroke="#d23b2c" stroke-width="2" rx="2"');
+    text(37, 19, 'Rowan', 13, '#d23b2c', 'start', 800);
+    text(20, 44, 'SBX-80', 22, '#3f5477', 'start', 900, 'font-style="italic"');
+    rect(136, 9, 214, 30, '#061412', 'rx="2"');
+    p(`<text id="rk-sbx-l" x="144" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" filter="url(#glowSm)">01 001 1</text>`);
+    p(`<text id="rk-sbx-r" x="342" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" text-anchor="end" filter="url(#glowSm)">96.0</text>`);
+    text(243, 50, 'SONG · MEASURE · BEAT · TEMPO', 8, '#eef1f5', 'middle', 800, 'letter-spacing="1"');
+    [['LOCK', 'rk-sbx-lock', '#4fe07a'], ['BEAT', 'rk-sbx-beat', '#ff6a3c']].forEach(([l, id, c], k) => { circle(378 + k * 30, 18, 4, '#2a1c1a'); p(`<circle id="${id}" cx="${378 + k * 30}" cy="18" r="4" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); text(378 + k * 30, 34, l, 8, '#3f5477', 'middle', 800); });
+    text(w - 20, 50, 'SYNC BOX', 10, '#3f5477', 'end', 900, 'font-style="italic" letter-spacing="1"');
   });
   const slotsY = uy + 8; uy += 34;
   unit(1, '#1a1b1e', (w, h) => {
