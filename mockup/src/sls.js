@@ -145,9 +145,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       for (let i = a0; i <= a1; i += 2) {
         for (const [k, ch] of [[0, i], [1, i + 1]]) {
           // real VU proportions (about 1.6 : 1), centred over the channel pair
-          const vw = 128, vh = 68, mx = stripX(i) + SW - vw / 2, my = 10 + k * 82, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
+          const vw = 138, vh = 76, mx = stripX(i) + SW - vw / 2, my = 9 + k * 82, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
           vu(mx, my, vw, vh, db, { brand: '' });
-          text(mx + vw / 2, my + vh + 9, String(ch + 1), 8, '#d9d6cc', 'middle', 700);
+          text(mx + 9, my + 19, String(ch + 1), 15, '#2a2520', 'start', 900);   // track number on the meter face (top left, clear of the scale)
         }
       }
     }
