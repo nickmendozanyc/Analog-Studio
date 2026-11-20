@@ -11,10 +11,11 @@
 // Every number here is (approx): voiced by ear to sound like a large two-inch deck, not measured from a JH-24.
 
 export const MECH = {
-  slots: 24,          // motor armature slots: whine = turns/s x slots
+  slots: 48,          // motor armature slots: whine = turns/s x slots (about 1.1 kHz at full wind)
+  rise: 0.35,         // extra pitch climb with speed (0 = strictly proportional): the whine rises high in a wind
   poles: 4,
-  whine: 0.010,       // whine level at full wind speed (linear, the machine level scales everything)
-  load: 0.0030,       // extra whine per m/s^2 of reel acceleration
+  whine: 0.0035,      // whine level at full wind speed (linear, the machine level scales everything)
+  load: 0.0010,       // extra whine per m/s^2 of reel acceleration
   air: 0.035,         // tape and air rush at full wind speed
   rumble: 0.020,
   clunk: 0.22,
@@ -51,7 +52,7 @@ export class MechSound {
   // add the machine's sound into L / R (the machine sits slightly left of centre in the room)
   render(L, R, level) {
     const c = this.c, fs = this.fs, n = L.length, av = Math.abs(this.v), x = Math.min(1.2, av / c.vMax);
-    const fS = av / (2 * Math.PI * (this.rS || 0.1)), fT = av / (2 * Math.PI * (this.rT || 0.1));   // turns per second
+    const climb = 1 + c.rise * (x - 1), fS = av / (2 * Math.PI * (this.rS || 0.1)) * climb, fT = av / (2 * Math.PI * (this.rT || 0.1)) * climb;   // turns per second, with the climb
     const wl = level * (c.whine * Math.pow(x, 1.1) + c.load * Math.abs(this.acc) * Math.min(1, x * 4));
     const al = level * c.air * x * x, rl = level * c.rumble * Math.min(1, x * 1.5);
     // air: a resonant band rising with speed
@@ -64,8 +65,8 @@ export class MechSound {
         this.ph[0] += fS / fs; this.ph[1] += fT / fs;
         const s1 = Math.sin(2 * Math.PI * this.ph[0] * c.slots), s2 = Math.sin(2 * Math.PI * this.ph[1] * c.slots);
         const g1 = Math.sin(2 * Math.PI * this.ph[0] * c.poles * 2), g2 = Math.sin(2 * Math.PI * this.ph[1] * c.poles * 2);
-        y += wl * (s1 + 0.35 * Math.sin(4 * Math.PI * this.ph[0] * c.slots) + 0.25 * g1);
-        y += wl * 0.85 * (s2 + 0.35 * Math.sin(4 * Math.PI * this.ph[1] * c.slots) + 0.25 * g2);
+        y += wl * (s1 + 0.2 * Math.sin(4 * Math.PI * this.ph[0] * c.slots) + 0.15 * g1);
+        y += wl * 0.85 * (s2 + 0.2 * Math.sin(4 * Math.PI * this.ph[1] * c.slots) + 0.15 * g2);
         // tape and air, pulsing with each reel's turn
         const nz = this.noise();
         const yb = b0 * nz - b0 * this.bp[1] - a1 * this.bp[2] - a2 * this.bp[3];
