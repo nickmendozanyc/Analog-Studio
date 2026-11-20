@@ -58,11 +58,12 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       p('<g transform="translate(0 178) scale(1 0.944) translate(0 -120)">');   // module controls sit below the taller meter bridge
       // ---- routing matrix: round buttons with an LED above, 4 columns x 6 rows (24 groups), quad bus row, PAN pot + PAN key
       for (let b = 0; b < 24; b++) {
-        const bx = x0 + 13 + (b % 4) * 15.5, by = 140 + Math.floor(b / 4) * 14.5, on = i < 24 && b === i;
+        const bx = x0 + 13 + (b % 4) * 15.5, by = 140 + Math.floor(b / 4) * 12.5, on = i < 24 && b === i;
         led(bx + 3.5, by - 5.5, on);
         circle(bx + 0.5, by + 1, 4.6, '#000', 'opacity="0.45"'); circle(bx, by, 4.6, '#d9d6cc'); circle(bx, by, 4.6, 'url(#capHiDark)');
         lab(bx - 6.5, by - 3.5, String(b + 1), 3.8, 'end');
       }
+      p('<g transform="translate(0 -14)">');   // quad row, group output and channel input moved up under the tighter matrix
       ['LF', 'RF', 'LB', 'RB'].forEach((q, k) => { const bx = x0 + 13 + k * 15.5, on = i >= 24 && k < 2; led(bx + 3.5, 223.5, on, '#ffb02e'); circle(bx + 0.5, 230, 4.6, '#000', 'opacity="0.45"'); circle(bx, 229, 4.6, '#d9d6cc'); lab(bx, 241, q, 3.9); });
       sk(L, 256, 7, '#d9dbde', ang()); lab(L - 9, 270, 'ODD', 3.8); lab(L + 9, 270, 'EVEN', 3.8);
       key(R - 10, 250, 22, 12, 'white', i >= 24, 'PAN', 5);
@@ -74,48 +75,75 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       sect(x0 + 4, 314, SW - 8, '');
       sk(L, 332, 7, '#d9dbde', ang()); lab(L, 347, 'LINE'); led(L + 10, 322, true, '#4fe07a');
       key(R - 12, 318, 26, 9, 'white', false, 'FLIP', 4.6); key(R - 12, 330, 26, 9, 'white', false, 'SUB GP', 4.1); key(R - 12, 342, 26, 9, 'white', false, 'Ø', 6);
-      // ---- dynamics (drawing: RATIO left, LINK top right, THRESHOLD right, RELEASE left; gate THRESHOLD right, GATE key, RANGE left, RELEASE left; LED ladder; CH IN / CH OUT / MON)
-      sect(x0 + 4, 354, SW - 8, 'DYNAMICS');
-      sk(L, 376, 8, '#e9eaec', ang()); lab(L, 391, 'RATIO');
-      key(R - 11, 364, 22, 9, 'white', false, 'LINK', 4.6);
-      sk(R, 392, 8, '#e9eaec', ang()); lab(R, 407, 'THRESH');
-      sk(L, 410, 8, '#e9eaec', ang()); lab(L, 425, 'RELEASE');
-      rect(x0 + 6, 430, SW - 12, 1, LINE, 'opacity="0.7"');
-      sk(R, 446, 8, '#3f9a58', ang()); lab(R, 461, 'THRESH');
-      sk(L, 454, 8, '#3f9a58', ang()); lab(L, 469, 'RANGE');
-      key(R - 11, 466, 22, 9, 'white', rnd() > 0.8, 'GATE', 4.6);
-      sk(L, 488, 8, '#3f9a58', ang()); lab(L, 503, 'RELEASE');
+      p('</g>');
+      // ---- dynamics, filters and equaliser laid out like the user's SSL 4000 E channel strip picture:
+      //      printed scales round every knob, the strip's wording, its keys and stepped section lines.
+      KS = 1.25;
+      const Y = (yl) => 340 + yl * 0.83;   // that strip's spacing, fitted into the module height
+      const kn = (kx, yl, r0, col, scale, l1, l2) => {
+        const ky = Y(yl), r = r0 * KS;
+        sk(kx, ky, r0, col, ang());
+        scale.forEach((t, k) => { if (!t) return; const a = (-150 + k * 300 / (scale.length - 1) - 90) * Math.PI / 180; text((kx + (r + 4.6) * Math.cos(a)).toFixed(1), (ky + (r + 4.6) * Math.sin(a) + 1.3).toFixed(1), t, 3.3, INK2, 'middle', 700); });
+        if (l1) text(kx, ky + r + 8.5, l1, 4.2, INK, 'middle', 800);
+        if (l2) text(kx, ky + r + 14, l2, 4.5, INK, 'middle', 900);
+      };
+      const ttl = (yl, t, tx = x0 + 6) => text(tx, Y(yl) + 3, t, 6, INK, 'start', 900, 'letter-spacing="0.3"');
+      const divider = (yl1, yl2, xm = cx + 4) => p(`<polyline points="${x0 + 4},${Y(yl1)} ${xm - 6},${Y(yl1)} ${xm + 6},${Y(yl2)} ${x0 + SW - 4},${Y(yl2)}" fill="none" stroke="${LINE}" stroke-width="1"/>`);
+      const tall3 = (yl, keys) => keys.forEach(([a1, a2, on, lc], k) => { const kx = x0 + 9 + k * 19; key(kx, Y(yl), 16, 17, 'white', false, '', 4); text(kx + 8, Y(yl) + 7.5, a1, 3.7, INK2, 'middle', 700); text(kx + 8, Y(yl) + 13, a2, 3.7, INK2, 'middle', 700); led(kx + 8, Y(yl) + 21.5, on, lc); });
+      const kL = x0 + 17, kR = x0 + SW - 17;
+      const GAIN = ['-15', '12', '9', '6', '3', '0', '3', '6', '9', '12', '+15'];
+      // DYNAMICS
+      sect(x0 + 4, Y(-4), SW - 8, ''); ttl(4, 'DYNAMICS');
+      key(kR - 12, Y(4), 24, 9, 'white', false, 'LINK', 4.6);
+      kn(kL, 30, 7.5, '#e9eaec', ['1', '2', '3', '5', '8', '20', '∞'], 'RATIO', 'COMPRESS');
+      kn(kR, 48, 7.5, '#e9eaec', ['+10', '+5', '0', '-5', '-10', '-15', '-20'], 'THRESHOLD');
+      kn(kL, 82, 7.5, '#e9eaec', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(98), 'F.ATK', 3.3, INK2, 'middle', 700);
+      divider(98, 90, cx + 2);
+      kn(kR, 110, 7.5, '#3f9a58', ['-30', '-25', '-20', '-12', '-4', '+5', '+10'], 'THRESHOLD');
+      kn(kL, 132, 7.5, '#3f9a58', ['0', '5', '10', '20', '30', '35', '40'], 'RANGE', 'EXPAND');
+      key(kR - 13, Y(136), 26, 9, 'white', false, 'SELECT', 4.2);
+      ['EX', 'G1', 'G2'].forEach((l, k) => { led(kR - 9 + k * 9, Y(152), k === 0, '#ffd23a'); text(kR - 9 + k * 9, Y(158), l, 3.2, INK2, 'middle', 700); });
       const gr = Math.floor(rnd() * 4), gg = Math.floor(rnd() * 3);
-      ['20', '14', '10', '6', '3'].forEach((v, k) => { const ly = 482 + k * 6; led(R - 6, ly, 4 - k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); led(R + 6, ly, 4 - k < gg, '#4fe07a'); lab(R, ly + 1.5, v, 3.4); });
-      tall(x0 + 8, 510, 'CH', 'IN', i % 5 === 0); tall(x0 + 28, 510, 'CH', 'OUT', false); tall(x0 + 48, 510, 'MON', '', false);
-      // ---- filters (drawing: LPF top right in kHz, HPF left in Hz, SPLIT key right)
-      sect(x0 + 4, 544, SW - 8, 'FILTERS');
-      sk(R, 562, 7, '#c9ccd1', ang()); lab(R, 576, 'kHz');
-      sk(L, 572, 7, '#c9ccd1', ang()); lab(L, 586, 'Hz');
-      key(R - 12, 580, 24, 9, 'white', false, 'SPLIT', 4.4);
-      // ---- G Series EQ (drawing order): HF gain L + x3 key R + HF freq R; HMF gain L, freq R, Q L; insert PRE / IN R;
-      //      LMF gain L, freq R, Q L; LF freq R, gain L, ÷3 R; EQUALISER to CH / FLT DYN S-C / MON; OVERLOAD
-      sect(x0 + 4, 596, SW - 8, '');
-      sk(L, 612, 8, '#c8352a', ang()); lab(L, 627, 'HF');
-      key(R - 10, 600, 20, 9, 'white', false, 'x3', 5.4);
-      sk(R, 626, 7, '#c8352a', ang()); lab(R, 640, 'kHz');
-      sk(L, 646, 8, '#3f9a58', ang()); lab(L, 661, 'HMF');
-      sk(R, 664, 7, '#3f9a58', ang()); lab(R, 678, 'kHz');
-      sk(L, 682, 6, '#3f9a58', ang()); lab(L, 695, 'Q');
-      key(R - 11, 686, 22, 9, 'white', false, 'PRE', 4.6); key(R - 11, 698, 22, 9, 'white', false, 'IN', 4.8); lab(cx, 714, 'INSERT', 3.8);
-      sk(L, 728, 8, '#3577c2', ang()); lab(L, 743, 'LMF');
-      sk(R, 746, 7, '#3577c2', ang()); lab(R, 760, 'kHz');
-      sk(L, 764, 6, '#3577c2', ang()); lab(L, 777, 'Q');
-      sk(R, 782, 7, '#1e1f22', ang()); lab(R, 796, 'Hz');
-      sk(L, 796, 8, '#1e1f22', ang()); lab(L, 811, 'LF');
-      key(R - 10, 800, 20, 9, 'white', false, '÷3', 5.4);
-      tall(x0 + 8, 816, 'CH', '', i % 3 !== 2); tall(x0 + 28, 816, 'FLT', 'DYN', false); tall(x0 + 48, 816, 'MON', '', false);
-      led(cx - 8, 850, i === 19); lab(cx - 4, 852, 'OVERLOAD', 3.6, 'start');
-      // ---- cues (drawing: stereo pan above stereo level; each send knob with PRE and SMALL FADER keys stacked to its right)
-      sect(x0 + 4, 858, SW - 8, 'CUES');
-      sk(L, 874, 6, '#e0b23a', ang()); lab(L - 9, 884, 'L', 3.8); lab(L + 9, 884, 'R', 3.8);
-      const send = (ky, col, l) => { sk(L, ky, 7, col, ang()); lab(L - 13, ky - 6, l, 4.2, 'start'); key(R - 13, ky - 9, 28, 8, 'white', false, 'PRE', 4.2); key(R - 13, ky + 1, 28, 8, 'white', false, 'SM FDR', 3.8); };
-      send(900, '#e0b23a', 'ST'); send(926, '#e9eaec', '1'); send(952, '#e9eaec', '2'); send(978, '#e9eaec', '3'); send(1004, '#e9eaec', '4');
+      ['20', '14', '10', '6', '3'].forEach((v, k) => { const ly = Y(166 + k * 9); led(kR - 7, ly, 4 - k < gg, '#4fe07a'); text(kR, ly + 1.4, v, 3.3, INK2, 'middle', 700); led(kR + 7, ly, 4 - k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); });
+      kn(kL, 182, 7.5, '#3f9a58', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(198), 'F.ATK', 3.3, INK2, 'middle', 700);
+      text(cx, Y(212), 'DYNAMICS', 3.7, INK, 'middle', 800);
+      tall3(216, [['DYN', 'IN', i % 5 === 0, '#4fe07a'], ['EXP', 'IN', false, '#ff3b2f'], ['CMP', 'IN', i % 5 === 0, '#ffd23a']]);
+      // FILTERS
+      sect(x0 + 4, Y(246), SW - 8, ''); ttl(254, 'FILTERS');
+      key(x0 + 6, Y(262), 24, 9, 'white', false, 'DYN SC', 3.8);
+      kn(kR, 270, 7, '#c9ccd1', ['OUT', '12', '8', '5', '4', '3.5', '3'], 'kHz');
+      kn(kL, 298, 7, '#c9ccd1', ['OUT', '20', '70', '120', '200', '300', '350'], 'Hz');
+      key(kR - 13, Y(302), 26, 9, 'white', false, 'PRE DYN', 3.7);
+      // EQUALISER
+      sect(x0 + 4, Y(322), SW - 8, '');
+      ttl(330, 'HF'); key(kR - 12, Y(324), 24, 9, 'white', false, 'BELL', 4.6);
+      kn(kL, 350, 7.5, '#c8352a', GAIN, 'dB');
+      kn(kR, 370, 6.8, '#c8352a', ['1.5', '2', '5', '8', '10', '14', '16'], 'kHz');
+      divider(388, 398, cx - 4);
+      ttl(402, 'HMF', x0 + 40);
+      kn(kL, 412, 7.5, '#3f9a58', GAIN, 'dB');
+      kn(kR, 432, 6.8, '#3f9a58', ['.6', '.8', '1.5', '3', '4.5', '6', '7'], 'kHz');
+      kn(kL, 456, 6.5, '#3f9a58', ['3', '2', '1.5', '1', '.5'], '');
+      text(kR, Y(458), 'EQUALISER', 3.8, INK, 'middle', 900); key(kR - 13, Y(462), 26, 9, 'white', false, 'SELECT', 4.2);
+      led(kR - 7, Y(478), false, '#ffd23a'); led(kR + 7, Y(478), true, '#ffd23a'); text(kR, Y(485), 'BLK/BRN', 3.1, INK2, 'middle', 700);
+      ttl(490, 'LMF', x0 + 40);
+      kn(kL, 504, 7.5, '#3577c2', GAIN, 'dB');
+      kn(kR, 524, 6.8, '#3577c2', ['.2', '.3', '.8', '1', '1.5', '2', '2.5'], 'kHz');
+      kn(kL, 548, 6.5, '#3577c2', ['3', '2', '1.5', '1', '.5'], '');
+      divider(566, 556, cx + 4);
+      ttl(572, 'LF', x0 + 6);
+      kn(kR, 576, 6.8, '#1e1f22', ['30', '50', '100', '200', '300', '450'], 'Hz');
+      kn(kL, 602, 7.5, '#1e1f22', GAIN, 'dB');
+      key(kR - 12, Y(608), 24, 9, 'white', false, 'BELL', 4.6);
+      text(cx, Y(624), 'EQUALIZER', 3.7, INK, 'middle', 800);
+      tall3(628, [['EQ', 'IN', i % 3 !== 2, '#4fe07a'], ['DYN', 'SC', false, '#ff3b2f'], ['PRE', 'DYN', false, '#ffd23a']]);
+      led(cx + 12, Y(656), i === 19); text(cx + 8, Y(656) + 1.4, 'OVERLOAD', 3.5, INK, 'end', 800);
+      KS = 1.4;
+      // ---- cues: stereo pan, stereo send and sends 1-4, each with PRE and SMALL FADER keys
+      sect(x0 + 4, 888, SW - 8, 'CUES');
+      sk(kL, 905, 5.5, '#e0b23a', ang()); lab(kL - 11, 913, 'L', 3.8); lab(kL + 11, 913, 'R', 3.8);
+      const send = (ky, col, l) => { sk(kL, ky, 6.2, col, ang()); lab(kL - 13, ky - 6, l, 4.2, 'start'); key(kR - 15, ky - 8.5, 30, 7.5, 'white', false, 'PRE', 4); key(kR - 15, ky + 0.5, 30, 7.5, 'white', false, 'SM FDR', 3.6); };
+      send(925, '#e0b23a', 'ST'); send(944, '#e9eaec', '1'); send(963, '#e9eaec', '2'); send(982, '#e9eaec', '3'); send(1001, '#e9eaec', '4');
       // ---- monitor input: READY GROUP, READY TAPE (square keys), RECORD (large red, track number)
       sect(x0 + 4, 1016, SW - 8, '');
       const rdy = i >= 19 && i <= 21;
