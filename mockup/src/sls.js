@@ -6,7 +6,10 @@
 
 module.exports = function buildSLS(h, { tapeNames }) {
   const { p, rect, text, circle, button, fader, capture } = h;
-  const CW = 3242, CH = 1446, N = 32, SW = 82, MX = 24 + N * SW + 10, MW = CW - MX - 14;
+  const CW = 3242, CH = 1446, N = 32, SW = 82, GAP = 6;
+  // split console: channels 1-16, the master section, channels 17-32
+  const MX = 24 + 16 * SW + GAP, MW = CW - 18 - 24 - N * SW - 2 * GAP;
+  const stripX = (i) => (i < 16 ? 24 + i * SW : MX + MW + GAP + (i - 16) * SW);
   const PANEL = '#33363b', PANEL2 = '#2a2c30', LINE = '#4b5058', INK = '#e9eaec', INK2 = '#aeb2b9';
   const names = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
@@ -34,7 +37,7 @@ module.exports = function buildSLS(h, { tapeNames }) {
 
     for (let i = 0; i < N; i++) {
       // Layout from the SL 611G I/O module drawings in the G Series operator's manual (section 2), top to bottom.
-      const x0 = 24 + i * SW, cx = x0 + SW / 2, L = x0 + 22, R = x0 + SW - 22;
+      const x0 = stripX(i), cx = x0 + SW / 2, L = x0 + 22, R = x0 + SW - 22;
       rect(x0 + 1, 4, SW - 2, CH - 8, PANEL, 'rx="3"');
       rect(x0 + 1, 4, 1, CH - 8, '#fff', 'opacity="0.06"');
       const led = (lx, ly, on, col = '#ff3b2f') => circle(lx, ly, 2.2, on ? col : '#3a2420', on ? 'filter="url(#glowSm)"' : '');
