@@ -333,7 +333,7 @@
 
   // ---------------- AutoLocator III (drives the transport) ----------------
   const alSvg = document.getElementById('alSvg');
-  const AL = { loc: 62, entry: '', apl: false, rep: false, tvi: false, reh: false, rehPunch: false, pending: null, ready: new Set([19, 20, 21]), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
+  const AL = { loc: 62, entry: '', apl: false, rep: false, tvi: false, reh: false, rehPunch: false, pending: null, ready: new Set(), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
   const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', ' ': '' };
   const fmt = (t) => { const a = Math.abs(t); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
   const segLast = {};
@@ -360,6 +360,7 @@
   function locate(sec, why) { AL.rehPunch = false; tr.locateTo(counterTake(sec), AL.apl ? 'play' : 'stop'); alMsg(`Locating ${why || ''} ${show2(fmt(sec))}`); }
   const recording = () => tr.mode === 'rec';
   function press(n) {
+    if ((n === 'play' || n === 'record') && window.AS_AUTOPOWER) window.AS_AUTOPOWER();   // a key press may start the audio engine
     if (AL.rep && n !== 'rep' && n !== 'tvi') { AL.rep = false; if (n !== 'stop' && n !== 'play' && n !== 'rew' && n !== 'ff') alMsg('Repeat cancelled'); }
     const d = /^d(\d)$/.exec(n);
     if (d) {

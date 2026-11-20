@@ -3,7 +3,7 @@
   // Values are kept per console and channel (localStorage 'as-strip-v1'). EQ shows its live frequency response,
   // dynamics its live transfer curve.
   const STRIP_SVG = document.getElementById('stripSvg');
-  const NAMES = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'SMPTE', '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
+  const NAMES = ['KICK', 'SNARE', 'HATS', 'TOMS', 'OH L', 'OH R', 'BASS', 'GUITAR', ...Array(15).fill(''), 'SMPTE', '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   const K = (id, label, min, max, def, unit, col, o = {}) => ({ t: 'knob', id, label, min, max, def, unit, col, ...o });
   const B = (id, label, def = false, col = 'white', o = {}) => ({ t: 'key', id, label, def, col, ...o });
   const GAP = { t: 'gap' };

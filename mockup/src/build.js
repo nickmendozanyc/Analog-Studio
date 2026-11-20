@@ -441,9 +441,9 @@ const capture = (fn) => { const st = out.length; fn(); return out.splice(st).joi
 const svgWrap = (w, h, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="position:absolute;left:0;top:0;overflow:visible">${body}</svg>`;
 const B3 = (st) => `position:absolute;transform-style:preserve-3d;${st}`;
 const scenes3d = [];
-const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'SMPTE'];
-const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + rnd() * 15));
-const readyTracks = new Set([19, 20, 21]);
+const tapeNames = ['KICK', 'SNARE', 'HATS', 'TOMS', 'OH L', 'OH R', 'BASS', 'GUITAR', ...Array(15).fill(''), 'SMPTE'];   // the demo tape (prototype/demo)
+const tapeDb = tapeNames.map((n, i) => (!n ? -40 : i === 23 ? -10 : -14 + rnd() * 12));
+const readyTracks = new Set();   // nothing armed: the demo tape plays back safely
 const LEG = '#ece7dc';   // legend colour on taupe
 
 
@@ -1280,7 +1280,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   const cables = `<svg width="${RW}" height="${RH}" style="position:absolute;left:0;top:0;overflow:visible">${cab(jx(12), pbY + 46, jx(0), pbY + 86, 80, '#c0392b')}${cab(jx(19), pbY + 46, jx(1), pbY + 86, 100, '#2f6fb3')}${cab(jx(6), pbY + 46, jx(20), pbY + 86, 70, '#e8c34a')}</svg>`;
   // plugin browser drawer
   uy += 24;
-  const by0 = uy, bh = RH - 30 - uy, bw = UW;
+  const by0 = uy, bh = RH - 30 - uy - 92, bw = UW;
+  globalThis.RACK_FILES = { x: RX + UX, y: RY + by0 + bh + 14, w: bw };
   const browser = capture(() => {
     rect(0, 0, bw, bh, '#141517', 'rx="6"'); rect(0, 0, bw, bh, 'none', 'rx="6" stroke="#2c2e32" stroke-width="1.5"');
     text(20, 38, 'PLUGINS', 18, '#e9e3d0', 'start', 800, 'letter-spacing="3"');
@@ -1577,6 +1578,18 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
+  #files-bar{position:absolute;z-index:72;font-family:Archivo,Arial,sans-serif}
+  #files-bar .fbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  #files-bar .fbtns button{font:900 16px Archivo,Arial;letter-spacing:2px;padding:14px 0;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  #files-bar .fbtns button:active{transform:translateY(3px);box-shadow:0 1px 0 #0c0b0a}
+  #files-msg{margin-top:9px;font:600 13px Archivo,Arial;color:#a9a594;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #files-bar .fmenu{position:absolute;left:0;right:0;bottom:100%;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;padding:12px;background:#1c1a18;border:1px solid #4a4440;border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  #files-bar .fmenu[hidden]{display:none}
+  #files-bar .fmenu button{text-align:left;font:900 16px Archivo,Arial;letter-spacing:1.5px;padding:10px 12px;border-radius:5px;border:1px solid #000;background:#e9e3d3;color:#1a1612;cursor:pointer}
+  #files-bar .fmenu button i{font-style:normal;color:#9a5a1c;margin-left:6px}
+  #files-bar .fmenu button small{display:block;font:600 12px Archivo,Arial;letter-spacing:0;color:#5a544c;margin-top:3px}
+  #files-bar .fmenu label{display:flex;justify-content:space-between;align-items:center;font:800 13px Archivo,Arial;letter-spacing:1.5px;color:#cfc6b3}
+  #files-bar .fmenu select{font:700 15px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:5px;width:240px}
   .tapesel{position:absolute;left:632px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
   .tapesel label{display:flex;align-items:center;gap:8px}
   .tapesel button{font:900 13px Archivo,Arial;letter-spacing:1px;padding:6px 9px;border-radius:5px;border:1px solid #6b635b;background:#e9e3d3;color:#1d1a16;cursor:pointer}
@@ -1602,6 +1615,12 @@ ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
 ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
+<div id="files-bar" style="left:${globalThis.RACK_FILES.x}px;top:${globalThis.RACK_FILES.y}px;width:${globalThis.RACK_FILES.w}px">
+  <div class="fbtns"><button type="button" data-f="load" title="Open a .TAP tape or a .MIX mix">LOAD</button><button type="button" data-f="save" title="Save the tape (.TAP) or the mix (.MIX)">SAVE</button><button type="button" data-f="import" title="Audio files onto tape tracks (WAV, AIFF, FLAC, MP3, AAC, OGG, CAF … numbered stems or one multichannel file), or a .TAP / .MIX">IMPORT</button><button type="button" data-f="export" title="The tape's tracks out as audio files">EXPORT</button></div>
+  <div class="fmenu" id="fm-save" hidden><button type="button" data-f="save-tap">TAPE <i>.TAP</i><small>the reel: its recordings, SMPTE, tempo map, locate points, alignment</small></button><button type="button" data-f="save-mix">MIX <i>.MIX</i><small>both consoles' channel settings and the patchbay</small></button></div>
+  <div class="fmenu" id="fm-export" hidden><label>FORMAT <select id="fx-fmt"><option value="wav:24">WAV 24-bit</option><option value="wav:16">WAV 16-bit</option><option value="wav:32">WAV 32-bit float</option><option value="aiff:24">AIFF 24-bit</option><option value="aiff:16">AIFF 16-bit</option><option value="flac:24">FLAC 24-bit</option><option value="flac:16">FLAC 16-bit</option><option value="mp3:16">MP3 320 kbps</option></select></label><label>TRACKS <select id="fx-which"><option value="rec">recorded tracks</option><option value="all">all 24</option></select></label><button type="button" data-f="go-export">EXPORT STEMS</button></div>
+  <div id="files-msg">Tapes, mixes and audio</div>
+</div>
 <div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name.replace(/"/g, '&quot;')}"${k === 'a499' ? ' selected' : ''}>${t.short.replace(/"/g, '&quot;')} · ${t.ol} nWb/m</option>`).join('')}</select></label><button type="button" id="tape-align" title="Realign the machine for this tape: its operating level, then repro, sync, bias, record level and HF on every channel (manual section 7)">ALIGN</button><label class="auto" title="Realign automatically whenever a tape is threaded"><input type="checkbox" id="tape-auto" checked> AUTO</label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n.replace(/"/g, '&quot;')}</option>`).join('')}</select></label></div>
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
@@ -1640,9 +1659,15 @@ ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" 
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
 <script>window.JH_SKINS = ${JSON.stringify(globalThis.JH_SKINS)}; window.JH_TAPES = ${JSON.stringify(TAPE_LIST)};</script>
+<script>window.JH24M = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '')}
+return { Machine, Track, Piece, TAPES, SPEEDS, align, IPS, VU0 }; })();
+window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'demo', 'demotape.js'), 'utf8').replace(/^export /gm, '')}
+return demoTape; })();
+window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
+return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
 <script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${['ltc.js', 'midiclock.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
 // artifact version: the same page without the document wrapper (the host adds it), title first

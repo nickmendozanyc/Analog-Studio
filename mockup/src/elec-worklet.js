@@ -33,6 +33,18 @@ class JH24Processor extends AudioWorkletProcessor {
     else if (d.type === 'load') { m.loadTransfer(d.track, d.data, d.u0, d.ips); this.port.postMessage({ type: 'loaded', track: d.track }); }
     else if (d.type === 'clear') { m.tracks[d.track].pieces = []; }
     else if (d.type === 'getTrims') this.sendTrims();
+    else if (d.type === 'getReel') {   // a reel's recordings, for a .TAP file or an export
+      this.reels = this.reels || {};
+      const tracks = d.key === this.tapeKey ? m.tracks : this.reels[d.key];
+      const out = (tracks || []).map((t) => t.pieces.map((p) => { const a = new Float32Array(p.n); for (let i = 0; i < p.n; i++) a[i] = p.at(i); return { u0: p.u0, du: p.du, post: p.post, lo: p.lo, hi: p.hi, fadeLo: p.fadeLo, fadeHi: p.fadeHi, data: a }; }));
+      this.port.postMessage({ type: 'reel', id: d.id, key: d.key, tracks: out, trims: m.ch.map((c) => c.t), opLevel: m.opLevel, ips: m.ips, opts: { quior: m.quior, hiss: m.hiss, wf: m.wf } });
+    }
+    else if (d.type === 'trimsAll') { d.trims.forEach((t, i) => { if (m.ch[i]) m.ch[i].t = t; }); m.setSpeed(m.ips); this.sendTrims(); }
+    else if (d.type === 'setReel') {   // a reel loaded from a .TAP file
+      this.reels = this.reels || {};
+      const tracks = Array.from({ length: m.n }, (_, i) => { const t = new Track(); for (const q of (d.tracks[i] || [])) { const p = new Piece(q.u0, q.du, q.post); for (let k = 0; k < q.data.length; k++) p.push(q.data[k]); Object.assign(p, { lo: q.lo ?? -Infinity, hi: q.hi ?? Infinity, fadeLo: q.fadeLo, fadeHi: q.fadeHi }); t.pieces.push(p); } return t; });
+      if (d.key === this.tapeKey) m.setTape(m.tape, tracks); else this.reels[d.key] = tracks;
+    }
     else if (d.type === 'tape') {   // a different reel threaded: its recordings come with it, its formulation into the model
       this.reels = this.reels || {};
       if (this.tapeKey) this.reels[this.tapeKey] = m.tracks;

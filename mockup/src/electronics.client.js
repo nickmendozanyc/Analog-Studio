@@ -31,12 +31,21 @@
       elPost({ type: 'mix', mute: false, gain: +document.getElementById('el-gain').value });
       document.getElementById('el-power').classList.add('on'); document.getElementById('el-plate').classList.add('on');
       elMsg(`Electronics on · ${EL.ctx.sampleRate / 1000} kHz · ${tr.speedIPS} ips. Play the tape, or load a transfer.`);
+      if (!EL.demo && window.DEMO) {   // the session reel: one minute of dummy audio on 1-8, SMPTE on 24, from the counter zero
+        EL.demo = true;
+        const d = window.DEMO(EL.ctx.sampleRate, encode);
+        d.tracks.forEach((x, t) => { if (x) elPost({ type: 'load', track: t, data: x, u0: tr.zero, ips: tr.speedIPS }, [x.buffer]); });
+        EL.quietLoads = d.tracks.filter(Boolean).length;
+        if (tr.mode === 'stop') tr.locate(tr.zero); else tr.locateTo(tr.zero, tr.playingMode ? 'play' : 'stop');
+        elMsg(`Demo tape loaded: 1 kick · 2 snare · 3 hats · 4 toms · 5-6 overheads · 7 bass · 8 guitar · 24 SMPTE 30 fps (from 01:00:00:00), 1:00 at ${tr.speedIPS} ips, ${d.bpm} BPM.`);
+      }
     } catch (err) { elMsg(`Audio could not start: ${err.message}`); }
   }
   function elRecv(d) {
     if (d.type === 'trims') { EL.trims = d.trims; elShowTrims(); }
     else if (d.type === 'debug') window.JH24_DEBUG = d;
-    else if (d.type === 'loaded') elMsg(`Track ${d.track + 1} loaded onto the tape.`);
+    else if (d.type === 'reel') { const w = EL.waiting && EL.waiting[d.id]; if (w) { delete EL.waiting[d.id]; w(d); } }
+    else if (d.type === 'loaded') { if (EL.quietLoads > 0) EL.quietLoads--; else elMsg(`Track ${d.track + 1} loaded onto the tape.`); }
     else if (d.type === 'vu') {
       window.JH24_VU = EL.on ? d.db : null;
       if (elRoot && !elRoot.closest('.overlay').hidden) elRoot.querySelectorAll('.ch').forEach((c) => {
@@ -110,24 +119,27 @@
     $('el-ol').addEventListener('change', (e) => { TP.opLevel = +e.target.value; elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
     for (const [id, key] of [['el-quior', 'quior'], ['el-hiss', 'hiss'], ['el-wf', 'wf']]) $(id).addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'opts', [key]: on }); });
     $('el-load').addEventListener('click', () => $('el-file').click());
-    $('el-file').addEventListener('change', async (e) => {
-      const files = [...e.target.files]; e.target.value = '';
-      if (!files.length) return;
+    $('el-file').addEventListener('change', (e) => { const files = [...e.target.files]; e.target.value = ''; EL.importAudio(files); });
+    // audio files onto tape tracks: numbered names go to their track, a multichannel file fills 1-24 (any format the
+    // browser decodes: WAV, AIFF, FLAC, MP3, AAC / M4A, OGG / Opus, CAF ...). Placed at the counter zero.
+    EL.importAudio = async (files, say = elMsg) => {
+      if (!files.length) return 0;
       if (!EL.node) await elPower();
-      if (!EL.ctx) return;
+      if (!EL.ctx) return 0;
       const u0 = tr.zero, ips = tr.speedIPS;
       let used = new Set(), n = 0;
       for (const [fi, f] of files.entries()) {
-        elMsg(`Decoding ${f.name}…`);
-        let buf; try { buf = await EL.ctx.decodeAudioData(await f.arrayBuffer()); } catch (err) { elMsg(`${f.name}: ${err.message}`); continue; }
+        say(`Decoding ${f.name}…`);
+        let buf; try { buf = await EL.ctx.decodeAudioData(await f.arrayBuffer()); } catch (err) { say(`${f.name}: this browser can't decode it (${err.message})`); continue; }
         if (buf.numberOfChannels > 2) { for (let c = 0; c < Math.min(24, buf.numberOfChannels); c++) { const d = buf.getChannelData(c).slice(); elPost({ type: 'load', track: c, data: d, u0, ips }, [d.buffer]); n++; } continue; }
         const m = /(?:^|[^0-9])(\d{1,2})(?:[^0-9]|$)/.exec(f.name.replace(/\.[^.]+$/, ''));
         let t = m ? +m[1] - 1 : -1; if (t < 0 || t > 23 || used.has(t)) { t = 0; while (used.has(t) && t < 23) t++; }
         used.add(t);
         const d = buf.getChannelData(0).slice(); elPost({ type: 'load', track: t, data: d, u0, ips }, [d.buffer]); n++;
       }
-      elMsg(`${n} track${n === 1 ? '' : 's'} on the tape from the counter zero at ${ips} ips. Monitor on TAPE and press PLAY.`);
-    });
+      say(`${n} track${n === 1 ? '' : 's'} on the tape from the counter zero at ${ips} ips. Monitor on TAPE and press PLAY.`);
+      return n;
+    };
     $('el-live').addEventListener('click', async (e) => {
       const b = e.currentTarget;
       if (EL.live) { EL.live.getTracks().forEach((t) => t.stop()); EL.live = null; b.classList.remove('on'); elPost({ type: 'live', on: false }); return; }
@@ -230,3 +242,7 @@
   const tapeSel = document.getElementById('tape-sel'), takeSel = document.getElementById('takeup-sel');
   if (tapeSel) tapeSel.addEventListener('change', () => threadTape(tapeSel.value));
   if (takeSel) takeSel.addEventListener('change', () => setReelSkin('t', takeSel.value));
+
+  // PLAY or RECORD with the electronics off powers them up (the click or key press lets the browser start audio)
+  window.AS_AUTOPOWER = () => { if (!EL.on && !EL.starting) { EL.starting = true; elPower().finally(() => { EL.starting = false; }); } };
+  tr.locate(tr.zero);   // the session reel starts parked at the counter zero (the head of the demo)
