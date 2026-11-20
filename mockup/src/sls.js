@@ -47,7 +47,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       const lab = (lx, ly, s, sz = 4.6, anchor = 'middle') => text(lx, ly, s, sz, INK2, anchor, 700);
       // tall section-routing key with its LED underneath (CH IN / CH OUT / MON style)
       const tall = (kx, ky, l1, l2, on) => { key(kx, ky, 16, 20, 'white', false, '', 4); lab(kx + 8, ky + 9, l1, 3.9); if (l2) lab(kx + 8, ky + 15, l2, 3.9); led(kx + 8, ky + 25, on); };
-      p('<g transform="translate(0 148) scale(1 0.973) translate(0 -120)">');   // module controls sit below the taller meter bridge
+      p('<g transform="translate(0 178) scale(1 0.944) translate(0 -120)">');   // module controls sit below the taller meter bridge
       // ---- routing matrix: round buttons with an LED above, 4 columns x 6 rows (24 groups), quad bus row, PAN pot + PAN key
       for (let b = 0; b < 24; b++) {
         const bx = x0 + 13 + (b % 4) * 15.5, by = 140 + Math.floor(b / 4) * 14.5, on = i < 24 && b === i;
@@ -141,11 +141,11 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     // =================== VU meter bridge across the top (black, two rows, one meter per channel: odd top, even bottom) ===================
     for (const [a0, a1] of [[0, 15], [16, 31]]) {
       const bx = stripX(a0), bw = stripX(a1) + SW - bx;
-      rect(bx, 4, bw, 144, '#16171a', 'rx="3"'); rect(bx, 4, bw, 2, '#fff', 'opacity="0.08"');
+      rect(bx, 4, bw, 172, '#16171a', 'rx="3"'); rect(bx, 4, bw, 2, '#fff', 'opacity="0.08"');
       for (let i = a0; i <= a1; i += 2) {
         for (const [k, ch] of [[0, i], [1, i + 1]]) {
           // real VU proportions (about 1.6 : 1), centred over the channel pair
-          const vw = 100, vh = 54, mx = stripX(i) + SW - vw / 2, my = 10 + k * 68, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
+          const vw = 128, vh = 68, mx = stripX(i) + SW - vw / 2, my = 10 + k * 82, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
           vu(mx, my, vw, vh, db, { brand: '' });
           text(mx + vw / 2, my + vh + 9, String(ch + 1), 8, '#d9d6cc', 'middle', 700);
         }
