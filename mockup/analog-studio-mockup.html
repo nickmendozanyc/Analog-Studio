@@ -54,6 +54,19 @@
   #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
   #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
   #elec .drs{display:flex;gap:18px}
+  #elec .eltr{position:absolute;left:24px;right:24px;bottom:18px;display:flex;gap:26px;align-items:center;padding:16px 22px;border-radius:10px;background:linear-gradient(180deg,#5d5650,#4a443f);border:2px solid #1a1715;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.5)}
+  #elec .eltr .ctr{display:flex;align-items:baseline;gap:12px;background:#120404;border:2px solid #050505;border-radius:6px;padding:8px 16px}
+  #elec .eltr .ctr b,#elec .eltr .grp>b{font:700 44px 'JetBrains Mono',monospace;color:#ff3a1e;text-shadow:0 0 10px rgba(255,60,30,.7);letter-spacing:2px}
+  #elec .eltr .grp>b{font-size:30px;background:#120404;border-radius:5px;padding:4px 10px}
+  #elec .eltr .cl,#elec .eltr .gl{font:900 14px Archivo,Arial;letter-spacing:2px;color:#e8e2d4}
+  #elec .eltr #el-mode{font:800 16px Archivo,Arial;color:#ffb3a6;letter-spacing:1.5px;min-width:110px}
+  #elec .eltr .grp{display:flex;gap:10px;align-items:center}
+  #elec .eltr .tk{font:900 20px Archivo,Arial;letter-spacing:1px;padding:16px 22px;border-radius:6px;border:1px solid #111;box-shadow:0 5px 0 #1a1715;color:#1a1208;cursor:pointer}
+  #elec .eltr .tk:active{transform:translateY(3px);box-shadow:0 2px 0 #1a1715}
+  #elec .eltr .tk.w{background:#efece4}#elec .eltr .tk.y{background:#f4e9c8}#elec .eltr .tk.g{background:#3fc9a0}#elec .eltr .tk.r{background:#e0322a;color:#fff}#elec .eltr .tk.b{background:#3f7fd6;color:#fff}#elec .eltr .tk.s{background:#efece4;padding:12px 16px;font-size:17px}
+  #elec .eltr .tk.on{box-shadow:0 0 18px 4px rgba(255,220,120,.85),0 5px 0 #1a1715;filter:brightness(1.15)}
+  #elec .eltr .tk.r.on{box-shadow:0 0 22px 6px rgba(255,60,40,.9),0 5px 0 #1a1715}
+  #elec .eltr .hint{margin-left:auto;font:600 15px Archivo,Arial;color:#e8e2d4;opacity:.8}
   #elec .drm{display:flex;gap:6px;margin-bottom:8px;padding:8px 0;background:#141211;border-radius:5px}
   #elec .drm .mt{flex:1;min-width:0}
   #elec .drm svg{display:block;width:100%;height:auto}
@@ -99062,6 +99075,14 @@
     <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
     <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
   </div></div></div></div>
+  <div class="eltr">
+    <div class="ctr"><span class="cl">TAPE</span><b id="el-ctr">00:00</b><span id="el-mode">STOP</span></div>
+    <div class="grp"><button type="button" class="tk w" data-tk="rtz">RTZ</button><button type="button" class="tk w" data-tk="rew">◀◀ REW</button><button type="button" class="tk w" data-tk="ff">F FWD ▶▶</button><button type="button" class="tk y" data-tk="stop">■ STOP</button><button type="button" class="tk g" data-tk="play">▶ PLAY</button><button type="button" class="tk r" data-tk="record">● REC</button></div>
+    <div class="grp"><span class="gl">LOCATE</span><b id="el-loc">00:00</b><button type="button" class="tk b" data-tk="loc">LOC</button></div>
+    <div class="grp"><span class="gl">IPS</span><button type="button" class="tk s" data-tk="s7.5">7½</button><button type="button" class="tk s" data-tk="s15">15</button><button type="button" class="tk s" data-tk="s30">30</button><button type="button" class="tk s" data-tk="lift">LIFT</button></div>
+    <div class="grp"><span class="gl">MONITOR</span><button type="button" class="tk s" data-tk="tape">TAPE</button><button type="button" class="tk s" data-tk="input">INPUT</button><button type="button" class="tk s" data-tk="auto">AUTO</button></div>
+    <div class="hint">space play / stop · , rewind · . fast forward · Z zero · R record</div>
+  </div>
 </div></div></div>
 <div class="overlay" id="ov-al" data-view="al" hidden><div class="ov-bar"><b>CMI AUTOLOCATOR III</b><span class="ov-msg" id="al-msg">Ready</span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="alSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
 <rect x="0" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
@@ -104808,7 +104829,7 @@ class ClockOut {
   }
   // per frame: transport and status
   function elecTick() {
-    tapeViewTick();
+    tapeViewTick(); elTransportTick();
     if (!EL.node || !EL.on) return;
     elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
@@ -104903,8 +104924,10 @@ class ClockOut {
   const tpMsg = document.getElementById('tp-msg'), tpOv = document.getElementById('ov-tape');
   document.querySelectorAll('#tapeview .tpk').forEach((b) => {
     b.addEventListener('pointerdown', () => b.classList.add('dn')); ['pointerup', 'pointerleave'].forEach((ev) => b.addEventListener(ev, () => b.classList.remove('dn')));
-    b.addEventListener('click', () => {
-      const n = b.dataset.tk;
+    b.addEventListener('click', () => tapeKey(b.dataset.tk));
+  });
+  function tapeKey(n) {
+    {
       if (['rew', 'ff', 'stop', 'play', 'record', 'loc', 'sto', 'rsttape', 'auto'].includes(n)) press(n);
       else if (n === 'rtz') { AL.rehPunch = false; tr.locateTo(tr.zero, 'stop'); }
       else if (n === 'safe') AL.ready.clear();
@@ -104915,8 +104938,21 @@ class ClockOut {
       else if (n.startsWith('s')) tr.setSpeed(+n.slice(1));
       else if (n === 'elec') show('elec');
       else if (n === 'edit') { if (tpMsg) tpMsg.textContent = 'EDIT (dump edit) is not modelled yet'; }
-    });
-  });
+      else if (['tape', 'input'].includes(n)) press(n);
+    }
+  }
+  // electronics window transport bar
+  document.querySelectorAll('#elec .eltr .tk').forEach((b) => b.addEventListener('click', () => tapeKey(b.dataset.tk)));
+  const elCtr = document.getElementById('el-ctr'), elMode = document.getElementById('el-mode'), elLoc = document.getElementById('el-loc'), elOv = document.getElementById('ov-elec');
+  const elTk = {}; document.querySelectorAll('#elec .eltr .tk').forEach((b) => { elTk[b.dataset.tk] = b; });
+  const mmss = (t) => `${t < -0.5 ? '-' : ''}${String(Math.floor(Math.abs(t) / 60)).padStart(2, '0')}:${String(Math.floor(Math.abs(t) % 60)).padStart(2, '0')}`;
+  function elTransportTick() {
+    if (!elCtr || elOv.hidden) return;
+    const m = tr.mode, names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
+    elCtr.textContent = mmss(tr.counter); elMode.textContent = names[m] || m.toUpperCase(); elLoc.textContent = AL.entry ? AL.entry.padStart(4, '0').replace(/(..)(..)/, '$1:$2') : mmss(AL.loc);
+    const on = { play: m === 'play' || m === 'rec', stop: m === 'stop', record: m === 'rec', ff: m === 'ff' || (m === 'locate' && tr.v > 0), rew: m === 'rew' || (m === 'locate' && tr.v < 0), loc: m === 'locate', 's7.5': tr.speedIPS === 7.5, s15: tr.speedIPS === 15, s30: tr.speedIPS === 30, lift: tr.liftDefeat, tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
+    for (const [k, b] of Object.entries(elTk)) { const v = !!on[k]; if (b._on !== v) { b._on = v; b.classList.toggle('on', v); } }
+  }
   function tapeViewTick() {
     if (!tpMsg || tpOv.hidden) return;
     const c = tr.counter, a = Math.abs(c), names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };

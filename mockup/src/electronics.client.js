@@ -47,7 +47,7 @@
   }
   // per frame: transport and status
   function elecTick() {
-    tapeViewTick();
+    tapeViewTick(); elTransportTick();
     if (!EL.node || !EL.on) return;
     elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
@@ -142,8 +142,10 @@
   const tpMsg = document.getElementById('tp-msg'), tpOv = document.getElementById('ov-tape');
   document.querySelectorAll('#tapeview .tpk').forEach((b) => {
     b.addEventListener('pointerdown', () => b.classList.add('dn')); ['pointerup', 'pointerleave'].forEach((ev) => b.addEventListener(ev, () => b.classList.remove('dn')));
-    b.addEventListener('click', () => {
-      const n = b.dataset.tk;
+    b.addEventListener('click', () => tapeKey(b.dataset.tk));
+  });
+  function tapeKey(n) {
+    {
       if (['rew', 'ff', 'stop', 'play', 'record', 'loc', 'sto', 'rsttape', 'auto'].includes(n)) press(n);
       else if (n === 'rtz') { AL.rehPunch = false; tr.locateTo(tr.zero, 'stop'); }
       else if (n === 'safe') AL.ready.clear();
@@ -154,8 +156,21 @@
       else if (n.startsWith('s')) tr.setSpeed(+n.slice(1));
       else if (n === 'elec') show('elec');
       else if (n === 'edit') { if (tpMsg) tpMsg.textContent = 'EDIT (dump edit) is not modelled yet'; }
-    });
-  });
+      else if (['tape', 'input'].includes(n)) press(n);
+    }
+  }
+  // electronics window transport bar
+  document.querySelectorAll('#elec .eltr .tk').forEach((b) => b.addEventListener('click', () => tapeKey(b.dataset.tk)));
+  const elCtr = document.getElementById('el-ctr'), elMode = document.getElementById('el-mode'), elLoc = document.getElementById('el-loc'), elOv = document.getElementById('ov-elec');
+  const elTk = {}; document.querySelectorAll('#elec .eltr .tk').forEach((b) => { elTk[b.dataset.tk] = b; });
+  const mmss = (t) => `${t < -0.5 ? '-' : ''}${String(Math.floor(Math.abs(t) / 60)).padStart(2, '0')}:${String(Math.floor(Math.abs(t) % 60)).padStart(2, '0')}`;
+  function elTransportTick() {
+    if (!elCtr || elOv.hidden) return;
+    const m = tr.mode, names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
+    elCtr.textContent = mmss(tr.counter); elMode.textContent = names[m] || m.toUpperCase(); elLoc.textContent = AL.entry ? AL.entry.padStart(4, '0').replace(/(..)(..)/, '$1:$2') : mmss(AL.loc);
+    const on = { play: m === 'play' || m === 'rec', stop: m === 'stop', record: m === 'rec', ff: m === 'ff' || (m === 'locate' && tr.v > 0), rew: m === 'rew' || (m === 'locate' && tr.v < 0), loc: m === 'locate', 's7.5': tr.speedIPS === 7.5, s15: tr.speedIPS === 15, s30: tr.speedIPS === 30, lift: tr.liftDefeat, tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
+    for (const [k, b] of Object.entries(elTk)) { const v = !!on[k]; if (b._on !== v) { b._on = v; b.classList.toggle('on', v); } }
+  }
   function tapeViewTick() {
     if (!tpMsg || tpOv.hidden) return;
     const c = tr.counter, a = Math.abs(c), names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };

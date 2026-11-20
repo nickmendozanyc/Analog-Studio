@@ -490,6 +490,14 @@ const elecView = (() => {
   </div>
   <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
   <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
+  <div class="eltr">
+    <div class="ctr"><span class="cl">TAPE</span><b id="el-ctr">00:00</b><span id="el-mode">STOP</span></div>
+    <div class="grp">${[['rtz', 'RTZ', 'w'], ['rew', '◀◀ REW', 'w'], ['ff', 'F FWD ▶▶', 'w'], ['stop', '■ STOP', 'y'], ['play', '▶ PLAY', 'g'], ['record', '● REC', 'r']].map(([n, l, c]) => `<button type="button" class="tk ${c}" data-tk="${n}">${l}</button>`).join('')}</div>
+    <div class="grp"><span class="gl">LOCATE</span><b id="el-loc">00:00</b><button type="button" class="tk b" data-tk="loc">LOC</button></div>
+    <div class="grp"><span class="gl">IPS</span>${['7.5', '15', '30'].map((v) => `<button type="button" class="tk s" data-tk="s${v}">${v === '7.5' ? '7½' : v}</button>`).join('')}<button type="button" class="tk s" data-tk="lift">LIFT</button></div>
+    <div class="grp"><span class="gl">MONITOR</span>${['tape', 'input', 'auto'].map((v) => `<button type="button" class="tk s" data-tk="${v}">${v.toUpperCase()}</button>`).join('')}</div>
+    <div class="hint">space play / stop · , rewind · . fast forward · Z zero · R record</div>
+  </div>
 </div>`;
 })();
 const elecCss = `
@@ -505,6 +513,19 @@ const elecCss = `
   #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
   #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
   #elec .drs{display:flex;gap:18px}
+  #elec .eltr{position:absolute;left:24px;right:24px;bottom:18px;display:flex;gap:26px;align-items:center;padding:16px 22px;border-radius:10px;background:linear-gradient(180deg,#5d5650,#4a443f);border:2px solid #1a1715;box-shadow:inset 0 2px 0 rgba(255,255,255,.12),0 8px 24px rgba(0,0,0,.5)}
+  #elec .eltr .ctr{display:flex;align-items:baseline;gap:12px;background:#120404;border:2px solid #050505;border-radius:6px;padding:8px 16px}
+  #elec .eltr .ctr b,#elec .eltr .grp>b{font:700 44px 'JetBrains Mono',monospace;color:#ff3a1e;text-shadow:0 0 10px rgba(255,60,30,.7);letter-spacing:2px}
+  #elec .eltr .grp>b{font-size:30px;background:#120404;border-radius:5px;padding:4px 10px}
+  #elec .eltr .cl,#elec .eltr .gl{font:900 14px Archivo,Arial;letter-spacing:2px;color:#e8e2d4}
+  #elec .eltr #el-mode{font:800 16px Archivo,Arial;color:#ffb3a6;letter-spacing:1.5px;min-width:110px}
+  #elec .eltr .grp{display:flex;gap:10px;align-items:center}
+  #elec .eltr .tk{font:900 20px Archivo,Arial;letter-spacing:1px;padding:16px 22px;border-radius:6px;border:1px solid #111;box-shadow:0 5px 0 #1a1715;color:#1a1208;cursor:pointer}
+  #elec .eltr .tk:active{transform:translateY(3px);box-shadow:0 2px 0 #1a1715}
+  #elec .eltr .tk.w{background:#efece4}#elec .eltr .tk.y{background:#f4e9c8}#elec .eltr .tk.g{background:#3fc9a0}#elec .eltr .tk.r{background:#e0322a;color:#fff}#elec .eltr .tk.b{background:#3f7fd6;color:#fff}#elec .eltr .tk.s{background:#efece4;padding:12px 16px;font-size:17px}
+  #elec .eltr .tk.on{box-shadow:0 0 18px 4px rgba(255,220,120,.85),0 5px 0 #1a1715;filter:brightness(1.15)}
+  #elec .eltr .tk.r.on{box-shadow:0 0 22px 6px rgba(255,60,40,.9),0 5px 0 #1a1715}
+  #elec .eltr .hint{margin-left:auto;font:600 15px Archivo,Arial;color:#e8e2d4;opacity:.8}
   #elec .drm{display:flex;gap:6px;margin-bottom:8px;padding:8px 0;background:#141211;border-radius:5px}
   #elec .drm .mt{flex:1;min-width:0}
   #elec .drm svg{display:block;width:100%;height:auto}
