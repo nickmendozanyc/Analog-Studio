@@ -1486,6 +1486,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   html,body{margin:0;background:#000;overflow:hidden;height:100%}
   #stage{position:absolute;left:0;top:0;width:3840px;height:2160px;transform-origin:0 0}
   #stage>svg{display:block}
+  .hot.elkey{z-index:56}
   .hot{position:absolute;z-index:50;cursor:pointer;border-radius:10px;outline:0 solid rgba(255,214,140,0);transition:outline-color .15s, background .15s}
   .hot span{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 16px;border-radius:6px;background:rgba(20,18,16,.85);color:#f1ece3;font:700 20px Archivo,Arial,sans-serif;letter-spacing:1px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
   .hot:hover{outline:4px solid rgba(255,214,140,.75);background:rgba(255,214,140,.05)} .hot:hover span{opacity:1}
@@ -1528,6 +1529,7 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
   ${a827}
   ${a827Remote}
+  <div class="hot elkey" data-open="elec" style="left:898px;top:494px;width:40px;height:28px" title="ELEC: open the channel cards to tweak the tape machine"><span>ELEC</span></div>
   ${wallClock(1554, 4)}
   ${a827Bridge}
   ${slsConsole}
@@ -1542,6 +1544,7 @@ ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
 ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
+<div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}

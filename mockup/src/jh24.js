@@ -349,7 +349,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     btn(stepB + 280, ry + 2, 32, 24, '#efece4', false, '', ''); s.push(txt(stepB + 296, ry + 18, 'NAB', 8, '#1a1208'));
     s.push(txt(stepB + 278, ry + 44, 'EQ', 7.5, '#e9e4da'));
     knobS(stepB + 342, ry + 14, 10, 40, 'SAT'); knobS(stepB + 378, ry + 14, 10, -60, 'W/F'); knobS(stepB + 414, ry + 14, 10, -90, 'HISS');
-    btn(stepB + 440, ry + 2, 32, 24, '#e8a840', false, '', 'BYPASS');
+    btn(stepB + 436, ry + 2, 40, 24, '#2f8f5a', false, '▤', 'ELECTRONICS');   // opens the audio electronics cards
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform-origin:50% 100%;transform:translateZ(${zFront}px) rotateX(${slope}deg)`)}">${svg(w, d, s.join(''))}</div>`);
     const zBack = zFront + d * Math.sin(-slope * Math.PI / 180);
     front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#5d5650,#4a443f)');
@@ -386,7 +386,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     s.push(`<text id="tctr" x="515" y="74" font-family="'JetBrains Mono', monospace" font-size="30" font-weight="800" fill="#ff3b2f" text-anchor="middle" filter="url(#gl)">00:03:42</text>`);
     // two rows of small function keys with lamps (speed, vari, lift and locator functions)
     const smk = (name, bx, by, lab, lamp = '#ff3b2f') => { s.push(`<rect x="${bx}" y="${by}" width="34" height="11" rx="1.5" fill="#2a2b2e"/>`); s.push(`<g id="lk-${name}" opacity="0"><rect x="${bx}" y="${by}" width="34" height="11" rx="1.5" fill="${lamp}" filter="url(#gl)"/></g>`); if (lab) s.push(txt(bx + 17, by + 22, lab, 7, '#2a2c30', 'middle', 800)); };
-    [['ips7.5', '7½'], ['ips15', '15'], ['ips30', '30'], ['vari', 'VAR'], ['lift', 'LIFT'], ['', ''], ['', '']].forEach(([n, l], i) => smk(n || `fx${i}`, 640 + i * 42, 34, l, n.startsWith('ips') || n === 'vari' ? '#59f07a' : '#ff3b2f'));
+    [['ips7.5', '7½'], ['ips15', '15'], ['ips30', '30'], ['vari', 'VAR'], ['lift', 'LIFT'], ['', ''], ['elec', 'ELEC']].forEach(([n, l], i) => smk(n || `fx${i}`, 640 + i * 42, 34, l, n.startsWith('ips') || n === 'vari' ? '#59f07a' : '#ff3b2f'));
     for (let i = 0; i < 7; i++) smk(`fy${i}`, 640 + i * 42, 66, ['LOC', 'STORE', 'ZERO', 'RTZ', 'AUTO', 'SAFE', 'MON'][i]);
     // green LCD
     s.push(`<rect x="${w - 170}" y="34" width="130" height="40" rx="3" fill="#13180e"/><rect x="${w - 164}" y="39" width="118" height="30" rx="2" fill="#8ccf3a"/><rect x="${w - 164}" y="39" width="118" height="10" rx="2" fill="#fff" opacity="0.2"/>`);
