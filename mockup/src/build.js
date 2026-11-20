@@ -463,6 +463,16 @@ const elecView = (() => {
   </div>`;
   const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
   const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  // the machine's 24 VU meters (as on the meter bridge), two rows of 12, reading the live line outputs
+  const MW = 3792, CW = 316, VW = 270, VH = 202, ROW = 262;
+  const meters = capture(() => {
+    for (let i = 0; i < 24; i++) {
+      const x = (i % 12) * CW + (CW - VW) / 2, y = Math.floor(i / 12) * ROW + 6;
+      vu(x, y, VW, VH, -20, { needleId: i, brand: 'CMI' });
+      text(x + 6, y + VH + 34, String(i + 1).padStart(2, '0'), 24, '#f2ead8', 'start', 900);
+      text(x + VW - 2, y + VH + 34, tapeNames[i], 20, '#cfc6b3', 'end', 700, 'letter-spacing="1"');
+    }
+  });
   return `<div id="elec">
   <div class="eltop">
     <button type="button" id="el-power" class="pw" title="JH-24D audio power supply: starts the audio engine">POWER</button>
@@ -484,6 +494,7 @@ const elecView = (() => {
   </div>
   <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
   <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
+  <div class="elm"><svg viewBox="0 0 ${MW} ${2 * ROW}" width="${MW}" height="${2 * ROW}">${meters}</svg></div>
 </div>`;
 })();
 const elecCss = `
@@ -499,6 +510,8 @@ const elecCss = `
   #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
   #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
   #elec .drs{display:flex;gap:18px}
+  #elec .elm{margin-top:16px;background:linear-gradient(180deg,#2a2725,#1b1918);border:2px solid #0c0b0a;border-radius:8px;padding:10px 0 0}
+  #elec .elm svg{display:block}
   #elec .dr{flex:1 1 0;min-width:0;background:linear-gradient(180deg,#3a3633,#2a2725);border:2px solid #0c0b0a;border-radius:8px;padding:8px}
   #elec .drh{font:900 20px Archivo,Arial;letter-spacing:2.5px;color:#d9d2c2;margin:2px 4px 8px}
   #elec .drc{display:flex;gap:6px}

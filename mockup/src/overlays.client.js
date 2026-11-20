@@ -22,7 +22,7 @@
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
-    if (v === 'elec') elShowTrims();
+    if (v === 'elec') { elShowTrims(); startMeters('#ov-elec'); }
   }
   function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
@@ -34,8 +34,8 @@
   const VU = [[-20, -45], [-10, -28], [-7, -18], [-5, -10], [-3, 0], [-2, 6], [-1, 12], [0, 19], [1, 27], [2, 35], [3, 45]];
   const vuAngle = (db) => { db = Math.max(-20, Math.min(3, db)); for (let i = 0; i < VU.length - 1; i++) { const [d0, a0] = VU[i], [d1, a1] = VU[i + 1]; if (db <= d1) return a0 + (a1 - a0) * (db - d0) / (d1 - d0); } return 45; };
   let raf = 0;
-  function startMeters() {
-    const needles = [...document.querySelectorAll('#ov-meters .vuN')].map((g) => ({ g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45, ph: Math.random() * 10 }));
+  function startMeters(sel = '#ov-meters') {
+    const needles = [...document.querySelectorAll(`${sel} .vuN`)].map((g) => ({ g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45, ph: Math.random() * 10 }));
     const base = window.TAPE_DB || [];
     let last = performance.now();
     const tick = (now) => {
@@ -44,7 +44,7 @@
         const b = base[n.i] ?? -12;
         // program-like level: phrases, beats and a little noise around the track's level
         const live = window.JH24_VU;   // the electronics are powered: real line-output levels
-        const lvl = live ? live[n.i] ?? -40 : b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
+        const lvl = live ? live[n.i] ?? -40 : sel !== '#ov-meters' ? -40 : b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
         const target = vuAngle(lvl);
         n.a += (target - n.a) * (1 - Math.exp(-dt / 0.065));   // ~300 ms to 99%, like a VU movement
         n.g.setAttribute('transform', `rotate(${n.a.toFixed(2)} ${n.cx} ${n.cy})`);
