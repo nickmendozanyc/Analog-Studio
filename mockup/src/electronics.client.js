@@ -182,7 +182,12 @@
   // Each tape is its own reel: what is recorded on it, where it is wound to and its time code go with it.
   function setReelSkin(k, style) {
     const sk = window.JH_SKINS && window.JH_SKINS[k] && window.JH_SKINS[k][style]; if (!sk) return;
+    // flange size: a 14" reel is bigger than a 10½" one around the same hub
+    const geo = (el) => { Object.assign(el.style, { left: `${(sk.cx - sk.r).toFixed(2)}px`, top: `${(sk.cy - sk.r).toFixed(2)}px`, width: `${(2 * sk.r).toFixed(2)}px`, height: `${(2 * sk.r).toFixed(2)}px` }); };
     for (const pre of ['jh', 'a8', 'jhp', 'a8p']) {
+      document.querySelectorAll(`.${pre}-fl[data-reel="${k}"], .${pre}-smear[data-reel="${k}"], .${pre}-lab[data-reel="${k}"], .${pre}-light[data-reel="${k}"], .${pre}-ring[data-reel="${k}"]`).forEach(geo);
+      document.querySelectorAll(`.${pre}-lab[data-reel="${k}"] svg`).forEach((el) => { const w = (2 * sk.r).toFixed(2); el.setAttribute('width', w); el.setAttribute('height', w); el.setAttribute('viewBox', `0 0 ${w} ${w}`); });
+      document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]:not(.${pre}-smearback), .${pre}-light[data-reel="${k}"]`).forEach((el) => { el.style.webkitMaskImage = sk.bandMask; el.style.maskImage = sk.bandMask; });
       document.querySelectorAll(`.${pre}-fl[data-reel="${k}"]`).forEach((el) => { el.style.background = sk[el.dataset.layer]; el.style.clipPath = `path(evenodd, '${sk.d}')`; });
       document.querySelectorAll(`.${pre}-lab[data-reel="${k}"] svg`).forEach((el) => { el.innerHTML = sk.label; });
       document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`).forEach((el) => {

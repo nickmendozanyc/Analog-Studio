@@ -119,16 +119,22 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const SILVER = { face: silver('#dfe2e5', '#e4e6e9', '#d9dce0', '#eceef0'), edge: 'linear-gradient(90deg,#8f9398,#e9ebee 40%,#7c8085)', back: '#9a9ea3' };
   const T = (x, y, str, size, fill, extra = '') => `<text x="${x}" y="${y}" font-family="${SANS}" font-size="${size}" fill="${fill}" text-anchor="middle" font-weight="900" ${extra}>${esc(str)}</text>`;
   const amtex = (num) => (rl, lx, ly, la) => [txt(lx, ly - 26, 'AMTEX', 19, '#141414', 'middle', 900, 'letter-spacing="1"'), txt(lx, ly + 13, num, 40, '#a9802f', 'middle', 900, 'letter-spacing="-1"'), txt(lx, ly + 27, num === '499' ? 'GOLD MASTER' : 'GRAND MASTER', 8.8, '#141414', 'middle', 800), txt(lx, ly + 39, 'Studio Mastering Audio Tape', 8.2, '#a9802f', 'middle', 600)].join('');
+  const GP9FACE = `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`;
   const REEL = {
     a499: { name: 'Amtex 499', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('499') },
     a456: { name: 'Amtex 456', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('456') },
     gp9: {
-      name: 'Quantica GP9', face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
-      edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b',
-      win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.12, wOut: 0.12, c: 0.035, a0: 0 },
-      // a small white sticker near the rim, as on the photographed GP9
-      labels: [[90, (g) => `<g transform="translate(0 ${g * 0.16})"><rect x="-58" y="-30" width="116" height="60" rx="4" fill="#f6f4ef" stroke="#c9c2b6" stroke-width="1"/>${T(-12, -14, 'QUANTICA', 11, '#d23a24', 'letter-spacing="0.6"')}<ellipse cx="2" cy="6" rx="46" ry="14" fill="#e94f2f" transform="rotate(-10 2 6)"/>${T(4, 15, 'GP9', 28, '#ffffff', 'font-style="italic"')}${T(0, 26, 'GRAND MASTER PLATINUM', 5.6, '#2a2a2a')}</g>`]],
-      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.5,
+      name: 'Quantica GP9', face: GP9FACE, edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b',
+      win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 },
+      legacy: (rl, lx, ly) => [txt(lx + 4, ly - 30, 'QUANTICA', 15.5, '#1b1b1b', 'middle', 900, 'letter-spacing="0.5"'), `<ellipse cx="${f(lx - 4)}" cy="${f(ly + 2)}" rx="60" ry="21" fill="#f3f1ec" transform="rotate(-12 ${f(lx)} ${f(ly)})"/>`, txt(lx + 2, ly + 14, 'GP9', 42, '#3a3a3c', 'middle', 900, 'font-style="italic" letter-spacing="-1"'), txt(lx + 2, ly + 35, 'PLATINUM MASTER', 8.8, '#1b1b1b', 'middle', 800)].join(''),
+      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.8,
+    },
+    gp14: {
+      // the 14" GP9 as photographed: solid red flange, two narrow slots, a small white sticker near the rim
+      name: 'Quantica GP9 14"', size: 14, face: GP9FACE, edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b',
+      win: { n: 2, rIn: 0.52, rOut: 0.86, wIn: 0.1, wOut: 0.1, c: 0.03, a0: 30 },
+      labels: [[105, () => `<g transform="translate(0 28) rotate(-90)"><rect x="-58" y="-30" width="116" height="60" rx="4" fill="#f6f4ef" stroke="#c9c2b6" stroke-width="1"/>${T(-12, -14, 'QUANTICA', 11, '#d23a24', 'letter-spacing="0.6"')}<ellipse cx="2" cy="6" rx="46" ry="14" fill="#e94f2f" transform="rotate(-10 2 6)"/>${T(4, 15, 'GP9', 28, '#ffffff', 'font-style="italic"')}${T(0, 26, 'GRAND MASTER PLATINUM', 5.6, '#2a2a2a')}</g>`]],
+      smearSlot: 'rgba(40,10,4,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.4,
     },
     maxwell: {
       name: 'Maxwell', ...SILVER, face: silver('#e3e5e7', '#e8e9eb', '#dcdee1', '#eff0f2'),
@@ -157,7 +163,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   };
   globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
   // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
-  const slot = (cx, cy, w, ang) => {
+  const slot = (cx, cy, w, ang, R) => {
     const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
     const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
     let d = '';
@@ -170,15 +176,17 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     return d + 'Z ';
   };
   const winAngles = (st, rot) => Array.from({ length: st.win.n }, (_, k) => rot + st.win.a0 + k * 360 / st.win.n);
-  function reelMask(st, rot) {
+  function reelMask(st, rot, R) {
     const c = R;
     let d = `M0 ${c} A${c} ${c} 0 1 0 ${2 * c} ${c} A${c} ${c} 0 1 0 0 ${c} Z M${c - hubR} ${c} A${hubR} ${hubR} 0 1 0 ${c + hubR} ${c} A${hubR} ${hubR} 0 1 0 ${c - hubR} ${c} Z `;
-    for (const a of winAngles(st, rot)) d += slot(c, c, st.win, a);
+    for (const a of winAngles(st, rot)) d += slot(c, c, st.win, a, R);
     return { d };
   }
   // everything about one reel that changes with the skin (also handed to the page so it can swap reels live)
+  const R10 = R;
   function skin(styleKey, rl) {
-    const st = REEL[styleKey], { d } = reelMask(st, rl.rot), c = R;
+    const st = REEL[styleKey], R = st.size === 14 ? 250 * 14 / 10.5 : R10, { d } = reelMask(st, rl.rot, R), c = R;
+    const bandMask = `radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px)`;
     const lab = [];
     let labAngles;
     if (st.legacy) {
@@ -205,7 +213,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       `radial-gradient(circle, transparent ${pr(0.49)}px, ${band(st.smearLabel || `rgba(${st.labRGB || '150,118,62'},A)`, 0.5, 0.78, 0.16 * (st.labK || 0.4) / 0.4, 0.14 * (st.labK || 0.4) / 0.4)}, transparent ${pr(0.79)}px)`,
     ].join(', ');
     return {
-      d, face: st.face, edge: st.edge, back: st.back, faceAvg, faceLight, label: lab.join(''),
+      r: R, cx: rl.cx, cy: rl.cy, bandMask, d, face: st.face, edge: st.edge, back: st.back, faceAvg, faceLight, label: lab.join(''),
       lightBg: `radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${faceLight}`,
       slots: winAngles(st, rl.rot).map((a) => f(a)).join(','), slotW: f(((st.win.wIn + st.win.wOut) / 2) / 0.67 * 180 / Math.PI),
       labs: labAngles.map((a) => f(a)).join(','), labW: f(2 * Math.atan(58 / (R * 0.62)) * 180 / Math.PI),
@@ -241,14 +249,14 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     // exposure smear (rotates with the reel): each window and the label drag an arc behind them whose length is the
     // angle the reel turns during one exposure; the client writes the conic gradients from the reel speed
     const bandMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px);mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px)`;
-    add(`<div class="jh-smear" data-reel="${key}" data-slots="${sk.slots}" data-slotw="${sk.slotW}" data-lab="${sk.labs}" data-labw="${sk.labW}" data-hole="${sk.hole}" data-labc="${sk.labc}" data-labk="${sk.labk}" data-avg="${sk.faceAvg}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.7px);background:${sk.faceAvg};${bandMask}`)}"></div>`);
+    add(`<div class="jh-smear" data-reel="${key}" data-slots="${sk.slots}" data-slotw="${sk.slotW}" data-lab="${sk.labs}" data-labw="${sk.labW}" data-hole="${sk.hole}" data-labc="${sk.labc}" data-labk="${sk.labk}" data-avg="${sk.faceAvg}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(104.6px);background:${sk.faceAvg};${bandMask}`)}"></div>`);
     add(`<div class="jh-lab" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, sk.label)}</div>`);
     // black hold-down knob on the spindle
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
     add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 5px, #3a3a3d 7.5px, #17171a 13px, #141416 28px, rgba(14,14,15,0.7) 31px, rgba(14,14,15,0.32) 37px, rgba(14,14,15,0) 41px)`)}"></div>`);
-    const staticAfter = `<div class="jh-light" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.75px);background:radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${sk.faceLight};${bandMask}`)}"></div>`
-      + `<div class="jh-blur jh-ring" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${sk.ringBg}`)}"></div>`;
+    const staticAfter = `<div class="jh-light" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(104.9px);background:radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${sk.faceLight};${bandMask}`)}"></div>`
+      + `<div class="jh-blur jh-ring" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(105.2px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${sk.ringBg}`)}"></div>`;
     add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
     add('</div>');
     add(staticAfter);   // non-rotating blur layers
