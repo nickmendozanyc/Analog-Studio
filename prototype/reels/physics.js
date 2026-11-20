@@ -19,15 +19,15 @@
 // A full reel is 2500 ft. Numbers marked (approx) are plausible values to tune by eye and ear against the real machine.
 
 export const TAPE = {
-  thickness: 38.1e-6,   // 1.5 mil base + oxide (approx, typical of 456 / 499 / GP9)
+  thickness: 50.8e-6,   // 2.0 mil overall (1.5 mil base + oxide and back coat), typical of 456 / 499 / GP9
   width: 0.0508,        // 2 inch
   density: 1350,        // kg/m^3 (approx)
   hubR: 0.0572,         // 4.5" hub diameter (approx)
-  flangeR: 0.1778,      // 14" reel
+  flangeR: 0.1334,      // 10.5" metal reel: 2500 ft of 2" tape on a 4.5" hub fills it
 };
 
 export const MACHINE = {
-  emptyReelInertia: 0.0127, // kg m^2, aluminium 14" reel (approx)
+  emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
   windSpeed: 9.0,           // m/s (~354 ips) (approx)
   windForce: 42,            // N, reel-motor drive force at the tape (approx)
   brakeForce: 64,           // N, braking force at the tape (approx)

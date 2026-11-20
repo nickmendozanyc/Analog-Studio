@@ -203,7 +203,8 @@ const P = {
 };
 
 // ---------- reels ----------
-const R = TAPE.flangeR * CM, HUB = TAPE.hubR * CM, FLANGE_GAP = 5.9, YB = 2.8, YF = YB + FLANGE_GAP;
+// reels are drawn at a fixed size on the deck; REEL_SCALE maps real reel dimensions onto it
+const R = 17.78, REEL_SCALE = R / (TAPE.flangeR * CM), HUB = TAPE.hubR * CM * REEL_SCALE, FLANGE_GAP = 5.9, YB = 2.8, YF = YB + FLANGE_GAP;
 function labelTexture(kind) {
   return canvasTex(1024, 1024, (g, w, h) => {
     g.clearRect(0, 0, w, h);
@@ -291,7 +292,7 @@ function makeReel(kind, at) {
   const frontF = new THREE.Mesh(flangeGeo, fm); frontF.position.y = YF; frontF.castShadow = true; frontF.receiveShadow = true; frontF.renderOrder = 2; g.add(frontF);
   const edgeMat = new THREE.MeshStandardMaterial({ color: kind === 'a499' ? 0xb9bdc2 : 0x8a2414, metalness: 0.85, roughness: 0.3 });
   for (const y of [YB, YF]) { const e = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.18, 160, 1, true), edgeMat); e.position.y = y - 0.09; g.add(e); }
-  const hub = cyl(HUB, FLANGE_GAP, blackPlastic, 64); hub.position.y = YB + FLANGE_GAP / 2; g.add(hub);
+  const hub = cyl(HUB, FLANGE_GAP - 0.4, blackPlastic, 64); hub.position.y = YB + FLANGE_GAP / 2; g.add(hub);   // kept clear of both flanges (no z-fighting)
   const pack = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, TW, 160, 1, false), [packSide, packTop, packTop]); pack.position.y = YM; pack.castShadow = true; pack.receiveShadow = true; g.add(pack);
   // three-lobed black hold-down knob on the spindle
   const knob = new THREE.Group(); knob.position.y = YF;
@@ -450,7 +451,7 @@ function frame(now) {
   tr.advance(dt);
   fpsAcc += dt; fpsN++; if (now - fpsT > 500) { $('fps').textContent = `${Math.round(fpsN / fpsAcc)} fps`; fpsAcc = 0; fpsN = 0; fpsT = now; }
 
-  const rS = tr.rS * CM, rT = tr.rT * CM;
+  const rS = tr.rS * CM * REEL_SCALE, rT = tr.rT * CM * REEL_SCALE;
   const path = tapePath(rS, rT, tr.lift, 1 - tr.pinch);
   writeTape(path.pts, (tr.take * CM) / 18);
   // reel direction from where the tape meets each pack; screen-CCW is positive in reel uv space
