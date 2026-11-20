@@ -52,7 +52,7 @@
   }
   function stopMeters() { cancelAnimationFrame(raf); raf = 0; }
 
-  // ---------------- Lexicon 224X remote ----------------
+  // ---------------- Leximan 224X remote ----------------
   const ov224 = document.getElementById('ov-224');
   if (ov224) {
     const svg = ov224.querySelector('svg');
@@ -110,8 +110,8 @@
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
     { id: 'chin', name: 'CONSOLE LINE IN', sub: 'channels 1–24', io: 'in', items: L('', 24), normal: 'ifin' },
     { id: 'bus', name: 'BUS OUT', sub: 'console buses', io: 'out', items: L('', 24) },
-    { id: 'tin', name: 'TAPE IN', sub: 'JH-24 track inputs', io: 'in', items: L('', 24), normal: 'bus' },
-    { id: 'tout', name: 'TAPE OUT', sub: 'JH-24 repro', io: 'out', items: L('', 24) },
+    { id: 'tin', name: 'TAPE IN', sub: 'HJ-24 track inputs', io: 'in', items: L('', 24), normal: 'bus' },
+    { id: 'tout', name: 'TAPE OUT', sub: 'HJ-24 repro', io: 'out', items: L('', 24) },
     { id: 'tret', name: 'TAPE RETURN', sub: 'console channels 1–24', io: 'in', items: L('', 24), normal: 'tout' },
     { id: 'isend', name: 'INSERT SEND', sub: 'channels 1–32', io: 'out', items: L('', 32) },
     { id: 'iret', name: 'INSERT RETURN', sub: 'channels 1–32', io: 'in', items: L('', 32), normal: 'isend' },

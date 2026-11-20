@@ -117,7 +117,7 @@ test('vari-speed changes play speed but not the tape counter rate', () => {
   t.setVarispeed(5); close(t.varispeed, VARI_RANGE, 1e-12, 'clamped to the range');
 });
 
-test('the A827 profile ramps smoothly (jerk limited); the JH-24 lurches', () => {
+test('the A827 profile ramps smoothly (jerk limited); the HJ-24 lurches', () => {
   const peakJerk = (machine) => {
     const t = new Transport({ machine, onTakeup: 1000 * FT }); let last = 0, peak = 0;
     t.command('ff');
@@ -128,7 +128,7 @@ test('the A827 profile ramps smoothly (jerk limited); the JH-24 lurches', () => 
   };
   const a = peakJerk('a827'), j = peakJerk('jh24');
   assert.ok(a.peak <= TRANSPORTS.a827.jerk * 2.5, `A827 jerk stays within ${TRANSPORTS.a827.jerk} m/s^3 (${a.peak.toFixed(1)})`);
-  assert.ok(j.peak > 10 * a.peak, `JH-24 changes acceleration far more abruptly (${j.peak.toFixed(0)} vs ${a.peak.toFixed(1)})`);
+  assert.ok(j.peak > 10 * a.peak, `HJ-24 changes acceleration far more abruptly (${j.peak.toFixed(0)} vs ${a.peak.toFixed(1)})`);
   close(a.v, 0, 1e-6, 'A827 comes to rest');
 });
 

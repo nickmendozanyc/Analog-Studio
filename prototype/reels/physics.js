@@ -1,4 +1,4 @@
-// JH-24 reel and transport physics (SI units).
+// HJ-24 reel and transport physics (SI units).
 // Renderer-independent so it can be ported 1:1 to the C++ engine.
 //
 // Model
@@ -8,7 +8,7 @@
 //    Each reel turns at w = v / r, so the full reel turns slowly and the empty one fast.
 //  - PLAY / RECORD: the capstan and pinch roller hold v at the selected speed with a fast,
 //    servo-like response. From a wind, the reels brake first and the pinch roller only
-//    engages once the tape is near play speed (the JH-24's motion sensing).
+//    engages once the tape is near play speed (the HJ-24's motion sensing).
 //  - Winds (F FWD, REW, shuttle, stop from a wind): the reel motors are force-limited, so
 //    acceleration = force / effective mass, where the effective mass of the reels seen at the
 //    tape is I_supply / r_s^2 + I_takeup / r_t^2. A full reel therefore spools up and brakes
@@ -32,12 +32,12 @@ export const TAPE = {
 //  pinchTau time constant (s) of the pinch roller swinging in or out
 export const TRANSPORTS = {
   jh24: {
-    name: 'MCI JH-24',
+    name: 'CMI HJ-24',
     emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
     windSpeed: 9.0,           // m/s (~354 ips) (approx)
     windForce: 42,            // N, reel-motor drive force at the tape (approx)
     brakeForce: 64,           // N, braking force at the tape (approx)
-    jerk: 400,                // effectively unlimited: torque steps straight in, the classic JH-24 lurch
+    jerk: 400,                // effectively unlimited: torque steps straight in, the classic HJ-24 lurch
     landing: 0.4,
     capstanTau: 0.11,         // s, capstan servo time constant (approx)
     capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
@@ -46,7 +46,7 @@ export const TRANSPORTS = {
     lifterSpeed: 1.6,         // m/s, lifters come in above this speed
   },
   a827: {
-    name: 'Studer A827',
+    name: 'Stauder A827',
     emptyReelInertia: 0.0065,
     windSpeed: 10.0,          // fast winds (approx)
     windForce: 50,            // strong, servo-controlled reel motors (approx)

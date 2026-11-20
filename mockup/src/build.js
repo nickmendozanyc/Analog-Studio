@@ -259,7 +259,7 @@ function ledLadder(x, y, n, w, h, level, horizontal = true) {
   }
 }
 
-// Lexicon 224X remote, traced from the user's photos (photo coordinates 430..1070 x 62..1062), drawn at scale sc
+// Leximan 224X remote, traced from the user's photos (photo coordinates 430..1070 x 62..1062), drawn at scale sc
 function remote224(ox, oy, sc, opts = {}) {
       p(`<g transform="translate(${ox} ${oy}) scale(${sc}) translate(-430 -62)">`);
   const T = (x, y, str, size, anchor = 'middle', w = 700, extra = '') => text(x, y, str, size, '#f2f4f8', anchor, w, extra);
@@ -269,7 +269,7 @@ function remote224(ox, oy, sc, opts = {}) {
   for (const x of [430, 1045]) { rect(x, 62, 25, 1000, '#111214', 'rx="4"'); rect(x + 4, 62, 4, 1000, '#fff', 'opacity="0.12"'); }
   // logo + model
   rect(500, 110, 134, 50, 'none', 'stroke="#f2f4f8" stroke-width="3"');
-  T(567, 150, 'lexicon', 40, 'middle', 900, 'letter-spacing="-1"');
+  T(567, 150, 'leximan', 40, 'middle', 900, 'letter-spacing="-1"');
   T(736, 150, '224X', 34, 'middle', 800); T(1002, 150, 'Digital Reverb', 30, 'end', 700, 'font-style="italic"');
   // display window: headroom bars + red 3-digit readout
   rect(515, 180, 475, 92, '#120404'); rect(515, 180, 260, 92, '#2a0705');
@@ -453,7 +453,7 @@ const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tal
     rect(0, 0, FW, 2, '#fff', 'opacity="0.25"');
     rect(4, 4, FW - 8, FD - 8, 'none', 'rx="6" stroke="#2f2b28" stroke-width="1.5"');
     rect(14, 14, 64, 24, '#0c0c0d', 'rx="2"');
-    text(46, 32, 'MCI', 15, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    text(46, 32, 'CMI', 15, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
     text(FW - 14, 33, 'AUTOLOCATOR III', 15, LEG, 'end', 800, 'letter-spacing="1.5"');
     // two red LED displays
     rect(12, 48, 244, 76, '#000', 'rx="5"'); rect(17, 53, 234, 66, 'url(#displayBg)', 'rx="3"');
@@ -536,7 +536,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
       // lamps above each meter: red record, blue status
       circle(x + w - 14, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
       circle(x + w - 32, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
-      // recessed meter window, wide like the JH-24 bridge meters
+      // recessed meter window, wide like the HJ-24 bridge meters
       rect(x + 4, 26, w - 8, 118, '#0a0908', 'rx="6"');
       rect(x + 4, 26, w - 8, 118, 'url(#bezelHi)', 'rx="6"');
       vu(x + 14, 34, w - 28, 102, tapeDb[i], { fontScale: 0.125 });
@@ -565,8 +565,8 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
   const plinth = capture(() => {
     rect(0, 0, TW3 + 24, PLH, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
     rect(0, 0, TW3 + 24, PLH, '#000', 'opacity="0.15"');
-    rect(18, 12, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 31, 'MCI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
-    text(104, 31, 'JH-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
+    rect(18, 12, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 31, 'CMI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    text(104, 31, 'HJ-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
     text(TW3 - 330, 31, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
     [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 9, 96, 32, 'green', on, k, { size: 14 }));
   });
@@ -581,7 +581,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
 }
 
 // =====================================================================
-// CONSOLE (MCI JH-636 / JH-600 style) — CSS 3D: knob panel + fader panel + armrest
+// CONSOLE (CMI HJ-632 / HJ-600 style) — CSS 3D: knob panel + fader panel + armrest
 // Faces are drawn with the SVG helpers (capture); knobs and fader caps are real 3D solids.
 // Text is 14 px or larger (50" 4K legibility rule).
 // =====================================================================
@@ -648,7 +648,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
 
   // ---------------- knob panel texture ----------------
   const upper = capture(() => {
-    // JH-600 series channel strip, laid out from the user's reference photos (top to bottom)
+    // HJ-600 series channel strip, laid out from the user's reference photos (top to bottom)
     const GOLD = '#d8c27c', WH = '#ece6da';
     const tx = (x, y, s2, size, col = WH, anchor = 'middle', w = 800) => text(x, y, s2, size, col, anchor, w);
     const blk = (x, y, w, h, label, lit = false, litCol = '#ff3b2f') => {
@@ -797,7 +797,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     text(mx + 222, y + 70, 'OSC', 14, L, 'middle', 800);
     button(mx + 262, y + 20, 196, 34, 'amber', false, 'BOUNCE MIX → WAV', { size: 14 });
     p('</g>');
-    // ---- Lexicon 224X remote resting on the master section (layout traced from the user's photos) ----
+    // ---- Leximan 224X remote resting on the master section (layout traced from the user's photos) ----
     {
       const RWd = 296, RHt = 462, rx = mx + (mw - RWd) / 2, ry = 486, sc = RWd / 640;
       p(`<rect x="${rx + 10}" y="${ry + 16}" width="${RWd}" height="${RHt}" rx="8" fill="#000" opacity="0.6" filter="url(#soft)"/>`);
@@ -917,11 +917,11 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     // flat front view: knob panel, fader panel, oak cheeks, oak rail and leather armrest
     const X = CX + 34, Y = CY;
     rect(CX, CY - BRIDGE - 14, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
-    // console meter bridge (JH-600 style): two staggered rows of VUs, one per channel, stereo pair over the master
+    // console meter bridge (HJ-600 style): two staggered rows of VUs, one per channel, stereo pair over the master
     const BY = Y - BRIDGE;
     rect(X, BY, PW, BRIDGE, 'url(#jh600)'); rect(X, BY, PW, BRIDGE, '#000', 'opacity="0.22"');
     rect(X, BY - 8, PW, 10, 'url(#oakH)');
-    rect(X + 4, BY + 4, 40, 14, '#0c0c0d', 'rx="2"'); text(X + 24, BY + 15, 'MCI', 10, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
+    rect(X + 4, BY + 4, 40, 14, '#0c0c0d', 'rx="2"'); text(X + 24, BY + 15, 'CMI', 10, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
     for (let j = 0; j < 16; j++) {
       const cx = X + j * 2 * 85 + 85;
       for (const [row, n] of [[0, 2 * j + 1], [1, 2 * j + 2]]) {
@@ -983,9 +983,9 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     units.push(`<div style="${B3(`left:${UX}px;top:${y0}px;width:${UW}px;height:${h}px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)`)}">${svgWrap(UW, h, face)}${kn}</div>`);
     uy += n * U;
   }
-  // Lexicon 224 (3U)
+  // Leximan 224 (3U)
   unit(3, 'url(#rack224)', (w, h) => {
-    text(26, 42, 'lexicon', 30, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
+    text(26, 42, 'leximan', 30, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
     text(26, 64, '224 DIGITAL REVERB', 14, '#d6cfbe', 'start', 800, 'letter-spacing="1"');
     rect(26, 80, 150, 56, '#000', 'rx="3"'); rect(30, 84, 142, 48, 'url(#displayBg)', 'rx="2"');
     seg7(38, 92, 30, '4.1', '#ff3220'); seg7(104, 92, 30, '2.4', '#ff3220');
@@ -1001,9 +1001,9 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w - 57, 110, 'BANK', 14, '#d6cfbe', 'middle', 800);
     text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
   });
-  // UA 1176LN x2 (2U)
+  // Unified Audio 1176LN x2 (2U)
   for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
-    text(26, 30, 'UNIVERSAL AUDIO', 14, '#cfcfcf', 'start', 800);
+    text(26, 30, 'UNIFIED AUDIO', 14, '#cfcfcf', 'start', 800);
     text(26, 64, '1176LN', 28, '#f2f2f2', 'start', 800);
     text(26, 88, k ? 'INS · VOX' : 'INS · BASS', 14, '#e8c34a', 'start', 800);
     for (const [kx, lab, a] of [[184, 'IN', k ? 10 : 40], [246, 'OUT', -10]]) {
@@ -1016,9 +1016,9 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     vu(w - 98, 10, 76, 52, k ? -6 : -3.5, { fontScale: 0.14 });
     ['20', '12', '8', '4'].forEach((r, i) => button(w - 100 + i * 20, 70, 18, 20, 'white', i === 3 - k, r, { size: 12 }));
   });
-  // Yamaha SPX90 x2 (1U)
+  // Yahaha SPX90 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackSpx)', (w, h) => {
-    text(26, 26, 'YAMAHA', 16, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
+    text(26, 26, 'YAHAHA', 16, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
     text(26, 46, 'SPX90', 14, '#d0d0d0', 'start', 800);
     RK(130, 22, 10, '#202124', -30, { dark: true }); text(130, 52, 'IN', 14, '#d0d0d0', 'middle', 800);
     rect(156, 8, 46, 40, '#000', 'rx="2"'); seg7(162, 14, 26, k ? '12' : '03', '#ff3220');
@@ -1027,9 +1027,9 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(218, 42, k ? 'L -8  R +8' : 'RT = 2.6 s', 14, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
     RK(w - 48, 22, 10, '#202124', 10, { dark: true }); text(w - 48, 52, 'OUT', 14, '#d0d0d0', 'middle', 800);
   });
-  // Lexicon PCM41 x2 (1U)
+  // Leximan PCM41 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
-    text(26, 26, 'lexicon', 18, '#f0f0f0', 'start', 900);
+    text(26, 26, 'leximan', 18, '#f0f0f0', 'start', 900);
     text(26, 46, 'PCM 41', 14, '#cfcfcf', 'start', 800);
     ['IN', 'RNG', 'DLY', 'DEP', 'SWP', 'FB', 'MIX', 'OUT'].forEach((l, i) => {
       const kx = 128 + i * 38;
@@ -1037,9 +1037,9 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
       text(kx, 52, l, 14, '#cfcfcf', 'middle', 800);
     });
   });
-  // Lexicon PCM42 x2 (1U)
+  // Leximan PCM42 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
-    text(26, 26, 'lexicon', 18, '#f0f0f0', 'start', 900);
+    text(26, 26, 'leximan', 18, '#f0f0f0', 'start', 900);
     text(26, 46, 'PCM 42', 14, '#cfcfcf', 'start', 800);
     rect(112, 8, 72, 40, '#000', 'rx="2"'); seg7(118, 14, 26, k ? '375' : '250', '#ff3220', { gap: 0.22 });
     text(190, 34, 'ms', 14, '#cfcfcf', 'start', 700);
@@ -1154,7 +1154,7 @@ const meterView = capture(() => {
     circle(x + 430, y + 30, 11, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
     circle(x + 396, y + 30, 11, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
     rect(x + 24, y + 54, 432, 330, '#0a0908', 'rx="10"'); rect(x + 24, y + 54, 432, 330, 'url(#bezelHi)', 'rx="10"');
-    vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i, brand: 'MCI' });
+    vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i, brand: 'CMI' });
     text(x + 30, y + 452, String(i + 1).padStart(2, '0'), 46, '#ece7dc', 'start', 800);
     rect(x + 112, y + 410, 344, 58, 'url(#tapeMask)', `rx="2" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 284} ${y + 439})"`);
     text(x + 284, y + 452, tapeNames[i], 34, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
@@ -1175,7 +1175,7 @@ const lexView = capture(() => {
   for (const [sx, sy] of [[fx + 40, fy + 50], [fx + fw - 40, fy + 50], [fx + 40, fy + fh - 50], [fx + fw - 40, fy + fh - 50], [fx + fw / 2, fy + 34], [fx + fw / 2, fy + fh - 34]]) screw(sx, sy, 12);
   rect(fx + 220, fy + fh * 0.4, fw - 440, fh * 0.17, '#2f6db3');
   rect(fx + 260, fy + fh * 0.4 + 20, 220, fh * 0.17 - 40, 'none', 'stroke="#f2f4f8" stroke-width="4"');
-  text(fx + 370, fy + fh * 0.4 + fh * 0.17 / 2 + 22, 'lexicon', 60, '#f2f4f8', 'middle', 900);
+  text(fx + 370, fy + fh * 0.4 + fh * 0.17 / 2 + 22, 'leximan', 60, '#f2f4f8', 'middle', 900);
   text(fx + fw - 260, fy + fh * 0.4 + fh * 0.17 / 2 + 22, 'Digital Reverberator', 56, '#f2f4f8', 'end', 700, 'font-style="italic"');
   text(fx + fw - 860, fy + fh * 0.4 + fh * 0.17 / 2 + 22, '224X', 64, '#f2f4f8', 'end', 900);
   circle(fx + 280, fy + fh * 0.78, 9, '#ff3b2f', 'filter="url(#glow)"'); text(fx + 280, fy + fh * 0.78 + 40, 'POWER', 18, '#cfcfcf', 'middle', 800);
@@ -1223,15 +1223,15 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
-${hot(24, 76, 1360, 590, 'tape', 'Open the JH-24')}
+${hot(24, 76, 1360, 590, 'tape', 'Open the HJ-24')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
-${hot(3340, 130, 450, 176, '224', 'Open the Lexicon 224X')}
-${hot(2857, 1280, 296, 462, '224', 'Open the Lexicon 224X')}
+${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
+${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
-${overlay('tape', 'MCI JH-24 · 24 TRACK', '<iframe title="JH-24 tape machine" data-src="tape-machine.html"></iframe>')}
-${overlay('meters', 'JH-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
-${overlay('224', 'LEXICON 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
+${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}
+${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
+${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
 </div>
 <script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))};</script>

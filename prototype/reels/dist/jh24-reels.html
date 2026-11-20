@@ -1,10 +1,10 @@
-<title>JH-24 Reel Prototype</title>
+<title>HJ-24 Reel Prototype</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
   /* One-screen instrument: the 3D deck fills the window; a transport strip and readouts float over it. */
   :root {
     --room: #0e0c0b;        /* control-room dark */
-    --panel: #6f6a63;       /* JH-24 deck taupe */
+    --panel: #6f6a63;       /* HJ-24 deck taupe */
     --panel-dk: #4c4844;
     --outline: #e6e1d8;     /* strip outline */
     --ink: #f1ece3;
@@ -52,13 +52,13 @@
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@600;700&display=swap">
 
-<div id="stage" aria-label="3D view of the JH-24 transport"></div>
+<div id="stage" aria-label="3D view of the HJ-24 transport"></div>
 
 <div class="hud">
   <div class="counter" aria-live="off"><b id="ctr">00:00.0</b><span>tape time</span></div>
   <dl class="readouts">
     <dt>Transport</dt><dd><span id="st" class="state">STOP</span></dd>
-    <dt>Feel</dt><dd id="feel">MCI JH-24</dd>
+    <dt>Feel</dt><dd id="feel">CMI HJ-24</dd>
     <dt>Tape speed</dt><dd id="v">0.0 ips</dd>
     <dt>Vari-speed</dt><dd id="vs">off</dd>
     <dt>Supply reel</dt><dd id="rs">0 rpm</dd>
@@ -83,8 +83,8 @@
   </div>
   <div class="group">
     <span class="lbl">Feel</span>
-    <button class="key small" id="k-jh24" aria-pressed="true" title="MCI JH-24 transport feel">JH-24</button>
-    <button class="key small" id="k-a827" aria-pressed="false" title="Studer A827 transport feel">A827</button>
+    <button class="key small" id="k-jh24" aria-pressed="true" title="CMI HJ-24 transport feel">HJ-24</button>
+    <button class="key small" id="k-a827" aria-pressed="false" title="Stauder A827 transport feel">A827</button>
   </div>
   <div class="group">
     <span class="lbl">IPS</span>
@@ -115,7 +115,7 @@
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
 // ---------------- physics (inlined from physics.js at build time) ----------------
-// JH-24 reel and transport physics (SI units).
+// HJ-24 reel and transport physics (SI units).
 // Renderer-independent so it can be ported 1:1 to the C++ engine.
 //
 // Model
@@ -125,7 +125,7 @@
 //    Each reel turns at w = v / r, so the full reel turns slowly and the empty one fast.
 //  - PLAY / RECORD: the capstan and pinch roller hold v at the selected speed with a fast,
 //    servo-like response. From a wind, the reels brake first and the pinch roller only
-//    engages once the tape is near play speed (the JH-24's motion sensing).
+//    engages once the tape is near play speed (the HJ-24's motion sensing).
 //  - Winds (F FWD, REW, shuttle, stop from a wind): the reel motors are force-limited, so
 //    acceleration = force / effective mass, where the effective mass of the reels seen at the
 //    tape is I_supply / r_s^2 + I_takeup / r_t^2. A full reel therefore spools up and brakes
@@ -149,12 +149,12 @@ const TAPE = {
 //  pinchTau time constant (s) of the pinch roller swinging in or out
 const TRANSPORTS = {
   jh24: {
-    name: 'MCI JH-24',
+    name: 'CMI HJ-24',
     emptyReelInertia: 0.0065, // kg m^2, aluminium 10.5" reel for 2" tape (approx)
     windSpeed: 9.0,           // m/s (~354 ips) (approx)
     windForce: 42,            // N, reel-motor drive force at the tape (approx)
     brakeForce: 64,           // N, braking force at the tape (approx)
-    jerk: 400,                // effectively unlimited: torque steps straight in, the classic JH-24 lurch
+    jerk: 400,                // effectively unlimited: torque steps straight in, the classic HJ-24 lurch
     landing: 0.4,
     capstanTau: 0.11,         // s, capstan servo time constant (approx)
     capstanSlew: 6.0,         // m/s^2, capstan acceleration limit (approx)
@@ -163,7 +163,7 @@ const TRANSPORTS = {
     lifterSpeed: 1.6,         // m/s, lifters come in above this speed
   },
   a827: {
-    name: 'Studer A827',
+    name: 'Stauder A827',
     emptyReelInertia: 0.0065,
     windSpeed: 10.0,          // fast winds (approx)
     windForce: 50,            // strong, servo-controlled reel motors (approx)
@@ -407,15 +407,15 @@ function labelTexture(kind) {
     // label sits between the slots (slots are along the local x axis), on the +y side
     g.save(); g.translate(c, c);
     if (kind === 'a499') {
-      g.textAlign = 'center'; g.fillStyle = '#121212'; g.font = '900 58px Archivo, Arial'; g.fillText('AMPEX', 0, -0.70 * sc);
+      g.textAlign = 'center'; g.fillStyle = '#121212'; g.font = '900 58px Archivo, Arial'; g.fillText('AMTEX', 0, -0.70 * sc);
       g.fillStyle = '#a9802f'; g.font = '900 120px Archivo, Arial'; g.fillText('499', 0, -0.47 * sc);
-      g.fillStyle = '#121212'; g.font = '800 26px Archivo, Arial'; g.fillText('GRAND MASTER™ GOLD', 0, -0.40 * sc);
+      g.fillStyle = '#121212'; g.font = '800 26px Archivo, Arial'; g.fillText('GOLD MASTER', 0, -0.40 * sc);
       g.fillStyle = '#a9802f'; g.font = '600 22px Archivo, Arial'; g.fillText('Studio Mastering Audio Tape', 0, -0.35 * sc);
     } else {
-      g.textAlign = 'center'; g.fillStyle = '#1b1b1b'; g.font = '900 46px Archivo, Arial'; g.fillText('QUANTEGY', 0.02 * sc, -0.72 * sc);
+      g.textAlign = 'center'; g.fillStyle = '#1b1b1b'; g.font = '900 46px Archivo, Arial'; g.fillText('QUANTICA', 0.02 * sc, -0.72 * sc);
       g.save(); g.rotate(-0.2); g.fillStyle = '#f3f1ec'; g.beginPath(); g.ellipse(0, -0.56 * sc, 170, 58, 0, 0, Math.PI * 2); g.fill(); g.restore();
       g.fillStyle = '#3a3a3c'; g.font = 'italic 900 118px Archivo, Arial'; g.fillText('GP9', 0.02 * sc, -0.50 * sc);
-      g.fillStyle = '#1b1b1b'; g.font = '800 24px Archivo, Arial'; g.fillText('GRAND MASTER PLATINUM', 0.02 * sc, -0.40 * sc);
+      g.fillStyle = '#1b1b1b'; g.font = '800 24px Archivo, Arial'; g.fillText('PLATINUM MASTER', 0.02 * sc, -0.40 * sc);
     }
     // six screws around the hub
     for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; g.fillStyle = '#111'; g.beginPath(); g.arc(Math.cos(a) * 0.42 * sc, Math.sin(a) * 0.42 * sc, 9, 0, 7); g.fill(); g.fillStyle = '#666'; g.beginPath(); g.arc(Math.cos(a) * 0.42 * sc - 2, Math.sin(a) * 0.42 * sc - 2, 3, 0, 7); g.fill(); }
@@ -674,7 +674,7 @@ function frame(now) {
   for (const [k, mat] of Object.entries(stripKeys)) mat.emissiveIntensity = (k === m || (k === 'play' && m === 'rec') || (k === 'lift' && tr.liftDefeat)) ? 0.9 : 0.0;
   for (const [k, el] of Object.entries(keysUI)) el.setAttribute('aria-pressed', String(k === m || (k === 'play' && m === 'rec')));
   $('k-lift').setAttribute('aria-pressed', String(tr.liftDefeat));
-  $('k-jh24').setAttribute('aria-pressed', String(tr.m.name === 'MCI JH-24')); $('k-a827').setAttribute('aria-pressed', String(tr.m.name === 'Studer A827'));
+  $('k-jh24').setAttribute('aria-pressed', String(tr.m.name === 'CMI HJ-24')); $('k-a827').setAttribute('aria-pressed', String(tr.m.name === 'Stauder A827'));
   $('k-7').setAttribute('aria-pressed', String(tr.speedIPS === 7.5)); $('k-vari').setAttribute('aria-pressed', String(variOn));
   $('k-15').setAttribute('aria-pressed', String(tr.speedIPS === 15)); $('k-30').setAttribute('aria-pressed', String(tr.speedIPS === 30));
   $('k-blur').setAttribute('aria-pressed', String(blurOn));

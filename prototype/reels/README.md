@@ -1,6 +1,6 @@
-# JH-24 reel prototype
+# HJ-24 reel prototype
 
-A first, runnable test of how the reels and tape move. A full reel is 2500 ft. It shows a 3D JH-24 transport (Ampex 499 supply, Quantegy GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
+A first, runnable test of how the reels and tape move. A full reel is 2500 ft. It shows a 3D HJ-24 transport (Amtex 499 supply, Quantica GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
 
 ## Run it
 
@@ -20,7 +20,7 @@ Controls: **Space** play / stop, **←** rewind, **→** fast forward, **R** rec
 
 ## Transport feel
 
-The Feel keys switch the transport profile in `physics.js` (`TRANSPORTS`). The JH-24 profile steps its reel torque straight in, so winds start and stop with a slight lurch. The Studer A827 profile is jerk-limited: acceleration builds and fades along an S-curve with a long, gentle landing, the A827's famously smooth transport. From a 1000 ft position the JH-24 reaches wind speed in about 0.7 s and stops in 0.5 s; the A827 takes about 1.3 s and 1.4 s, without any jolt. The visuals stay those of the JH-24 for now.
+The Feel keys switch the transport profile in `physics.js` (`TRANSPORTS`). The HJ-24 profile steps its reel torque straight in, so winds start and stop with a slight lurch. The Stauder A827 profile is jerk-limited: acceleration builds and fades along an S-curve with a long, gentle landing, the A827's famously smooth transport. From a 1000 ft position the HJ-24 reaches wind speed in about 0.7 s and stops in 0.5 s; the A827 takes about 1.3 s and 1.4 s, without any jolt. The visuals stay those of the HJ-24 for now.
 
 ## How it works
 
