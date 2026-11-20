@@ -463,11 +463,11 @@ const elecView = (() => {
   </div>`;
   const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
   const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
-  // the machine's 24 VU meters (as on the meter bridge), two rows of 12, reading the live line outputs
-  const MW = 3792, CW = 316, VW = 270, VH = 202, ROW = 262;
+  // the machine's 24 VU meters (as on the meter bridge), three rows of 8, reading the live line outputs
+  const MW = 3792, CW = 474, VW = 232, VH = 172, ROW = 222;   // three rows of eight, like the meter bridge
   const meters = capture(() => {
     for (let i = 0; i < 24; i++) {
-      const x = (i % 12) * CW + (CW - VW) / 2, y = Math.floor(i / 12) * ROW + 6;
+      const x = (i % 8) * CW + (CW - VW) / 2, y = Math.floor(i / 8) * ROW + 6;
       vu(x, y, VW, VH, -20, { needleId: i, brand: 'CMI' });
       text(x + 6, y + VH + 34, String(i + 1).padStart(2, '0'), 24, '#f2ead8', 'start', 900);
       text(x + VW - 2, y + VH + 34, tapeNames[i], 20, '#cfc6b3', 'end', 700, 'letter-spacing="1"');
@@ -493,7 +493,7 @@ const elecView = (() => {
     <input id="el-file" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" multiple hidden>
   </div>
   <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
-  <div class="elm"><svg viewBox="0 0 ${MW} ${2 * ROW}" width="${MW}" height="${2 * ROW}">${meters}</svg></div>
+  <div class="elm"><svg viewBox="0 0 ${MW} ${3 * ROW}" width="${MW}" height="${3 * ROW}">${meters}</svg></div>
   <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
 </div>`;
 })();
