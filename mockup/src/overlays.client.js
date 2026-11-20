@@ -229,7 +229,12 @@
   // A827 front panel: live tape timer and key lamps
   const a8ctr = document.getElementById('a8-tctr');
   const a8lamp = (n, on) => { const g = document.getElementById(`a8-lk-${n}`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
+  const slsTc = document.getElementById('sls-tc');
   function drawA827() {
+    if (slsTc) {   // Studio Computer screen: timecode from the tape position (01:00:00:00 at zero, 30 fps)
+      const t = Math.max(0, 3600 + tr.counter), fr = Math.floor((t % 1) * 30);
+      slsTc.textContent = `${String(Math.floor(t / 3600)).padStart(2, '0')}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(Math.floor(t) % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`;
+    }
     if (!a8ctr) return;
     const c = tr.counter, a = Math.abs(c), hh = Math.floor(a / 3600), mm = Math.floor(a / 60) % 60, ss = Math.floor(a % 60);
     a8ctr.textContent = `${c < -0.5 ? '-' : ''}${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;

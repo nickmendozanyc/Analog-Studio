@@ -38,4 +38,9 @@ Sections: 1 Introduction, 2 SL 611G I/O module (PDF pages ~8-26: every control w
 3 SL 611S stereo module, 4 Centre section (SL 651G master), 5 Meter bridge, 6 Patch, 7 Routing and signal flow,
 8 Signal processor routing, 9 Cue and aux sends, 10 Applications, 11 Fault finding, 12 Index.
 
+## Photos
+
+- Centre section with the onboard Studio Computer (screen, status keys, function keypad, keyboard, multitrack remote):
+  https://mixedbymarcmozart.com/2014/09/16/buying-a-ssl-4000-g-series-mixing-console/ssl_onboard_display/
+
 Naming: in the app this studio is "SLS" and the gear gets fictional names (see the naming rules in the spec).
