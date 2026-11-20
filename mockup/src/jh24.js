@@ -11,9 +11,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   const DW = TW, DD = 720;            // original deck size (deck units = px before tilt)
   // Layout for 14" reels: the reels sit 2" further apart and 2" further back, the transport 2" further forward.
   // The deck grows to fit and is scaled back into the same screen space. (1" = 250 / 7 deck units.)
-  const IN = 250 / 7, DZ = 2 * IN, OX = 44, OY = 64;
+  const IN = 250 / 7, DZ = 2 * IN, OX = 44;
+  // deck plate: 2" (at 10.5" reel scale) of clearance around the reels; OX fixes the drawing scale, so it stays
+  const U = 250 / 5.25, REEL_CX = 300 + IN, REEL_CY = 292 - 2 * IN;
+  const PL = REEL_CX - 250 - 2 * U, PT = REEL_CY - 250 - 2 * U, PR = DW - PL;
+  const OY = Math.ceil(-PT);
   const DW2 = DW + 2 * OX, DD2 = DD + OY + DZ, DSCALE = DW / DW2;
-  const FRONT = 560;                  // screen y (scene coords) of the deck's front edge
+  const FRONT = 560;
+  const PW = PR - PL, PH = DD + DZ - PT, CI = Math.round((PL + OX) * DW / (DW + 2 * OX));   // plate size; cabinet inset to match the plate's front edge
+  globalThis.JH_CI = CI;                  // screen y (scene coords) of the deck's front edge
   const TILT = 59;                    // degrees the deck is tilted away from the viewer
   const out = [];
   const add = (s) => out.push(s);
@@ -82,10 +88,10 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     <filter id="dsh2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
     <filter id="tex"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.10"/></feComponentTransfer></filter>
   </defs>`;
-  deckSvg += `<rect x="${-OX}" y="${-OY}" width="${DW2}" height="${DD2}" rx="10" fill="url(#rim)"/>`;
-  deckSvg += `<rect x="${16 - OX}" y="${16 - OY}" width="${DW2 - 32}" height="${DD2 - 30}" rx="6" fill="url(#dk)"/>`;
-  deckSvg += `<rect x="${16 - OX}" y="${16 - OY}" width="${DW2 - 32}" height="${DD2 - 30}" rx="6" filter="url(#tex)"/>`;
-  deckSvg += `<rect x="${16.5 - OX}" y="${16.5 - OY}" width="${DW2 - 33}" height="${DD2 - 31}" rx="6" fill="none" stroke="#2f2b28" stroke-width="2"/>`;
+  deckSvg += `<rect x="${PL}" y="${PT}" width="${PW}" height="${PH}" rx="10" fill="url(#rim)"/>`;
+  deckSvg += `<rect x="${16 + PL}" y="${16 + PT}" width="${PW - 32}" height="${PH - 30}" rx="6" fill="url(#dk)"/>`;
+  deckSvg += `<rect x="${16 + PL}" y="${16 + PT}" width="${PW - 32}" height="${PH - 30}" rx="6" filter="url(#tex)"/>`;
+  deckSvg += `<rect x="${16.5 + PL}" y="${16.5 + PT}" width="${PW - 33}" height="${PH - 31}" rx="6" fill="none" stroke="#2f2b28" stroke-width="2"/>`;
   // head plate seam
   deckSvg += `<rect x="${headX - 330}" y="${392 + DZ}" width="700" height="210" rx="10" fill="none" stroke="#4a4541" stroke-width="2.5"/><rect x="${headX - 328}" y="${394 + DZ}" width="696" height="206" rx="9" fill="none" stroke="#fff" stroke-opacity="0.10"/>`;
   // shadows (light from upper-front-left -> shadows fall back and right)
@@ -94,7 +100,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   for (const c of [guideL, capstan, pinch, guideR, lifterPin, armL, armR]) deckSvg += `<ellipse cx="${c.cx + 22}" cy="${c.cy - 26}" rx="${c.r + 14}" ry="${c.r + 26}" fill="#000" opacity="0.4" filter="url(#dsh2)"/>`;
   // screws
   const screwSvg = (x, y, r = 5, a = 30) => `<circle cx="${x}" cy="${y + 0.8}" r="${r + 1}" fill="#000" opacity="0.45"/><circle cx="${x}" cy="${y}" r="${r}" fill="#a9a59e"/><line x1="${x - r * 0.75 * Math.cos(a)}" y1="${y - r * 0.75 * Math.sin(a)}" x2="${x + r * 0.75 * Math.cos(a)}" y2="${y + r * 0.75 * Math.sin(a)}" stroke="#3a3633" stroke-width="1.6"/>`;
-  for (const [x, y] of [[34 - OX, 34 - OY], [DW + OX - 34, 34 - OY], [34 - OX, DD + DZ - 36], [DW + OX - 34, DD + DZ - 36], [headX - 316, 406 + DZ], [headX + 356, 406 + DZ], [headX - 316, 588 + DZ], [headX + 356, 588 + DZ]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
+  for (const [x, y] of [[PL + 34, PT + 34], [PR - 34, PT + 34], [PL + 34, DD + DZ - 36], [PR - 34, DD + DZ - 36], [headX - 316, 406 + DZ], [headX + 356, 406 + DZ], [headX - 316, 588 + DZ], [headX + 356, 588 + DZ]]) deckSvg += screwSvg(x, y, 5, x * 0.7);
   // engraved legends on the head plate
   // reel table hint rings
   for (const rl of [supply, takeup]) deckSvg += `<circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="#5f5a55" stroke="#3f3b37" stroke-width="2"/><circle cx="${rl.cx}" cy="${rl.cy}" r="96" fill="none" stroke="#fff" stroke-opacity="0.12" stroke-width="1" transform="translate(0 1.5)"/>`;
@@ -372,19 +378,19 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
     <filter id="grainV"><feTurbulence type="fractalNoise" baseFrequency="0.0025 0.21" numOctaves="5" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.035  0 0 0 0 0.0  0 0 0 2.4 -0.85"/><feComposite in2="SourceGraphic" operator="in"/></filter>
     <linearGradient id="shadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
   </defs>`);
-  cab.push(`<rect x="0" y="${FRONT - 2}" width="${TW}" height="${LIPH + 2}" fill="url(#lip)"/><rect x="0" y="${FRONT - 2}" width="${TW}" height="1.5" fill="#fff" opacity="0.25"/>`);
-  cab.push(`<rect x="44" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="44" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
-  cab.push(txt(92, FRONT + 29, 'CMI', 17, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="4"'));
+  cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="${LIPH + 2}" fill="url(#lip)"/><rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="1.5" fill="#fff" opacity="0.25"/>`);
+  cab.push(`<rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
+  cab.push(txt(CI + 92, FRONT + 29, 'CMI', 17, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="4"'));
   // drawer front: woodgrain laminate inside a dark frame, small model tag at right
-  cab.push(`<rect x="0" y="${WOODY}" width="${TW}" height="${Math.max(0, TH - WOODY)}" fill="#3a3633"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="url(#lam)"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="#000" filter="url(#grainV)"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
-  cab.push(`<rect x="22" y="${WOODY + 14}" width="${TW - 44}" height="36" fill="url(#shadeTop)"/>`);
-  cab.push(`<rect x="${TW - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2725"/>`);
-  cab.push(txt(TW - 87, TH - 17, 'HJ-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
+  cab.push(`<rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="${Math.max(0, TH - WOODY)}" fill="#3a3633"/>`);
+  cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="url(#lam)"/>`);
+  cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="#000" filter="url(#grainV)"/>`);
+  cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
+  cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="36" fill="url(#shadeTop)"/>`);
+  cab.push(`<rect x="${TW - CI - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2725"/>`);
+  cab.push(txt(TW - CI - 87, TH - 17, 'HJ-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
   // cabinet side frames
-  cab.push(`<rect x="0" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#3a3633"/><rect x="${TW - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#33302d"/>`);
+  cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#3a3633"/><rect x="${TW - CI - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="#33302d"/>`);
 
   return `<div id="jh24" style="position:absolute;left:${TX}px;top:${TY}px;width:${TW}px;height:${TH}px;overflow:hidden;perspective:1650px;perspective-origin:50% -20%;">
   ${svg(TW, TH, cab.join(''))}

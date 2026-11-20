@@ -428,7 +428,8 @@ text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 // =====================================================================
 const TX = 24, TY = 76, TW = 1360, TH = 590;   // top row trimmed to make room for the console meter bridge
 p(`<g filter="url(#shadow)">`);
-rect(TX, TY, TW, TH, '#2a2725', 'rx="10"');
+const TCI = 32;   // the HJ-24 cabinet is inset this much each side to hug its deck plate (checked against jh24.js)
+rect(TX, TY, TW - 2 * TCI, TH, '#2a2725', 'rx="10"');
 p(`</g>`);
 
 // =====================================================================
@@ -541,9 +542,9 @@ function al3(live = false, st = {}) {
 }
 
 // ---------------- AL-III autolocator on its pedestal ----------------
-const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tall, shown scaled to fit the top row
+const AX = TX + TW - 2 * TCI + 22, AY = 76, AW = 400, AH = 676, ALK = Math.min((1692 - AX) / AW, 590 / AH);   // fills the gap between the tape machine and the meter bridge
 {
-  const FW = 376, FD = Math.round(AL_H * FW / AL_W), LIP = 34, TOP = 150, SLOPE = 30;
+  const FW = 376, FD = Math.round(AL_H * FW / AL_W), LIP = 34, TOP = 60, SLOPE = 30;
   const face = capture(() => { p(`<g transform="scale(${FW / AL_W})">`); al3(false); p('</g>'); });
   // side planes (wedge)
   const depth = FD * Math.sin(SLOPE * Math.PI / 180), rise = FD * Math.cos(SLOPE * Math.PI / 180);
@@ -1262,7 +1263,8 @@ const alView = capture(() => {
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
-const jh24 = require('./jh24.js')({ TX, TY, TW, TH });
+const jh24 = require('./jh24.js')({ TX: TX - TCI, TY, TW, TH });
+if (globalThis.JH_CI !== TCI) throw new Error(`cabinet inset is ${globalThis.JH_CI}, expected ${TCI}`);
 // copy the live reel prototype next to the mockup so the tape machine view can load it
 const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
 if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
@@ -1290,8 +1292,8 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
-${hot(24, 76, 1360, 590, 'tape', 'Open the HJ-24')}
-${hot(1408, 76, 290, 590, 'al', 'Open the AutoLocator III')}
+${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
+${hot(AX, 76, Math.round(AW * ALK), 590, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
 ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
