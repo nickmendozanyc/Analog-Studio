@@ -1258,7 +1258,7 @@ const alView = capture(() => {
   text(mx + 320, my + 58, 'LOCATE MEMORIES', 34, '#efe9da', 'middle', 800, 'letter-spacing="3"');
   p(`<g id="al-mem" font-family="'JetBrains Mono', monospace"></g>`);
   text(ox + AL_W * K / 2, oy + AL_H * K + 120, 'Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD', 28, '#d9d3c7', 'middle', 600);
-  text(ox + AL_W * K / 2, oy + AL_H * K + 170, 'Keyboard: Space play/stop · ← → wind · L locate · R record · digits enter a locate time', 26, '#a9a293', 'middle', 600);
+  text(ox + AL_W * K / 2, oy + AL_H * K + 170, 'Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate', 26, '#a9a293', 'middle', 600);
 });
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');

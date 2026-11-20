@@ -70,7 +70,7 @@
 </div>
 
 <div class="hint" id="hint">
-  <kbd>Space</kbd> play / stop · <kbd>P</kbd> reverse play · <kbd>←</kbd> rewind · <kbd>→</kbd> fast forward · <kbd>R</kbd> record · <kbd>S</kbd> stop · <kbd>B</kbd> motion blur. Drag to look around, scroll to zoom.
+  <kbd>Space</kbd> play / stop · <kbd>,</kbd> rewind · <kbd>.</kbd> fast forward · <kbd>Z</kbd> return to zero · <kbd>R</kbd> record · <kbd>P</kbd> reverse play · <kbd>B</kbd> motion blur. Drag to look around, scroll to zoom.
 </div>
 
 <div class="strip" role="toolbar" aria-label="Transport">
@@ -659,13 +659,17 @@ $('shuttle').onchange = (e) => { if (Number(e.target.value) === 0) tr.command('s
 const load = (frac) => { tr.locate(tr.total * frac); tr.setZero(0); };
 $('k-head').onclick = () => load(0); $('k-mid').onclick = () => load(0.5); $('k-tail').onclick = () => load(0.97);
 $('k-blur').onclick = () => { blurOn = !blurOn; };
+// studio shortcuts: Space play/stop · , rewind · . fast forward · Z return to zero · R record (plus P reverse play, B blur)
 window.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') return;
+  if (e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
-  if (k === ' ') { e.preventDefault(); setMode(tr.playingMode ? 'stop' : 'play'); }
+  if (shared && [' ', ',', '.', 'z', 'r'].includes(k)) { e.preventDefault(); window.parent.postMessage({ as: 'cmd', fn: 'key', args: [k] }, '*'); return; }   // the console handles them (record needs armed tracks)
+  if (k === ' ') { e.preventDefault(); setMode(tr.mode === 'stop' ? 'play' : 'stop'); }
+  else if (k === ',') setMode('rew'); else if (k === '.') setMode('ff');
+  else if (k === 'z') tr.locateTo(tr.zero);
+  else if (k === 'r') setMode('rec');
   else if (k === 'p') setMode(tr.mode === 'rplay' ? 'stop' : 'rplay');
-  else if (k === 'arrowleft') setMode('rew'); else if (k === 'arrowright') setMode('ff');
-  else if (k === 's') setMode('stop'); else if (k === 'r') setMode('rec'); else if (k === 'b') blurOn = !blurOn;
+  else if (k === 'b') blurOn = !blurOn;
 });
 // orbit / zoom
 let drag = null;
@@ -714,7 +718,7 @@ function frame(now) {
   $('k-blur').setAttribute('aria-pressed', String(blurOn));
   // readouts
   $('ctr').textContent = fmtTime(tr.counter);
-  const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REVERSE PLAY', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE', locate: 'LOCATE' })[m];
+  const st = $('st'); st.textContent = tr.endOfTape ? 'END OF TAPE' : ({ stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REVERSE PLAY', ff: 'F FWD', rew: 'REWIND', shuttle: 'SHUTTLE', locate: tr.locTarget === tr.zero ? 'RETURN TO ZERO' : 'LOCATE' })[m];
   st.className = 'state' + (m === 'rec' ? ' rec' : m !== 'stop' ? ' on' : '');
   $('v').textContent = `${(tr.v / IPS).toFixed(1)} ips`;
   $('vs').textContent = tr.varispeed ? `${(tr.varispeed * 100).toFixed(1)} % · ${tr.semitones.toFixed(2)} st` : 'off';

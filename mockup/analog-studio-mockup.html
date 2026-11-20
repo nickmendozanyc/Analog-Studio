@@ -29349,7 +29349,7 @@
 <text x="3220" y="358" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="34" fill="#efe9da" text-anchor="middle" font-weight="800" letter-spacing="3">LOCATE MEMORIES</text>
 <g id="al-mem" font-family="'JetBrains Mono', monospace"></g>
 <text x="1820" y="1833.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="28" fill="#d9d3c7" text-anchor="middle" font-weight="600" >Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD</text>
-<text x="1820" y="1883.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#a9a293" text-anchor="middle" font-weight="600" >Keyboard: Space play/stop · ← → wind · L locate · R record · digits enter a locate time</text></svg></div></div>
+<text x="1820" y="1883.9999999999998" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="26" fill="#a9a293" text-anchor="middle" font-weight="600" >Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate</text></svg></div></div>
 <div class="overlay" id="ov-meters" data-view="meters" hidden><div class="ov-bar"><b>HJ-24 METER BRIDGE</b><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block"><rect x="0" y="0" width="3840" height="2104" fill="url(#deck)" />
 <rect x="0" y="0" width="3840" height="2104" fill="#000" opacity="0.45"/>
 <rect x="0" y="0" width="3840" height="2104" fill="#000" filter="url(#brushed)" opacity="0.06"/>
@@ -32158,15 +32158,25 @@ window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 *
       }
       g.addEventListener('click', () => press(n));
     });
-    addEventListener('keydown', (e) => {
-      if (!open || open.dataset.view !== 'al') return;
-      const k = e.key;
-      if (/^\d$/.test(k)) press(`d${k}`);
-      else if (k === ' ') { e.preventDefault(); press(tr.mode === 'stop' ? 'play' : 'stop'); }
-      else if (k === 'ArrowLeft') press('rew'); else if (k === 'ArrowRight') press('ff');
-      else if (k === 'l' || k === 'L' || k === 'Enter') press('loc'); else if (k === 'r' || k === 'R') press('record');
-    });
   }
+  // studio shortcuts, everywhere in the console: Space play/stop · , rewind · . fast forward · Z return to zero · R record
+  function shortcut(k) {
+    if (k === ' ') press(tr.mode === 'stop' ? 'play' : 'stop');
+    else if (k === ',') press('rew');
+    else if (k === '.') press('ff');
+    else if (k === 'z') { AL.rehPunch = false; tr.locateTo(tr.zero, 'stop'); alMsg('Return to zero'); }
+    else if (k === 'r') press('record');
+    else return false;
+    return true;
+  }
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') return;
+    const k = e.key.toLowerCase();
+    if (shortcut(k)) { e.preventDefault(); return; }
+    if (!open || open.dataset.view !== 'al') return;   // keypad entry when the autolocator is open
+    if (/^\d$/.test(k)) press(`d${k}`);
+    else if (k === 'l' || k === 'enter') press('loc');
+  });
 
   // ---------------- tape machine view (iframe) mirrors this transport ----------------
   const STATE_KEYS = ['take', 'total', 'v', 'acc', 'mode', 'speedIPS', 'varispeed', 'shuttle', 'liftDefeat', 'pinch', 'lift', 'angleS', 'angleT', 'zero', 'endOfTape', 'locTarget'];
@@ -32174,7 +32184,7 @@ window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 *
   const CMDS = {
     command: (m) => { if (['stop', 'play', 'rec', 'rplay', 'ff', 'rew', 'shuttle'].includes(m)) { AL.rehPunch = false; tr.command(m); } },
     setSpeed: (ips) => tr.setSpeed(+ips), setVarispeed: (x) => { tr.setVarispeed(+x); AL.varOn = +x !== 0; if (AL.varOn) AL.vari = +x; },
-    setShuttle: (x) => tr.setShuttle(+x), locate: (pos) => tr.locate(+pos), setLift: (on) => { tr.liftDefeat = !!on; }, setZero: (z) => { tr.zero = +z; },
+    setShuttle: (x) => tr.setShuttle(+x), key: (k) => shortcut(String(k)), locate: (pos) => tr.locate(+pos), setLift: (on) => { tr.liftDefeat = !!on; }, setZero: (z) => { tr.zero = +z; },
   };
   addEventListener('message', (e) => {
     if (!tapeFrame || e.source !== tapeFrame.contentWindow) return;

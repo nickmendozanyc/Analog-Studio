@@ -346,15 +346,25 @@
       }
       g.addEventListener('click', () => press(n));
     });
-    addEventListener('keydown', (e) => {
-      if (!open || open.dataset.view !== 'al') return;
-      const k = e.key;
-      if (/^\d$/.test(k)) press(`d${k}`);
-      else if (k === ' ') { e.preventDefault(); press(tr.mode === 'stop' ? 'play' : 'stop'); }
-      else if (k === 'ArrowLeft') press('rew'); else if (k === 'ArrowRight') press('ff');
-      else if (k === 'l' || k === 'L' || k === 'Enter') press('loc'); else if (k === 'r' || k === 'R') press('record');
-    });
   }
+  // studio shortcuts, everywhere in the console: Space play/stop · , rewind · . fast forward · Z return to zero · R record
+  function shortcut(k) {
+    if (k === ' ') press(tr.mode === 'stop' ? 'play' : 'stop');
+    else if (k === ',') press('rew');
+    else if (k === '.') press('ff');
+    else if (k === 'z') { AL.rehPunch = false; tr.locateTo(tr.zero, 'stop'); alMsg('Return to zero'); }
+    else if (k === 'r') press('record');
+    else return false;
+    return true;
+  }
+  addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') return;
+    const k = e.key.toLowerCase();
+    if (shortcut(k)) { e.preventDefault(); return; }
+    if (!open || open.dataset.view !== 'al') return;   // keypad entry when the autolocator is open
+    if (/^\d$/.test(k)) press(`d${k}`);
+    else if (k === 'l' || k === 'enter') press('loc');
+  });
 
   // ---------------- tape machine view (iframe) mirrors this transport ----------------
   const STATE_KEYS = ['take', 'total', 'v', 'acc', 'mode', 'speedIPS', 'varispeed', 'shuttle', 'liftDefeat', 'pinch', 'lift', 'angleS', 'angleT', 'zero', 'endOfTape', 'locTarget'];
@@ -362,7 +372,7 @@
   const CMDS = {
     command: (m) => { if (['stop', 'play', 'rec', 'rplay', 'ff', 'rew', 'shuttle'].includes(m)) { AL.rehPunch = false; tr.command(m); } },
     setSpeed: (ips) => tr.setSpeed(+ips), setVarispeed: (x) => { tr.setVarispeed(+x); AL.varOn = +x !== 0; if (AL.varOn) AL.vari = +x; },
-    setShuttle: (x) => tr.setShuttle(+x), locate: (pos) => tr.locate(+pos), setLift: (on) => { tr.liftDefeat = !!on; }, setZero: (z) => { tr.zero = +z; },
+    setShuttle: (x) => tr.setShuttle(+x), key: (k) => shortcut(String(k)), locate: (pos) => tr.locate(+pos), setLift: (on) => { tr.liftDefeat = !!on; }, setZero: (z) => { tr.zero = +z; },
   };
   addEventListener('message', (e) => {
     if (!tapeFrame || e.source !== tapeFrame.contentWindow) return;
