@@ -380,10 +380,180 @@
     if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') return;
     const k = e.key.toLowerCase();
     if (shortcut(k)) { e.preventDefault(); return; }
+    if (open && open.dataset.view === 'sbx') { if (k === 't') sbxPress('tap', performance.now()); else if (/^\d$/.test(k)) sbxPress(`d${k}`); else if (k === 'enter') sbxPress('ent'); return; }
     if (!open || open.dataset.view !== 'al') return;   // keypad entry when the autolocator is open
     if (/^\d$/.test(k)) press(`d${k}`);
     else if (k === 'l' || k === 'enter') press('loc');
   });
+
+  // ---------------- Rowan SBX-80 sync box ----------------
+  // SMPTE is striped to track 24 of whichever machine is loaded (generator + track 24 armed + RECORD), read back off the
+  // moving tape, and turned into song / measure / beat, MIDI clock (24 ppq), song position and DIN sync via the tempo map.
+  const sbxSvg = document.getElementById('sbxSvg');
+  const FRS = [[24, '24'], [25, '25'], [30, '30'], [29.97, '30DF']];
+  const TBS = [1, 2, 3, 4, 24, 48, 64, 96, 120];
+  const SBX = {
+    src: 'smpte', disp: 1, frI: 1, tbI: 4, resp: 0, taps: [], tempo: 96, entry: '', mode: '', rec: false, gen: false,
+    intRun: false, intBeats: 0, offset: 2, editBar: 0, seg: null, locked: false, beatIx: -1, beatFlash: 0, clocks: 0, msg: '', msgT: 0,
+    metro: 0.6, audio: 0.5, sigBuf: '', totalT: 0, song: 1,
+    bars: Array.from({ length: 160 }, () => ({ bpm: 96, num: 4, den: 4 })),
+    stripes: [{ take0: 0, take1: tr.total, code0: 0, speed: 30 * IPS }],   // the session reel came already striped
+  };
+  try { const sv = JSON.parse(localStorage.getItem('as-sbx-map') || 'null'); if (sv && sv.bars) { SBX.bars = sv.bars; SBX.offset = sv.offset ?? 2; } } catch (e) {}
+  const sbxMsg = (t, sec = 2.2) => { SBX.msg = t; SBX.msgT = sec; };
+  const fps = () => FRS[SBX.frI][0];
+  const tapeCode = (take) => { for (const s of SBX.stripes) if (take >= s.take0 && take <= s.take1) return s.code0 + (take - s.take0) / s.speed; return null; };
+  const barLen = (b) => b.num * (60 / b.bpm) * (4 / b.den);
+  // song time (s from bar 1) -> position in the tempo map
+  function where(t) {
+    const B = SBX.bars;
+    if (t < 0) { const b = B[0], bl = 60 / b.bpm; return { bar: 0, beat: Math.floor((t + barLen(b)) / bl) + 1, beats: t / bl, bpm: b.bpm, num: b.num, den: b.den }; }
+    let acc = 0, beats = 0;
+    for (let i = 0; i < B.length; i++) {
+      const b = B[i], L = barLen(b), bl = L / b.num;
+      if (t < acc + L) { const into = (t - acc) / bl; return { bar: i + 1, beat: Math.floor(into) + 1, beats: beats + into, bpm: b.bpm, num: b.num, den: b.den }; }
+      acc += L; beats += b.num;
+    }
+    const b = B[B.length - 1]; return { bar: B.length, beat: b.num, beats, bpm: b.bpm, num: b.num, den: b.den, end: true };
+  }
+  const songLen = () => SBX.bars.reduce((a, b) => a + barLen(b), 0);
+  const smpteStr = (c) => { if (c == null) return ['--:--:--', '--.--']; c = Math.max(0, c); const f = fps(), fr = Math.floor((c % 1) * f), bit = Math.floor(((c * f) % 1) * 80); return [`${String(Math.floor(c / 3600)).padStart(2, '0')}:${String(Math.floor(c / 60) % 60).padStart(2, '0')}:${String(Math.floor(c) % 60).padStart(2, '0')}`, `${String(fr).padStart(2, '0')}${FRS[SBX.frI][1] === '30DF' ? ';' : '.'}${String(bit).padStart(2, '0')}`]; };
+  const sbxEl = (id) => document.getElementById(id);
+  const sbxSet = (id, v) => { const e = sbxEl(id); if (e && e.textContent !== v) e.textContent = v; };
+  const sbxOn = (id, on) => { const e = sbxEl(id); if (e) e.setAttribute('opacity', on ? 1 : 0); };
+  const sbxLamp = (n, on) => { const g = sbxSvg && sbxSvg.querySelector(`[data-sbxl="${n}"]`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
+  function curBar() { const w = SBX.cur; return w && w.bar > 0 ? w.bar - 1 : 0; }
+  function sbxTap(now) {
+    const n = [2, 3, 4][SBX.resp];
+    if (SBX.taps.length && now - SBX.taps[SBX.taps.length - 1] > 2000) SBX.taps = [];
+    SBX.taps.push(now); if (SBX.taps.length > n) SBX.taps.shift();
+    if (SBX.src === 'int' && !SBX.intRun && SBX.taps.length === 1 && !SBX.rec) { /* first tap also arms START */ }
+    if (SBX.taps.length < n) { sbxMsg(`TAP ${SBX.taps.length}/${n}`); return; }
+    const d = (SBX.taps[SBX.taps.length - 1] - SBX.taps[0]) / (SBX.taps.length - 1), bpm = Math.max(30, Math.min(250, 60000 / d));
+    SBX.tempo = Math.round(bpm * 10) / 10;
+    if (SBX.rec && (SBX.locked || SBX.intRun)) { const b = curBar(); for (let i = b; i < SBX.bars.length; i++) SBX.bars[i].bpm = SBX.tempo; sbxMsg(`REC M${String(b + 1).padStart(3, '0')} ${SBX.tempo.toFixed(1)}`); }
+    else { if (SBX.src === 'int') SBX.bars.forEach((b) => { b.bpm = SBX.tempo; }); sbxMsg(`TEMPO ${SBX.tempo.toFixed(1)}`); }
+  }
+  function sbxPress(n, now = performance.now()) {
+    const d = /^d(\d)$/.exec(n);
+    if (d) {
+      if (SBX.mode === 'sig') { SBX.sigBuf += d[1]; if (SBX.sigBuf.length >= 2) { const num = +SBX.sigBuf[0] || 4, den = +SBX.sigBuf.slice(1) || 4; const b = SBX.mode === 'sig' ? (SBX.editMode ? SBX.editBar : curBar()) : 0; for (let i = b; i < SBX.bars.length; i++) { SBX.bars[i].num = num; SBX.bars[i].den = [2, 4, 8, 16].includes(den) ? den : 4; } SBX.mode = SBX.editMode ? 'edit' : ''; SBX.sigBuf = ''; sbxMsg(`TIME SIG ${num}/${den} FROM M${b + 1}`); } else sbxMsg(`TIME SIG ${SBX.sigBuf}/_`); return; }
+      SBX.entry = (SBX.entry + d[1]).slice(-4); sbxMsg(`ENTRY ${SBX.entry}`, 4); return;
+    }
+    switch (n) {
+      case 'clr': SBX.entry = ''; SBX.sigBuf = ''; if (SBX.mode === 'sig') SBX.mode = SBX.editMode ? 'edit' : ''; sbxMsg('CLEAR'); break;
+      case 'ent': {
+        const v = +SBX.entry; SBX.entry = '';
+        if (!v) { sbxMsg('ENTER A VALUE'); break; }
+        if (SBX.editMode) { SBX.bars[SBX.editBar].bpm = Math.max(30, Math.min(250, v)); sbxMsg(`M${SBX.editBar + 1} = ${SBX.bars[SBX.editBar].bpm} BPM`); }
+        else { SBX.tempo = Math.max(30, Math.min(250, v)); SBX.bars.forEach((b) => { b.bpm = SBX.tempo; }); sbxMsg(`TEMPO ${SBX.tempo} ALL MEASURES`); }
+        break;
+      }
+      case 'manual': SBX.src = 'int'; SBX.locked = false; sbxMsg('MANUAL · INTERNAL CLOCK'); break;
+      case 'smpte': SBX.src = 'smpte'; SBX.intRun = false; sbxMsg('EXT SMPTE · PLAY THE TAPE'); break;
+      case 'gen': SBX.gen = !SBX.gen; sbxMsg(SBX.gen ? 'SMPTE WRITE · ARM TRK 24 + REC' : 'SMPTE WRITE OFF'); break;
+      case 'start': { const c = tapeCode(tr.take); if (c == null) { sbxMsg('NO CODE HERE'); break; } SBX.offset = c; const [h] = smpteStr(c); sbxMsg(`BAR 1 = ${h}`); break; }
+      case 'play': if (SBX.src === 'int') { SBX.intRun = true; SBX.intBeats = -2 * SBX.bars[0].num; sbxMsg('COUNT IN · 2 MEASURES'); } else sbxMsg('ROLL THE TAPE TO LOCK'); break;
+      case 'stop': SBX.intRun = false; sbxMsg('STOP'); break;
+      case 'cont': if (SBX.src === 'int') { SBX.intRun = true; sbxMsg('CONTINUE'); } break;
+      case 'rec': SBX.rec = !SBX.rec; sbxMsg(SBX.rec ? 'TEMPO RECORD · TAP ALONG' : 'RECORD OFF'); break;
+      case 'edit': SBX.editMode = !SBX.editMode; SBX.mode = SBX.editMode ? 'edit' : ''; if (SBX.editMode) SBX.editBar = curBar(); sbxMsg(SBX.editMode ? `EDIT M${SBX.editBar + 1}` : 'EDIT OFF'); break;
+      case 'left': case 'right':
+        if (SBX.editMode) { SBX.editBar = Math.max(0, Math.min(SBX.bars.length - 1, SBX.editBar + (n === 'left' ? -1 : 1))); sbxMsg(`EDIT M${SBX.editBar + 1}`); }
+        else if (SBX.src === 'int') { const b = SBX.bars[0]; SBX.intBeats = Math.max(0, SBX.intBeats + (n === 'left' ? -b.num : b.num)); }
+        break;
+      case 'insert': { const b = SBX.editMode ? SBX.editBar : curBar(); SBX.bars.splice(b, 0, { ...SBX.bars[b] }); sbxMsg(`INSERT AT M${b + 1}`); break; }
+      case 'delete': { const b = SBX.editMode ? SBX.editBar : curBar(); if (SBX.bars.length > 1) SBX.bars.splice(b, 1); sbxMsg(`DELETE M${b + 1}`); break; }
+      case 'copy': { const b = SBX.editMode ? SBX.editBar : curBar(); for (let i = b + 1; i < SBX.bars.length; i++) SBX.bars[i] = { ...SBX.bars[b] }; sbxMsg(`COPY M${b + 1} TO END`); break; }
+      case 'sig': SBX.mode = 'sig'; SBX.sigBuf = ''; sbxMsg('TIME SIG: TWO DIGITS'); break;
+      case 'total': SBX.totalT = 3; break;
+      case 'save': try { localStorage.setItem('as-sbx-map', JSON.stringify({ bars: SBX.bars, offset: SBX.offset })); } catch (e) {} sbxMsg('SAVE ········ OK', 3); break;
+      case 'verify': { const c0 = tapeCode(0), cov = SBX.stripes.reduce((a, s) => a + (s.take1 - s.take0), 0) / tr.total; sbxMsg(c0 == null ? 'VERIFY · NO CODE AT HEAD' : `VERIFY OK · ${Math.round(cov * 100)}% STRIPED`, 3); break; }
+      case 'load': try { const sv = JSON.parse(localStorage.getItem('as-sbx-map') || 'null'); if (sv) { SBX.bars = sv.bars; SBX.offset = sv.offset ?? 2; sbxMsg('LOAD ········ OK', 3); } else sbxMsg('LOAD · NO DATA', 3); } catch (e) {} break;
+      case 'disp': SBX.disp = SBX.disp % 3 + 1; break;
+      case 'frame': SBX.frI = (SBX.frI + 1) % FRS.length; sbxMsg(`FRAME RATE ${FRS[SBX.frI][1]}`); break;
+      case 'tb': SBX.tbI = (SBX.tbI + 1) % TBS.length; sbxMsg(`TIME BASE ${TBS[SBX.tbI]} PULSES / QUARTER`); break;
+      case 'resp': SBX.resp = (SBX.resp + 1) % 3; sbxMsg(`TAP RESPONSE ${['QUICK (2)', 'MEDIUM (3)', 'SLOW (4)'][SBX.resp]}`); break;
+      case 'metro': SBX.metro = (SBX.metro + 0.2) % 1.2; break;
+      case 'audio': SBX.audio = (SBX.audio + 0.2) % 1.2; break;
+      case 'tap': sbxTap(now); break;
+    }
+  }
+  function sbxTick(dt, now) {
+    // ---- generator: print SMPTE to track 24 while the machine records with track 24 armed
+    const writing = SBX.gen && tr.mode === 'rec' && AL.ready.has(23) && tr.v > 0;
+    if (writing) { if (!SBX.seg) SBX.seg = { take0: tr.take, take1: tr.take, code0: tapeCode(tr.take) ?? 0, speed: tr.nominalSpeed }; /* continues the code already on tape, else 00:00:00:00 */ SBX.seg.take1 = tr.take; }
+    else if (SBX.seg) {
+      const s = SBX.seg; SBX.seg = null;
+      SBX.stripes = SBX.stripes.flatMap((o) => (o.take1 < s.take0 || o.take0 > s.take1) ? [o] : [...(o.take0 < s.take0 ? [{ ...o, take1: s.take0 }] : []), ...(o.take1 > s.take1 ? [{ ...o, take0: s.take1, code0: o.code0 + (s.take1 - o.take0) / o.speed }] : [])]).concat([s]);
+      if (s.take0 <= 0.5 && s.take1 >= tr.total * 0.9) SBX.stripes = [{ ...s, take0: 0 }];
+      sbxMsg('STRIPE DONE · VERIFY', 3);
+    }
+    // ---- reader / internal clock
+    const code = SBX.seg ? SBX.seg.code0 + (tr.take - SBX.seg.take0) / SBX.seg.speed : tapeCode(tr.take);
+    const fwd = (tr.mode === 'play' || tr.mode === 'rec') && tr.v > 0.5 * tr.nominalSpeed;
+    let ratio = 1, running = false;
+    if (SBX.src === 'smpte') {
+      const was = SBX.locked;
+      SBX.locked = code != null && fwd && !SBX.seg;
+      if (SBX.locked) { ratio = tr.v / tr.nominalSpeed; running = true; }
+      SBX.cur = where((code ?? SBX.offset) - SBX.offset);
+      if (SBX.locked && !was) sbxMsg(`LOCK · SONG POS ${Math.floor(Math.max(0, SBX.cur.beats) * 4)} · CONTINUE`);
+      if (!SBX.locked && was) sbxMsg('NO CODE · CLOCK STOPPED');
+    } else {
+      SBX.locked = false;
+      const b = SBX.bars[0];
+      if (SBX.intRun) { SBX.intBeats += dt * SBX.tempo / 60; running = true; }
+      const t = SBX.intBeats * 60 / SBX.tempo;
+      SBX.cur = SBX.intBeats < 0 ? { bar: 0, beat: Math.floor(SBX.intBeats + 2 * b.num) % b.num + 1, beats: SBX.intBeats, bpm: SBX.tempo, num: b.num, den: b.den } : { ...where(t), bpm: SBX.tempo };
+    }
+    const w = SBX.cur, bi = Math.floor(w.beats);
+    if (running && bi !== SBX.beatIx) { SBX.beatFlash = w.beat === 1 ? 0.14 : 0.08; }
+    SBX.beatIx = running ? bi : -1;
+    SBX.beatFlash = Math.max(0, SBX.beatFlash - dt);
+    const clkRate = running ? w.bpm / 60 * 24 * ratio : 0, tbRate = running ? w.bpm / 60 * TBS[SBX.tbI] * ratio : 0;
+    SBX.msgT = Math.max(0, SBX.msgT - dt); SBX.totalT = Math.max(0, SBX.totalT - dt);
+    // ---- rack readout
+    const [hms, frb] = smpteStr(code);
+    const bbStr = w.bar > 0 ? `${String(SBX.song).padStart(2, '0')} ${String(w.bar).padStart(3, '0')} ${w.beat}` : `${String(SBX.song).padStart(2, '0')} -${String(-Math.floor(w.beats / (w.num || 4)) || 0).padStart(2, '0')} ${w.beat}`;
+    sbxSet('rk-sbx-l', SBX.disp === 3 ? hms : bbStr); sbxSet('rk-sbx-r', SBX.disp === 3 ? frb : (w.bpm || 0).toFixed(1));
+    sbxOn('rk-sbx-lock', SBX.locked || SBX.intRun); sbxOn('rk-sbx-beat', SBX.beatFlash > 0);
+    if (!open || open.dataset.view !== 'sbx') return;
+    // ---- front panel
+    let L, R, LL, RL;
+    if (SBX.totalT > 0) { const T = songLen(); L = `${String(Math.floor(T / 60)).padStart(2, '0')}:${(T % 60).toFixed(1).padStart(4, '0')}`; R = `${SBX.bars.length}`; LL = 'TOTAL TIME   MIN : SEC'; RL = 'MEASURES'; }
+    else if (SBX.editMode) { const b = SBX.bars[SBX.editBar]; L = `E ${String(SBX.editBar + 1).padStart(3, '0')} ${b.num}/${b.den}`; R = SBX.entry ? SBX.entry : b.bpm.toFixed(1); LL = 'EDIT   MEASURE   TIME SIG'; RL = SBX.entry ? 'ENTRY' : 'TEMPO'; }
+    else if (SBX.disp === 3) { L = hms; R = frb; LL = 'HOUR    MIN    SEC'; RL = 'FRAME   BIT'; }
+    else if (SBX.disp === 2) { L = bbStr; R = `${w.num}/${w.den}`; LL = 'SONG   MEASURE   BEAT'; RL = 'TIME SIG'; }
+    else { L = bbStr; R = SBX.entry ? SBX.entry : (w.bpm || 0).toFixed(1); LL = 'SONG   MEASURE   BEAT'; RL = SBX.entry ? 'ENTRY' : 'TEMPO'; }
+    sbxSet('sbx-l', L); sbxSet('sbx-r', R); sbxSet('sbx-ll', LL); sbxSet('sbx-rl', RL);
+    sbxSet('sbx-msg', SBX.msgT > 0 ? SBX.msg : SBX.src === 'smpte' ? (SBX.locked ? `EXT SMPTE · LOCKED ${FRS[SBX.frI][1]} fps` : code == null ? 'EXT SMPTE · NO CODE' : 'EXT SMPTE · WAITING FOR TAPE') : (SBX.intRun ? 'MANUAL · RUNNING' : 'MANUAL'));
+    sbxSet('sbx-fr', FRS[SBX.frI][1]);
+    sbxOn('sbx-led-lock', SBX.locked); sbxOn('sbx-led-smpte', code != null && Math.abs(tr.v) > 0.05); sbxOn('sbx-led-gen', SBX.gen && (writing || Math.floor(now / 400) % 2 === 0));
+    sbxOn('sbx-led-clk', running && Math.floor(w.beats * 4) % 2 === 0); sbxOn('sbx-led-din', running && Math.floor(w.beats * 4) % 2 === 0); sbxOn('sbx-led-beat', SBX.beatFlash > 0); sbxOn('sbx-led-rec', SBX.rec && (running || Math.floor(now / 300) % 2 === 0));
+    [1, 2, 3].forEach((k) => sbxOn(`sbx-led-d${k}`, SBX.disp === k));
+    sbxLamp('manual', SBX.src === 'int'); sbxLamp('smpte', SBX.src === 'smpte'); sbxLamp('gen', SBX.gen); sbxLamp('play', running); sbxLamp('rec', SBX.rec); sbxLamp('stop', !running); sbxLamp('edit', SBX.editMode); sbxLamp('sig', SBX.mode === 'sig'); sbxLamp('total', SBX.totalT > 0); sbxLamp('tap', SBX.beatFlash > 0);
+    const knobAt = (id, frac) => { const e = sbxEl(id); if (e) e.setAttribute('transform', `rotate(${(-150 + 300 * frac).toFixed(1)} ${e.dataset.cx} ${e.dataset.cy})`); };
+    knobAt('sbx-k-tempo', (SBX.tempo - 40) / 210); knobAt('sbx-k-tb', SBX.tbI / 8); knobAt('sbx-k-metro', SBX.metro); knobAt('sbx-k-audio', SBX.audio);
+    const rs = sbxEl('sbx-resp'); if (rs) rs.setAttribute('y', 604 + SBX.resp * 50);
+    sbxSet('sbx-out', `OUTPUTS   MIDI CLOCK ${clkRate.toFixed(1)} /s   SONG POS ${Math.max(0, Math.floor(w.beats * 4))}   DIN SYNC ${running ? 'RUN' : 'STOP'}   TIME BASE ${TBS[SBX.tbI]} ppq = ${tbRate.toFixed(1)} /s   SMPTE ${hms}:${frb.slice(0, 2)}`);
+    const st = sbxEl('sbx-status'); if (st) st.textContent = SBX.locked ? `Locked to track 24 · ${(w.bpm * ratio).toFixed(1)} BPM at the tape's speed` : SBX.src === 'smpte' ? 'EXT SMPTE · roll the tape (Space) to lock' : 'MANUAL · internal clock';
+  }
+  if (sbxSvg) {
+    sbxSvg.querySelectorAll('[data-sbx]').forEach((g) => {
+      const n = g.dataset.sbx;
+      if (n === 'tempo') {
+        let y0 = null, t0 = 0;
+        g.addEventListener('pointerdown', (e) => { y0 = e.clientY; t0 = SBX.tempo; g.setPointerCapture(e.pointerId); });
+        g.addEventListener('pointermove', (e) => { if (y0 == null) return; SBX.tempo = Math.round(Math.max(40, Math.min(250, t0 + (y0 - e.clientY) / 2)) * 10) / 10; SBX.bars.forEach((b) => { if (SBX.src === 'int') b.bpm = SBX.tempo; }); sbxMsg(`TEMPO ${SBX.tempo.toFixed(1)}`); });
+        g.addEventListener('pointerup', () => { y0 = null; });
+        return;
+      }
+      g.addEventListener('pointerdown', (e) => { if (n === 'tap') { e.preventDefault(); sbxPress('tap', performance.now()); } });
+      g.addEventListener('click', () => { if (n !== 'tap') sbxPress(n); });
+    });
+  }
+  window.SBX = SBX; window.SBX_PRESS = sbxPress;
 
   // ---------------- tape machine view (iframe) mirrors this transport ----------------
   const STATE_KEYS = ['take', 'total', 'v', 'acc', 'mode', 'speedIPS', 'varispeed', 'shuttle', 'liftDefeat', 'pinch', 'lift', 'angleS', 'angleT', 'zero', 'endOfTape', 'locTarget'];
@@ -425,6 +595,7 @@
     const dt = Math.min(0.25, (now - last) / 1000); last = now;   // tape time keeps up with real time even on a slow frame
     tr.advance(dt);
     drawConsoleReels();
+    sbxTick(dt, now);
     if (document.body.dataset.studio === 'sls') drawA827();
     postState();
     if (open && open.dataset.view === 'al') alRender(now);

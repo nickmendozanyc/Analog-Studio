@@ -439,7 +439,7 @@ const capture = (fn) => { const st = out.length; fn(); return out.splice(st).joi
 const svgWrap = (w, h, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="position:absolute;left:0;top:0;overflow:visible">${body}</svg>`;
 const B3 = (st) => `position:absolute;transform-style:preserve-3d;${st}`;
 const scenes3d = [];
-const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'TAMB'];
+const tapeNames = ['KICK', 'SNR TOP', 'SNR BTM', 'HAT', 'TOM 1', 'TOM 2', 'FL TOM', 'OH L', 'OH R', 'ROOM L', 'ROOM R', 'BASS DI', 'BASS AMP', 'GTR 1', 'GTR 2', 'AC GTR', 'KEYS L', 'KEYS R', 'ORGAN', 'LEAD VOX', 'BGV 1', 'BGV 2', 'PERC', 'SMPTE'];
 const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + rnd() * 15));
 const readyTracks = new Set([19, 20, 21]);
 const LEG = '#ece7dc';   // legend colour on taupe
@@ -1103,6 +1103,18 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
       text(kx, 52, l, 14, '#cfcfcf', 'middle', 800);
     });
   });
+  // Rowan SBX-80 sync box (1U): two-tone grey, orange legends, green VFD readouts that follow the sync engine
+  globalThis.RACK_SBX_Y = RY + uy;
+  unit(1, '#3c3e42', (w, h) => {
+    rect(0, h * 0.62, w, h * 0.38, '#8b8d90');
+    text(22, 24, 'Rowan', 16, '#f0a040', 'start', 900, 'font-style="italic"');
+    text(22, 44, 'SBX-80 SYNC BOX', 10, '#f0a040', 'start', 800, 'letter-spacing="1"');
+    rect(138, 7, 196, 30, '#061513', 'rx="2"'); rect(138, 7, 196, 10, '#fff', 'opacity="0.04" rx="2"');
+    p(`<text id="rk-sbx-l" x="146" y="29" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" filter="url(#glowSm)">01 017 3</text>`);
+    p(`<text id="rk-sbx-r" x="326" y="29" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" text-anchor="end" filter="url(#glowSm)">96.0</text>`);
+    [['LOCK', 'rk-sbx-lock', '#4fe07a'], ['BEAT', 'rk-sbx-beat', '#ff6a3c']].forEach(([l, id, c], k) => { circle(354 + k * 34, 16, 4, '#2a2020'); p(`<circle id="${id}" cx="${354 + k * 34}" cy="16" r="4" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); text(354 + k * 34, 32, l, 8, '#f0a040', 'middle', 800); });
+    text(w - 20, 49, 'MIDI · DIN SYNC · SMPTE', 8, '#2a2b2d', 'end', 800, 'letter-spacing="1"');
+  });
   const slotsY = uy + 8; uy += 34;
   unit(1, '#1a1b1e', (w, h) => {
     rect(30, 6, w - 60, h - 12, '#26292e', 'rx="3"');
@@ -1110,7 +1122,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(96, 35, 'Plate Reverb', 16, '#e8e4d8', 'start', 600);
     text(w - 44, 35, 'AUX 2 ▸', 14, '#e8c34a', 'end', 800);
   });
-  for (let k = 0; k < 2; k++) unit(1, '#121315', (w, h) => {
+  for (let k = 0; k < 1; k++) unit(1, '#121315', (w, h) => {
     rect(30, 6, w - 60, h - 12, 'none', 'rx="3" stroke="#5a5c60" stroke-width="1.5" stroke-dasharray="6 5"');
     text(w / 2, 35, '+ drop a VST3 / AU plugin', 14, '#8a877c', 'middle', 700);
   });
@@ -1260,6 +1272,7 @@ const alView = capture(() => {
   text(ox + AL_W * K / 2, oy + AL_H * K + 120, 'Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD', 28, '#d9d3c7', 'middle', 600);
   text(ox + AL_W * K / 2, oy + AL_H * K + 170, 'Keyboard: Space play/stop · , rewind · . fast forward · Z return to zero · R record · digits + L locate', 26, '#a9a293', 'middle', 600);
 });
+const sbxView = require('./sbx.js')({ p, rect, text, circle, capture }, { W, OVH });
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
@@ -1340,9 +1353,11 @@ ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
 ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
+${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}
 ${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>')}
+${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span>')}
 ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
 ${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
