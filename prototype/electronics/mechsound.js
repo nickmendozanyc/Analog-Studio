@@ -11,12 +11,14 @@
 // Every number here is (approx): voiced by ear to sound like a large two-inch deck, not measured from a JH-24.
 
 export const MECH = {
-  slots: 48,          // motor armature slots: whine = turns/s x slots (about 1.1 kHz at full wind)
-  rise: 0.35,         // extra pitch climb with speed (0 = strictly proportional): the whine rises high in a wind
+  slots: 132,         // whine = turns/s x slots x climb: about 3 kHz at full wind (motor commutation + servo, voiced by ear)
+  rise: 0.45,         // extra pitch climb with speed (0 = strictly proportional): the whine rises high in a wind
+  rough: 0.5,         // share of the whine that is a narrow band of noise (brushes, bearings) rather than a clean tone
+  jitter: 0.004,      // the motor's speed wander (fraction), at a few Hz plus once per turn
   poles: 4,
-  whine: 0.0035,      // whine level at full wind speed (linear, the machine level scales everything)
+  whine: 0.0050,      // whine level at full wind speed (linear, the machine level scales everything)
   load: 0.0010,       // extra whine per m/s^2 of reel acceleration
-  air: 0.035,         // tape and air rush at full wind speed
+  air: 0.022,         // tape and air rush at full wind speed
   rumble: 0.020,
   clunk: 0.22,
   flap: 0.16,
@@ -26,7 +28,8 @@ export const MECH = {
 export class MechSound {
   constructor(fs, cfg = MECH) {
     this.fs = fs; this.c = cfg;
-    this.ph = [0, 0, 0, 0];           // supply / take-up motor phases (turns), and their slot phases
+    this.ph = [0, 0, 0, 0];           // supply / take-up reel phases (turns), tail-flap phase
+    this.mph = [0, 0]; this.bq = [null, null];   // whine phases, noise-band filters
     this.rng = 0x2545f491;
     this.bp = [0, 0, 0, 0];           // band-pass state (air), low-pass state (rumble)
     this.ev = [];                     // clunks and flaps: { t, f1, f2, a, d }
@@ -49,24 +52,39 @@ export class MechSound {
     this.eot = s.endOfTape;
     this.v = s.v; this.rS = s.rS; this.rT = s.rT; this.acc = s.acc || 0; this.lift = s.lift ?? this.lift;
   }
+  // a resonant band (Q ~ 18) of noise at frequency f: the motor's roughness around its whine
+  tuneBand(m, f) {
+    const fs = this.fs, w = 2 * Math.PI * Math.min(f, fs * 0.45) / fs, alpha = Math.sin(w) / (2 * 18), a0 = 1 + alpha;
+    this.bq[m] = { b0: (alpha * 4.5) / a0, a1: -2 * Math.cos(w) / a0, a2: (1 - alpha) / a0, s: this.bq[m] ? this.bq[m].s : [0, 0, 0, 0] };
+  }
+  bandOut(m) {
+    const q = this.bq[m]; if (!q) return 0; const x = this.noise(), z = q.s;
+    const y = q.b0 * x - q.b0 * z[1] - q.a1 * z[2] - q.a2 * z[3]; z[1] = z[0]; z[0] = x; z[3] = z[2]; z[2] = y; return y;
+  }
   // add the machine's sound into L / R (the machine sits slightly left of centre in the room)
   render(L, R, level) {
     const c = this.c, fs = this.fs, n = L.length, av = Math.abs(this.v), x = Math.min(1.2, av / c.vMax);
     const climb = 1 + c.rise * (x - 1), fS = av / (2 * Math.PI * (this.rS || 0.1)) * climb, fT = av / (2 * Math.PI * (this.rT || 0.1)) * climb;   // turns per second, with the climb
+    this.tuneBand(0, fS * c.slots); this.tuneBand(1, fT * c.slots);
     const wl = level * (c.whine * Math.pow(x, 1.1) + c.load * Math.abs(this.acc) * Math.min(1, x * 4));
     const al = level * c.air * x * x, rl = level * c.rumble * Math.min(1, x * 1.5);
     // air: a resonant band rising with speed
-    const fc = 500 + 2200 * x, q = 0.7, w = 2 * Math.PI * fc / fs, alpha = Math.sin(w) / (2 * q), cw = Math.cos(w), a0 = 1 + alpha;
+    const fc = 350 + 1050 * x, q = 0.8, w = 2 * Math.PI * fc / fs, alpha = Math.sin(w) / (2 * q), cw = Math.cos(w), a0 = 1 + alpha;
     const b0 = alpha / a0, a1 = -2 * cw / a0, a2 = (1 - alpha) / a0, lpk = 1 - Math.exp(-2 * Math.PI * 140 / fs);
     for (let k = 0; k < n; k++) {
       let y = 0;
       if (av > 0.02) {
-        // motors: slot whine + a softer pole cogging, each reel its own pitch
+        // motors: each a slightly unsteady tone (speed wander + once-per-turn wobble), inharmonic partials, and a
+        // narrow band of noise riding on the same pitch: real motors sound rough, not like a sine wave
         this.ph[0] += fS / fs; this.ph[1] += fT / fs;
-        const s1 = Math.sin(2 * Math.PI * this.ph[0] * c.slots), s2 = Math.sin(2 * Math.PI * this.ph[1] * c.slots);
-        const g1 = Math.sin(2 * Math.PI * this.ph[0] * c.poles * 2), g2 = Math.sin(2 * Math.PI * this.ph[1] * c.poles * 2);
-        y += wl * (s1 + 0.2 * Math.sin(4 * Math.PI * this.ph[0] * c.slots) + 0.15 * g1);
-        y += wl * 0.85 * (s2 + 0.2 * Math.sin(4 * Math.PI * this.ph[1] * c.slots) + 0.15 * g2);
+        this.wob = (this.wob || 0) + (this.noise() * 0.02 - (this.wob || 0)) * (6 / fs);   // slow random wander
+        for (let m = 0; m < 2; m++) {
+          const P = this.ph[m], j = 1 + c.jitter * (Math.sin(2 * Math.PI * P) + 25 * this.wob * (m ? -1 : 1));
+          this.mph[m] += (m ? fT : fS) * c.slots * j / fs;
+          const q = this.mph[m] * 2 * Math.PI, g = (m ? 0.8 : 1) * wl * (1 - c.rough);
+          y += g * (Math.sin(q) + 0.32 * Math.sin(2.003 * q + 0.7) + 0.16 * Math.sin(2.98 * q + 1.9));
+        }
+        y += wl * c.rough * (this.bandOut(0) + 0.8 * this.bandOut(1)) * (1 + 0.25 * Math.sin(2 * Math.PI * this.ph[0]));
         // tape and air, pulsing with each reel's turn
         const nz = this.noise();
         const yb = b0 * nz - b0 * this.bp[1] - a1 * this.bp[2] - a2 * this.bp[3];
