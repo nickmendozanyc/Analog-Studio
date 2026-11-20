@@ -22,6 +22,7 @@
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
+    if (v === 'elec') elShowTrims();
   }
   function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
@@ -42,7 +43,8 @@
       for (const n of needles) {
         const b = base[n.i] ?? -12;
         // program-like level: phrases, beats and a little noise around the track's level
-        const lvl = b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
+        const live = window.JH24_VU;   // the electronics are powered: real line-output levels
+        const lvl = live ? live[n.i] ?? -40 : b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
         const target = vuAngle(lvl);
         n.a += (target - n.a) * (1 - Math.exp(-dt / 0.065));   // ~300 ms to 99%, like a VU movement
         n.g.setAttribute('transform', `rotate(${n.a.toFixed(2)} ${n.cx} ${n.cy})`);
@@ -768,6 +770,7 @@
       else if (tr.mode !== 'play' && tr.mode !== 'locate') AL.rep = false;
     }
     if ((open && open.dataset.view === 'al') || document.body.dataset.studio !== 'sls') alRender(now);   // the studio-view face mirrors it too
+    elecTick();
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests

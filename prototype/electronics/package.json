@@ -1,0 +1,1 @@
+{ "name": "jh24-electronics", "private": true, "type": "module", "scripts": { "test": "node --test" } }

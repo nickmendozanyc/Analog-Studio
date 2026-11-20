@@ -59,3 +59,5 @@ AutoLocator III (2.2.4, 2.2.5, 2.3.3):
 - AL-III now follows section 2: STO stores the locate position, ← / → shift between the displays, 8/9/REP loop,
   MODE (FIX / VAR), TVI (held: ips and ¼-semitone pitch), TAPE SPEED pot. The A.PLAY and LOC 0 keys are gone
   (Z still returns to zero from the keyboard).
+- Audio electronics (section 4) are modelled in `prototype/electronics/` and run live in the mockup (AUDIO ELECTRONICS
+  plate on the cabinet front).

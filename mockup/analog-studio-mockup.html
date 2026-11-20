@@ -35,6 +35,49 @@
   .sls-area{position:absolute;border:2px dashed #4a4744;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#cfc8b8;font-family:Archivo,Arial,sans-serif;text-align:center;background:rgba(255,255,255,.02)}
   .sls-area b{font-size:44px;font-weight:900;letter-spacing:4px;color:#ece6da}
   .sls-area span{font-size:22px;font-weight:600;color:#9c9384;max-width:80%}
+
+  #elec{position:absolute;inset:0;padding:18px 24px;box-sizing:border-box;font-family:Archivo,Arial,sans-serif;color:#e8e2d4;background:linear-gradient(180deg,#24211f,#171514)}
+  #elec .eltop{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:17px;font-weight:800;letter-spacing:1px}
+  #elec label{display:flex;gap:8px;align-items:center;color:#cfc6b3}
+  #elec select{font:700 16px Archivo,Arial;background:#0f0e0d;color:#f0e8d6;border:1px solid #5a534c;border-radius:4px;padding:5px 6px}
+  #elec input[type=range]{width:180px}
+  #elec .sep{width:1px;height:30px;background:#4a4440}
+  #elec button{font:800 16px Archivo,Arial;letter-spacing:1px;border-radius:5px;border:1px solid #6b635b;background:#e9e3d3;color:#1d1a16;padding:8px 14px;cursor:pointer}
+  #elec button.t.on{background:#ffcf5a;box-shadow:0 0 12px rgba(255,190,60,.5)}
+  #elec button.pw{background:#3a1512;color:#ffb3a6;border-color:#7a2b22;min-width:120px}
+  #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
+  #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
+  #elec .drs{display:flex;gap:18px}
+  #elec .dr{flex:1 1 0;min-width:0;background:linear-gradient(180deg,#3a3633,#2a2725);border:2px solid #0c0b0a;border-radius:8px;padding:8px}
+  #elec .drh{font:900 20px Archivo,Arial;letter-spacing:2.5px;color:#d9d2c2;margin:2px 4px 8px}
+  #elec .drc{display:flex;gap:6px}
+  #elec .ch{flex:1;min-width:0;background:#1d1c1a;border-radius:5px;padding:6px;display:flex;flex-direction:column;gap:9px}
+  #elec .chh{display:flex;gap:6px;align-items:baseline;font-size:15px}
+  #elec .chh b{font-size:28px;color:#fff}
+  #elec .chh .nm{flex:1;font-size:16px;color:#bdb4a2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #elec .chh .src{font:800 16px 'JetBrains Mono',monospace;padding:3px 6px;border-radius:3px;background:#2d4a77;color:#dfe9ff}
+  #elec .chh .src.in{background:#7a5a12;color:#ffe6a8}#elec .chh .src.cue{background:#1f6b3a;color:#c9ffd9}
+  #elec .vub{position:relative;height:14px;background:#0b0a09;border-radius:2px;overflow:hidden}
+  #elec .vub i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#3fbf5c 0 70%,#ffd23a 70% 87%,#ff3b2f 87%)}
+  #elec .vub s{position:absolute;left:87%;top:0;bottom:0;width:1px;background:#fff;opacity:.6}
+  #elec .keys{display:flex;gap:3px}
+  #elec .keys .k{flex:1;min-width:0;padding:8px 0;font-size:12px;letter-spacing:.5px}
+  #elec .keys .k.on{background:#7dff9a}#elec .keys .solo.on{background:#ffd23a}
+  #elec .cd{background:linear-gradient(180deg,#1f5b3b,#174630);border:1px solid #0b2a1b;border-radius:5px;padding:7px 3px 9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 4px}
+  #elec .cd.out{grid-template-columns:1fr}
+  #elec .cn{grid-column:1/-1;font:900 15px Archivo,Arial;letter-spacing:1.5px;color:#d7f2df}
+  #elec .tr{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:ns-resize;user-select:none;touch-action:none}
+  #elec .scr{width:38px;height:38px;border-radius:3px;background:linear-gradient(135deg,#3f7fd1,#1f4f96);position:relative;box-shadow:inset 0 0 0 1px #0d2a52}
+  #elec .scr b{position:absolute;left:8px;top:8px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f4e2a0,#a88a3a);transform:rotate(0deg)}
+  #elec .scr b::after{content:'';position:absolute;left:10px;top:2px;width:3px;height:18px;background:#4a3a14}
+  #elec .tl{font:800 13px Archivo,Arial;color:#e6f5ea;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip}
+  #elec .tv{font:700 14px 'JetBrains Mono',monospace;color:#fff6d0}
+  #elec .sw{grid-column:1/-1;padding:7px 0 !important;font-size:15px !important}
+  #elec .sw.alt{background:#ff8a5a !important}
+  .el-plate{position:absolute;z-index:40;display:flex;gap:8px;align-items:center;padding:6px 14px;border-radius:5px;background:#141211;border:1px solid #4a4440;color:#e8e2d4;font:900 15px Archivo,Arial;letter-spacing:2px;cursor:pointer}
+  .el-plate i{width:10px;height:10px;border-radius:50%;background:#4a1a14}
+  .el-plate.on i{background:#ff3b2f;box-shadow:0 0 10px #ff3b2f}
+
 </style></head><body><div id="stage">
 <svg id="room-svg" xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
 <defs>
@@ -95761,8 +95804,223 @@
 <div class="hot" data-open="224" style="left:2857px;top:1280px;width:296px;height:462px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
 <div class="hot" data-open="patchbay" style="left:3340px;top:1134px;width:450px;height:116px" title="Open the patchbay"><span>Open the patchbay</span></div>
 <div class="hot" data-open="sbx" style="left:3340px;top:910px;width:450px;height:56px" title="Open the SBX-80 sync box"><span>Open the SBX-80 sync box</span></div>
+<div class="el-plate" data-open="elec" id="el-plate" style="left:664px;top:624px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 <div class="hot" data-open="patchbay" style="left:3480px;top:8px;width:160px;height:40px" title="Open the patchbay"><span>Open the patchbay</span></div>
 <div class="overlay" id="ov-tape" data-view="tape" hidden><div class="ov-bar"><b>CMI HJ-24 · 24 TRACK</b><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe></div></div>
+<div class="overlay" id="ov-elec" data-view="elec" hidden><div class="ov-bar"><b>CMI HJ-24 · AUDIO ELECTRONICS</b><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><div id="elec">
+  <div class="eltop">
+    <button type="button" id="el-power" class="pw" title="JH-24D audio power supply: starts the audio engine">POWER</button>
+    <label>MONITOR <input id="el-gain" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+    <button type="button" id="el-mute" class="t">MUTE</button>
+    <span class="sep"></span>
+    <label>OSCILLATOR <select id="el-osc-f"><option value="100">100 Hz</option><option value="1000" selected>1 kHz</option><option value="10000">10 kHz</option><option value="15000">15 kHz</option></select> <select id="el-osc-db"><option value="-10">-10 VU</option><option value="0" selected>0 VU</option><option value="4">+4 VU</option><option value="12.4">MOL +12.4</option></select> <select id="el-osc-to"><option value="off" selected>OFF</option><option value="ready">TO READY TRACKS</option><option value="all">TO ALL INPUTS</option></select></label>
+    <label>ALIGNMENT TAPE <select id="el-mrl"><option value="off" selected>OFF</option><option value="1000">1 kHz level</option><option value="10000">10 kHz</option><option value="15000">15 kHz</option><option value="100">100 Hz</option><option value="50">50 Hz</option></select> <select id="el-mrl-std"><option value="NAB" selected>NAB tape</option><option value="IEC">IEC tape</option></select></label>
+    <button type="button" id="el-align" class="t" title="Section 7: repro to the alignment tape, bias peak + overbias, record level and HF, on every channel">ALIGN ALL</button>
+    <span class="sep"></span>
+    <label>OPERATING LEVEL <select id="el-ol"><option value="185">185 nWb/m</option><option value="250" selected>250 nWb/m</option><option value="320">320 nWb/m</option><option value="370">370 nWb/m</option></select></label>
+    <button type="button" id="el-quior" class="t on" title="QUIOR: erase / bias delay and ramps on punch-in and punch-out (bias card jumper)">QUIOR</button>
+    <button type="button" id="el-hiss" class="t on">TAPE HISS</button>
+    <button type="button" id="el-wf" class="t on">WOW &amp; FLUTTER</button>
+    <span class="sep"></span>
+    <button type="button" id="el-load" class="t" title="Load a tape transfer: one file per track (numbered names) or one 24-channel file; starts at the counter zero">LOAD TRANSFER</button>
+    <button type="button" id="el-live" class="t" title="Your computer's audio input into the record-ready tracks">LIVE IN</button>
+    <input id="el-file" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" multiple hidden>
+  </div>
+  <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
+  <div class="drs"><div class="dr"><div class="drh">DRAWER 1 · CHANNELS 1–8</div><div class="drc"><div class="ch" data-ch="0">
+    <div class="chh"><b>1</b><span class="nm">KICK</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="1">
+    <div class="chh"><b>2</b><span class="nm">SNR TOP</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="2">
+    <div class="chh"><b>3</b><span class="nm">SNR BTM</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="3">
+    <div class="chh"><b>4</b><span class="nm">HAT</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="4">
+    <div class="chh"><b>5</b><span class="nm">TOM 1</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="5">
+    <div class="chh"><b>6</b><span class="nm">TOM 2</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="6">
+    <div class="chh"><b>7</b><span class="nm">FL TOM</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="7">
+    <div class="chh"><b>8</b><span class="nm">OH L</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div></div></div><div class="dr"><div class="drh">DRAWER 2 · CHANNELS 9–16</div><div class="drc"><div class="ch" data-ch="8">
+    <div class="chh"><b>9</b><span class="nm">OH R</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="9">
+    <div class="chh"><b>10</b><span class="nm">ROOM L</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="10">
+    <div class="chh"><b>11</b><span class="nm">ROOM R</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="11">
+    <div class="chh"><b>12</b><span class="nm">BASS DI</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="12">
+    <div class="chh"><b>13</b><span class="nm">BASS AMP</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="13">
+    <div class="chh"><b>14</b><span class="nm">GTR 1</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="14">
+    <div class="chh"><b>15</b><span class="nm">GTR 2</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="15">
+    <div class="chh"><b>16</b><span class="nm">AC GTR</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div></div></div><div class="dr"><div class="drh">DRAWER 3 · CHANNELS 17–24</div><div class="drc"><div class="ch" data-ch="16">
+    <div class="chh"><b>17</b><span class="nm">KEYS L</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="17">
+    <div class="chh"><b>18</b><span class="nm">KEYS R</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="18">
+    <div class="chh"><b>19</b><span class="nm">ORGAN</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="19">
+    <div class="chh"><b>20</b><span class="nm">LEAD VOX</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="20">
+    <div class="chh"><b>21</b><span class="nm">BGV 1</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="21">
+    <div class="chh"><b>22</b><span class="nm">BGV 2</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="22">
+    <div class="chh"><b>23</b><span class="nm">PERC</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div><div class="ch" data-ch="23">
+    <div class="chh"><b>24</b><span class="nm">SMPTE</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    <div class="cd rep"><div class="cn">REPRODUCE</div><div class="tr" data-key="reproHf" data-ips="30" title="&lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproHf" data-ips="15" title="&lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="30" title="&gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLf" data-ips="15" title="&gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">&gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="reproLvl" title="LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">LVL</span><span class="tv">0.0</span></div><button type="button" class="sw" data-key="std" data-a="NAB" data-b="IEC">NAB</button></div>
+    <div class="cd out"><div class="cn">OUTPUT</div><button type="button" class="sw" data-key="biasDefeat" data-a="NORMAL" data-b="B.DEFEAT">NORMAL</button></div>
+    <div class="cd rc"><div class="cn">RECORD / CUE</div><div class="tr" data-key="inCal" title="IN CAL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">IN CAL</span><span class="tv">0.0</span></div><div class="tr" data-key="calRec" title="CAL REC · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CAL REC</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="30" title="REC &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="recHf" data-ips="15" title="REC &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">REC &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="30" title="CUE &lt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueHf" data-ips="15" title="CUE &lt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &lt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="30" title="CUE &gt; 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 30</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLf" data-ips="15" title="CUE &gt; 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE &gt; 15</span><span class="tv">0.0</span></div><div class="tr" data-key="cueLvl" title="CUE LVL · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">CUE LVL</span><span class="tv">0.0</span></div><div class="tr" data-key="crossfeed" title="X-FEED · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">X-FEED</span><span class="tv">0.0</span></div></div>
+    <div class="cd bias"><div class="cn">BIAS</div><div class="tr" data-key="bias" data-ips="30" title="BIAS 30 (HI speed, 30 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 30</span><span class="tv">0.0</span></div><div class="tr" data-key="bias" data-ips="15" title="BIAS 15 (LO speed, 15 ips) · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">BIAS 15</span><span class="tv">0.0</span></div></div>
+  </div></div></div></div>
+</div></div></div>
 <div class="overlay" id="ov-al" data-view="al" hidden><div class="ov-bar"><b>CMI AUTOLOCATOR III</b><span class="ov-msg" id="al-msg">Ready</span><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg id="alSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none"><rect x="0" y="0" width="3840" height="2104" fill="url(#wall)" />
 <rect x="0" y="0" width="94" height="2104" fill="url(#woodH)" opacity="0.3"/>
 <rect x="94" y="0" width="2" height="2104" fill="#000" opacity="0.6"/>
@@ -99801,6 +100059,405 @@ class Transport {
 
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
+<script type="text/plain" id="jh24-worklet-src">// HJ-24 (MCI JH-24) audio electronics model: every channel's Record/Cue, Reproduce, Output and Bias boards, the
+// erase / record / reproduce heads and the tape between them. Renderer-independent: plain sample loops over
+// Float32Arrays, so the same code runs in an AudioWorklet in the mockup, in Node tests, and ports 1:1 to the C++ engine.
+//
+// Signal flow follows the manual's block diagrams (JH-24 manual, section 4, figures 4-1 and 4-2):
+//   LINE IN ─ balanced input amp ─┬─ IN CAL ─────────────────────────────────────────────────┐
+//                                 └─ CAL REC ─ record HF EQ (<, per speed) ─ bias / tape ─ RECORD HEAD   │
+//   ERASE HEAD (105 kHz)  ←  QUIOR: erase on, bias delayed by the erase→record head distance, both ramped │
+//   RECORD/CUE HEAD (sync) ─ cue relay ─ cue preamp (+ cross-feed cancel) ─ cue EQ (<, >) ─ CUE LVL ──┤ output module:
+//   REPRO HEAD ─ repro preamp ─ repro EQ (<, >, per speed) ─ REPRO LVL ────────────────────────────────┤ FET select
+//                                                                                                       └─ line out, VU
+// Units: audio samples where 0 VU (line level, +4 dBu) is -18 dBFS rms. On tape, 1.0 = the peak flux of a 0 VU sine
+// at the machine's operating level (default 250 nWb/m). Numbers marked (approx) are plausible values, not MCI data.
+
+const VU0 = 10 ** (-18 / 20) * Math.SQRT2;   // peak amplitude of a 0 VU sine in the audio buffers
+const IPS = 0.0254;
+// head stack geometry: distances along the tape path (m), erase → record → reproduce (approx)
+const HEADS = { eraseToRecord: 0.0381, recordToRepro: 0.0381 };
+// per speed: losses and responses of heads and tape (approx; tuned so a factory-aligned channel is flat 30 Hz–20 kHz)
+const SPEED = {
+  7.5: { gap: 18000, cueGap: 8000, tape: 13000, bump: 32, bumpDb: 2.5, shelf: 6000, hissDb: -50, overbias: 3.5, ramp: 0.04 },
+  15: { gap: 30000, cueGap: 12000, tape: 22000, bump: 50, bumpDb: 2.5, shelf: 8000, hissDb: -54, overbias: 3.0, ramp: 0.03 },
+  30: { gap: 40000, cueGap: 18000, tape: 30000, bump: 85, bumpDb: 2.0, shelf: 10000, hissDb: -58, overbias: 2.0, ramp: 0.015 },
+};
+const SPEEDS = [7.5, 15, 30];
+// equalisation standards, playback time constants (s). The JH-24's HI speed (30 ips) is AES; LO switches NAB / IEC.
+const STANDARD = {
+  NAB: { 7.5: [50e-6, 3180e-6], 15: [50e-6, 3180e-6], 30: [17.5e-6, 0] },
+  IEC: { 7.5: [70e-6, 0], 15: [35e-6, 0], 30: [17.5e-6, 0] },
+};
+// level of an alignment-tape tone recorded to standard A, reproduced by a machine set to standard B (dB)
+function standardOffset(a, b, ips, f) {
+  const c = (std) => { const [th, tl] = STANDARD[std][ips], w = 2 * Math.PI * f, w1 = 2 * Math.PI * 1000; const g = (w) => Math.sqrt(1 + (w * th) ** 2) / (tl ? Math.sqrt(1 + 1 / (w * tl) ** 2) : 1); return g(w) / g(w1); };
+  return 20 * Math.log10(c(b) / c(a));
+}
+
+// ---------------------------------------------------------------- filters (RBJ biquads, direct form 1)
+class Biquad {
+  constructor() { this.b0 = 1; this.b1 = 0; this.b2 = 0; this.a1 = 0; this.a2 = 0; this.x1 = this.x2 = this.y1 = this.y2 = 0; }
+  set(type, fs, f, q = 0.707, db = 0) {
+    f = Math.min(f, fs * 0.45);
+    const A = 10 ** (db / 40), w = 2 * Math.PI * f / fs, cs = Math.cos(w), sn = Math.sin(w), al = sn / (2 * q);
+    let b0, b1, b2, a0, a1, a2;
+    if (type === 'lp') { b0 = (1 - cs) / 2; b1 = 1 - cs; b2 = b0; a0 = 1 + al; a1 = -2 * cs; a2 = 1 - al; }
+    else if (type === 'hp') { b0 = (1 + cs) / 2; b1 = -(1 + cs); b2 = b0; a0 = 1 + al; a1 = -2 * cs; a2 = 1 - al; }
+    else if (type === 'peak') { b0 = 1 + al * A; b1 = -2 * cs; b2 = 1 - al * A; a0 = 1 + al / A; a1 = -2 * cs; a2 = 1 - al / A; }
+    else if (type === 'hs' || type === 'ls') {
+      const s = type === 'hs' ? 1 : -1, sq = 2 * Math.sqrt(A) * al;
+      b0 = A * ((A + 1) + s * (A - 1) * cs + sq); b1 = -2 * s * A * ((A - 1) + s * (A + 1) * cs); b2 = A * ((A + 1) + s * (A - 1) * cs - sq);
+      a0 = (A + 1) - s * (A - 1) * cs + sq; a1 = 2 * s * ((A - 1) - s * (A + 1) * cs); a2 = (A + 1) - s * (A - 1) * cs - sq;
+    }
+    this.b0 = b0 / a0; this.b1 = b1 / a0; this.b2 = b2 / a0; this.a1 = a1 / a0; this.a2 = a2 / a0;
+    return this;
+  }
+  run(x) { const y = this.b0 * x + this.b1 * this.x1 + this.b2 * this.x2 - this.a1 * this.y1 - this.a2 * this.y2; this.x2 = this.x1; this.x1 = x; this.y2 = this.y1; this.y1 = y; return y; }
+  mag(f, fs) {   // |H(e^jw)|
+    const w = 2 * Math.PI * f / fs, c1 = Math.cos(w), s1 = Math.sin(w), c2 = Math.cos(2 * w), s2 = Math.sin(2 * w);
+    const nr = this.b0 + this.b1 * c1 + this.b2 * c2, ni = -(this.b1 * s1 + this.b2 * s2), dr = 1 + this.a1 * c1 + this.a2 * c2, di = -(this.a1 * s1 + this.a2 * s2);
+    return Math.sqrt((nr * nr + ni * ni) / (dr * dr + di * di));
+  }
+}
+const chainMag = (fl, f, fs) => fl.reduce((m, b) => m * b.mag(f, fs), 1);
+const dB = (x) => 20 * Math.log10(Math.max(x, 1e-12));
+const gain = (d) => 10 ** (d / 20);
+
+// ---------------------------------------------------------------- tape: per track, pieces of recorded flux by position
+// A piece is a run of samples written while the tape moved at du metres per sample, starting at coordinate u0 (metres
+// from the head of the tape; the point under the repro head is the transport's `take`). lo / hi clip it where it was
+// erased later, with linear fades (the erase head's ramp). `post` pieces are transfers loaded from audio files: they hold
+// what the tape already sounds like reproduced, so they skip the head / EQ models.
+class Piece {
+  constructor(u0, du, post = false) { this.u0 = u0; this.du = du; this.post = post; this.chunks = [new Float32Array(1 << 15)]; this.n = 0; this.lo = -Infinity; this.hi = Infinity; this.fadeLo = 0; this.fadeHi = 0; }
+  push(x) { const c = this.n >> 15; if (c >= this.chunks.length) this.chunks.push(new Float32Array(1 << 15)); this.chunks[c][this.n & 32767] = x; this.n++; }
+  get end() { return this.u0 + this.n * this.du; }
+  set(i, x) { this.chunks[i >> 15][i & 32767] = x; }
+  // write the flux under the head at coordinate u: the piece is indexed by position (du per cell), so speed changes
+  // (vari-speed, the transport easing) just write cells faster or slower, linearly filled between samples
+  write(u, x) {
+    const j = Math.round((u - this.u0) / this.du);
+    if (j < 0) return;
+    if (this.n === 0 || j < this.n) { while (this.n <= j) this.push(x); this.set(j, x); return; }
+    const last = this.at(this.n - 1), from = this.n - 1, span = j - from;
+    for (let q = 1; q <= span; q++) this.push(last + (x - last) * q / span);
+  }
+  at(i) { return this.chunks[i >> 15][i & 32767]; }
+  read(u) {
+    if (u < this.lo || u > this.hi) return 0;
+    const p = (u - this.u0) / this.du; if (p < 0 || p > this.n - 1) return 0;
+    const i = Math.floor(p), fr = p - i, x = this.at(i) + (i + 1 < this.n ? (this.at(i + 1) - this.at(i)) * fr : 0);
+    let w = 1;
+    if (this.fadeLo > 0 && u < this.lo + this.fadeLo) w *= (u - this.lo) / this.fadeLo;
+    if (this.fadeHi > 0 && u > this.hi - this.fadeHi) w *= (this.hi - u) / this.fadeHi;
+    return x * w;
+  }
+  clone() { const q = Object.assign(Object.create(Piece.prototype), this); return q; }
+}
+class Track {
+  constructor() { this.pieces = []; }
+  read(u, post) { let s = 0; for (const p of this.pieces) if (p.post === post && u >= p.lo && u <= p.hi && u >= p.u0 && u <= p.end) s += p.read(u); return s; }
+  // erase [a, b): pieces fade out over `ramp` after a and fade back in over `ramp` before b (the erase head's ramps)
+  erase(a, b, ramp, except = null) {
+    if (b < a + ramp) return;   // still inside the erase head's ramp-up: nothing fully erased yet
+    const out = [];
+    for (const p of this.pieces) {
+      if ((except && p.owner === except) || p.end <= a || p.u0 >= b || p.hi <= a || p.lo >= b) { out.push(p); continue; }
+      if (p.lo < a) { const l = p.clone(); l.hi = Math.min(p.hi, a + ramp); l.fadeHi = ramp; out.push(l); }
+      if (p.hi > b) { const r = p.clone(); r.lo = Math.max(p.lo, b - ramp); r.fadeLo = ramp; out.push(r); }
+    }
+    this.pieces = out;
+  }
+}
+
+// ---------------------------------------------------------------- one channel's boards
+// trims (the 18-turn pots and switches on the cards), per speed where the board switches networks with HI EQ / LO EQ
+function defaultTrims() {
+  const per = (v) => ({ 7.5: v, 15: v, 30: v });
+  return {
+    std: 'NAB',                 // NAB / IEC button on the Record/Cue and Reproduce cards (LO speed only; HI is AES)
+    inCal: 0, calRec: 0,        // Record/Cue card: IN CAL (input monitor), CAL REC (record level), dB
+    recHf: per(0),              // record HF EQ  < (dB)
+    cueLvl: 0, cueHf: per(0), cueLf: per(0),
+    reproLvl: 0, reproHf: per(0), reproLf: per(0),
+    bias: per(0),               // bias relative to the 10 kHz peak (dB); aligned = the speed's overbias
+    biasDefeat: false,          // Output module: spot erase (erase only, nothing recorded)
+    crossfeed: 1,               // cross-feed cancel amount (1 = matched)
+  };
+}
+
+class Channel {
+  constructor(fs, index) {
+    this.fs = fs; this.i = index; this.t = defaultTrims();
+    this.fl = { rec: [new Biquad(), new Biquad()], tape: new Biquad(), rep: [new Biquad(), new Biquad(), new Biquad(), new Biquad(), new Biquad()], cue: [new Biquad(), new Biquad(), new Biquad(), new Biquad(), new Biquad()], aa: [new Biquad(), new Biquad()] };
+    this.ips = 30; this.sel = 'repro'; this.mix = { input: 0, cue: 0, repro: 1 }; this.vu = 0; this.lastRec = 0;
+    this.configure(30);
+  }
+  // build the networks for a speed (the speed switch's HI EQ / LO EQ lines)
+  configure(ips, opLevel = 250) {
+    const S = SPEED[ips], t = this.t, fs = this.fs; this.ips = ips; this.S = S;
+    const b = t.bias[ips];   // dB from peak: >0 overbias (less HF, cleaner), <0 underbias (less output, distortion)
+    const hfBias = b >= 0 ? -b : -1.2 * b * b, lfBias = b >= 0 ? -0.12 * b : -0.4 * b * b;
+    this.recGain = gain(t.calRec + lfBias) / VU0;
+    this.fl.rec[0].set('hs', fs, S.shelf, 0.7, t.recHf[ips]);
+    this.fl.rec[1].set('hs', fs, 7000, 0.7, hfBias);
+    this.fl.tape.set('lp', fs, S.tape, 0.6);
+    const mol = 1040 / opLevel;   // 3 % third harmonic at 1040 nWb/m (spec table 1-1)
+    this.sat = (0.6 / mol) * (b < 0 ? 1 + 0.35 * -b : 1 - 0.03 * Math.min(b, 6));
+    const head = (fl, gap, hf, lf, lvl) => {
+      fl[0].set('hp', fs, S.bump * 0.28, 0.6); fl[1].set('peak', fs, S.bump, 1.1, S.bumpDb); fl[2].set('lp', fs, gap, 0.6);
+      fl[3].set('hs', fs, S.shelf * 1.6, 0.7, hf); fl[4].set('ls', fs, S.bump * 1.3, 0.7, lf);
+      return gain(lvl) * VU0;
+    };
+    this.repGain = head(this.fl.rep, S.gap, t.reproHf[ips], t.reproLf[ips], t.reproLvl);
+    this.cueGain = head(this.fl.cue, S.cueGap, t.cueHf[ips], t.cueLf[ips], t.cueLvl);
+    this.inGain = gain(t.inCal);
+    this.hiss = gain(S.hissDb + 20 * Math.log10(510 / opLevel)) * Math.SQRT1_2;
+  }
+  // analytic responses (dB re 1 kHz) for alignment and the test bench
+  recordReproDb(f) { const fs = this.fs; const r = (f) => chainMag(this.fl.rec, f, fs) * this.fl.tape.mag(f, fs) * chainMag(this.fl.rep, f, fs); return dB(r(f) / r(1000)); }
+  reproDb(f) { const fs = this.fs, r = (f) => chainMag(this.fl.rep, f, fs); return dB(r(f) / r(1000)); }
+  cueDb(f) { const fs = this.fs, r = (f) => chainMag(this.fl.cue, f, fs); return dB(r(f) / r(1000)); }
+  // gain of each path at 1 kHz relative to unity (dB): repro of a flat-flux tape, and record → repro of a 0 VU input
+  reproLevelDb() { return dB(chainMag(this.fl.rep, 1000, this.fs) * this.repGain / VU0); }
+  overallDb(f = 1000) { return dB(chainMag(this.fl.rec, f, this.fs) * this.fl.tape.mag(f, this.fs) * this.recGain * VU0 * chainMag(this.fl.rep, f, this.fs) * this.repGain / VU0); }
+}
+
+// factory alignment, the way section 7 does it on a machine: repro to the alignment tape (level 1 kHz, HF 10 kHz,
+// LF 50 / 100 Hz), cue the same, bias peak + overbias, then record level and record HF for a flat record → repro.
+function align(ch, ips, opLevel = 250) {
+  const t = ch.t, lfF = ips === 30 ? 100 : 50;
+  t.bias[ips] = SPEED[ips].overbias;
+  for (let it = 0; it < 30; it++) {
+    ch.configure(ips, opLevel);
+    t.reproHf[ips] -= ch.reproDb(10000) * 0.8; t.reproLf[ips] -= ch.reproDb(lfF) * 0.8;
+    t.cueHf[ips] -= ch.cueDb(10000) * 0.8; t.cueLf[ips] -= ch.cueDb(lfF) * 0.8;
+    ch.configure(ips, opLevel);
+    t.reproLvl -= ch.reproLevelDb() * 0.8;
+    t.cueLvl -= dB(chainMag(ch.fl.cue, 1000, ch.fs) * ch.cueGain / VU0) * 0.8;
+    ch.configure(ips, opLevel);
+    t.recHf[ips] -= ch.recordReproDb(10000) * 0.8;
+    ch.configure(ips, opLevel);
+    t.calRec -= ch.overallDb(1000) * 0.8;
+  }
+  ch.configure(ips, opLevel);
+}
+
+// ---------------------------------------------------------------- monitor switching (output module FETs)
+// st: { master: { tape, input, auto } (INPUT and AUTO may both be down), ready: Set, cue: Set, inputs: Set (individual
+// input), mode: transport mode }. Returns 'input' | 'cue' | 'repro' for channel i. Manual sections 2.2.3 and 2.3.2.
+function monitorSource(i, st) {
+  const ready = st.ready.has(i), rec = st.mode === 'rec' && ready, playing = st.mode === 'play' || st.mode === 'rec';
+  if (st.inputs && st.inputs.has(i)) return 'input';
+  if (st.master.input && st.master.auto) return ready ? 'input' : 'cue';
+  if (st.master.input) return 'input';
+  if (st.master.auto) { if (!ready) return 'cue'; return rec ? 'input' : playing ? 'cue' : 'input'; }
+  if (rec) return 'repro';                                     // TAPE: recording channels monitor the repro head
+  return st.cue && st.cue.has(i) ? 'cue' : 'repro';
+}
+
+// ---------------------------------------------------------------- the machine: 24 channels, tape, heads, QUIOR
+class Machine {
+  constructor(fs, { tracks = 24, opLevel = 250, quior = true, hiss = true, wowFlutter = true } = {}) {
+    this.fs = fs; this.n = tracks; this.opLevel = opLevel; this.quior = quior; this.hiss = hiss; this.wf = wowFlutter;
+    this.ch = Array.from({ length: tracks }, (_, i) => new Channel(fs, i));
+    this.tracks = Array.from({ length: tracks }, () => new Track());
+    this.take = 0; this.v = 0; this.lift = 0; this.ips = 30; this.time = 0;
+    this.st = { master: { tape: false, input: false, auto: true }, ready: new Set(), cue: new Set(), inputs: new Set(), mode: 'stop' };
+    this.pass = Array(tracks).fill(null);    // per track: active record pass (erase / bias timing)
+    this.rng = 0x1234567;
+    for (const s of SPEEDS) for (const c of this.ch) align(c, s, opLevel);
+    this.setSpeed(30);
+  }
+  setSpeed(ips) { this.ips = ips; for (const c of this.ch) c.configure(ips, this.opLevel); }
+  setOpLevel(ol) { this.opLevel = ol; for (const s of SPEEDS) for (const c of this.ch) align(c, s, ol); this.setSpeed(this.ips); }
+  noise() { this.rng ^= this.rng << 13; this.rng ^= this.rng >>> 17; this.rng ^= this.rng << 5; return ((this.rng >>> 0) / 4294967296 - 0.5) * 3.4641; }   // unit-variance
+  // load a transfer (already reproduced audio) onto a track, starting at tape coordinate u0, recorded at `ips`
+  loadTransfer(track, samples, u0, ips = 30, fsFile = this.fs) {
+    const p = new Piece(u0, ips * IPS / fsFile, true);
+    for (let i = 0; i < samples.length; i++) p.push(samples[i]);
+    this.tracks[track].erase(u0, p.end, 0);
+    this.tracks[track].pieces.push(p);
+  }
+  // process one block. inp[i] / out[i]: Float32Array per channel (line in / line out). ctl: { take, v, lift, mode, ips }
+  // (transport at the start of the block; v in m/s, + toward the take-up reel).
+  process(inp, out, ctl) {
+    const fs = this.fs, N = out[0].length, st = this.st;
+    if (ctl && ctl.take != null && Math.abs(ctl.take - this.take) > 0.005) {   // the tape jumped (locate): end any record pass
+      for (let i = 0; i < this.n; i++) { const ps = this.pass[i]; if (ps) { this.tracks[i].erase(ps.ua, ps.ub ?? this.take + HEADS.recordToRepro + HEADS.eraseToRecord, ps.ramp, ps); this.pass[i] = null; } }
+    }
+    if (ctl) { if (ctl.ips && ctl.ips !== this.ips) this.setSpeed(ctl.ips); if (ctl.take != null) this.take = ctl.take; if (ctl.v != null) this.v = ctl.v; if (ctl.lift != null) this.lift = ctl.lift; if (ctl.mode) st.mode = ctl.mode; }
+    const v = this.v, dt = 1 / fs, vn = this.ips * IPS, dER = HEADS.eraseToRecord, dRR = HEADS.recordToRepro;
+    const contact = 1 - Math.min(1, this.lift), moving = Math.min(1, Math.abs(v) / vn);
+    const recording = st.mode === 'rec' && v > 0.5 * vn;
+    // anti-alias the heads while winding with the lifters out (the "spooling" sound)
+    const ratio = Math.max(1, Math.abs(v) / vn);
+    if (ratio > 1.01) for (const c of this.ch) { c.fl.aa[0].set('lp', fs, 18000 / ratio, 0.7); c.fl.aa[1].set('lp', fs, 18000 / ratio, 0.7); }
+    // monitor sources and their crossfades (FET switching, ~2 ms)
+    const src = this.ch.map((c, i) => monitorSource(i, st));
+    // record passes: QUIOR timing at the head positions. A tape that has slowed below play speed ends the pass (the
+    // record relays drop out with the transport)
+    if (Math.abs(v) < 0.3 * vn) for (let i = 0; i < this.n; i++) { const ps = this.pass[i]; if (ps) { this.tracks[i].erase(ps.ua, ps.ub ?? this.take + dRR + dER, ps.ramp, ps); this.pass[i] = null; } }
+    for (let i = 0; i < this.n; i++) {
+      const want = recording && st.ready.has(i);
+      let ps = this.pass[i];
+      const ramp = this.ch[i].S.ramp * Math.max(v, 1e-3), delay = this.quior ? dER / Math.max(v, 1e-3) : 0;
+      if (want && !ps) ps = this.pass[i] = { eraseOn: this.time, eraseOff: null, biasOn: this.time + delay, biasOff: null, ua: this.take + dRR + dER, ramp, piece: null, env: 0 };
+      if (!want && ps && ps.eraseOff == null) { ps.eraseOff = this.time; ps.biasOff = this.time + delay; ps.ub = this.take + dRR + dER; }
+    }
+    for (let k = 0; k < N; k++) {
+      const take = this.take;
+      // wow and flutter: small periodic + random displacement of what each head reads (0.03-0.04 %)
+      const wf = this.wf ? (0.0003 * v) * (Math.sin(2 * Math.PI * 0.7 * this.time) / (2 * Math.PI * 0.7) * 0.6 + Math.sin(2 * Math.PI * 5.3 * this.time) / (2 * Math.PI * 5.3)) : 0;
+      const uRep = take + wf, uRec = take + dRR + wf * 0.9, uEr = take + dRR + dER;
+      for (let i = 0; i < this.n; i++) {
+        const c = this.ch[i], tr = this.tracks[i], x = inp && inp[i] ? inp[i][k] : 0, ps = this.pass[i];
+        // ---- record: erase head then bias at the record head (QUIOR ramps)
+        let recOut = 0;
+        if (ps) {
+          // erase window: everything between ua and the erase head now is erased (ramped at both ends)
+          const eraseNow = ps.eraseOff == null || this.time < ps.eraseOff;
+          if (eraseNow && k % 32 === 0) tr.erase(ps.ua, uEr, ps.ramp, ps);
+          const biasLive = this.time >= ps.biasOn && (ps.biasOff == null || this.time < ps.biasOff + c.S.ramp);
+          if (biasLive && !c.t.biasDefeat && v > 0.3 * vn) {
+            if (!ps.piece) { const pc = new Piece(uRec, vn * dt); pc.owner = ps; tr.pieces.push(pc); ps.piece = pc; }
+            const up = (this.time - ps.biasOn) / c.S.ramp, down = ps.biasOff == null ? 1 : 1 - (this.time - ps.biasOff) / c.S.ramp;
+            ps.env = Math.max(0, Math.min(1, up, down));
+            let r = c.fl.rec[1].run(c.fl.rec[0].run(x * c.recGain));
+            r = Math.tanh(c.sat * r) / c.sat;
+            recOut = r;
+            ps.piece.write(uRec, c.fl.tape.run(r) * ps.env);
+          }
+          if (ps.eraseOff != null && this.time >= ps.biasOff + c.S.ramp) {   // pass over: final erase with the ramp back
+            tr.erase(ps.ua, ps.ub, ps.ramp, ps); this.pass[i] = null;
+          }
+        }
+        c.lastRec = recOut;
+        // ---- reproduce and cue (sync) heads
+        const h = this.hiss ? this.noise() * c.hiss * Math.sqrt(moving) : 0;
+        let rep = 0, cue = 0;
+        if (contact > 0.001 && Math.abs(v) > 1e-5) {
+          const fr = tr.read(uRep, false) + h, fc = tr.read(uRec, false) + h;
+          let a = fr, b = fc;
+          if (ratio > 1.01) { a = c.fl.aa[0].run(a); b = c.fl.aa[1].run(b); }
+          // only the heads being monitored (or fading out) are run through their electronics
+          if (c.mix.repro > 0 || src[i] === 'repro') for (const f of c.fl.rep) a = f.run(a);
+          if (c.mix.cue > 0 || src[i] === 'cue') for (const f of c.fl.cue) b = f.run(b);
+          rep = (a * c.repGain + tr.read(uRep, true)) * contact;
+          // cue: the record head can't play while its own track records; adjacent recording tracks leak in
+          // (≈ -32 dB) and the cross-feed cancels it out of phase
+          let xt = 0;
+          for (const j of [i - 1, i + 1]) if (j >= 0 && j < this.n && this.pass[j]) xt += this.ch[j].lastRec * VU0 * gain(-32) * (1 - c.t.crossfeed);
+          cue = ps ? 0 : (b * c.cueGain + tr.read(uRec, true) * 0.97 + xt) * contact;
+        }
+        // ---- output module: FET select with a short crossfade, balanced output amp
+        const m = c.mix, s = src[i], step = 1 / (0.002 * fs);
+        for (const key of ['input', 'cue', 'repro']) m[key] += Math.max(-step, Math.min(step, (key === s ? 1 : 0) - m[key]));
+        const y = m.input * x * c.inGain + m.cue * cue + m.repro * rep;
+        out[i][k] = y;
+        // VU ballistics (≈300 ms)
+        c.vu += (Math.abs(y) - c.vu) * (1 / (0.3 * fs / 3));
+      }
+      this.take += v * dt; this.time += dt;
+    }
+  }
+}
+
+// AudioWorklet wrapper around the HJ-24 electronics model (prototype/electronics/jh24audio.js is inlined above this).
+// The main thread posts the shared transport every frame; the worklet runs its own sample clock and follows it.
+class JH24Processor extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.m = new Machine(sampleRate);
+    this.N = this.m.n;
+    this.inp = Array.from({ length: this.N }, () => new Float32Array(128));
+    this.out = Array.from({ length: this.N }, () => new Float32Array(128));
+    this.ctl = null; this.target = null;
+    this.osc = { on: false, f: 1000, db: 0, to: 'ready', ph: 0 };
+    this.live = { on: false };
+    this.mix = { gain: 0.5, solo: -1, mute: false };
+    this.align = { on: false, f: 1000, std: 'NAB' };   // alignment tape playing: standard-flux tones on every track
+    this.vuT = 0; this.vu = new Float32Array(this.N);
+    this.port.onmessage = (e) => this.msg(e.data);
+  }
+  msg(d) {
+    const m = this.m;
+    if (d.type === 'transport') this.target = d;
+    else if (d.type === 'status') { m.st.master = d.master; m.st.ready = new Set(d.ready); m.st.cue = new Set(d.cue); m.st.inputs = new Set(d.inputs); }
+    else if (d.type === 'trim') {
+      const c = m.ch[d.ch]; if (!c) return;
+      if (d.ips != null) c.t[d.key][d.ips] = d.value; else c.t[d.key] = d.value;
+      c.configure(m.ips, m.opLevel);
+    }
+    else if (d.type === 'align') { for (const c of (d.ch == null ? m.ch : [m.ch[d.ch]])) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); this.sendTrims(); }
+    else if (d.type === 'opts') { if (d.quior != null) m.quior = d.quior; if (d.hiss != null) m.hiss = d.hiss; if (d.wf != null) m.wf = d.wf; if (d.opLevel && d.opLevel !== m.opLevel) { m.setOpLevel(d.opLevel); this.sendTrims(); } }
+    else if (d.type === 'osc') Object.assign(this.osc, d);
+    else if (d.type === 'live') this.live.on = d.on;
+    else if (d.type === 'mix') Object.assign(this.mix, d);
+    else if (d.type === 'alignTape') Object.assign(this.align, d);
+    else if (d.type === 'load') { m.loadTransfer(d.track, d.data, d.u0, d.ips); this.port.postMessage({ type: 'loaded', track: d.track }); }
+    else if (d.type === 'clear') { m.tracks[d.track].pieces = []; }
+    else if (d.type === 'getTrims') this.sendTrims();
+    else if (d.type === 'debug') this.port.postMessage({ type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0 });
+  }
+  sendTrims() { this.port.postMessage({ type: 'trims', trims: this.m.ch.map((c) => c.t) }); }
+  process(inputs, outputs) {
+    const m = this.m, out = outputs[0], n = out[0].length, live = inputs[0] && inputs[0][0];
+    if (this.inp[0].length !== n) { this.inp = this.inp.map(() => new Float32Array(n)); this.out = this.out.map(() => new Float32Array(n)); }
+    // follow the transport: hard-set on a jump, otherwise pull gently toward the main thread's tape position
+    let ctl = {};
+    const T = this.target;
+    if (T) {
+      // a real locate moves the tape by far more than any timing slip between the two threads
+      const err = T.take - m.take, jump = Math.abs(err) > Math.max(0.3, Math.abs(T.v) * 0.6);
+      if (jump) { ctl.take = T.take; this.jumps = (this.jumps || 0) + 1; }
+      ctl.v = T.v + (jump ? 0 : Math.max(-0.1 * Math.abs(T.v) - 0.02, Math.min(0.1 * Math.abs(T.v) + 0.02, err * 1.5)));
+      ctl.lift = T.lift; ctl.mode = T.mode; ctl.ips = T.ips;
+    }
+    // line inputs: test oscillator to the chosen tracks, the computer's input to the ready tracks
+    const o = this.osc, amp = VU0 * 10 ** (o.db / 20), w = 2 * Math.PI * o.f / sampleRate;
+    for (let i = 0; i < this.N; i++) {
+      const buf = this.inp[i]; buf.fill(0);
+      const ready = m.st.ready.has(i);
+      if (o.on && (o.to === 'all' || (o.to === 'ready' && ready) || o.to === i)) for (let k = 0; k < n; k++) buf[k] = amp * Math.sin(o.ph + w * k);
+      if (this.live.on && live && ready) for (let k = 0; k < n; k++) buf[k] += live[k];
+    }
+    o.ph = (o.ph + w * n) % (2 * Math.PI);
+    m.process(this.inp, this.out, ctl);
+    // alignment tape: reference-flux tones played at the repro / sync heads instead of the session tape
+    if (this.align.on && Math.abs(m.v) > 0.3 * m.ips * IPS) {
+      const a = this.align, aw = 2 * Math.PI * a.f / sampleRate;
+      for (let i = 0; i < this.N; i++) {
+        const c = m.ch[i], src = monitorSource(i, m.st);
+        if (src === 'input') continue;
+        const g = 10 ** ((src === 'repro' ? c.reproDb(a.f) + c.t.reproLvl : c.cueDb(a.f) + c.t.cueLvl) / 20) * 10 ** (standardOffset(a.std, c.t.std, m.ips, a.f) / 20) * VU0;
+        for (let k = 0; k < n; k++) this.out[i][k] = g * Math.sin((a.ph || 0) + aw * k);
+      }
+      a.ph = ((a.ph || 0) + aw * n) % (2 * Math.PI);
+    }
+    // monitor mix to the speakers (tracks spread across the stereo field), or one channel soloed
+    const L = out[0], R = out[1] || out[0];
+    L.fill(0); if (R !== L) R.fill(0);
+    if (!this.mix.mute) for (let i = 0; i < this.N; i++) {
+      if (this.mix.solo >= 0 && this.mix.solo !== i) continue;
+      const pan = this.mix.solo >= 0 ? 0.5 : 0.15 + 0.7 * (i % 8) / 7, gl = Math.cos(pan * Math.PI / 2) * this.mix.gain, gr = Math.sin(pan * Math.PI / 2) * this.mix.gain;
+      const y = this.out[i];
+      for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
+    }
+    // VU levels (average-responding, ~300 ms; 0 VU = 0 dB) and what each channel is monitoring, ~30 times a second
+    const kv = 1 / (0.1 * sampleRate);
+    for (let i = 0; i < this.N; i++) { const y = this.out[i]; let v = this.vu[i]; for (let k = 0; k < n; k++) v += (Math.abs(y[k]) - v) * kv; this.vu[i] = v; }
+    this.vuT += n;
+    if (this.vuT > sampleRate / 30) {
+      this.vuT = 0;
+      this.port.postMessage({ type: 'vu', db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
+    }
+    return true;
+  }
+}
+registerProcessor('jh24-electronics', JH24Processor);
+</script>
 <script>// LTC (SMPTE linear timecode) encoder / decoder for the SBX-80 sync engine.
 // Renderer- and platform-independent: works on Float32Array samples, so the same code reads track 24 of a tape transfer
 // in the browser mockup, in Node tests, and ports 1:1 to the C++ engine.
@@ -100014,6 +100671,7 @@ class ClockOut {
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
+    if (v === 'elec') elShowTrims();
   }
   function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
@@ -100034,7 +100692,8 @@ class ClockOut {
       for (const n of needles) {
         const b = base[n.i] ?? -12;
         // program-like level: phrases, beats and a little noise around the track's level
-        const lvl = b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
+        const live = window.JH24_VU;   // the electronics are powered: real line-output levels
+        const lvl = live ? live[n.i] ?? -40 : b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
         const target = vuAngle(lvl);
         n.a += (target - n.a) * (1 - Math.exp(-dt / 0.065));   // ~300 ms to 99%, like a VU movement
         n.g.setAttribute('transform', `rotate(${n.a.toFixed(2)} ${n.cx} ${n.cy})`);
@@ -101057,6 +101716,145 @@ class ClockOut {
   const syncHot = () => { const sls = document.body.dataset.studio === 'sls'; const a = document.getElementById('strip-hot-cmi'), b = document.getElementById('strip-hot-sls'); if (a) a.hidden = sls; if (b) b.hidden = !sls; };
   modeKeys.forEach((b) => b.addEventListener('click', syncHot)); syncHot();
 
+  // ---------------- HJ-24 audio electronics (prototype/electronics/jh24audio.js in an AudioWorklet) ----------------
+  // POWER starts the engine. Every frame the shared transport and the monitoring status (AutoLocator TAPE / INPUT /
+  // AUTO, record-ready and input keys, the cards' CUE keys) go to the worklet; it sends back VU levels and sources.
+  const EL = { ctx: null, node: null, on: false, trims: null, cue: new Set(), solo: -1, statusKey: '', mrl: 'off', live: null };
+  window.JH24_VU = null;
+  const elRoot = document.getElementById('elec');
+  const elMsg = (t) => { const m = document.getElementById('el-msg'); if (m) m.textContent = t; };
+  const elPost = (d, tr2) => { if (EL.node) EL.node.port.postMessage(d, tr2 || []); };
+  window.JH24_POST = elPost;
+  async function elPower() {
+    if (EL.on) {   // power down
+      EL.on = false; elPost({ type: 'mix', mute: true }); try { await EL.ctx.suspend(); } catch (e) {}
+      document.getElementById('el-power').classList.remove('on'); document.getElementById('el-plate').classList.remove('on'); window.JH24_VU = null;
+      elMsg('Electronics off.'); return;
+    }
+    try {
+      if (!EL.ctx) {
+        EL.ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'playback' });
+        const src = document.getElementById('jh24-worklet-src').textContent;
+        try { await EL.ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([src], { type: 'application/javascript' }))); }
+        catch (e) { await EL.ctx.audioWorklet.addModule(`data:application/javascript;charset=utf-8,${encodeURIComponent(src)}`); }   // file:// pages
+        EL.node = new AudioWorkletNode(EL.ctx, 'jh24-electronics', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
+        EL.node.connect(EL.ctx.destination);
+        EL.node.port.onmessage = (e) => elRecv(e.data);
+        elPost({ type: 'getTrims' });
+      }
+      await EL.ctx.resume();
+      EL.on = true; EL.statusKey = '';
+      elPost({ type: 'mix', mute: false, gain: +document.getElementById('el-gain').value });
+      document.getElementById('el-power').classList.add('on'); document.getElementById('el-plate').classList.add('on');
+      elMsg(`Electronics on · ${EL.ctx.sampleRate / 1000} kHz · ${tr.speedIPS} ips. Play the tape, or load a transfer.`);
+    } catch (err) { elMsg(`Audio could not start: ${err.message}`); }
+  }
+  function elRecv(d) {
+    if (d.type === 'trims') { EL.trims = d.trims; elShowTrims(); }
+    else if (d.type === 'debug') window.JH24_DEBUG = d;
+    else if (d.type === 'loaded') elMsg(`Track ${d.track + 1} loaded onto the tape.`);
+    else if (d.type === 'vu') {
+      window.JH24_VU = EL.on ? d.db : null;
+      if (elRoot && !elRoot.closest('.overlay').hidden) elRoot.querySelectorAll('.ch').forEach((c) => {
+        const i = +c.dataset.ch, db = d.db[i], s = d.src[i];
+        c.querySelector('.vub i').style.width = `${Math.max(0, Math.min(100, (db + 20) / 23 * 100)).toFixed(1)}%`;
+        const t = c.querySelector('.src'); const lab = s === 'input' ? 'IN' : s === 'cue' ? 'CUE' : 'REP';
+        if (t.textContent !== lab) { t.textContent = lab; t.className = `src ${s === 'input' ? 'in' : s === 'cue' ? 'cue' : ''}`; }
+      });
+    }
+  }
+  // per frame: transport and status
+  function elecTick() {
+    if (!EL.node || !EL.on) return;
+    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
+    const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
+    const key = `${AL.mon}|${[...AL.ready].join(',')}|${[...AL.inMon].join(',')}|${[...EL.cue].join(',')}`;
+    if (key !== EL.statusKey) { EL.statusKey = key; elPost({ type: 'status', master, ready: [...AL.ready], cue: [...EL.cue], inputs: [...AL.inMon] }); }
+  }
+  // trims: drag up / down (0.1 dB per 3 px, shift for fine), double-click restores the factory alignment
+  const trimRange = { crossfeed: [0, 1.2], bias: [-6, 10] };
+  function elShowTrims() {
+    if (!EL.trims || !elRoot) return;
+    elRoot.querySelectorAll('.ch').forEach((c) => {
+      const t = EL.trims[+c.dataset.ch];
+      c.querySelectorAll('.tr').forEach((el) => {
+        const k = el.dataset.key, ips = el.dataset.ips, v = ips ? t[k][ips] : t[k];
+        el.querySelector('.tv').textContent = k === 'crossfeed' ? `${Math.round(v * 100)}%` : `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
+        el.querySelector('.scr b').style.transform = `rotate(${(k === 'crossfeed' ? (v - 0.6) * 300 : v * 18).toFixed(0)}deg)`;
+      });
+      c.querySelectorAll('.sw').forEach((b) => {
+        const k = b.dataset.key, alt = k === 'std' ? t.std === 'IEC' : !!t[k];
+        b.textContent = alt ? b.dataset.b : b.dataset.a; b.classList.toggle('alt', alt && k === 'biasDefeat');
+      });
+    });
+  }
+  if (elRoot) {
+    elRoot.querySelectorAll('.ch').forEach((c) => {
+      const ch = +c.dataset.ch;
+      c.querySelectorAll('.tr').forEach((el) => {
+        const k = el.dataset.key, ips = el.dataset.ips ? +el.dataset.ips : null;
+        let y0 = null, v0 = 0;
+        const get = () => (ips ? EL.trims[ch][k][ips] : EL.trims[ch][k]);
+        const put = (v) => { const [lo, hi] = trimRange[k] || [-15, 15]; v = Math.max(lo, Math.min(hi, v)); if (ips) EL.trims[ch][k][ips] = v; else EL.trims[ch][k] = v; elPost({ type: 'trim', ch, key: k, ips, value: v }); elShowTrims(); };
+        el.addEventListener('pointerdown', (e) => { if (!EL.trims) { elMsg('Power the electronics first.'); return; } y0 = e.clientY; v0 = get(); el.setPointerCapture(e.pointerId); });
+        el.addEventListener('pointermove', (e) => { if (y0 == null) return; const step = (k === 'crossfeed' ? 0.004 : 0.1) * (e.shiftKey ? 0.2 : 1); put(v0 + Math.round((y0 - e.clientY) / 3) * step); });
+        el.addEventListener('pointerup', () => { y0 = null; });
+        el.addEventListener('dblclick', () => { if (EL.node) { elPost({ type: 'align', ch }); elMsg(`Channel ${ch + 1} realigned to the factory settings.`); } });
+      });
+      c.querySelectorAll('.sw').forEach((b) => b.addEventListener('click', () => {
+        if (!EL.trims) { elMsg('Power the electronics first.'); return; }
+        const k = b.dataset.key, t = EL.trims[ch];
+        const v = k === 'std' ? (t.std === 'NAB' ? 'IEC' : 'NAB') : !t[k];
+        t[k] = v; elPost({ type: 'trim', ch, key: k, value: v }); elShowTrims();
+        if (k === 'biasDefeat') elMsg(v ? `Track ${ch + 1}: BIAS DEFEAT, recording only erases (spot erase).` : `Track ${ch + 1}: bias normal.`);
+      }));
+      c.querySelector('.cue').addEventListener('click', (e) => { if (EL.cue.has(ch)) EL.cue.delete(ch); else EL.cue.add(ch); e.currentTarget.classList.toggle('on', EL.cue.has(ch)); });
+      c.querySelector('.solo').addEventListener('click', () => { EL.solo = EL.solo === ch ? -1 : ch; elRoot.querySelectorAll('.solo').forEach((s) => s.classList.toggle('on', +s.closest('.ch').dataset.ch === EL.solo)); elPost({ type: 'mix', solo: EL.solo }); });
+      c.querySelector('.clr').addEventListener('click', () => { if (confirm(`Bulk-erase track ${ch + 1}?`)) { elPost({ type: 'clear', track: ch }); elMsg(`Track ${ch + 1} erased.`); } });
+    });
+    const $ = (id) => document.getElementById(id);
+    $('el-power').addEventListener('click', elPower);
+    $('el-plate').addEventListener('dblclick', (e) => { e.stopPropagation(); elPower(); });
+    $('el-gain').addEventListener('input', (e) => elPost({ type: 'mix', gain: +e.target.value }));
+    $('el-mute').addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'mix', mute: on }); });
+    const osc = () => { const to = $('el-osc-to').value; elPost({ type: 'osc', on: to !== 'off', to, f: +$('el-osc-f').value, db: +$('el-osc-db').value }); };
+    ['el-osc-f', 'el-osc-db', 'el-osc-to'].forEach((id) => $(id).addEventListener('change', osc));
+    const mrl = () => { const f = $('el-mrl').value; elPost({ type: 'alignTape', on: f !== 'off', f: +f || 1000, std: $('el-mrl-std').value }); if (f !== 'off') elMsg('Alignment tape loaded: press PLAY. Monitor on TAPE to align the repro, CUE to align sync (manual 7.3).'); };
+    ['el-mrl', 'el-mrl-std'].forEach((id) => $(id).addEventListener('change', mrl));
+    $('el-align').addEventListener('click', () => { if (!EL.node) { elMsg('Power the electronics first.'); return; } elPost({ type: 'align' }); elMsg('All 24 channels aligned: repro, sync, bias (peak + overbias), record level and HF.'); });
+    $('el-ol').addEventListener('change', (e) => { elPost({ type: 'opts', opLevel: +e.target.value }); elMsg(`Operating level ${e.target.value} nWb/m: all channels realigned.`); });
+    for (const [id, key] of [['el-quior', 'quior'], ['el-hiss', 'hiss'], ['el-wf', 'wf']]) $(id).addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'opts', [key]: on }); });
+    $('el-load').addEventListener('click', () => $('el-file').click());
+    $('el-file').addEventListener('change', async (e) => {
+      const files = [...e.target.files]; e.target.value = '';
+      if (!files.length) return;
+      if (!EL.node) await elPower();
+      if (!EL.ctx) return;
+      const u0 = tr.zero, ips = tr.speedIPS;
+      let used = new Set(), n = 0;
+      for (const [fi, f] of files.entries()) {
+        elMsg(`Decoding ${f.name}…`);
+        let buf; try { buf = await EL.ctx.decodeAudioData(await f.arrayBuffer()); } catch (err) { elMsg(`${f.name}: ${err.message}`); continue; }
+        if (buf.numberOfChannels > 2) { for (let c = 0; c < Math.min(24, buf.numberOfChannels); c++) { const d = buf.getChannelData(c).slice(); elPost({ type: 'load', track: c, data: d, u0, ips }, [d.buffer]); n++; } continue; }
+        const m = /(?:^|[^0-9])(\d{1,2})(?:[^0-9]|$)/.exec(f.name.replace(/\.[^.]+$/, ''));
+        let t = m ? +m[1] - 1 : -1; if (t < 0 || t > 23 || used.has(t)) { t = 0; while (used.has(t) && t < 23) t++; }
+        used.add(t);
+        const d = buf.getChannelData(0).slice(); elPost({ type: 'load', track: t, data: d, u0, ips }, [d.buffer]); n++;
+      }
+      elMsg(`${n} track${n === 1 ? '' : 's'} on the tape from the counter zero at ${ips} ips. Monitor on TAPE and press PLAY.`);
+    });
+    $('el-live').addEventListener('click', async (e) => {
+      const b = e.currentTarget;
+      if (EL.live) { EL.live.getTracks().forEach((t) => t.stop()); EL.live = null; b.classList.remove('on'); elPost({ type: 'live', on: false }); return; }
+      if (!EL.node) await elPower();
+      try {
+        EL.live = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+        EL.ctx.createMediaStreamSource(EL.live).connect(EL.node); b.classList.add('on'); elPost({ type: 'live', on: true });
+        elMsg('Live input feeds the record-ready tracks.');
+      } catch (err) { elMsg(`No audio input: ${err.message}`); }
+    });
+  }
+
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
@@ -101071,6 +101869,7 @@ class ClockOut {
       else if (tr.mode !== 'play' && tr.mode !== 'locate') AL.rep = false;
     }
     if ((open && open.dataset.view === 'al') || document.body.dataset.studio !== 'sls') alRender(now);   // the studio-view face mirrors it too
+    elecTick();
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests

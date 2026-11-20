@@ -446,6 +446,90 @@ const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + 
 const readyTracks = new Set([19, 20, 21]);
 const LEG = '#ece7dc';   // legend colour on taupe
 
+
+// ---------------- HJ-24 audio electronics: three roll-out drawers of channel cards (manual section 4) ----------------
+const elecView = (() => {
+  const trim = (key, lab, ips) => `<div class="tr" data-key="${key}"${ips ? ` data-ips="${ips}"` : ''} title="${lab}${ips ? ` (${ips === 30 ? 'HI speed, 30 ips' : 'LO speed, 15 ips'})` : ''} · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">${lab}</span><span class="tv">0.0</span></div>`;
+  const sw = (key, a, b) => `<button type="button" class="sw" data-key="${key}" data-a="${a}" data-b="${b}">${a}</button>`;
+  const card = (cls, name, body) => `<div class="cd ${cls}"><div class="cn">${name}</div>${body}</div>`;
+  const chan = (i) => `<div class="ch" data-ch="${i}">
+    <div class="chh"><b>${i + 1}</b><span class="nm">${tapeNames[i]}</span><span class="src">REP</span></div>
+    <div class="vub"><i></i><s></s></div>
+    <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
+    ${card('rep', 'REPRODUCE', `${trim('reproHf', '&lt; 30', 30)}${trim('reproHf', '&lt; 15', 15)}${trim('reproLf', '&gt; 30', 30)}${trim('reproLf', '&gt; 15', 15)}${trim('reproLvl', 'LVL')}${sw('std', 'NAB', 'IEC')}`)}
+    ${card('out', 'OUTPUT', `${sw('biasDefeat', 'NORMAL', 'B.DEFEAT')}`)}
+    ${card('rc', 'RECORD / CUE', `${trim('inCal', 'IN CAL')}${trim('calRec', 'CAL REC')}${trim('recHf', 'REC &lt; 30', 30)}${trim('recHf', 'REC &lt; 15', 15)}${trim('cueHf', 'CUE &lt; 30', 30)}${trim('cueHf', 'CUE &lt; 15', 15)}${trim('cueLf', 'CUE &gt; 30', 30)}${trim('cueLf', 'CUE &gt; 15', 15)}${trim('cueLvl', 'CUE LVL')}${trim('crossfeed', 'X-FEED')}`)}
+    ${card('bias', 'BIAS', `${trim('bias', 'BIAS 30', 30)}${trim('bias', 'BIAS 15', 15)}`)}
+  </div>`;
+  const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
+  const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
+  return `<div id="elec">
+  <div class="eltop">
+    <button type="button" id="el-power" class="pw" title="JH-24D audio power supply: starts the audio engine">POWER</button>
+    <label>MONITOR <input id="el-gain" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+    <button type="button" id="el-mute" class="t">MUTE</button>
+    <span class="sep"></span>
+    <label>OSCILLATOR ${sel('el-osc-f', [['100', '100 Hz'], ['1000', '1 kHz'], ['10000', '10 kHz'], ['15000', '15 kHz']], '1000')} ${sel('el-osc-db', [['-10', '-10 VU'], ['0', '0 VU'], ['4', '+4 VU'], ['12.4', 'MOL +12.4']], '0')} ${sel('el-osc-to', [['off', 'OFF'], ['ready', 'TO READY TRACKS'], ['all', 'TO ALL INPUTS']], 'off')}</label>
+    <label>ALIGNMENT TAPE ${sel('el-mrl', [['off', 'OFF'], ['1000', '1 kHz level'], ['10000', '10 kHz'], ['15000', '15 kHz'], ['100', '100 Hz'], ['50', '50 Hz']], 'off')} ${sel('el-mrl-std', [['NAB', 'NAB tape'], ['IEC', 'IEC tape']], 'NAB')}</label>
+    <button type="button" id="el-align" class="t" title="Section 7: repro to the alignment tape, bias peak + overbias, record level and HF, on every channel">ALIGN ALL</button>
+    <span class="sep"></span>
+    <label>OPERATING LEVEL ${sel('el-ol', [['185', '185 nWb/m'], ['250', '250 nWb/m'], ['320', '320 nWb/m'], ['370', '370 nWb/m']], '250')}</label>
+    <button type="button" id="el-quior" class="t on" title="QUIOR: erase / bias delay and ramps on punch-in and punch-out (bias card jumper)">QUIOR</button>
+    <button type="button" id="el-hiss" class="t on">TAPE HISS</button>
+    <button type="button" id="el-wf" class="t on">WOW &amp; FLUTTER</button>
+    <span class="sep"></span>
+    <button type="button" id="el-load" class="t" title="Load a tape transfer: one file per track (numbered names) or one 24-channel file; starts at the counter zero">LOAD TRANSFER</button>
+    <button type="button" id="el-live" class="t" title="Your computer's audio input into the record-ready tracks">LIVE IN</button>
+    <input id="el-file" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" multiple hidden>
+  </div>
+  <div class="elmsg" id="el-msg">Power the electronics to hear the tape. Monitoring follows the AutoLocator's TAPE / INPUT / AUTO and the track keys.</div>
+  <div class="drs">${[0, 1, 2].map(drawer).join('')}</div>
+</div>`;
+})();
+const elecCss = `
+  #elec{position:absolute;inset:0;padding:18px 24px;box-sizing:border-box;font-family:Archivo,Arial,sans-serif;color:#e8e2d4;background:linear-gradient(180deg,#24211f,#171514)}
+  #elec .eltop{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:17px;font-weight:800;letter-spacing:1px}
+  #elec label{display:flex;gap:8px;align-items:center;color:#cfc6b3}
+  #elec select{font:700 16px Archivo,Arial;background:#0f0e0d;color:#f0e8d6;border:1px solid #5a534c;border-radius:4px;padding:5px 6px}
+  #elec input[type=range]{width:180px}
+  #elec .sep{width:1px;height:30px;background:#4a4440}
+  #elec button{font:800 16px Archivo,Arial;letter-spacing:1px;border-radius:5px;border:1px solid #6b635b;background:#e9e3d3;color:#1d1a16;padding:8px 14px;cursor:pointer}
+  #elec button.t.on{background:#ffcf5a;box-shadow:0 0 12px rgba(255,190,60,.5)}
+  #elec button.pw{background:#3a1512;color:#ffb3a6;border-color:#7a2b22;min-width:120px}
+  #elec button.pw.on{background:#ff3b2f;color:#fff;box-shadow:0 0 18px rgba(255,60,40,.7)}
+  #elec .elmsg{margin:10px 0 12px;font:600 17px Archivo,Arial;color:#ffcf8a;min-height:22px}
+  #elec .drs{display:flex;gap:18px}
+  #elec .dr{flex:1 1 0;min-width:0;background:linear-gradient(180deg,#3a3633,#2a2725);border:2px solid #0c0b0a;border-radius:8px;padding:8px}
+  #elec .drh{font:900 20px Archivo,Arial;letter-spacing:2.5px;color:#d9d2c2;margin:2px 4px 8px}
+  #elec .drc{display:flex;gap:6px}
+  #elec .ch{flex:1;min-width:0;background:#1d1c1a;border-radius:5px;padding:6px;display:flex;flex-direction:column;gap:9px}
+  #elec .chh{display:flex;gap:6px;align-items:baseline;font-size:15px}
+  #elec .chh b{font-size:28px;color:#fff}
+  #elec .chh .nm{flex:1;font-size:16px;color:#bdb4a2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #elec .chh .src{font:800 16px 'JetBrains Mono',monospace;padding:3px 6px;border-radius:3px;background:#2d4a77;color:#dfe9ff}
+  #elec .chh .src.in{background:#7a5a12;color:#ffe6a8}#elec .chh .src.cue{background:#1f6b3a;color:#c9ffd9}
+  #elec .vub{position:relative;height:14px;background:#0b0a09;border-radius:2px;overflow:hidden}
+  #elec .vub i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#3fbf5c 0 70%,#ffd23a 70% 87%,#ff3b2f 87%)}
+  #elec .vub s{position:absolute;left:87%;top:0;bottom:0;width:1px;background:#fff;opacity:.6}
+  #elec .keys{display:flex;gap:3px}
+  #elec .keys .k{flex:1;min-width:0;padding:8px 0;font-size:12px;letter-spacing:.5px}
+  #elec .keys .k.on{background:#7dff9a}#elec .keys .solo.on{background:#ffd23a}
+  #elec .cd{background:linear-gradient(180deg,#1f5b3b,#174630);border:1px solid #0b2a1b;border-radius:5px;padding:7px 3px 9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 4px}
+  #elec .cd.out{grid-template-columns:1fr}
+  #elec .cn{grid-column:1/-1;font:900 15px Archivo,Arial;letter-spacing:1.5px;color:#d7f2df}
+  #elec .tr{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:ns-resize;user-select:none;touch-action:none}
+  #elec .scr{width:38px;height:38px;border-radius:3px;background:linear-gradient(135deg,#3f7fd1,#1f4f96);position:relative;box-shadow:inset 0 0 0 1px #0d2a52}
+  #elec .scr b{position:absolute;left:8px;top:8px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f4e2a0,#a88a3a);transform:rotate(0deg)}
+  #elec .scr b::after{content:'';position:absolute;left:10px;top:2px;width:3px;height:18px;background:#4a3a14}
+  #elec .tl{font:800 13px Archivo,Arial;color:#e6f5ea;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip}
+  #elec .tv{font:700 14px 'JetBrains Mono',monospace;color:#fff6d0}
+  #elec .sw{grid-column:1/-1;padding:7px 0 !important;font-size:15px !important}
+  #elec .sw.alt{background:#ff8a5a !important}
+  .el-plate{position:absolute;z-index:40;display:flex;gap:8px;align-items:center;padding:6px 14px;border-radius:5px;background:#141211;border:1px solid #4a4440;color:#e8e2d4;font:900 15px Archivo,Arial;letter-spacing:2px;cursor:pointer}
+  .el-plate i{width:10px;height:10px;border-radius:50%;background:#4a1a14}
+  .el-plate.on i{background:#ff3b2f;box-shadow:0 0 10px #ff3b2f}
+`;
+
 // ---------------- AL-III autolocator face (400 x 340 units, modelled on the CMI AutoLocator III) ----------------
 // live = true draws the clickable pop-up version: every control is a <g data-al="..."> and every lamp a hidden lit copy
 const AL_W = 400, AL_H = 340;
@@ -1433,6 +1517,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .sls-area{position:absolute;border:2px dashed #4a4744;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#cfc8b8;font-family:Archivo,Arial,sans-serif;text-align:center;background:rgba(255,255,255,.02)}
   .sls-area b{font-size:44px;font-weight:900;letter-spacing:4px;color:#ece6da}
   .sls-area span{font-size:22px;font-weight:600;color:#9c9384;max-width:80%}
+${elecCss}
 </style></head><body><div id="stage">
 ${svg}
 ${jh24}
@@ -1457,8 +1542,10 @@ ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
 ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
+<div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}
+${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>')}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>')}
 ${overlay('strip', 'CHANNEL', '<svg id="stripSvg" width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block;user-select:none;touch-action:none"></svg>', '<span class="ov-msg" id="strip-title"></span>')}
@@ -1470,8 +1557,9 @@ ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" 
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'reels', 'physics.js'), 'utf8').replace(/^export /gm, '')}
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${['ltc.js', 'midiclock.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
 // artifact version: the same page without the document wrapper (the host adds it), title first
