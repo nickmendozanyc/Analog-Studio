@@ -108,7 +108,8 @@ module.exports = function buildSLS(h, { tapeNames }) {
       key(x0 + 8, 910, 32, 13, 'white', false, 'R.GRP', 5); key(x0 + 42, 910, 32, 13, 'white', rdy || i < 24, 'R.TAPE', 4.8);
       key(x0 + 12, 928, 58, 18, 'red', rdy, i < 24 ? `REC ${i + 1}` : 'RECORD', 6.5);
       // ---- small fader with INPUT / OUTPUT, SOLO and CUT
-      fader(x0 + 22, 956, 1030, 0.25 + rnd() * 0.4, { capW: 18, capH: 22, scale: false, capFill: 'url(#faderCapBlack)' });
+      fader(x0 + 22, 956, 1058, 0.25 + rnd() * 0.4, { capW: 18, capH: 22, scale: false, capFill: 'url(#faderCapBlack)' });
+      p('<g transform="translate(0 28)">');   // everything below the small fader moves down with it
       led(x0 + 22, 1040, i >= 24, '#4fe07a');
       key(x0 + 40, 952, 34, 10, 'white', false, 'INPUT', 5.2); key(x0 + 40, 965, 34, 10, 'white', false, 'OUTPUT', 4.8);
       key(x0 + 40, 984, 34, 11, 'yellow', false, 'SOLO', 5.4); key(x0 + 40, 999, 34, 11, 'red', false, 'CUT', 5.4);
@@ -121,10 +122,12 @@ module.exports = function buildSLS(h, { tapeNames }) {
       // ---- VCA group window, VCA fader and automation status keys (Off Read Write Touch Latch Trim)
       rect(x0 + 8, 1112, 30, 13, '#0b0b0c', 'rx="2"');
       text(x0 + 23, 1122, `G${1 + Math.floor(i / 4) % 8}`, 8, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
+      p('</g>');
+      // VCA fader: 100 mm travel at the module's scale (38 mm wide = 82 px, so 100 mm = 216 px)
       const modes = [['O', 'grey'], ['R', 'green'], ['W', 'red'], ['T', 'amber'], ['L', 'blue'], ['Tr', 'yellow']];
       const m = i % 9 === 4 ? 2 : i % 7 === 3 ? 3 : 1;
-      modes.forEach(([lab, col], k) => key(x0 + 62, 1136 + k * 17, 14, 13, col, k === m, lab, 6));
-      fader(x0 + 32, 1136, 1380, 0.3 + rnd() * 0.25, { capW: 24, capH: 38, scaleColor: '#2a2b2d' });
+      modes.forEach(([lab, col], k) => key(x0 + 62, 1164 + k * 17, 14, 13, col, k === m, lab, 6));
+      fader(x0 + 32, 1164, 1380, 0.3 + rnd() * 0.25, { capW: 24, capH: 38, scaleColor: '#2a2b2d' });
       // ---- scribble strip
       rect(x0 + 5, 1396, SW - 10, 22, '#e9e4d6', 'rx="2"');
       text(cx, 1411.5, names[i], 9.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`);
@@ -171,13 +174,19 @@ module.exports = function buildSLS(h, { tapeNames }) {
     key(x + 12, 542, 74, 26, 'red', false, 'TALK', 9); key(x + 92, 542, 60, 26, 'white', false, 'SLATE', 7.5); sk(x + 186, 555, 10, '#8a8f97', 0, 'TB', 574);
     ['100', '1k', '10k'].forEach((l, k) => key(x + 12 + k * 44, 584, 40, 18, 'green', k === 1, l, 7)); sk(x + 186, 593, 10, '#8a8f97', -30, 'OSC', 612);
     // group (VCA) masters: 8 faders with M / S
-    sect(x + 6, 622, LW - 12, 'GROUP MASTERS');
+    // local (split) aux sends panel, as in the G Series centre section
+    sect(x + 6, 622, LW - 12, 'LOCAL AUX SENDS');
+    ['ST', '1', '2', '3', '4', '5'].forEach((l, k) => { const kx = x + 30 + (k % 3) * 90, ky = 664 + Math.floor(k / 3) * 120; sk(kx, ky, 15, k ? '#d9dbde' : '#e0b23a', -30 + k * 14, `AUX ${l}`, ky + 28); key(kx - 20, ky + 40, 40, 16, 'white', k === 1, 'SPLIT', 6.5); });
+    [['FOLDBACK A', false], ['FOLDBACK B', false], ['AUX TO CUE', true]].forEach(([l, on], k) => key(x + 12 + k * 74, 920, 68, 20, 'white', on, l, 6));
+    ['CUE 1', 'CUE 2', 'STUDIO'].forEach((l, k) => sk(x + 46 + k * 74, 980, 13, '#8a8f97', 10 - k * 20, l, 1002));
+    ['PHONES A', 'PHONES B'].forEach((l, k) => key(x + 12 + k * 110, 1022, 104, 20, 'amber', false, l, 7));
+    sect(x + 6, 1100, LW - 12, 'GROUP MASTERS');
     const gw = (LW - 20) / 8;
     for (let g = 0; g < 8; g++) {
       const gx = x + 10 + g * gw + gw / 2;
-      key(gx - 11, 636, 22, 14, 'red', g === 5, 'M', 7);
-      key(gx - 11, 654, 22, 14, 'green', g === 1, 'S', 7);
-      fader(gx, 690, 1380, 0.3 + (g % 3) * 0.05, { capW: 22, capH: 38, scale: false, capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4] });
+      key(gx - 11, 1118, 22, 14, 'red', g === 5, 'M', 7);
+      key(gx - 11, 1136, 22, 14, 'green', g === 1, 'S', 7);
+      fader(gx, 1164, 1380, 0.3 + (g % 3) * 0.05, { capW: 22, capH: 38, scale: false, capFill: ['url(#faderCapYellow)', 'url(#faderCapGreen)', 'url(#faderCapWhite)', 'url(#faderCapBlack)'][g % 4] });
       text(gx, 1404, `G${g + 1}`, 9, INK, 'middle', 800);
     }
     // ---------- right column: Studio Computer ----------
@@ -221,7 +230,7 @@ module.exports = function buildSLS(h, { tapeNames }) {
     [['OFF', 'grey'], ['READ', 'green'], ['WRITE', 'red'], ['TOUCH', 'amber'], ['LATCH', 'blue'], ['TRIM', 'yellow']].forEach(([l, c], k) => key(RX + 12 + (k % 3) * ((RW - 24) / 3), 814 + Math.floor(k / 3) * 26, (RW - 24) / 3 - 8, 20, c, k === 1, l, 7.5));
     sect(RX + 6, 872, RW - 12, 'MAIN');
     const mfx = RX + RW - 60;
-    fader(mfx, 900, 1380, 0.22, { capW: 34, capH: 48, scaleColor: '#2a2b2d', capFill: 'url(#faderCapRed)' });
+    fader(mfx, 1164, 1380, 0.22, { capW: 34, capH: 48, scaleColor: '#2a2b2d', capFill: 'url(#faderCapRed)' });
     text(mfx, 1404, 'STEREO', 9, INK, 'middle', 800);
     ['MASTER CUT', 'MONO CHECK', 'FADER START'].forEach((l, k) => key(RX + 18, 910 + k * 34, 110, 24, k ? 'white' : 'red', false, l, 7));
     rect(RX + 18, 1020, 110, 60, '#0b0b0c', 'rx="3"');
