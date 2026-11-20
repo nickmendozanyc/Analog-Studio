@@ -452,14 +452,22 @@ const elecView = (() => {
   const trim = (key, lab, ips) => `<div class="tr" data-key="${key}"${ips ? ` data-ips="${ips}"` : ''} title="${lab}${ips ? ` (${ips === 30 ? 'HI speed, 30 ips' : 'LO speed, 15 ips'})` : ''} · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">${lab}</span><span class="tv">0.0</span></div>`;
   const sw = (key, a, b) => `<button type="button" class="sw" data-key="${key}" data-a="${a}" data-b="${b}">${a}</button>`;
   const card = (cls, name, body) => `<div class="cd ${cls}"><div class="cn">${name}</div>${body}</div>`;
+  // the cards' front edges as on the real machine (black faces, white legends, trims in access holes, round push
+  // switches, the channel tag at the bottom): REPRO, OUTPUT, RECORD / CUE, BIAS. HI / LO = the 30 / 15 ips networks.
+  const hole = (key, ips, mark, name) => `<div class="tr${/^&[lg]t;$/.test(mark) ? '' : ' lft'}" data-key="${key}"${ips ? ` data-ips="${ips}"` : ''} data-name="${name}" title="${name} · drag up / down (shift: fine) · double-click realigns this channel"><i class="scr"><b></b></i><span class="mk">${mark}</span><span class="tv"></span></div>`;
+  const inert = (mark, name) => `<div class="tr inert" title="${name} (factory set)"><i class="scr"><b></b></i><span class="mk">${mark}</span></div>`;
+  const brk = (lab, body) => `<div class="brk"><span class="bl">${lab}</span><span class="bk"></span><div class="bi">${body}</div></div>`;
+  const push = (key, a, b, lab, title) => `<button type="button" class="sw push" data-key="${key}" data-a="${a}" data-b="${b}" title="${title}"><span class="pb"></span></button>${lab}`;
+  const nabiec = (where) => `<div class="std">${push('std', 'NAB', 'IEC', '', `NAB / IEC equalization (${where}; 15 ips network, 30 ips is AES)`)}<div class="ind"><span class="n"><i></i>NAB</span><span class="i"><i></i>IEC</span></div></div>`;
+  const face = (cls, title, body, i) => `<div class="cf ${cls}"><div class="ct">${title}</div>${body}<div class="num">${i + 1}</div></div>`;
   const chan = (i) => `<div class="ch" data-ch="${i}">
     <div class="chh"><b>${i + 1}</b><span class="nm">${tapeNames[i]}</span><span class="src">REP</span></div>
     <div class="vub"><i></i><s></s></div>
     <div class="keys"><button type="button" class="k cue" title="CUE: monitor the record head (sync)">CUE</button><button type="button" class="k solo" title="Solo this channel in the speakers">SOLO</button><button type="button" class="k clr" title="Erase this track (bulk)">ERASE</button></div>
-    ${card('rep', 'REPRODUCE', `${trim('reproHf', '&lt; 30', 30)}${trim('reproHf', '&lt; 15', 15)}${trim('reproLf', '&gt; 30', 30)}${trim('reproLf', '&gt; 15', 15)}${trim('reproLvl', 'LVL')}${sw('std', 'NAB', 'IEC')}`)}
-    ${card('out', 'OUTPUT', `${sw('biasDefeat', 'NORMAL', 'B.DEFEAT')}`)}
-    ${card('rc', 'RECORD / CUE', `${trim('inCal', 'IN CAL')}${trim('calRec', 'CAL REC')}${trim('recHf', 'REC &lt; 30', 30)}${trim('recHf', 'REC &lt; 15', 15)}${trim('cueHf', 'CUE &lt; 30', 30)}${trim('cueHf', 'CUE &lt; 15', 15)}${trim('cueLf', 'CUE &gt; 30', 30)}${trim('cueLf', 'CUE &gt; 15', 15)}${trim('cueLvl', 'CUE LVL')}${trim('crossfeed', 'X-FEED')}`)}
-    ${card('bias', 'BIAS', `${trim('bias', 'BIAS 30', 30)}${trim('bias', 'BIAS 15', 15)}`)}
+    ${face('rep', 'REPRO', `${nabiec('repro')}${brk('HI', hole('reproHf', 30, '&lt;', `CH ${i + 1} REPRO HI &lt; (30 ips HF)`) + hole('reproLf', 30, '&gt;', `CH ${i + 1} REPRO HI &gt; (30 ips LF)`))}${brk('LO', hole('reproHf', 15, '&lt;', `CH ${i + 1} REPRO LO &lt; (15 ips HF)`) + hole('reproLf', 15, '&gt;', `CH ${i + 1} REPRO LO &gt; (15 ips LF)`))}<div class="row">${hole('reproLvl', 0, 'LVL', `CH ${i + 1} REPRO LVL`)}</div>`, i)}
+    ${face('out', 'OUTPUT', `<div class="bd">${push('biasDefeat', 'NORMAL', 'DEFEAT', '<span class="pl">BIAS<br>DEFEAT</span>', 'BIAS DEFEAT: recording only erases (spot erase)')}</div>`, i)}
+    ${face('rc', 'RECORD', `<div class="row">${hole('recHf', 30, 'HI &lt;', `CH ${i + 1} RECORD HI &lt; (30 ips HF)`)}</div><div class="row">${hole('recHf', 15, 'LO &lt;', `CH ${i + 1} RECORD LO &lt; (15 ips HF)`)}</div><div class="row">${hole('calRec', 0, 'LVL', `CH ${i + 1} RECORD LVL (CAL REC)`)}</div><div class="row">${hole('inCal', 0, 'IN CAL', `CH ${i + 1} IN CAL (input monitor level)`)}</div><div class="sep"></div>${nabiec('record / cue')}<div class="sep"></div><div class="ct">CUE</div>${brk('HI', hole('cueHf', 30, '&lt;', `CH ${i + 1} CUE HI &lt; (30 ips HF)`) + hole('cueLf', 30, '&gt;', `CH ${i + 1} CUE HI &gt; (30 ips LF)`))}${brk('LO', hole('cueHf', 15, '&lt;', `CH ${i + 1} CUE LO &lt; (15 ips HF)`) + hole('cueLf', 15, '&gt;', `CH ${i + 1} CUE LO &gt; (15 ips LF)`))}<div class="row">${hole('cueLvl', 0, 'LVL', `CH ${i + 1} CUE LVL`)}</div>`, i)}
+    ${face('bias', 'BIAS', `${brk('BIAS', hole('bias', 30, 'HI', `CH ${i + 1} BIAS HI (30 ips)`) + hole('bias', 15, 'LO', `CH ${i + 1} BIAS LO (15 ips)`))}${brk('ERASE', inert('', 'ERASE peak'))}`, i)}
   </div>`;
   const drawer = (d) => `<div class="dr"><div class="drh">DRAWER ${d + 1} · CHANNELS ${d * 8 + 1}–${d * 8 + 8}</div><div class="drm">${Array.from({ length: 8 }, (_, k) => meter(d * 8 + k)).join('')}</div><div class="drc">${Array.from({ length: 8 }, (_, k) => chan(d * 8 + k)).join('')}</div></div>`;
   const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
@@ -549,17 +557,33 @@ const elecCss = `
   #elec .keys{display:flex;gap:3px}
   #elec .keys .k{flex:1;min-width:0;padding:8px 0;font-size:12px;letter-spacing:.5px}
   #elec .keys .k.on{background:#7dff9a}#elec .keys .solo.on{background:#ffd23a}
-  #elec .cd{background:linear-gradient(180deg,#1f5b3b,#174630);border:1px solid #0b2a1b;border-radius:5px;padding:7px 3px 9px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 4px}
-  #elec .cd.out{grid-template-columns:1fr}
-  #elec .cn{grid-column:1/-1;font:900 15px Archivo,Arial;letter-spacing:1.5px;color:#d7f2df}
-  #elec .tr{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:ns-resize;user-select:none;touch-action:none}
-  #elec .scr{width:38px;height:38px;border-radius:3px;background:linear-gradient(135deg,#3f7fd1,#1f4f96);position:relative;box-shadow:inset 0 0 0 1px #0d2a52}
-  #elec .scr b{position:absolute;left:8px;top:8px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f4e2a0,#a88a3a);transform:rotate(0deg)}
-  #elec .scr b::after{content:'';position:absolute;left:10px;top:2px;width:3px;height:18px;background:#4a3a14}
-  #elec .tl{font:800 13px Archivo,Arial;color:#e6f5ea;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip}
-  #elec .tv{font:700 14px 'JetBrains Mono',monospace;color:#fff6d0}
-  #elec .sw{grid-column:1/-1;padding:7px 0 !important;font-size:15px !important}
-  #elec .sw.alt{background:#ff8a5a !important}
+  #elec .cf{position:relative;background:linear-gradient(90deg,#060607,#141416 10%,#0e0e10 50%,#151517 90%,#050506);border:1px solid #000;border-radius:2px;padding:12px 8px 40px;box-shadow:inset 1px 0 0 rgba(255,255,255,.1),inset -1px 0 0 rgba(255,255,255,.05),0 3px 0 #000;color:#f4f4f0;display:flex;flex-direction:column;align-items:center;gap:10px}
+  #elec .cf .ct{font:900 20px Archivo,Arial;letter-spacing:.5px;color:#f7f7f3;align-self:center}
+  #elec .cf .num{position:absolute;right:16%;bottom:8px;min-width:24px;padding:1px 5px;background:#efe6cc;color:#141210;font:800 16px Archivo,Arial;text-align:center;border:1px solid #9a8d6c;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+  #elec .cf .row{display:flex;justify-content:center;width:100%}
+  #elec .cf .sep{width:112%;height:3px;background:#000;box-shadow:0 1px 0 rgba(255,255,255,.08);margin:2px 0}
+  #elec .brk{display:grid;grid-template-columns:auto 9px auto;align-items:stretch;column-gap:4px;justify-content:center}
+  #elec .brk .bl{font:900 14px Archivo,Arial;color:#f4f4f0;align-self:start;margin-top:4px}
+  #elec .brk .bk{border:2px solid #ecece6;border-right:0;margin:10px 0}
+  #elec .brk .bi{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+  #elec .tr{position:relative;display:flex;align-items:center;gap:6px;cursor:ns-resize;user-select:none;touch-action:none}
+  #elec .tr.lft{flex-direction:row-reverse}
+  #elec .tr.inert{cursor:default}
+  #elec .scr{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,#020202 50%,#1c1c1e 58%,#3a3a3c 64%,#0b0b0c 74%);position:relative;box-shadow:inset 0 3px 5px rgba(0,0,0,.95)}
+  #elec .scr b{position:absolute;left:11px;top:11px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8a7638,#3a2f12);box-shadow:0 0 3px 2px rgba(0,0,0,.8)}
+  #elec .scr b::after{content:'';position:absolute;left:5px;top:1px;width:2px;height:10px;background:#141006}
+  #elec .tr:hover .scr b{background:radial-gradient(circle at 40% 35%,#c9ad5c,#6a5420)}
+  #elec .mk{font:900 15px Archivo,Arial;color:#f4f4f0;white-space:nowrap}
+  #elec .tv{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:3px;padding:2px 6px;border-radius:3px;background:#ffd23a;color:#1a1208;font:800 13px 'JetBrains Mono',monospace;white-space:nowrap;display:none;z-index:5}
+  #elec .tr:hover .tv,#elec .tr.drag .tv{display:block}
+  #elec .push{all:unset;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.18),rgba(255,255,255,0) 22%),radial-gradient(circle,#1c1c1e,#0a0a0b 52%,#000 56%,#f2f2f4 60%,#8d9095 66%,#d8dadd 71%,#1a1a1c 76%,#000 80%);box-shadow:0 3px 4px #000;cursor:pointer;display:block}
+  #elec .push.on{background:radial-gradient(circle at 42% 36%,rgba(255,255,255,.35),rgba(255,255,255,0) 22%),radial-gradient(circle,#ff5a3c,#8a1408 52%,#000 56%,#f2f2f4 60%,#8d9095 66%,#d8dadd 71%,#1a1a1c 76%,#000 80%);box-shadow:0 0 14px rgba(255,60,40,.7),0 3px 4px #000}
+  #elec .std{display:flex;flex-direction:column;align-items:center;gap:5px;margin:2px 0}
+  #elec .std .ind{display:flex;gap:10px;font:900 13px Archivo,Arial;color:#f4f4f0}
+  #elec .std .ind i{display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid #ecece6;margin-right:4px;vertical-align:-1px}
+  #elec .std .ind .on i{background:#ecece6}
+  #elec .bd{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0}
+  #elec .bd .pl{font:900 13px Archivo,Arial;text-align:center;line-height:1.15}
   .el-plate{position:absolute;z-index:40;display:flex;gap:8px;align-items:center;padding:6px 14px;border-radius:5px;background:#141211;border:1px solid #4a4440;color:#e8e2d4;font:900 15px Archivo,Arial;letter-spacing:2px;cursor:pointer}
   .el-plate i{width:10px;height:10px;border-radius:50%;background:#4a1a14}
   .el-plate.on i{background:#ff3b2f;box-shadow:0 0 10px #ff3b2f}

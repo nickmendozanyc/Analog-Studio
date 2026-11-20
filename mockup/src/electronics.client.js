@@ -77,28 +77,31 @@
     if (!EL.trims || !elRoot) return;
     elRoot.querySelectorAll('.ch').forEach((c) => {
       const t = EL.trims[+c.dataset.ch];
-      c.querySelectorAll('.tr').forEach((el) => {
+      c.querySelectorAll('.tr:not(.inert)').forEach((el) => {
         const k = el.dataset.key, ips = el.dataset.ips, v = ips ? t[k][ips] : t[k];
         el.querySelector('.tv').textContent = k === 'crossfeed' ? `${Math.round(v * 100)}%` : `${v >= 0 ? '+' : ''}${v.toFixed(1)}`;
         el.querySelector('.scr b').style.transform = `rotate(${(k === 'crossfeed' ? (v - 0.6) * 300 : v * 18).toFixed(0)}deg)`;
       });
       c.querySelectorAll('.sw').forEach((b) => {
         const k = b.dataset.key, alt = k === 'std' ? t.std === 'IEC' : !!t[k];
-        b.textContent = alt ? b.dataset.b : b.dataset.a; b.classList.toggle('alt', alt && k === 'biasDefeat');
+        if (b.classList.contains('push')) {   // round push switch: lit when in (BIAS DEFEAT); NAB / IEC shows on its indicators
+          if (k === 'biasDefeat') b.classList.toggle('on', alt);
+          const ind = b.parentElement.querySelector('.ind'); if (ind) { ind.querySelector('.n').classList.toggle('on', !alt); ind.querySelector('.i').classList.toggle('on', alt); }
+        } else { b.textContent = alt ? b.dataset.b : b.dataset.a; b.classList.toggle('alt', alt && k === 'biasDefeat'); }
       });
     });
   }
   if (elRoot) {
     elRoot.querySelectorAll('.ch').forEach((c) => {
       const ch = +c.dataset.ch;
-      c.querySelectorAll('.tr').forEach((el) => {
+      c.querySelectorAll('.tr:not(.inert)').forEach((el) => {
         const k = el.dataset.key, ips = el.dataset.ips ? +el.dataset.ips : null;
         let y0 = null, v0 = 0;
         const get = () => (ips ? EL.trims[ch][k][ips] : EL.trims[ch][k]);
-        const put = (v) => { const [lo, hi] = trimRange[k] || [-15, 15]; v = Math.max(lo, Math.min(hi, v)); if (ips) EL.trims[ch][k][ips] = v; else EL.trims[ch][k] = v; elPost({ type: 'trim', ch, key: k, ips, value: v }); elShowTrims(); };
-        el.addEventListener('pointerdown', (e) => { if (!EL.trims) { elMsg('Power the electronics first.'); return; } y0 = e.clientY; v0 = get(); el.setPointerCapture(e.pointerId); });
+        const put = (v) => { const [lo, hi] = trimRange[k] || [-15, 15]; v = Math.max(lo, Math.min(hi, v)); if (ips) EL.trims[ch][k][ips] = v; else EL.trims[ch][k] = v; elPost({ type: 'trim', ch, key: k, ips, value: v }); elShowTrims(); elMsg(`${el.dataset.name || k}: ${k === 'crossfeed' ? `${Math.round(v * 100)} %` : `${v >= 0 ? '+' : ''}${v.toFixed(1)} dB`}`); };
+        el.addEventListener('pointerdown', (e) => { if (!EL.trims) { elMsg('Power the electronics first.'); return; } y0 = e.clientY; v0 = get(); el.setPointerCapture(e.pointerId); el.classList.add('drag'); });
         el.addEventListener('pointermove', (e) => { if (y0 == null) return; const step = (k === 'crossfeed' ? 0.004 : 0.1) * (e.shiftKey ? 0.2 : 1); put(v0 + Math.round((y0 - e.clientY) / 3) * step); });
-        el.addEventListener('pointerup', () => { y0 = null; });
+        el.addEventListener('pointerup', () => { y0 = null; el.classList.remove('drag'); });
         el.addEventListener('dblclick', () => { if (EL.node) { elPost({ type: 'align', ch }); elMsg(`Channel ${ch + 1} realigned to the factory settings.`); } });
       });
       c.querySelectorAll('.sw').forEach((b) => b.addEventListener('click', () => {
