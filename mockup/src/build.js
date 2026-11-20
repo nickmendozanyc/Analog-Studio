@@ -443,55 +443,108 @@ const tapeDb = tapeNames.map((n, i) => (i === 19 ? 1.2 : i === 21 ? -30 : -14 + 
 const readyTracks = new Set([19, 20, 21]);
 const LEG = '#ece7dc';   // legend colour on taupe
 
+// ---------------- AL-III autolocator face (400 x 340 units, modelled on the CMI AutoLocator III) ----------------
+// live = true draws the clickable pop-up version: every control is a <g data-al="..."> and every lamp a hidden lit copy
+const AL_W = 400, AL_H = 340;
+function al3(live = false, st = {}) {
+  const S = Object.assign({ tape: '03:42', loc: '01:02', ready: readyTracks, lamps: new Set(['auto']), leds: new Set(['ready']) }, st);
+  const PANEL = '#4b4845', BAY = '#3a3836', INK = '#e6e1d6';
+  const key = (name, x, y, w, h, color, label, size = 6) => {
+    if (live) p(`<g data-al="${name}" style="cursor:pointer">`);
+    const lit = !live && S.lamps.has(name);
+    button(x, y, w, h, color, lit, label, { size, pastel: true });
+    if (live) { p(`<g class="al-lamp" data-lamp="${name}" opacity="0" pointer-events="none">`); button(x, y, w, h, color, true, label, { size }); p('</g></g>'); }
+  };
+  const led = (name, cx, cy, col, w = 5, h = 3) => {
+    rect(cx - w / 2, cy - h / 2, w, h, '#160c08', 'rx="0.8"');
+    const on = !live && S.leds.has(name);
+    rect(cx - w / 2, cy - h / 2, w, h, col, `rx="0.8" ${live ? `class="al-led" data-led="${name}" opacity="0"` : on ? 'filter="url(#glowSm)"' : 'opacity="0"'}`);
+  };
+  const roundKey = (name, cx, cy, r, fill, hi) => {
+    if (live) p(`<g data-al="${name}" style="cursor:pointer">`);
+    circle(cx + 0.6, cy + 1.2, r + 0.6, '#000', 'opacity="0.55"');
+    circle(cx, cy, r + 0.8, '#222'); circle(cx, cy, r, fill); circle(cx - r * 0.25, cy - r * 0.3, r * 0.55, hi, 'opacity="0.35"');
+    if (live) p('</g>');
+  };
+  const display = (id, x, label, val) => {
+    text(x + 55, 15, label, 7, INK, 'middle', 800, 'letter-spacing="0.6"');
+    rect(x, 20, 110, 33, '#060606', 'rx="2"'); rect(x + 3, 23, 104, 27, 'url(#displayBg)', 'rx="1.5"');
+    if (live) p(`<g id="al-${id}">`);
+    seg7(x + 22, 27, 19, val, '#ff3220');
+    if (live) p('</g>');
+    rect(x + 3, 23, 104, 10, 'url(#glass)', 'rx="1.5"');
+    text(x + 33, 62, 'MINUTES', 5, INK, 'middle', 700, 'letter-spacing="0.4"'); text(x + 80, 62, 'SECONDS', 5, INK, 'middle', 700, 'letter-spacing="0.4"');
+  };
+  // housing: control head, three track bays, transport bay
+  rect(-4, -4, AL_W + 8, AL_H + 8, '#232120', 'rx="7"');
+  rect(0, 0, AL_W, 148, PANEL, 'rx="5"'); rect(0, 0, AL_W, 1.5, '#fff', 'opacity="0.18"');
+  for (let r = 0; r < 3; r++) {
+    const y0 = 151 + r * 45;
+    rect(0, y0, AL_W, 42, BAY, 'rx="2"'); rect(0, y0, AL_W, 1.2, '#fff', 'opacity="0.14"'); rect(0, y0 + 40.5, AL_W, 1.5, '#000', 'opacity="0.5"');
+    rect(6, y0 + 3, AL_W - 12, 11, '#2c2a29', 'rx="1"');
+    for (let k = 0; k < 8; k++) {
+      const t = r * 8 + k, cx = 32 + k * 48;
+      led(`r${t}`, cx - 10, y0 + 8.5, '#ff3b2f'); led(`i${t}`, cx + 10, y0 + 8.5, '#59f07a');
+      text(cx, y0 + 11.5, String(t + 1), 7, INK, 'middle', 800);
+      roundKey(`ready${t}`, cx - 8, y0 + 27, 6.5, '#151515', '#9a9a9a');
+      roundKey(`input${t}`, cx + 8, y0 + 27, 6.5, '#d9d6cf', '#ffffff');
+      if (!live && S.ready.has(t)) rect(cx - 12.5, y0 + 7, 5, 3, '#ff3b2f', 'rx="0.8" filter="url(#glowSm)"');
+    }
+  }
+  rect(0, 289, AL_W, 51, PANEL, 'rx="5"'); rect(0, 289, AL_W, 1.2, '#fff', 'opacity="0.15"');
+  // displays
+  display('tape', 22, 'TAPE POSITION', S.tape);
+  display('loc', 150, 'LOCATE POSITION', S.loc);
+  key('rsttape', 66, 72, 22, 16, 'red', 'RST', 6);
+  key('rstloc', 194, 72, 22, 16, 'red', 'RST', 6);
+  key('loc', 130, 84, 22, 16, 'blue', 'LOC', 6);
+  key('aplay', 96, 100, 22, 16, 'white', 'A.PLAY', 4.6);
+  key('loc0', 164, 100, 22, 16, 'white', 'LOC 0', 4.6);
+  // tape speed
+  if (live) p('<g data-al="vari" style="cursor:pointer">');
+  circle(30, 104, 11, '#000', 'opacity="0.4"'); circle(29, 102, 10, '#171717'); circle(29, 102, 10, 'url(#capHiDark)');
+  p(`<line ${live ? 'id="al-vari-ptr" ' : ''}x1="29" y1="102" x2="29" y2="94" stroke="#f2f2f2" stroke-width="1.6" stroke-linecap="round" transform="rotate(0 29 102)"/>`);
+  if (live) p('</g>');
+  led('var', 48, 97, '#ff3b2f', 4, 4); led('fix', 48, 107, '#59f07a', 4, 4);
+  text(53, 99, 'VAR', 4.8, INK, 'start', 700); text(53, 109, 'FIX', 4.8, INK, 'start', 700);
+  text(29, 124, 'TAPE', 5, INK, 'middle', 800); text(29, 130, 'SPEED', 5, INK, 'middle', 800);
+  // badges
+  rect(16, 134, 42, 11, '#0d0d0e', 'rx="1.5"'); text(37, 142.6, 'CMI', 8.5, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="1.4"');
+  rect(180, 136, 22, 9, '#0d0d0e', 'rx="1"'); text(191, 143.3, 'CMI', 6, '#e3e5e8', 'middle', 900, 'font-style="italic"');
+  text(270, 145, 'AutoLocator III', 8.5, INK, 'end', 700);
+  // keypad
+  const pad = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['◀', '0', '▶']];
+  pad.forEach((row, r) => row.forEach((k, c) => key(k === '◀' ? 'left' : k === '▶' ? 'right' : `d${k}`, 286 + c * 34, 10 + r * 26, 28, 21, k.length === 1 && /\d/.test(k) ? 'grey' : 'blue', k, 10)));
+  [['sto', 'STO'], ['rcl', 'RCL'], ['reh', 'REH']].forEach(([n, l], c) => key(n, 286 + c * 34, 114, 28, 21, 'white', l, 7));
+  p(`<path d="M318 57 H383 V139 H350" fill="none" stroke="${INK}" stroke-opacity="0.7" stroke-width="0.9"/>`);
+  // transport bay
+  led('ready', 12, 297, '#ffd23a', 4, 4); text(18, 299, 'RECORD READY', 4.8, INK, 'start', 700);
+  led('rec', 70, 297, '#ff3b2f', 4, 4); text(76, 299, 'RECORD', 4.8, INK, 'start', 700);
+  led('cue', 106, 297, '#59f07a', 4, 4); text(112, 299, 'CUE', 4.8, INK, 'start', 700);
+  [['tape', 'TAPE'], ['input', 'INPUT'], ['auto', 'AUTO']].forEach(([n, l], i) => {
+    const cx = 18 + i * 24;
+    roundKey(n, cx, 317, 7, '#141414', '#999');
+    led(`m${n}`, cx, 306.5, '#ffb02e', 4, 2.4);
+    text(cx, 334, l, 4.8, INK, 'middle', 700);
+  });
+  [['rew', 'RWD', 'white'], ['ff', 'FWD', 'white'], ['stop', 'STOP', 'yellow'], ['play', 'PLAY', 'green']].forEach(([n, l, c], i) => {
+    const x = 134 + i * 42;
+    text(x + 16, 300, l, 5.5, INK, 'middle', 800);
+    key(n, x, 304, 32, 28, c, '', 6);
+    if (n === 'rew' || n === 'ff' || n === 'stop' || n === 'play') text(x + 16, 322, n === 'rew' ? '◀◀' : n === 'ff' ? '▶▶' : n === 'stop' ? '■' : '▶', 9, '#1a1208', 'middle', 800, 'pointer-events="none" opacity="0.75"');
+  });
+  text(349, 297, 'RECORD', 5.5, INK, 'middle', 800);
+  rect(323, 300, 52, 36, '#161514', 'rx="3"'); rect(323, 300, 52, 1, '#fff', 'opacity="0.15"');
+  key('record', 333, 305, 32, 26, 'red', '●', 10);
+  // cables out of the bottom right (as on the real unit)
+  for (let k = 0; k < 3; k++) rect(AL_W + 2, 160 + k * 46, 8, 14, '#2a2a2c', 'rx="2"');
+}
+
 // ---------------- AL-III autolocator on its pedestal ----------------
 const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tall, shown scaled to fit the top row
 {
-  const FW = 376, FD = 640, LIP = 44, TOP = -40, SLOPE = 28;
-  const face = capture(() => {
-    rect(0, 0, FW, FD, 'url(#deck)', 'rx="8"');
-    rect(0, 0, FW, FD, '#000', 'filter="url(#brushed)" opacity="0.1" rx="8"');
-    rect(0, 0, FW, 2, '#fff', 'opacity="0.25"');
-    rect(4, 4, FW - 8, FD - 8, 'none', 'rx="6" stroke="#2f2b28" stroke-width="1.5"');
-    rect(14, 14, 64, 24, '#0c0c0d', 'rx="2"');
-    text(46, 32, 'CMI', 15, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
-    text(FW - 14, 33, 'AUTOLOCATOR III', 15, LEG, 'end', 800, 'letter-spacing="1.5"');
-    // two red LED displays
-    rect(12, 48, 244, 76, '#000', 'rx="5"'); rect(17, 53, 234, 66, 'url(#displayBg)', 'rx="3"');
-    seg7(26, 63, 44, '03:42.1', '#ff3220'); rect(17, 53, 234, 26, 'url(#glass)', 'rx="3"');
-    rect(264, 48, 100, 76, '#000', 'rx="5"'); rect(269, 53, 90, 66, 'url(#displayBg)', 'rx="3"');
-    seg7(290, 63, 44, ' 3', '#ff3220'); rect(269, 53, 90, 26, 'url(#glass)', 'rx="3"');
-    text(134, 144, 'TAPE TIME', 14, LEG, 'middle', 800, 'letter-spacing="1"');
-    text(314, 144, 'LOC', 14, LEG, 'middle', 800, 'letter-spacing="1"');
-    // locate memories
-    const locs = [['1', 'INTRO', '00:00.0'], ['2', 'VERSE 1', '00:21.4'], ['3', 'CHORUS', '01:02.8'], ['4', 'SOLO', '02:47.3']];
-    locs.forEach(([n, nm, tm], i) => {
-      const ry = 158 + i * 42;
-      button(12, ry, 60, 34, 'amber', i === 2, `LOC ${n}`, { size: 14, pastel: i !== 2 });
-      rect(80, ry, FW - 92, 34, '#0b0b0c', 'rx="3"'); rect(80, ry, FW - 92, 2, '#000', 'opacity="0.8"');
-      text(92, ry + 23, nm, 15, '#e9dcc0', 'start', 600);
-      text(FW - 22, ry + 24, tm, 16, '#ff6a50', 'end', 700, `font-family="'JetBrains Mono', monospace"`);
-    });
-    // 24 round black track-select buttons (armed tracks glow red)
-    text(12, 344, 'TRACK READY', 14, LEG, 'start', 800, 'letter-spacing="1"');
-    for (let t = 0; t < 24; t++) {
-      const cx = 30 + (t % 8) * 45, cy = 370 + Math.floor(t / 8) * 36;
-      const on = readyTracks.has(t);
-      circle(cx + 1.5, cy + 3, 15, '#000', 'opacity="0.5"');
-      if (on) circle(cx, cy, 16, '#ff3b2f', 'filter="url(#glow)"');
-      circle(cx, cy, 14, '#121214'); circle(cx, cy, 14, 'url(#capHiDark)');
-      text(cx, cy + 5, String(t + 1), 14, on ? '#ff8a7a' : '#d8d8d8', 'middle', 800);
-    }
-    // keypad (light blue), function keys, punch keys
-    const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'CLR', '0', 'ENT'];
-    keys.forEach((k, i) => button(12 + (i % 3) * 48, 478 + Math.floor(i / 3) * 34, 42, 28, 'blue', false, k, { size: k.length > 1 ? 14 : 16, pastel: true }));
-    ['STORE', 'RECALL', 'LOCATE', 'ZERO'].forEach((k, i) => button(162, 478 + i * 34, 94, 28, i === 2 ? 'green' : 'white', false, k, { size: 14, pastel: true }));
-    [['PUNCH IN', 'red', true], ['PUNCH OUT', 'red', false], ['AUTO', 'amber', false], ['ALL SAFE', 'white', false]].forEach(([k, c, on], i) => button(266, 478 + i * 34, 98, 28, c, on, k, { size: 14, pastel: !on }));
-    // transport keys
-    [['◀◀', 'white'], ['▶▶', 'white'], ['■', 'yellow'], ['▶', 'green'], ['●', 'red']].forEach(([g, c], i) => {
-      button(12 + i * 72, 614, 64, 20, c, i >= 3, '', { pastel: i < 3 });
-      text(44 + i * 72, 630, g, 15, '#1a1208', 'middle', 800);
-    });
-  });
+  const FW = 376, FD = Math.round(AL_H * FW / AL_W), LIP = 34, TOP = 150, SLOPE = 30;
+  const face = capture(() => { p(`<g transform="scale(${FW / AL_W})">`); al3(false); p('</g>'); });
   // side planes (wedge)
   const depth = FD * Math.sin(SLOPE * Math.PI / 180), rise = FD * Math.cos(SLOPE * Math.PI / 180);
   const yb = TOP + FD;            // bottom edge of the face (rotation origin)
@@ -513,7 +566,7 @@ const AX = 1408, AY = 76, AW = 400, AH = 816, ALK = 0.723;   // drawn at 816 tal
     ${cable}
     <div style="${B3(`left:12px;top:0;width:${FW}px;height:${AH}px`)}">
       ${side(0)}${side(FW)}
-      <div style="${B3(`left:0;top:${yb}px;width:${FW}px;height:${LIP}px;background:linear-gradient(180deg,#4e4945,#2e2a27);border-radius:0 0 6px 6px`)}"><div style="position:absolute;left:14px;top:12px;font:800 14px ${SANS};color:${LEG};letter-spacing:2px">AL-III REMOTE</div></div>
+      <div style="${B3(`left:0;top:${yb}px;width:${FW}px;height:${LIP}px;background:linear-gradient(180deg,#4e4945,#2e2a27);border-radius:0 0 6px 6px`)}"><div style="position:absolute;left:14px;top:12px;font:800 14px ${SANS};color:${LEG};letter-spacing:2px">AL-III</div></div>
       <div style="${B3(`left:0;top:${TOP}px;width:${FW}px;height:${FD}px;transform-origin:50% 100%;transform:rotateX(${SLOPE}deg);filter:drop-shadow(0 10px 18px rgba(0,0,0,0.5))`)}">${svgWrap(FW, FD, face)}</div>
     </div>
   </div>`);
@@ -1192,6 +1245,20 @@ const lexView = capture(() => {
   remote224(500, 210, 1.6, { liveDisplay: true });
   text(1012, 1900, 'Drag a slider to change it · press a lower key to show its value · press a program key to load a program', 26, '#d9d3c7', 'middle', 600);
 });
+const alView = capture(() => {
+  rect(0, 0, W, OVH, 'url(#wall)'); for (let x = 0; x < W; x += 96) { rect(x, 0, 94, OVH, 'url(#woodH)', 'opacity="0.3"'); rect(x + 94, 0, 2, OVH, '#000', 'opacity="0.6"'); }
+  rect(0, 0, W, OVH, '#000', 'opacity="0.4"');
+  const K = 4.6, ox = 900, oy = 150;
+  rect(ox + 40, oy + 60, AL_W * K, AL_H * K, '#000', 'opacity="0.6" filter="url(#soft)"');
+  p(`<g transform="translate(${ox} ${oy}) scale(${K})">`); al3(true); p('</g>');
+  // locate memory card
+  const mx = 2900, my = 300;
+  rect(mx, my, 640, 900, '#efe9da', 'rx="8"'); rect(mx, my, 640, 90, '#2f2b28', 'rx="8"'); rect(mx, my + 80, 640, 10, '#2f2b28');
+  text(mx + 320, my + 58, 'LOCATE MEMORIES', 34, '#efe9da', 'middle', 800, 'letter-spacing="3"');
+  p(`<g id="al-mem" font-family="'JetBrains Mono', monospace"></g>`);
+  text(ox + AL_W * K / 2, oy + AL_H * K + 120, 'Type a time on the keypad (MMSS) · LOC locates · STO then 0–9 stores the tape position · RCL then 0–9 recalls it · arm tracks with the black keys, then PLAY + RECORD', 28, '#d9d3c7', 'middle', 600);
+  text(ox + AL_W * K / 2, oy + AL_H * K + 170, 'Keyboard: Space play/stop · ← → wind · L locate · R record · digits enter a locate time', 26, '#a9a293', 'middle', 600);
+});
 const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
@@ -1224,12 +1291,14 @@ ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
 ${hot(24, 76, 1360, 590, 'tape', 'Open the HJ-24')}
+${hot(1408, 76, 290, 590, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
 ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}
+${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>')}
 ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
 ${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}

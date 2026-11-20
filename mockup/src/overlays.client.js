@@ -21,8 +21,9 @@
     if (v === 'tape') { const f = o.querySelector('iframe'); if (!f.getAttribute('src')) f.setAttribute('src', f.dataset.src); }
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
+    if (v === 'al') startAL();
   }
-  function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); }
+  function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
   document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', hide));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
@@ -212,5 +213,116 @@
       c.addEventListener('click', () => { patches.splice(n, 1); save(); renderCables(); say(`Pulled ${label(pc.a)} → ${label(pc.b)}`); });
     });
     const cnt = document.getElementById('pb-count'); if (cnt) cnt.textContent = `${patches.length} cable${patches.length === 1 ? '' : 's'}`;
+  }
+
+  // ---------------- AutoLocator III ----------------
+  const alSvg = document.getElementById('alSvg');
+  const AL = { pos: 222, zero: 0, v: 0, mode: 'stop', target: 0, loc: 62, entry: '', apl: false, reh: false, rec: false, pending: null,
+    ready: new Set([19, 20, 21]), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
+  const AL_LEN = 1000;   // 2500 ft at 30 ips
+  const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', ' ': '' };
+  const fmt = (t) => { const a = Math.max(0, Math.abs(t)); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
+  function setSeg(id, digits) {
+    const rs = alSvg.querySelectorAll(`#al-${id} rect`);
+    [...digits].forEach((ch, d) => { const on = SEG[ch] || ''; 'abcdefg'.split('').forEach((k, i) => { const r = rs[d * 7 + i]; if (!r) return; if (on.includes(k)) { r.setAttribute('opacity', '1'); r.setAttribute('filter', 'url(#glowSm)'); } else { r.setAttribute('opacity', '0.09'); r.removeAttribute('filter'); } }); });
+  }
+  const lamp = (n, on) => { const g = alSvg && alSvg.querySelector(`[data-lamp="${n}"]`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
+  const led = (n, on) => { const r = alSvg && alSvg.querySelector(`[data-led="${n}"]`); if (r) { r.setAttribute('opacity', on ? 1 : 0); if (on) r.setAttribute('filter', 'url(#glowSm)'); else r.removeAttribute('filter'); } };
+  const alMsg = (t) => { const m = document.getElementById('al-msg'); if (m) m.textContent = t; };
+  const show2 = (t) => `${t.slice(0, 2)}:${t.slice(2)}`;
+  function drawMem() {
+    const g = document.getElementById('al-mem'); if (!g) return;
+    g.innerHTML = AL.mem.map((m, i) => {
+      const y = 300 + 150 + i * 76, hi = i === AL.last;
+      return `${hi ? `<rect x="2920" y="${y - 50}" width="600" height="68" rx="6" fill="#ffd9a0"/>` : ''}<text x="2960" y="${y}" font-size="40" font-weight="800" fill="#2f2b28">${i}</text><text x="3480" y="${y}" font-size="44" font-weight="800" fill="${m == null ? '#b3ab9a' : '#b3261e'}" text-anchor="end">${m == null ? '--:--' : show2(fmt(m))}</text>`;
+    }).join('');
+  }
+  function locate(t, why) { AL.target = Math.max(0, Math.min(AL_LEN, t + AL.zero)); AL.mode = 'locate'; AL.rec = false; alMsg(`Locating ${why || ''} ${show2(fmt(t))}`); }
+  function press(n) {
+    const d = /^d(\d)$/.exec(n);
+    if (d) {
+      const k = +d[1];
+      if (AL.pending === 'sto') { AL.mem[k] = AL.pos - AL.zero; AL.last = k; AL.pending = null; alMsg(`Stored ${show2(fmt(AL.mem[k]))} in memory ${k}`); drawMem(); return; }
+      if (AL.pending === 'rcl') { AL.pending = null; if (AL.mem[k] == null) { alMsg(`Memory ${k} is empty`); return; } AL.loc = AL.mem[k]; AL.entry = ''; AL.last = k; drawMem(); alMsg(`Recalled memory ${k}: ${show2(fmt(AL.loc))} · press LOC`); return; }
+      AL.entry = (AL.entry + k).slice(-4); const e = AL.entry.padStart(4, '0'); AL.loc = Math.min(5999, +e.slice(0, 2) * 60 + Math.min(59, +e.slice(2))); return;
+    }
+    switch (n) {
+      case 'left': case 'right': AL.loc = Math.max(0, AL.loc + (n === 'left' ? -1 : 1)); AL.entry = ''; break;
+      case 'sto': AL.pending = AL.pending === 'sto' ? null : 'sto'; alMsg(AL.pending ? 'STO: press a memory number 0–9' : 'Ready'); break;
+      case 'rcl': AL.pending = AL.pending === 'rcl' ? null : 'rcl'; alMsg(AL.pending ? 'RCL: press a memory number 0–9' : 'Ready'); break;
+      case 'reh': AL.reh = !AL.reh; alMsg(AL.reh ? 'Rehearse: RECORD switches the monitors but does not record' : 'Rehearse off'); break;
+      case 'rsttape': AL.zero = AL.pos; alMsg('Tape position zeroed here'); break;
+      case 'rstloc': AL.entry = ''; AL.loc = 0; break;
+      case 'loc': AL.entry = ''; locate(AL.loc); break;
+      case 'loc0': locate(0, 'to zero'); break;
+      case 'aplay': AL.apl = !AL.apl; alMsg(AL.apl ? 'Auto play after locate' : 'Auto play off'); break;
+      case 'tape': case 'input': case 'auto': AL.mon = n; alMsg(`Monitor: ${n.toUpperCase()}`); break;
+      case 'rew': case 'ff': AL.mode = n; AL.rec = false; alMsg(n === 'ff' ? 'Fast forward' : 'Rewind'); break;
+      case 'stop': AL.mode = 'stop'; AL.rec = false; alMsg('Stop'); break;
+      case 'play': if (AL.rec) { AL.rec = false; alMsg('Punch out'); } else { AL.mode = 'play'; alMsg('Play'); } break;
+      case 'record':
+        if (!AL.ready.size) { alMsg('No tracks ready: arm tracks with the black keys'); break; }
+        if (AL.mode !== 'play') AL.mode = 'play';
+        AL.rec = true; alMsg(AL.reh ? 'Rehearse punch in (not recording)' : `Recording on ${[...AL.ready].map((t) => t + 1).join(', ')}`); break;
+      default: {
+        const r = /^(ready|input)(\d+)$/.exec(n); if (!r) break;
+        const set = r[1] === 'ready' ? AL.ready : AL.inMon, t = +r[2];
+        if (set.has(t)) set.delete(t); else set.add(t);
+        if (r[1] === 'ready' && AL.rec && !AL.reh) alMsg(`Track ${t + 1} ${set.has(t) ? 'punched in' : 'punched out'}`);
+      }
+    }
+  }
+  let alRaf = 0, alLast = 0;
+  function alTick(now) {
+    const dt = Math.min(0.05, (now - alLast) / 1000); alLast = now;
+    const WIND = 17, A = 9;
+    let want = 0;
+    if (AL.mode === 'play') want = 1 + (AL.varOn ? AL.vari : 0);
+    else if (AL.mode === 'ff') want = WIND; else if (AL.mode === 'rew') want = -WIND;
+    else if (AL.mode === 'locate') { const dd = AL.target - AL.pos; want = Math.sign(dd) * Math.min(WIND, Math.sqrt(2 * A * 0.8 * Math.abs(dd))); if (Math.abs(dd) < 0.05 && Math.abs(AL.v) < 1) { AL.pos = AL.target; AL.v = 0; AL.mode = AL.apl ? 'play' : 'stop'; alMsg(AL.apl ? 'Located · playing' : 'Located'); } }
+    const acc = AL.mode === 'play' ? 4 : A;
+    AL.v += Math.max(-acc * dt, Math.min(acc * dt, want - AL.v));
+    AL.pos += AL.v * dt;
+    if (AL.pos <= 0 || AL.pos >= AL_LEN) { AL.pos = Math.max(0, Math.min(AL_LEN, AL.pos)); if (AL.mode !== 'stop') alMsg(AL.pos <= 0 ? 'Head of tape' : 'End of tape'); AL.v = 0; AL.mode = 'stop'; AL.rec = false; }
+    const tp = AL.pos - AL.zero;
+    setSeg('tape', (tp < 0 ? '-' : '') + fmt(tp).slice(tp < 0 ? 1 : 0));
+    setSeg('loc', AL.entry ? AL.entry.padStart(4, ' ') : fmt(AL.loc));
+    const blink = Math.floor(now / 250) % 2 === 0, recording = AL.rec && AL.mode === 'play';
+    for (let t = 0; t < 24; t++) {
+      const r = AL.ready.has(t);
+      led(`r${t}`, r && (recording && !AL.reh ? true : blink));
+      const inp = AL.mon === 'input' || AL.inMon.has(t) || (AL.mon === 'auto' && r && (AL.mode === 'stop' || recording));
+      led(`i${t}`, inp);
+    }
+    led('ready', AL.ready.size > 0); led('rec', recording && (!AL.reh || blink)); led('cue', AL.mode === 'locate');
+    ['tape', 'input', 'auto'].forEach((m) => led(`m${m}`, AL.mon === m));
+    led('var', AL.varOn); led('fix', !AL.varOn);
+    lamp('play', AL.mode === 'play'); lamp('stop', AL.mode === 'stop'); lamp('ff', AL.mode === 'ff' || (AL.mode === 'locate' && AL.v > 0)); lamp('rew', AL.mode === 'rew' || (AL.mode === 'locate' && AL.v < 0));
+    lamp('record', recording); lamp('loc', AL.mode === 'locate'); lamp('aplay', AL.apl); lamp('reh', AL.reh); lamp('sto', AL.pending === 'sto'); lamp('rcl', AL.pending === 'rcl');
+    const ptr = document.getElementById('al-vari-ptr'); if (ptr) ptr.setAttribute('transform', `rotate(${AL.varOn ? AL.vari * 675 : 0} 29 102)`);
+    alRaf = requestAnimationFrame(alTick);
+  }
+  function startAL() { drawMem(); alLast = performance.now(); cancelAnimationFrame(alRaf); alRaf = requestAnimationFrame(alTick); }
+  function stopAL() { cancelAnimationFrame(alRaf); alRaf = 0; }
+  if (alSvg) {
+    alSvg.querySelectorAll('[data-al]').forEach((g) => {
+      const n = g.dataset.al;
+      if (n === 'vari') {
+        let y0 = null, v0 = 0, moved = false;
+        g.addEventListener('pointerdown', (e) => { y0 = e.clientY; v0 = AL.vari; moved = false; g.setPointerCapture(e.pointerId); });
+        g.addEventListener('pointermove', (e) => { if (y0 == null) return; const dy = y0 - e.clientY; if (Math.abs(dy) > 4) moved = true; if (moved) { AL.varOn = true; AL.vari = Math.max(-0.2, Math.min(0.2, v0 + dy / 600)); alMsg(`Vari-speed ${AL.vari >= 0 ? '+' : ''}${(AL.vari * 100).toFixed(1)} %`); } });
+        g.addEventListener('pointerup', () => { if (!moved) { AL.varOn = !AL.varOn; alMsg(AL.varOn ? `Vari-speed ${(AL.vari * 100).toFixed(1)} % · drag the knob` : 'Fixed speed'); } y0 = null; });
+        return;
+      }
+      g.addEventListener('click', () => press(n));
+    });
+    addEventListener('keydown', (e) => {
+      if (!open || open.dataset.view !== 'al') return;
+      const k = e.key;
+      if (/^\d$/.test(k)) press(`d${k}`);
+      else if (k === ' ') { e.preventDefault(); press(AL.mode === 'stop' ? 'play' : 'stop'); }
+      else if (k === 'ArrowLeft') press('rew'); else if (k === 'ArrowRight') press('ff');
+      else if (k === 'l' || k === 'L' || k === 'Enter') press('loc'); else if (k === 'r' || k === 'R') press('record');
+    });
   }
 })();
