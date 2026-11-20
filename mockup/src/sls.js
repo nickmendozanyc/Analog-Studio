@@ -16,16 +16,19 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
   const names = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
   let seed = 7; const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
 
-  // SSL knob: dark grey knurled body, coloured cap insert on top, white pointer line, scale dots round the panel.
+  // SSL knob (as the 611EQ / G+ photos): tall light-grey ribbed body, large coloured cap on top, white pointer line on the cap,
+  // scale dots printed round it on the panel. The body's side shows as a darker crescent below the cap (seen from the front).
   const sk = (cx, cy, r, col, ang = 0, lab = '', labY = null) => {
-    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.2) * Math.cos(a)).toFixed(1), (cy + (r + 3.2) * Math.sin(a)).toFixed(1), 0.6, '#2a2b2d'); }
-    circle(cx + 0.7, cy + 1.6, r + 0.6, '#000', 'opacity="0.5"');
-    circle(cx, cy, r, '#2f3134');
-    p(`<circle cx="${cx}" cy="${cy}" r="${(r - 0.6).toFixed(1)}" fill="none" stroke="#56595d" stroke-width="1.2" stroke-dasharray="0.9 1.1"/>`);
-    circle(cx, cy, r * 0.64, col);
-    circle(cx, cy, r * 0.64, 'url(#capHiDark)');
+    if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.2) * Math.cos(a)).toFixed(1), (cy + (r + 3.2) * Math.sin(a)).toFixed(1), 0.6, '#1e2022'); }
+    circle(cx + 1.2, cy + r * 0.38 + 1.4, r * 1.02, '#000', 'opacity="0.38"');        // cast shadow
+    circle(cx, cy + r * 0.3, r, '#8e9292');                                           // side of the body
+    p(`<circle cx="${cx}" cy="${(cy + r * 0.3).toFixed(1)}" r="${(r - 0.5).toFixed(1)}" fill="none" stroke="#6e7272" stroke-width="1" stroke-dasharray="0.8 1"/>`);
+    circle(cx, cy, r, '#c4c7c6');                                                     // ribbed top rim
+    p(`<circle cx="${cx}" cy="${cy}" r="${(r - 0.5).toFixed(1)}" fill="none" stroke="#9fa3a3" stroke-width="1" stroke-dasharray="0.8 1"/>`);
+    circle(cx, cy, r * 0.8, col);                                                     // coloured cap
+    circle(cx, cy, r * 0.8, 'url(#capHiDark)', 'opacity="0.55"');
     const a = (ang - 90) * Math.PI / 180;
-    p(`<line x1="${cx}" y1="${cy}" x2="${(cx + r * 0.92 * Math.cos(a)).toFixed(1)}" y2="${(cy + r * 0.92 * Math.sin(a)).toFixed(1)}" stroke="#fff" stroke-width="${Math.max(1, r * 0.14).toFixed(1)}" stroke-linecap="round"/>`);
+    p(`<line x1="${(cx + r * 0.15 * Math.cos(a)).toFixed(1)}" y1="${(cy + r * 0.15 * Math.sin(a)).toFixed(1)}" x2="${(cx + r * 0.78 * Math.cos(a)).toFixed(1)}" y2="${(cy + r * 0.78 * Math.sin(a)).toFixed(1)}" stroke="${col === '#e9eaec' || col === '#d9dbde' || col === '#c9ccd1' || col === '#e0b23a' ? '#1e2022' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.15).toFixed(1)}" stroke-linecap="round"/>`);
     if (lab) text(cx, labY ?? cy + r + 9, lab, 6.5, INK2, 'middle', 700, 'letter-spacing="0.3"');
   };
   const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
