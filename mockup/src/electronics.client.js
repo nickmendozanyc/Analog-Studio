@@ -22,6 +22,7 @@
         EL.node = new AudioWorkletNode(EL.ctx, 'jh24-electronics', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
         EL.node.connect(EL.ctx.destination);
         EL.node.port.onmessage = (e) => elRecv(e.data);
+        EL.node.port.postMessage({ type: 'tape', key: TP.key, params: window.JH_TAPES[TP.key], align: true });
         elPost({ type: 'getTrims' });
       }
       await EL.ctx.resume();
@@ -176,3 +177,36 @@
     const c = tr.counter, a = Math.abs(c), names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
     tpMsg.textContent = `${c < 0 ? '-' : ''}${String(Math.floor(a / 60)).padStart(2, '0')}:${String(Math.floor(a % 60)).padStart(2, '0')} · ${names[tr.mode] || tr.mode.toUpperCase()} · ${tr.speedIPS} ips${tr.varispeed ? ` ${tr.varispeed > 0 ? '+' : ''}${(tr.varispeed * 100).toFixed(1)} %` : ''}${tr.liftDefeat ? ' · LIFT' : ''} · space play/stop · , rewind · . fast forward · Z zero`;
   }
+
+  // ---------------- tapes: swap the reel on the machine (every deck view) and the formulation in the electronics ----
+  // Each tape is its own reel: what is recorded on it, where it is wound to and its time code go with it.
+  function setReelSkin(k, style) {
+    const sk = window.JH_SKINS && window.JH_SKINS[k] && window.JH_SKINS[k][style]; if (!sk) return;
+    for (const pre of ['jh', 'a8', 'jhp', 'a8p']) {
+      document.querySelectorAll(`.${pre}-fl[data-reel="${k}"]`).forEach((el) => { el.style.background = sk[el.dataset.layer]; el.style.clipPath = `path(evenodd, '${sk.d}')`; });
+      document.querySelectorAll(`.${pre}-lab[data-reel="${k}"] svg`).forEach((el) => { el.innerHTML = sk.label; });
+      document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`).forEach((el) => {
+        if (el.classList.contains(`${pre}-smearback`)) { el.style.background = sk.backBg; return; }
+        Object.assign(el.dataset, { slots: sk.slots, slotw: sk.slotW, lab: sk.labs, labw: sk.labW, hole: sk.hole, labc: sk.labc, labk: sk.labk, avg: sk.faceAvg });
+        el.style.background = sk.faceAvg;
+      });
+      document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`).forEach((el) => { el.style.background = sk.lightBg; });
+      document.querySelectorAll(`.${pre}-ring[data-reel="${k}"]`).forEach((el) => { el.style.background = sk.ringBg; });
+    }
+    for (const rl of reels) if (rl.k === k) rl.smKey = '';   // redraw the exposure smear for the new windows
+  }
+  const TP = { key: 'a499', store: {}, aligned: false };
+  function threadTape(key) {
+    const t = window.JH_TAPES[key]; if (!t || key === TP.key) return;
+    AL.rep = false; AL.rehPunch = false; tr.command('stop');
+    TP.store[TP.key] = { take: tr.take, zero: tr.zero, stripes: SBX.stripes };
+    const sv = TP.store[key] || { take: 0.6, zero: 0.6, stripes: [] };   // a fresh reel: at the head, leader on, no code yet
+    TP.key = key;
+    tr.locate(sv.take); tr.zero = sv.zero; SBX.stripes = sv.stripes;
+    setReelSkin('s', t.reel);
+    elPost({ type: 'tape', key, params: t });
+    elMsg(`${t.name} threaded (recommended ${t.ol} nWb/m). Realign for it: ALIGN ALL, or by hand with the alignment tape.`);
+  }
+  const tapeSel = document.getElementById('tape-sel'), takeSel = document.getElementById('takeup-sel');
+  if (tapeSel) tapeSel.addEventListener('change', () => threadTape(tapeSel.value));
+  if (takeSel) takeSel.addEventListener('change', () => setReelSkin('t', takeSel.value));

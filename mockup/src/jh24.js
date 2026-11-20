@@ -112,43 +112,122 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   add(svg(DW, DD, deckSvg));
 
   // ---------- reels ----------
+  // reel skins: each tape's reel as photographed (made-up brand names; designs after the user's photos). Windows: n
+  // trapezoids from rIn to rOut (fractions of R), widths wIn / wOut, first at a0 degrees from the reel's own rotation.
+  // Labels: art drawn upright at (0, 0), placed at the given angles (clockwise from the top of the reel).
+  const silver = (base, a, b, c2) => `radial-gradient(circle at 38% 30%, rgba(255,255,255,0.75), rgba(255,255,255,0) 45%), conic-gradient(from 200deg, rgba(255,255,255,0.35), rgba(0,0,0,0.10) 25%, rgba(255,255,255,0.30) 50%, rgba(0,0,0,0.12) 75%, rgba(255,255,255,0.35)), repeating-conic-gradient(from 0deg, ${a} 0deg 0.35deg, ${b} 0.35deg 0.8deg, ${c2} 0.8deg 1.1deg), ${base}`;
+  const SILVER = { face: silver('#dfe2e5', '#e4e6e9', '#d9dce0', '#eceef0'), edge: 'linear-gradient(90deg,#8f9398,#e9ebee 40%,#7c8085)', back: '#9a9ea3' };
+  const T = (x, y, str, size, fill, extra = '') => `<text x="${x}" y="${y}" font-family="${SANS}" font-size="${size}" fill="${fill}" text-anchor="middle" font-weight="900" ${extra}>${esc(str)}</text>`;
+  const amtex = (num) => (rl, lx, ly, la) => [txt(lx, ly - 26, 'AMTEX', 19, '#141414', 'middle', 900, 'letter-spacing="1"'), txt(lx, ly + 13, num, 40, '#a9802f', 'middle', 900, 'letter-spacing="-1"'), txt(lx, ly + 27, num === '499' ? 'GOLD MASTER' : 'GRAND MASTER', 8.8, '#141414', 'middle', 800), txt(lx, ly + 39, 'Studio Mastering Audio Tape', 8.2, '#a9802f', 'middle', 600)].join('');
   const REEL = {
-    a499: {
-      face: `radial-gradient(circle at 38% 30%, rgba(255,255,255,0.75), rgba(255,255,255,0) 45%), conic-gradient(from 200deg, rgba(255,255,255,0.35), rgba(0,0,0,0.10) 25%, rgba(255,255,255,0.30) 50%, rgba(0,0,0,0.12) 75%, rgba(255,255,255,0.35)), repeating-conic-gradient(from 0deg, #e4e6e9 0deg 0.35deg, #d9dce0 0.35deg 0.8deg, #eceef0 0.8deg 1.1deg), #dfe2e5`,
-      edge: 'linear-gradient(90deg,#8f9398,#e9ebee 40%,#7c8085)', back: '#9a9ea3', ink: '#141414',
-    },
+    a499: { name: 'Amtex 499', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('499') },
+    a456: { name: 'Amtex 456', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('456') },
     gp9: {
-      face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
-      edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b', ink: '#1b1b1b',
-      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.8,
+      name: 'Quantica GP9', face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
+      edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b',
+      win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.12, wOut: 0.12, c: 0.035, a0: 0 },
+      // a small white sticker near the rim, as on the photographed GP9
+      labels: [[90, (g) => `<g transform="translate(0 ${g * 0.16})"><rect x="-58" y="-30" width="116" height="60" rx="4" fill="#f6f4ef" stroke="#c9c2b6" stroke-width="1"/>${T(-12, -14, 'QUANTICA', 11, '#d23a24', 'letter-spacing="0.6"')}<ellipse cx="2" cy="6" rx="46" ry="14" fill="#e94f2f" transform="rotate(-10 2 6)"/>${T(4, 15, 'GP9', 28, '#ffffff', 'font-style="italic"')}${T(0, 26, 'GRAND MASTER PLATINUM', 5.6, '#2a2a2a')}</g>`]],
+      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)', holeRGB: '40,12,6', labRGB: '246,240,232', labK: 0.5,
+    },
+    maxwell: {
+      name: 'Maxwell', ...SILVER, face: silver('#e3e5e7', '#e8e9eb', '#dcdee1', '#eff0f2'),
+      win: { n: 2, rIn: 0.43, rOut: 0.86, wIn: 0.32, wOut: 0.36, c: 0.025, a0: 90 },
+      labels: [0, 180].map((a) => [a, () => `<g>${T(0, 44, 'm', 150, '#111', 'transform="scale(1.18 1)" letter-spacing="-4"')}<text transform="translate(-86 -6) rotate(-90)" font-family="${SANS}" font-size="15" font-weight="800" fill="#111" text-anchor="middle">maxwell</text></g>`]),
+      labRGB: '30,30,30', labK: 0.35,
+    },
+    scotia: {
+      name: 'Scotia', ...SILVER, face: silver('#dcdfe2', '#e1e3e6', '#d5d8dc', '#e8eaed'),
+      win: { n: 3, rIn: 0.44, rOut: 0.87, wIn: 0.28, wOut: 0.56, c: 0.07, a0: 60 },
+      labels: [[0, () => `<g>${T(0, 16, 'Scotia', 50, 'rgba(255,255,255,0.45)', 'font-style="italic" stroke="#8a8e93" stroke-width="1.6" letter-spacing="1"')}${T(78, -6, '®', 12, '#8a8e93')}</g>`]],
+      labRGB: '150,154,160', labK: 0.25,
+    },
+    atx: {
+      name: 'ATX Magnetics', ...SILVER, face: silver('#e1e3e5', '#e6e7e9', '#dadcdf', '#edeef0'),
+      win: { n: 3, rIn: 0.44, rOut: 0.86, wIn: 0.26, wOut: 0.48, c: 0.06, a0: 30 },
+      labels: [[90, () => `<g transform="rotate(-90)"><rect x="-62" y="-36" width="124" height="72" rx="3" fill="#fbfbf8" stroke="#141414" stroke-width="3"/><rect x="-40" y="-31" width="80" height="28" fill="none" stroke="#141414" stroke-width="2"/>${T(0, -9, 'ATX', 25, '#141414', 'letter-spacing="2"')}${T(0, 9, 'MAGNETICS', 11, '#141414', 'letter-spacing="1.5"')}<rect x="-57" y="15" width="114" height="17" fill="#141414"/>${T(0, 28, 'MASTER TAPE', 12.5, '#fbfbf8', 'letter-spacing="1"')}</g>`]],
+      labRGB: '120,120,118', labK: 0.4,
+    },
+    bafs: {
+      name: 'BAFS Studio Master 900', face: silver('#cfd1cf', '#d4d6d4', '#c8cac8', '#dadcda'), edge: 'linear-gradient(90deg,#86898a,#dcdedd 40%,#76797a)', back: '#8e9192',
+      win: { n: 3, rIn: 0.46, rOut: 0.87, wIn: 0.34, wOut: 0.58, c: 0.09, a0: 60 },
+      labels: [[0, () => `<g><rect x="-74" y="-40" width="148" height="80" rx="3" fill="#121212"/><rect x="-66" y="-33" width="18" height="18" fill="#e3321f"/><circle cx="-57" cy="-24" r="5" fill="none" stroke="#fff" stroke-width="2"/>${T(12, -15, 'BAFS', 26, '#ffffff', 'letter-spacing="1"')}${T(8, 2, 'STUDIO MASTER', 12, '#ffffff', 'letter-spacing="0.8"')}${T(30, 26, '900', 24, '#e3321f')}${T(30, 37, 'maxima', 10, '#e3321f', 'font-style="italic"')}${T(-38, 22, 'HIGH OUTPUT', 6.5, '#e3321f')}</g>`]],
+      labRGB: '30,30,30', labK: 0.45,
     },
   };
-  const slot = (cx, cy, rIn, rOut, w, ang, c) => {
-    const t = ang * Math.PI / 180, rot = (x, y) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
-    const hw = w / 2, y0 = -rOut, y1 = -rIn;
-    const seq = [['M', -hw + c, y0], ['L', hw - c, y0], ['A', hw, y0 + c], ['L', hw, y1 - c], ['A', hw - c, y1], ['L', -hw + c, y1], ['A', -hw, y1 - c], ['L', -hw, y0 + c], ['A', -hw + c, y0]];
-    return seq.map(([cmd, x, y]) => { const [X, Y] = rot(x, y); return cmd === 'A' ? `A${c} ${c} 0 0 1 ${f(X)} ${f(Y)}` : `${cmd}${f(X)} ${f(Y)}`; }).join(' ') + ' Z ';
+  globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
+  // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
+  const slot = (cx, cy, w, ang) => {
+    const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
+    const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
+    let d = '';
+    for (let i = 0; i < 4; i++) {
+      const p0 = P[(i + 3) % 4], p1 = P[i], p2 = P[(i + 1) % 4];
+      const u = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy); return [dx / L, dy / L]; };
+      const a = u(p1, p0), b = u(p1, p2), s1 = [p1[0] + a[0] * c, p1[1] + a[1] * c], s2 = [p1[0] + b[0] * c, p1[1] + b[1] * c];
+      d += `${i === 0 ? 'M' : 'L'}${f(s1[0])} ${f(s1[1])} Q${f(p1[0])} ${f(p1[1])} ${f(s2[0])} ${f(s2[1])} `;
+    }
+    return d + 'Z ';
   };
-  function reelMask(rot) {
+  const winAngles = (st, rot) => Array.from({ length: st.win.n }, (_, k) => rot + st.win.a0 + k * 360 / st.win.n);
+  function reelMask(st, rot) {
     const c = R;
     let d = `M0 ${c} A${c} ${c} 0 1 0 ${2 * c} ${c} A${c} ${c} 0 1 0 0 ${c} Z M${c - hubR} ${c} A${hubR} ${hubR} 0 1 0 ${c + hubR} ${c} A${hubR} ${hubR} 0 1 0 ${c - hubR} ${c} Z `;
-    for (const k of [0, 180]) d += slot(c, c, R * 0.5, R * 0.84, R * 0.17, rot + k, R * 0.035);
-    const s = `<svg xmlns='http://www.w3.org/2000/svg' width='${2 * c}' height='${2 * c}'><path d='${d}' fill='black' fill-rule='evenodd'/></svg>`;
-    return { url: `url("data:image/svg+xml;utf8,${encodeURIComponent(s)}")`, d };
+    for (const a of winAngles(st, rot)) d += slot(c, c, st.win, a);
+    return { d };
+  }
+  // everything about one reel that changes with the skin (also handed to the page so it can swap reels live)
+  function skin(styleKey, rl) {
+    const st = REEL[styleKey], { d } = reelMask(st, rl.rot), c = R;
+    const lab = [];
+    let labAngles;
+    if (st.legacy) {
+      const la = rl.labelAt ?? rl.rot;
+      const [lx, ly] = [c + R * 0.62 * Math.cos(la * Math.PI / 180), c + R * 0.62 * Math.sin(la * Math.PI / 180)];
+      lab.push(`<g transform="rotate(${la + (rl.labelAt != null ? 180 : 0)} ${f(lx)} ${f(ly)})">${st.legacy(rl, lx, ly, la)}</g>`);
+      labAngles = [la + 90];
+    } else {
+      labAngles = st.labels.map(([a]) => rl.rot + a);
+      for (const [a, art] of st.labels) { const A = rl.rot + a, r = A * Math.PI / 180; lab.push(`<g transform="translate(${f(c + R * 0.64 * Math.sin(r))} ${f(c - R * 0.64 * Math.cos(r))}) rotate(${f(A)})">${art(R)}</g>`); }
+    }
+    for (let k = 0; k < 6; k++) { const a = (rl.rot + 30 + k * 60) * Math.PI / 180; lab.push(`<circle cx="${f(c + R * 0.42 * Math.cos(a))}" cy="${f(c + R * 0.42 * Math.sin(a))}" r="3.8" fill="#111"/><circle cx="${f(c + R * 0.42 * Math.cos(a) - 0.8)}" cy="${f(c + R * 0.42 * Math.sin(a) - 0.8)}" r="1.4" fill="#555"/>`); }
+    lab.push(`<path d="${d}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2"/>`);
+    lab.push(`<circle cx="${c}" cy="${c}" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>`);
+    lab.push(`<circle cx="${c}" cy="${c}" r="${hubR}" fill="none" stroke="#0d0d0e" stroke-width="8"/>`);
+    const layers = (() => { const out = []; let dd = 0, cur = ''; for (const ch of st.face) { if (ch === '(') dd++; if (ch === ')') dd--; if (ch === ',' && dd === 0) { out.push(cur.trim()); cur = ''; } else cur += ch; } out.push(cur.trim()); return out; })();
+    const faceAvg = layers[layers.length - 1], faceLight = layers.filter((l) => !l.startsWith('repeating') && l !== faceAvg).join(', ');
+    const base = st.face.replace(/repeating-conic-gradient\([^()]*\),\s*/, '');
+    const pr = (x) => f(R * x), band = (col, a, b, fa, fb) => `${col.replace('A', 0)} ${pr(a)}px, ${col.replace('A', fa)} ${pr(a + 0.03)}px, ${col.replace('A', fb)} ${pr(b - 0.03)}px, ${col.replace('A', 0)} ${pr(b)}px`;
+    const open = Math.min(0.35, st.win.n * ((st.win.wIn + st.win.wOut) / 2) / (2 * Math.PI * 0.67));   // fraction of the circle that is window
+    const ring = [
+      `radial-gradient(circle, transparent ${pr(0.36)}px, ${band('rgba(0,0,0,A)', 0.385, 0.455, 0.16, 0.16)}, transparent ${pr(0.46)}px)`,
+      `radial-gradient(circle, transparent ${pr(st.win.rIn - 0.03)}px, ${band(st.smearSlot || 'rgba(26,18,12,A)', st.win.rIn - 0.02, st.win.rOut + 0.02, (open * 1.6).toFixed(3), (open * 1.4).toFixed(3))}, transparent ${pr(st.win.rOut + 0.03)}px)`,
+      `radial-gradient(circle, transparent ${pr(0.49)}px, ${band(st.smearLabel || `rgba(${st.labRGB || '150,118,62'},A)`, 0.5, 0.78, 0.16 * (st.labK || 0.4) / 0.4, 0.14 * (st.labK || 0.4) / 0.4)}, transparent ${pr(0.79)}px)`,
+    ].join(', ');
+    return {
+      d, face: st.face, edge: st.edge, back: st.back, faceAvg, faceLight, label: lab.join(''),
+      lightBg: `radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${faceLight}`,
+      slots: winAngles(st, rl.rot).map((a) => f(a)).join(','), slotW: f(((st.win.wIn + st.win.wOut) / 2) / 0.67 * 180 / Math.PI),
+      labs: labAngles.map((a) => f(a)).join(','), labW: f(2 * Math.atan(58 / (R * 0.62)) * 180 / Math.PI),
+      hole: st.holeRGB || '24,16,11', labc: st.labRGB || '150,120,64', labk: st.labK || 0.4,
+      ringBg: `radial-gradient(circle, transparent ${f(hubR - 1)}px, #0d0d0e ${f(hubR)}px, #0d0d0e ${f(hubR + 4)}px, transparent ${f(hubR + 5)}px), ${ring}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`,
+      backBg: `radial-gradient(circle, transparent ${pr(st.win.rIn - 0.03)}px, rgba(0,0,0,0.12) ${pr(st.win.rIn + 0.01)}px, rgba(0,0,0,0.1) ${pr(st.win.rOut - 0.01)}px, transparent ${pr(st.win.rOut + 0.03)}px), ${st.back}`,
+    };
   }
   function reel(rl) {
-    const st = REEL[rl.style];
-    const { url, d } = reelMask(rl.rot);
+    const key = rl === supply ? 's' : 't';
+    const sk = skin(rl.style, rl), d = sk.d;
+    // every skin of this reel, so the page can swap tapes without rebuilding the deck
+    (globalThis.JH_SKINS = globalThis.JH_SKINS || {})[key] = Object.fromEntries(Object.keys(REEL).map((k) => [k, skin(k, rl)]));
     const { cx, cy } = rl;
     // turntable + spindle
     cylinder(cx, cy, 92, 0, 18, 'linear-gradient(90deg,#2a2725,#55504b 40%,#1e1c1a)', '#3c3835', 3);
-    const key = rl === supply ? 's' : 't';
     const rotor = () => add(`<div class="jh-rotor" data-reel="${key}" style="${box(`left:0;top:0;width:${DW}px;height:${DD}px;transform-origin:${f(cx)}px ${f(cy)}px`)}">`);
     // back flange (3 layers)
     rotor();
-    const flange = (z, bg) => add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${bg};clip-path:path(evenodd,'${d}')`)}"></div>`);
-    flange(20, st.edge); flange(21.5, st.edge); flange(23, st.back);
-    add(`<div class="jh-smear" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:radial-gradient(circle, transparent ${f(R * 0.47)}px, rgba(0,0,0,0.12) ${f(R * 0.51)}px, rgba(0,0,0,0.1) ${f(R * 0.83)}px, transparent ${f(R * 0.87)}px), ${st.back}`)}"></div>`);   // back flange smears too
+    const flange = (z, layer) => add(`<div class="jh-fl" data-reel="${key}" data-layer="${layer}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${sk[layer]};clip-path:path(evenodd,'${d}')`)}"></div>`);
+    flange(20, 'edge'); flange(21.5, 'edge'); flange(23, 'back');
+    add(`<div class="jh-smear jh-smearback" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:${sk.backBg}`)}"></div>`);   // back flange smears too
     add('</div>');
     // hub ring (black plastic) between the flanges
     for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
@@ -158,55 +237,19 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #1a110b ${f(hubR)}px, #2a1b11 ${f(hubR + 8)}px, #21150d ${f(rl.pack * 0.7)}px, #332216 ${f(rl.pack - 3)}px, #110b07 ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`, '', `jh-pack jh-pack-${key} jh-packtop`);
     rotor();
     // front flange (3 layers, the top one with the finish)
-    flange(100, st.edge); flange(101.5, st.edge);
-    flange(103, st.face);
-    // printed label + screws + hub detail on the front flange
-    const lab = [];
-    const c = R;
-    const la = rl.labelAt ?? rl.rot;
-    const [lx, ly] = [c + R * 0.62 * Math.cos(la * Math.PI / 180), c + R * 0.62 * Math.sin(la * Math.PI / 180)];
-    lab.push(`<g transform="rotate(${la + (rl.labelAt != null ? 180 : 0)} ${f(lx)} ${f(ly)})">`);
-    if (rl.style === 'gp9') {
-      lab.push(txt(lx + 4, ly - 30, 'QUANTICA', 15.5, '#1b1b1b', 'middle', 900, 'letter-spacing="0.5"'));
-      lab.push(`<ellipse cx="${f(lx - 4)}" cy="${f(ly + 2)}" rx="60" ry="21" fill="#f3f1ec" transform="rotate(-12 ${f(lx)} ${f(ly)})"/>`);
-      lab.push(txt(lx + 2, ly + 14, 'GP9', 42, '#3a3a3c', 'middle', 900, 'font-style="italic" letter-spacing="-1"'));
-      lab.push(txt(lx + 2, ly + 35, 'PLATINUM MASTER', 8.8, '#1b1b1b', 'middle', 800));
-    } else {
-      lab.push(txt(lx, ly - 26, 'AMTEX', 19, '#141414', 'middle', 900, 'letter-spacing="1"'));
-      lab.push(txt(lx, ly + 13, '499', 40, '#a9802f', 'middle', 900, 'letter-spacing="-1"'));
-      lab.push(txt(lx, ly + 27, 'GOLD MASTER', 8.8, '#141414', 'middle', 800));
-      lab.push(txt(lx, ly + 39, 'Studio Mastering Audio Tape', 8.2, '#a9802f', 'middle', 600));
-    }
-    lab.push(`</g>`);
-    for (let k = 0; k < 6; k++) { const a = (rl.rot + 30 + k * 60) * Math.PI / 180; lab.push(`<circle cx="${f(c + R * 0.42 * Math.cos(a))}" cy="${f(c + R * 0.42 * Math.sin(a))}" r="3.8" fill="#111"/><circle cx="${f(c + R * 0.42 * Math.cos(a) - 0.8)}" cy="${f(c + R * 0.42 * Math.sin(a) - 0.8)}" r="1.4" fill="#555"/>`); }
-    lab.push(`<path d="${d}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2"/>`);
-    lab.push(`<circle cx="${c}" cy="${c}" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>`);
-    lab.push(`<circle cx="${c}" cy="${c}" r="${hubR}" fill="none" stroke="#0d0d0e" stroke-width="8"/>`);
-    // exposure smear (rotates with the reel): each slot and the label drag an arc behind them whose length is the angle
-    // the reel turns during one exposure; the client writes the conic gradients from the reel speed
-    const faceLayers = (() => { const out = []; let d = 0, cur = ''; for (const ch of st.face) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && d === 0) { out.push(cur.trim()); cur = ''; } else cur += ch; } out.push(cur.trim()); return out; })();
-    const faceAvg = faceLayers[faceLayers.length - 1], faceLight = faceLayers.filter((l) => !l.startsWith('repeating') && l !== faceAvg).join(', ');
+    flange(100, 'edge'); flange(101.5, 'edge'); flange(103, 'face');
+    // exposure smear (rotates with the reel): each window and the label drag an arc behind them whose length is the
+    // angle the reel turns during one exposure; the client writes the conic gradients from the reel speed
     const bandMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px);mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px)`;
-    const slotW = 2 * Math.atan((R * 0.17 / 2) / (R * 0.67)) * 180 / Math.PI, labW = 2 * Math.atan(58 / (R * 0.62)) * 180 / Math.PI;
-    add(`<div class="jh-smear" data-reel="${key}" data-slots="${f(rl.rot)},${f(rl.rot + 180)}" data-slotw="${f(slotW)}" data-lab="${f((rl.labelAt ?? rl.rot) + 90)}" data-labw="${f(labW)}" data-hole="${st.holeRGB || '24,16,11'}" data-labc="${st.labRGB || '150,120,64'}" data-labk="${st.labK || 0.4}" data-avg="${faceAvg}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.7px);background:${faceAvg};${bandMask}`)}"></div>`);
-    add(`<div class="jh-lab" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, lab.join(''))}</div>`);
-    // motion blur (fast winds): what a spinning reel really looks like. Lighting and the flange finish stay put (they
-    // belong to the room light), the brushed texture goes smooth, and the two slots, the label and the screws smear into
-    // faint soft rings in proportion to how much of each circle they cover. Faded in with reel speed.
-    const base = st.face.replace(/repeating-conic-gradient\([^()]*\),\s*/, '');
-    const pr = (x) => f(R * x), band = (c, a, b, fa, fb) => `${c.replace('A', 0)} ${pr(a)}px, ${c.replace('A', fa)} ${pr(a + 0.03)}px, ${c.replace('A', fb)} ${pr(b - 0.03)}px, ${c.replace('A', 0)} ${pr(b)}px`;
-    const smear = [
-      `radial-gradient(circle, transparent ${pr(0.36)}px, ${band('rgba(0,0,0,A)', 0.385, 0.455, 0.16, 0.16)}, transparent ${pr(0.46)}px)`,   // screw circle
-      `radial-gradient(circle, transparent ${pr(0.47)}px, ${band(st.smearSlot || 'rgba(26,18,12,A)', 0.48, 0.86, 0.13, 0.11)}, transparent ${pr(0.87)}px)`,   // slots: ~8 % of the circle is see-through
-      `radial-gradient(circle, transparent ${pr(0.49)}px, ${band(st.smearLabel || 'rgba(150,118,62,A)', 0.5, 0.76, 0.16, 0.14)}, transparent ${pr(0.77)}px)`,   // the printed label
-    ].join(', ');
-    const ringDisc = `<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${smear}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`)}"></div>`;   // added after the rotor closes: it must not turn
+    add(`<div class="jh-smear" data-reel="${key}" data-slots="${sk.slots}" data-slotw="${sk.slotW}" data-lab="${sk.labs}" data-labw="${sk.labW}" data-hole="${sk.hole}" data-labc="${sk.labc}" data-labk="${sk.labk}" data-avg="${sk.faceAvg}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.7px);background:${sk.faceAvg};${bandMask}`)}"></div>`);
+    add(`<div class="jh-lab" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, sk.label)}</div>`);
     // black hold-down knob on the spindle
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
     add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 5px, #3a3a3d 7.5px, #17171a 13px, #141416 28px, rgba(14,14,15,0.7) 31px, rgba(14,14,15,0.32) 37px, rgba(14,14,15,0) 41px)`)}"></div>`);
-    const staticAfter = `<div class="jh-light" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.75px);background:radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${faceLight};${bandMask}`)}"></div>${ringDisc.replace(/^add\(|\)$/g, '')}`;
-    add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="44" cy="44" r="30" fill="url(#none)"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
+    const staticAfter = `<div class="jh-light" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.75px);background:radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${sk.faceLight};${bandMask}`)}"></div>`
+      + `<div class="jh-blur jh-ring" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${sk.ringBg}`)}"></div>`;
+    add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
     add('</div>');
     add(staticAfter);   // non-rotating blur layers
   }

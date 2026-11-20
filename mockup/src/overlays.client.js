@@ -276,7 +276,7 @@
   const f2 = (v) => v.toFixed(2);
   // conic gradients for one reel's exposure smear (reel frame; angles clockwise from the top, as CSS conic-gradient)
   function smearBg(el, S, dir) {
-    const d = el.dataset, slots = d.slots.split(',').map(Number), sw = +d.slotw, la = +d.lab, lw = +d.labw, lk = +d.labk;
+    const d = el.dataset, slots = d.slots.split(',').map(Number), sw = +d.slotw, las = d.lab.split(',').map(Number), lw = +d.labw, lk = +d.labk;
     const cov = (th, a, wd) => {   // fraction of the exposure that point th spent under a feature of width wd centred at a
       let u = ((th - a) * dir % 360 + 540) % 360 - 180;   // along the trail, -180..180
       if (u < -wd / 2 - 1) u += 360;
@@ -288,7 +288,7 @@
       const th = i * 360 / N;
       const ch = Math.min(1, slots.reduce((a, s) => a + cov(th, s, sw), 0));
       hole.push(`rgba(${d.hole},${(ch * 0.97).toFixed(3)}) ${th.toFixed(1)}deg`);
-      lab.push(`rgba(${d.labc},${(Math.min(1, cov(th, la, lw)) * lk).toFixed(3)}) ${th.toFixed(1)}deg`);
+      lab.push(`rgba(${d.labc},${(Math.min(1, las.reduce((a, l) => a + cov(th, l, lw), 0)) * lk).toFixed(3)}) ${th.toFixed(1)}deg`);
     }
     return `conic-gradient(${hole.join(',')}), conic-gradient(${lab.join(',')}), ${d.avg}`;
   }

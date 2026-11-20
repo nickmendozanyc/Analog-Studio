@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Machine, monitorSource, VU0, IPS, HEADS, align, standardOffset } from './jh24audio.js';
+import { Machine, monitorSource, VU0, IPS, HEADS, align, standardOffset, TAPES, SPEEDS } from './jh24audio.js';
 
 const FS = 48000, B = 128;
 const dB = (x) => 20 * Math.log10(Math.max(x, 1e-12));
@@ -137,4 +137,14 @@ test('loaded transfers play back at their level and are erased by recording over
   m.loadTransfer(0, x, t0, 30);
   const o = run(m, 0.8, { mode: 'play', take: t0 })[0];
   assert.ok(Math.abs(tone(o, 440, Math.round(0.2 * FS), Math.round(0.7 * FS))) < 0.5);
+});
+
+test('threading another formulation: level and headroom change until the machine is realigned for it', () => {
+  const m = quiet(), c = m.ch[0]; m.setSpeed(30);
+  const before = c.overallDb(1000), sat0 = c.sat;
+  m.setTape(TAPES.atx);
+  assert.ok(Math.abs(c.overallDb(1000) - before - TAPES.atx.sens) < 0.6, `ATX plays ${(c.overallDb(1000) - before).toFixed(1)} dB hot before realigning`);
+  assert.ok(c.sat < sat0, 'more headroom (higher MOL) on the hotter tape');
+  for (const s of SPEEDS) align(c, s, m.opLevel); c.configure(30);
+  assert.ok(Math.abs(c.overallDb(1000)) < 0.2, 'realigned to unity');
 });

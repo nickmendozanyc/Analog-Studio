@@ -33,6 +33,14 @@ class JH24Processor extends AudioWorkletProcessor {
     else if (d.type === 'load') { m.loadTransfer(d.track, d.data, d.u0, d.ips); this.port.postMessage({ type: 'loaded', track: d.track }); }
     else if (d.type === 'clear') { m.tracks[d.track].pieces = []; }
     else if (d.type === 'getTrims') this.sendTrims();
+    else if (d.type === 'tape') {   // a different reel threaded: its recordings come with it, its formulation into the model
+      this.reels = this.reels || {};
+      if (this.tapeKey) this.reels[this.tapeKey] = m.tracks;
+      this.tapeKey = d.key;
+      m.setTape(d.params, this.reels[d.key] || Array.from({ length: m.n }, () => new Track()));
+      if (d.align) { for (const c of m.ch) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); }
+      this.sendTrims();
+    }
     else if (d.type === 'debug') this.port.postMessage({ type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0 });
   }
   sendTrims() { this.port.postMessage({ type: 'trims', trims: this.m.ch.map((c) => c.t) }); }

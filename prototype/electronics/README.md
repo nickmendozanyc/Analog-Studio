@@ -17,6 +17,10 @@ Renderer-independent (plain loops over Float32Arrays): it runs in an AudioWorkle
 | Spec table 1-1 | 0 VU = operating level (185–370 nWb/m), 3 % 3rd harmonic at 1040 nWb/m, hiss −64 / −60 dB re 510 nWb/m, wow & flutter 0.03–0.04 % |
 | Section 7 alignment | `align()`: repro to the alignment tape (level, 10 kHz, LF), sync the same, bias peak + overbias, record level and record HF |
 
+Tape formulations (`TAPES`, made-up names after real reels): Amtex 456 and 499, Quantica GP9, Maxwell UD, Scotia 250,
+ATX Master Tape and BAFS Studio Master 900. Each sets the MOL, noise, 1 kHz and 10 kHz sensitivity and the bias it
+wants; `Machine.setTape()` threads one without realigning (the meters show the mismatch until you align for it).
+
 Tape transfers (audio files) load as already-reproduced pieces; recording over them erases them like any track.
 Numbers marked (approx) in the source are plausible values, not MCI data.
 

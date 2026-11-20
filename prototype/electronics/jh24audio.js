@@ -23,6 +23,18 @@ export const SPEED = {
   30: { gap: 40000, cueGap: 18000, tape: 30000, bump: 85, bumpDb: 2.0, shelf: 10000, hissDb: -58, overbias: 2.0, ramp: 0.015 },
 };
 export const SPEEDS = [7.5, 15, 30];
+// tape formulations (made-up brand names). ol: recommended operating level, mol: 3 % third harmonic at 1 kHz (nWb/m),
+// noise: hiss relative to the reference tape (dB), sens: 1 kHz sensitivity (dB), bias: extra bias it wants for the
+// same overbias (dB), hf: 10 kHz sensitivity (dB). Relative to a 456-type tape; all (approx).
+export const TAPES = {
+  a456: { short: 'Amtex 456', name: 'Amtex 456 Grand Master', reel: 'a456', ol: 320, mol: 1040, noise: 0, sens: 0, bias: 0, hf: 0 },
+  a499: { short: 'Amtex 499', name: 'Amtex 499 Gold Master', reel: 'a499', ol: 370, mol: 1300, noise: -1, sens: 0.5, bias: 0.5, hf: 0.5 },
+  gp9: { short: 'Quantica GP9', name: 'Quantica GP9 Grand Master Platinum', reel: 'gp9', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5 },
+  maxwell: { short: 'Maxwell UD', name: 'Maxwell UD Studio', reel: 'maxwell', ol: 320, mol: 1150, noise: -1, sens: 0.3, bias: 0.3, hf: 1 },
+  scotia: { short: 'Scotia 250', name: 'Scotia 250', reel: 'scotia', ol: 250, mol: 1000, noise: 1, sens: -0.5, bias: -0.5, hf: -0.5 },
+  atx: { short: 'ATX Master', name: 'ATX Magnetics Master Tape', reel: 'atx', ol: 400, mol: 1650, noise: -2, sens: 1.5, bias: 1.5, hf: 0 },
+  bafs: { short: 'BAFS SM 900', name: 'BAFS Studio Master 900 maxima', reel: 'bafs', ol: 370, mol: 1500, noise: -2.5, sens: 1, bias: 2, hf: -0.5 },
+};
 // equalisation standards, playback time constants (s). The JH-24's HI speed (30 ips) is AES; LO switches NAB / IEC.
 export const STANDARD = {
   NAB: { 7.5: [50e-6, 3180e-6], 15: [50e-6, 3180e-6], 30: [17.5e-6, 0] },
@@ -134,15 +146,15 @@ export class Channel {
     this.configure(30);
   }
   // build the networks for a speed (the speed switch's HI EQ / LO EQ lines)
-  configure(ips, opLevel = 250) {
-    const S = SPEED[ips], t = this.t, fs = this.fs; this.ips = ips; this.S = S;
-    const b = t.bias[ips];   // dB from peak: >0 overbias (less HF, cleaner), <0 underbias (less output, distortion)
+  configure(ips, opLevel = this.opLevel ?? 250) {
+    const S = SPEED[ips], t = this.t, fs = this.fs, tp = this.tape || TAPES.a456; this.ips = ips; this.S = S; this.opLevel = opLevel;
+    const b = t.bias[ips] - tp.bias;   // bias relative to what this tape wants   // dB from peak: >0 overbias (less HF, cleaner), <0 underbias (less output, distortion)
     const hfBias = b >= 0 ? -b : -1.2 * b * b, lfBias = b >= 0 ? -0.12 * b : -0.4 * b * b;
-    this.recGain = gain(t.calRec + lfBias) / VU0;
+    this.recGain = gain(t.calRec + lfBias + tp.sens) / VU0;
     this.fl.rec[0].set('hs', fs, S.shelf, 0.7, t.recHf[ips]);
-    this.fl.rec[1].set('hs', fs, 7000, 0.7, hfBias);
+    this.fl.rec[1].set('hs', fs, 7000, 0.7, hfBias + tp.hf);
     this.fl.tape.set('lp', fs, S.tape, 0.6);
-    const mol = 1040 / opLevel;   // 3 % third harmonic at 1040 nWb/m (spec table 1-1)
+    const mol = tp.mol / opLevel;   // 3 % third harmonic at the tape's MOL (1040 nWb/m for the spec table's tape)
     this.sat = (0.6 / mol) * (b < 0 ? 1 + 0.35 * -b : 1 - 0.03 * Math.min(b, 6));
     const head = (fl, gap, hf, lf, lvl) => {
       fl[0].set('hp', fs, S.bump * 0.28, 0.6); fl[1].set('peak', fs, S.bump, 1.1, S.bumpDb); fl[2].set('lp', fs, gap, 0.6);
@@ -152,7 +164,7 @@ export class Channel {
     this.repGain = head(this.fl.rep, S.gap, t.reproHf[ips], t.reproLf[ips], t.reproLvl);
     this.cueGain = head(this.fl.cue, S.cueGap, t.cueHf[ips], t.cueLf[ips], t.cueLvl);
     this.inGain = gain(t.inCal);
-    this.hiss = gain(S.hissDb + 20 * Math.log10(510 / opLevel)) * Math.SQRT1_2;
+    this.hiss = gain(S.hissDb + tp.noise + 20 * Math.log10(510 / opLevel)) * Math.SQRT1_2;
   }
   // analytic responses (dB re 1 kHz) for alignment and the test bench
   recordReproDb(f) { const fs = this.fs; const r = (f) => chainMag(this.fl.rec, f, fs) * this.fl.tape.mag(f, fs) * chainMag(this.fl.rep, f, fs); return dB(r(f) / r(1000)); }
@@ -167,7 +179,7 @@ export class Channel {
 // LF 50 / 100 Hz), cue the same, bias peak + overbias, then record level and record HF for a flat record → repro.
 export function align(ch, ips, opLevel = 250) {
   const t = ch.t, lfF = ips === 30 ? 100 : 50;
-  t.bias[ips] = SPEED[ips].overbias;
+  t.bias[ips] = SPEED[ips].overbias + (ch.tape || TAPES.a456).bias;
   for (let it = 0; it < 30; it++) {
     ch.configure(ips, opLevel);
     t.reproHf[ips] -= ch.reproDb(10000) * 0.8; t.reproLf[ips] -= ch.reproDb(lfF) * 0.8;
@@ -200,7 +212,8 @@ export function monitorSource(i, st) {
 export class Machine {
   constructor(fs, { tracks = 24, opLevel = 250, quior = true, hiss = true, wowFlutter = true } = {}) {
     this.fs = fs; this.n = tracks; this.opLevel = opLevel; this.quior = quior; this.hiss = hiss; this.wf = wowFlutter;
-    this.ch = Array.from({ length: tracks }, (_, i) => new Channel(fs, i));
+    this.tape = TAPES.a456;
+    this.ch = Array.from({ length: tracks }, (_, i) => { const c = new Channel(fs, i); c.tape = this.tape; return c; });
     this.tracks = Array.from({ length: tracks }, () => new Track());
     this.take = 0; this.v = 0; this.lift = 0; this.ips = 30; this.time = 0;
     this.st = { master: { tape: false, input: false, auto: true }, ready: new Set(), cue: new Set(), inputs: new Set(), mode: 'stop' };
@@ -211,6 +224,14 @@ export class Machine {
   }
   setSpeed(ips) { this.ips = ips; for (const c of this.ch) c.configure(ips, this.opLevel); }
   setOpLevel(ol) { this.opLevel = ol; for (const s of SPEEDS) for (const c of this.ch) align(c, s, ol); this.setSpeed(this.ips); }
+  // thread a different tape: its formulation changes level, headroom, noise and the bias it wants. The machine keeps
+  // its alignment (realign for the new tape, as you would); `tracks` are what is recorded on that reel.
+  setTape(tape, tracks = null) {
+    this.tape = tape; for (const c of this.ch) c.tape = tape;
+    this.pass = Array(this.n).fill(null);
+    if (tracks) this.tracks = tracks;
+    this.setSpeed(this.ips);
+  }
   noise() { this.rng ^= this.rng << 13; this.rng ^= this.rng >>> 17; this.rng ^= this.rng << 5; return ((this.rng >>> 0) / 4294967296 - 0.5) * 3.4641; }   // unit-variance
   // load a transfer (already reproduced audio) onto a track, starting at tape coordinate u0, recorded at `ips`
   loadTransfer(track, samples, u0, ips = 30, fsFile = this.fs) {

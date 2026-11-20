@@ -408,7 +408,7 @@ rect(24, 12, 300, 32, 'url(#bezelHi)', 'rx="3"');
 text(42, 34, 'ANALOG STUDIO', 17, '#e9dcc0', 'start', 800, 'letter-spacing="5"');
 circle(304, 28, 5, '#ff3b2f', 'filter="url(#glow)"');
 text(420, 34, 'SESSION', 11, '#8b8778', 'start', 700, 'letter-spacing="2"');
-text(500, 34, 'Midnight Tapes — 24 trk · 2" · 30 IPS · loaded from midnight_tapes.mogg', 15, '#e8e4d8', 'start', 500);
+text(500, 34, 'Midnight Tapes', 15, '#e8e4d8', 'start', 500);   // the tape menus sit beside it
 const statusItems = [['INTERFACE', 'TASCAM Studio Bridge · 24 in / 24 out'], ['CONTROL', 'MCU ● transport + rec ready'], ['RATE', '48 kHz'], ['BUFFER', '128 smp · 2.7 ms'], ['DSP', '18 %']];
 let sx = 1640;
 for (const [k, v] of statusItems) {
@@ -1413,6 +1413,7 @@ const svg = out.join('\n');
 const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.svg'), svg);
 const jh24 = require('./jh24.js')({ TX: TX - TCI, TY, TW, TH });
+const TAPE_LIST = (() => { const src = fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8'); const m = /export const TAPES = (\{[\s\S]*?\n\});/.exec(src); return Function(`return ${m[1]}`)(); })();
 if (globalThis.JH_CI !== TCI) throw new Error(`cabinet inset is ${globalThis.JH_CI}, expected ${TCI}`);
 // copy the live reel prototype next to the mockup so the tape machine view can load it
 const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
@@ -1567,6 +1568,10 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #strip-hl{position:absolute;z-index:67;pointer-events:none;border:3px solid #ffb02e;border-radius:4px;background:rgba(255,176,46,.12);box-shadow:0 0 18px rgba(255,176,46,.5)}
   #strip-hl[hidden]{display:none}
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
+  .tapesel{position:absolute;left:650px;top:8px;height:40px;display:flex;align-items:center;gap:14px;z-index:70;font:800 15px Archivo,Arial,sans-serif;letter-spacing:1.5px;color:#a9a594}
+  .tapesel label{display:flex;align-items:center;gap:8px}
+  .tapesel select{font:700 15px Archivo,Arial;background:#121110;color:#f0e8d6;border:1px solid #5a534c;border-radius:5px;padding:4px 6px;width:230px}
+  .tapesel #takeup-sel{width:160px}
   .modes{position:absolute;left:1236px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
   .modes .lbl{color:#8b8778;font-size:11px;font-weight:700;letter-spacing:2px;margin-right:4px}
   .modes button{width:112px;height:40px;border-radius:4px;border:1px solid #000;cursor:pointer;font:900 17px Archivo,Arial,sans-serif;letter-spacing:3px;color:#d8d0c0;background:linear-gradient(#3a3b3f,#232427);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.6)}
@@ -1584,6 +1589,7 @@ ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
 ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
+<div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name}"${k === 'a499' ? ' selected' : ''}>${t.short} · ${t.ol} nWb/m</option>`).join('')}</select></label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n}</option>`).join('')}</select></label></div>
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
@@ -1620,6 +1626,7 @@ ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" 
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'reels', 'physics.js'), 'utf8').replace(/^export /gm, '')}
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
+<script>window.JH_SKINS = ${JSON.stringify(globalThis.JH_SKINS)}; window.JH_TAPES = ${JSON.stringify(TAPE_LIST)};</script>
 <script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${['ltc.js', 'midiclock.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
 <script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
