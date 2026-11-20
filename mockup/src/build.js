@@ -452,16 +452,19 @@ const AL_W = 400, AL_H = 340;
 function al3(live = false, st = {}) {
   const S = Object.assign({ tape: '03:42', loc: '01:02', ready: readyTracks, lamps: new Set(['auto']), leds: new Set(['ready']) }, st);
   const PANEL = '#4b4845', BAY = '#3a3836', INK = '#e6e1d6';
+  // live: the pop-up (clickable). mirror: the studio-view face, same lamps / LEDs / displays driven from the pop-up's state
+  const mirror = live === 'mirror'; if (mirror) live = false;
   const key = (name, x, y, w, h, color, label, size = 6) => {
     if (live) p(`<g data-al="${name}" style="cursor:pointer">`);
-    const lit = !live && S.lamps.has(name);
+    const lit = !live && !mirror && S.lamps.has(name);
     button(x, y, w, h, color, lit, label, { size, pastel: true });
     if (live) { p(`<g class="al-lamp" data-lamp="${name}" opacity="0" pointer-events="none">`); button(x, y, w, h, color, true, label, { size }); p('</g></g>'); }
+    if (mirror) { p(`<g data-mlamp="${name}" opacity="0">`); button(x, y, w, h, color, true, label, { size }); p('</g>'); }
   };
   const led = (name, cx, cy, col, w = 5, h = 3) => {
     rect(cx - w / 2, cy - h / 2, w, h, '#160c08', 'rx="0.8"');
-    const on = !live && S.leds.has(name);
-    rect(cx - w / 2, cy - h / 2, w, h, col, `rx="0.8" ${live ? `class="al-led" data-led="${name}" opacity="0"` : on ? 'filter="url(#glowSm)"' : 'opacity="0"'}`);
+    const on = !live && !mirror && S.leds.has(name);
+    rect(cx - w / 2, cy - h / 2, w, h, col, `rx="0.8" ${live ? `class="al-led" data-led="${name}" opacity="0"` : mirror ? `data-mled="${name}" opacity="0"` : on ? 'filter="url(#glowSm)"' : 'opacity="0"'}`);
   };
   const roundKey = (name, cx, cy, r, fill, hi) => {
     if (live) p(`<g data-al="${name}" style="cursor:pointer">`);
@@ -472,9 +475,9 @@ function al3(live = false, st = {}) {
   const display = (id, x, label, val) => {
     text(x + 55, 15, label, 7, INK, 'middle', 800, 'letter-spacing="0.6"');
     rect(x, 20, 110, 33, '#060606', 'rx="2"'); rect(x + 3, 23, 104, 27, 'url(#displayBg)', 'rx="1.5"');
-    if (live) p(`<g id="al-${id}">`);
+    if (live) p(`<g id="al-${id}">`); else if (mirror) p(`<g class="alm-${id}">`);
     seg7(x + 22, 27, 19, val, '#ff3220');
-    if (live) p('</g>');
+    if (live || mirror) p('</g>');
     rect(x + 3, 23, 104, 10, 'url(#glass)', 'rx="1.5"');
     text(x + 33, 62, 'MINUTES', 5, INK, 'middle', 700, 'letter-spacing="0.4"'); text(x + 80, 62, 'SECONDS', 5, INK, 'middle', 700, 'letter-spacing="0.4"');
   };
@@ -547,7 +550,7 @@ function al3(live = false, st = {}) {
 const AX = TX + TW - 2 * TCI + 22, AW = 400, ALK = Math.min((1692 - AX) / AW, 590 / 676), ALDROP = 40, AY = 76 + ALDROP, AH = 676 - Math.round(ALDROP / ALK);   // dropped under the SMPTE wall clock   // fills the gap between the tape machine and the meter bridge
 {
   const FW = 376, FD = Math.round(AL_H * FW / AL_W), LIP = 34, TOP = 60, SLOPE = 30;
-  const face = capture(() => { p(`<g transform="scale(${FW / AL_W})">`); al3(false); p('</g>'); });
+  const face = capture(() => { p(`<g transform="scale(${FW / AL_W})">`); al3('mirror'); p('</g>'); });
   // side planes (wedge)
   const depth = FD * Math.sin(SLOPE * Math.PI / 180), rise = FD * Math.cos(SLOPE * Math.PI / 180);
   const yb = TOP + FD;            // bottom edge of the face (rotation origin)

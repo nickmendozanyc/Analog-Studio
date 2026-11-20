@@ -306,12 +306,15 @@
   const AL = { loc: 62, entry: '', apl: false, reh: false, rehPunch: false, pending: null, ready: new Set([19, 20, 21]), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
   const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', ' ': '' };
   const fmt = (t) => { const a = Math.abs(t); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
+  const segLast = {};
   function setSeg(id, digits) {
-    const rs = alSvg.querySelectorAll(`#al-${id} rect`);
+    if (segLast[id] === digits) return; segLast[id] = digits;
+    for (const rs of [alSvg.querySelectorAll(`#al-${id} rect`), ...[...document.querySelectorAll(`.alm-${id}`)].map((g) => g.querySelectorAll('rect'))])
     [...digits].forEach((ch, d) => { const on = SEG[ch] || ''; 'abcdefg'.split('').forEach((k, i) => { const r = rs[d * 7 + i]; if (!r) return; if (on.includes(k)) { r.setAttribute('opacity', '1'); r.setAttribute('filter', 'url(#glowSm)'); } else { r.setAttribute('opacity', '0.09'); r.removeAttribute('filter'); } }); });
   }
-  const lamp = (n, on) => { const g = alSvg && alSvg.querySelector(`[data-lamp="${n}"]`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
-  const led = (n, on) => { const r = alSvg && alSvg.querySelector(`[data-led="${n}"]`); if (r) { r.setAttribute('opacity', on ? 1 : 0); if (on) r.setAttribute('filter', 'url(#glowSm)'); else r.removeAttribute('filter'); } };
+  const lampEls = {}, ledEls = {};   // the pop-up's element and the studio-view face's mirror of it
+  const lamp = (n, on) => { const els = lampEls[n] || (lampEls[n] = [alSvg && alSvg.querySelector(`[data-lamp="${n}"]`), ...document.querySelectorAll(`[data-mlamp="${n}"]`)].filter(Boolean)); for (const g of els) if (g._on !== on) { g._on = on; g.setAttribute('opacity', on ? 1 : 0); } };
+  const led = (n, on) => { const els = ledEls[n] || (ledEls[n] = [alSvg && alSvg.querySelector(`[data-led="${n}"]`), ...document.querySelectorAll(`[data-mled="${n}"]`)].filter(Boolean)); for (const r of els) if (r._on !== on) { r._on = on; r.setAttribute('opacity', on ? 1 : 0); if (on) r.setAttribute('filter', 'url(#glowSm)'); else r.removeAttribute('filter'); } };
   const alMsg = (t) => { const m = document.getElementById('al-msg'); if (m) m.textContent = t; };
   const show2 = (t) => `${t.slice(0, 2)}:${t.slice(2)}`;
   const counterTake = (sec) => tr.zero + sec * tr.nominalSpeed;   // tape counter seconds -> tape position
@@ -710,7 +713,7 @@
     sbxTick(dt, now);
     if (document.body.dataset.studio === 'sls') drawA827();
     postState();
-    if (open && open.dataset.view === 'al') alRender(now);
+    if ((open && open.dataset.view === 'al') || document.body.dataset.studio !== 'sls') alRender(now);   // the studio-view face mirrors it too
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests
