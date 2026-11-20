@@ -365,6 +365,9 @@ const plate = boxM(46, 0.25, 24, new THREE.MeshStandardMaterial({ color: 0x56514
 
 // ---------- geometry of the transport (cm, x right, z toward the operator) ----------
 const TF = 16.45;                           // tape front line across the head faces
+// tape lifters: two chrome pins push the tape 1/4" away from the heads during winds
+const LIFT_CM = 0.25 * 2.54, PIN_R = 0.3, PIN_REST = TF - 0.6;
+const pinZ = (lift) => PIN_REST + lift * (TF + LIFT_CM - PIN_R - PIN_REST);   // pin centre; tape contact = pinZ + PIN_R
 const Y0 = 3.2, TW = TAPE.width * CM;      // tape bottom height, tape width
 const YM = Y0 + TW / 2;
 const P = {
@@ -490,7 +493,7 @@ function post(at, r, h, mat, baseR) {
 post(P.guideL, P.guideL.r, 11.5, blackPlastic, 2.4);
 post(P.guideR, P.guideR.r, 12.5, ribbed, 3.4);
 post(P.capstan, P.capstan.r, 12, ribbed, 2.6);
-const pins = [P.pinL, P.pinR].map((pn) => { const m = cyl(pn.r, 10, chrome, 16); m.position.set(pn.x, 1 + 5, TF - 0.8); scene.add(m); return m; });
+const pins = [P.pinL, P.pinR].map((pn) => { const m = cyl(pn.r, 10, chrome, 16); m.position.set(pn.x, 1 + 5, PIN_REST); scene.add(m); return m; });
 const pinchG = new THREE.Group(); scene.add(pinchG);
 const pinchRoller = cyl(P.pinch.r, 10.5, cream, 32); pinchRoller.position.y = 1 + 5.25; pinchG.add(pinchRoller);
 const pinchArm = boxM(5.5, 2.2, 2.4, blackPlastic); pinchArm.position.set(3.2, 1.1, 0.6); pinchG.add(pinchArm);
@@ -544,9 +547,9 @@ function pickTangent(A, B, ha, hb) {
 function tapePath(rS, rT, lift, pinchOut) {
   const sPack = { x: P.supply.x, z: P.supply.z, r: rS }, tPack = { x: P.takeup.x, z: P.takeup.z, r: rT };
   const chain = [[sPack, SW, SW], [P.guideL, N, N]];   // oxide-in: tape leaves the supply from its outer (left) side; both reels turn CCW in play
-  if (lift > 0.02) {
-    const zp = TF - 0.35 + 0.75 * lift;
-    chain.push([{ x: P.pinL.x, z: zp, r: P.pinL.r }, S, S], [{ x: P.pinR.x, z: zp, r: P.pinR.r }, S, S]);
+  {
+    const zp = pinZ(lift);
+    if (zp + PIN_R > TF + 0.01) chain.push([{ x: P.pinL.x, z: zp, r: P.pinL.r }, S, S], [{ x: P.pinR.x, z: zp, r: P.pinR.r }, S, S]);
   }
   chain.push([P.capstan, S, S], [P.guideR, S, E], [tPack, E, E]);
   const pts = [];
@@ -646,7 +649,7 @@ function frame(now) {
   const out = 1 - tr.pinch;
   pinchG.position.set(P.pinch.x + 1.0 * out, 0, P.pinch.z + 1.6 * out);
   pinchRoller.rotation.y = tr.capstanDriving ? (-tr.take * CM / P.pinch.r) : pinchRoller.rotation.y;
-  pins.forEach((m) => { m.position.z = TF - 0.35 + 0.75 * tr.lift; });
+  pins.forEach((m) => { m.position.z = pinZ(tr.lift); });
   // strip lights + HTML keys
   const m = tr.mode;
   for (const [k, mat] of Object.entries(stripKeys)) mat.emissiveIntensity = (k === m || (k === 'play' && m === 'rec') || (k === 'lift' && tr.liftDefeat)) ? 0.9 : 0.0;
