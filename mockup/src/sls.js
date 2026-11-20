@@ -18,19 +18,19 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
 
   // SSL knob: white knurled body, coloured cap insert on top (E-channel colour code), white pointer line down the body.
   // Cap colours: light grey for filters / compressor / utility, red HF, green HMF + expander/gate, blue LMF, black LF.
-  const KCOL = { '#e9eaec': '#d9d9d4', '#d9dbde': '#d9d9d4', '#c9ccd1': '#d9d9d4', '#c8352a': '#c8262b', '#3f9a58': '#1d8a55', '#3577c2': '#2a8fc2', '#1e1f22': '#2c2d31', '#8a8f97': '#d9d9d4', '#e0b23a': '#e2b43a' };
+  const KCOL = { '#e9eaec': '#cfd0cb', '#d9dbde': '#cfd0cb', '#c9ccd1': '#cfd0cb', '#c8352a': '#b3262b', '#3f9a58': '#1f6e3d', '#3577c2': '#1f6dac', '#1e1f22': '#8b4a28', '#8a8f97': '#cfd0cb', '#e0b23a': '#e2b43a' };   // E-series caps, LF brown
   const sk = (cx, cy, r0, col0, ang = 0, lab = '', labY = null) => {
-    const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#d9d9d4' || col === '#e2b43a';
+    const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#cfd0cb' || col === '#e2b43a';
     if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.4) * Math.cos(a)).toFixed(1), (cy + (r + 3.4) * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
     circle(cx + 1.3, cy + 2, r * 1.02, '#000', 'opacity="0.45"');                     // cast shadow
     circle(cx, cy, r, '#efefea');                                                      // white body
     p(`<circle cx="${cx}" cy="${cy}" r="${(r - 0.7).toFixed(1)}" fill="none" stroke="#b9bab4" stroke-width="1.3" stroke-dasharray="0.9 1.1"/>`);   // knurling
     p(`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="url(#capHiDark)" opacity="0.35"/>`);
-    circle(cx, cy, r * 0.6, col === '#d9d9d4' ? '#bdbdb6' : col);                                                      // coloured cap
-    circle(cx - r * 0.16, cy - r * 0.2, r * 0.22, '#fff', 'opacity="0.25"');          // gloss
+    circle(cx, cy, r * 0.8, col);                                                      // large cap: thin white rim shows                                                      // coloured cap
+    circle(cx - r * 0.22, cy - r * 0.26, r * 0.28, '#fff', 'opacity="0.22"');          // gloss
     const a = (ang - 90) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
-    p(`<line x1="${(cx + r * 0.6 * ca).toFixed(1)}" y1="${(cy + r * 0.6 * sa).toFixed(1)}" x2="${(cx + r * 0.94 * ca).toFixed(1)}" y2="${(cy + r * 0.94 * sa).toFixed(1)}" stroke="#141416" stroke-width="${Math.max(1, r * 0.15).toFixed(1)}" stroke-linecap="round"/>`);
-    p(`<line x1="${cx}" y1="${cy}" x2="${(cx + r * 0.56 * ca).toFixed(1)}" y2="${(cy + r * 0.56 * sa).toFixed(1)}" stroke="${light ? '#141416' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.13).toFixed(1)}" stroke-linecap="round"/>`);
+    p(`<line x1="${(cx + r * 0.8 * ca).toFixed(1)}" y1="${(cy + r * 0.8 * sa).toFixed(1)}" x2="${(cx + r * 0.96 * ca).toFixed(1)}" y2="${(cy + r * 0.94 * sa).toFixed(1)}" stroke="#141416" stroke-width="${Math.max(1, r * 0.15).toFixed(1)}" stroke-linecap="round"/>`);
+    p(`<line x1="${cx}" y1="${cy}" x2="${(cx + r * 0.76 * ca).toFixed(1)}" y2="${(cy + r * 0.76 * sa).toFixed(1)}" stroke="${light ? '#141416' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.13).toFixed(1)}" stroke-linecap="round"/>`);
     if (lab) text(cx, labY ?? cy + r + 9, lab, 6.5, INK2, 'middle', 700, 'letter-spacing="0.3"');
   };
   const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
