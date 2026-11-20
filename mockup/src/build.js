@@ -1286,24 +1286,66 @@ const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 
 if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
 const a827 = require('./jh24.js')({ TX: 24 - TCI, TY: 20, TW, TH, skin: 'a827' });
 // A827 meter bridge: Studer-grey housing, 24 VU meters in two rows with track ready / safe lamps
+// A827 meter bridge as photographed: charcoal housing with wood cheeks, 24 amber-lit meters in three rows of 8,
+// "- n -" track legends, STAUDER logo bottom right
 const a827Bridge = capture(() => {
-  const BX = 1788, BW = 1478, BH = 590, cw = (BW - 40) / 12;
+  const BX = 1788, BW = 1478, BH = 590;
   p(`<svg xmlns="http://www.w3.org/2000/svg" width="${BW}" height="${BH}" viewBox="0 0 ${BW} ${BH}" style="position:absolute;left:${BX}px;top:20px">`);
-  rect(0, 0, BW, BH, '#c9c7c0', 'rx="10"'); rect(0, 0, BW, 3, '#fff', 'opacity="0.5" rx="2"'); rect(0, BH - 6, BW, 6, '#000', 'opacity="0.2"');
-  rect(14, 14, BW - 28, 36, '#2a2c30', 'rx="4"');
-  text(30, 39, 'STAUDER', 18, '#e6e7e9', 'start', 900, 'letter-spacing="5"');
-  text(BW - 30, 39, 'A827 · 24 TRACK · METER PANEL', 14, '#b9bcc2', 'end', 800, 'letter-spacing="2"');
+  p(`<defs><linearGradient id="a8amb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="0.55" stop-color="#f6a63c"/><stop offset="1" stop-color="#d9811e"/></linearGradient></defs>`);
+  rect(0, 0, BW, BH, '#6d4122', 'rx="8"'); rect(0, 0, 22, BH, 'url(#woodH)', 'rx="6"'); rect(BW - 22, 0, 22, BH, 'url(#woodH)', 'rx="6"');
+  rect(22, 0, BW - 44, BH, '#1e1f22'); rect(22, 0, BW - 44, 3, '#fff', 'opacity="0.1"');
+  const mw = (BW - 44 - 60) / 8, mh = 124;
   for (let i = 0; i < 24; i++) {
-    const c = i % 12, r = Math.floor(i / 12), x = 20 + c * cw, y = 64 + r * 262, on = readyTracks.has(i);
-    rect(x + 4, y, cw - 8, 250, '#2a2c30', 'rx="6"');
-    vu(x + 14, y + 12, cw - 28, 92, tapeDb[i], { brand: 'STAUDER' });
-    text(x + cw / 2, y + 136, String(i + 1), 22, '#e6e7e9', 'middle', 900);
-    rect(x + 12, y + 146, cw - 24, 24, '#e9e4d6', 'rx="2"');
-    text(x + cw / 2, y + 163, tapeNames[i], 12, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-    button(x + 12, y + 180, (cw - 30) / 2, 24, 'red', on, 'READY', { size: 8.5 });
-    button(x + 18 + (cw - 30) / 2, y + 180, (cw - 30) / 2, 24, 'white', !on, 'SAFE', { size: 8.5 });
-    [['INP', on], ['SYNC', false], ['REP', !on]].forEach(([l, lit], k) => { const lx = x + 22 + k * ((cw - 44) / 2); circle(lx, y + 222, 4, lit ? '#59f07a' : '#1d3b25', lit ? 'filter="url(#glowSm)"' : ''); text(lx, y + 240, l, 8, '#b9bcc2', 'middle', 800); });
+    const c = i % 8, r = Math.floor(i / 8), x = 52 + c * mw, y = 26 + r * 172;
+    rect(x, y, mw - 14, mh + 34, '#141416', 'rx="4"');
+    vu(x + 8, y + 8, mw - 30, mh - 16, tapeDb[i], { faceFill: 'url(#a8amb)', bezel: '#0c0c0d', fontScale: 0.11 });
+    p(`<rect x="${x + 8}" y="${y + 8}" width="${mw - 30}" height="${mh - 16}" fill="#ffb547" opacity="0.12" filter="url(#glow)"/>`);
+    text(x + (mw - 14) / 2, y + mh + 22, `–  ${i + 1}  –`, 16, '#d9dbde', 'middle', 800, 'letter-spacing="1"');
   }
+  rect(BW - 210, BH - 46, 170, 30, '#141416', 'rx="3"'); text(BW - 125, BH - 25, 'STAUDER', 18, '#c9ccd0', 'middle', 900, 'letter-spacing="4"');
+  circle(BW - 22 - 18, BH - 31, 9, '#2a2b2e');
+  p('</svg>');
+});
+// A827 remote controller (autolocator slot), from the user's photo: black two-tier panel on a wood pedestal with a leather
+// armrest. Upper tier: ALL, 24 track keys in three coloured rows (ready / input / safe), transport keys. Lower tier: red
+// LED tape-time display, function keys, keypad, transport keys, shuttle. Keys are live: data-a8r drives the tape transport.
+const a827Remote = capture(() => {
+  const RX = 1344, RW = 420, RH = 590;
+  p(`<svg xmlns="http://www.w3.org/2000/svg" width="${RW}" height="${RH}" viewBox="0 0 ${RW} ${RH}" style="position:absolute;left:${RX}px;top:20px">`);
+  rect(0, 0, RW, RH, '#6d4122', 'rx="8"'); rect(0, 0, 14, RH, 'url(#woodH)', 'rx="6"'); rect(RW - 14, 0, 14, RH, 'url(#woodH)', 'rx="6"');
+  rect(14, 0, RW - 28, 250, '#202124'); rect(14, 254, RW - 28, 268, '#1b1c1e'); rect(14, 250, RW - 28, 4, '#000');
+  rect(14, RH - 66, RW - 28, 66, '#7a3f22', 'rx="0"'); rect(14, RH - 66, RW - 28, 8, '#000', 'opacity="0.35"');
+  for (const [sx, sy] of [[26, 10], [RW - 26, 10], [26, 240], [RW - 26, 240], [26, 264], [RW - 26, 264], [26, 510], [RW - 26, 510]]) { circle(sx, sy, 3.5, '#3a3c40'); }
+  text(24, 22, 'STAUDER', 8, '#9a9ea3', 'start', 900, 'letter-spacing="1.5"'); text(RW - 24, 22, 'MULTI-CHANNEL REMOTE', 6.5, '#9a9ea3', 'end', 800);
+  const k = (name, x, y, w, h, fill, lab, lit = '#fff4d6', lsize = 7) => {
+    p(`<g data-a8r="${name}" style="cursor:pointer">`);
+    rect(x + 0.5, y + 1.5, w, h, '#000', 'opacity="0.55" rx="1.5"'); rect(x, y, w, h, fill, 'rx="1.5"'); rect(x, y, w, h * 0.4, '#fff', 'opacity="0.18" rx="1.5"');
+    p(`<rect id="a8r-l-${name}" x="${x}" y="${y}" width="${w}" height="${h}" rx="1.5" fill="${lit}" opacity="0" filter="url(#glowSm)"/>`);
+    if (lab) text(x + w / 2, y + h / 2 + lsize * 0.36, lab, lsize, fill === '#e9eaec' || fill === '#d8d9d5' ? '#1a1a1a' : '#eef0f2', 'middle', 900);
+    p('</g>');
+  };
+  // ALL + 24 tracks, three rows: green (ready), blue (input), orange (safe)
+  k('all', 22, 34, 22, 14, '#d8d9d5', 'ALL', '#fff4d6', 6);
+  const tx = (t) => 52 + t * 14.4 + Math.floor(t / 8) * 6;
+  for (let t = 0; t < 24; t++) {
+    text(tx(t) + 6, 32, String(t + 1), 6.5, '#d9dbde', 'middle', 800);
+    k(`rdy${t}`, tx(t), 36, 12, 10, '#1f5b33', '', '#ff3b2f');
+    k(`inp${t}`, tx(t), 52, 12, 10, '#24477a', '', '#5fb4ff');
+    k(`safe${t}`, tx(t), 68, 12, 10, '#a14e1c', '', '#ffb02e');
+  }
+  text(48, 45, 'RDY', 6, '#9a9ea3', 'end', 800); text(48, 61, 'INP', 6, '#9a9ea3', 'end', 800); text(48, 77, 'SAFE', 6, '#9a9ea3', 'end', 800);
+  // function keys, upper tier
+  [['MON', 'mon'], ['SYNC', 'sync'], ['REPRO', 'repro'], ['', ''], ['AUTO', 'auto'], ['', '']].forEach(([l, n], i) => n && k(`f-${n}`, 54 + i * 34, 104, 26, 14, '#3a3c40', l, '#ffb02e', 6));
+  [['rew', '◁'], ['ff', '▷'], ['play', 'PLAY'], ['stop', 'STOP'], ['rec', 'REC']].forEach(([n, l], i) => k(n, 24 + i * 44, 150, 38, 30, '#e9eaec', l, n === 'rec' ? '#ff5a3c' : n === 'play' ? '#7dff9a' : '#fff4d6', l.length > 1 ? 8 : 12));
+  for (let i = 0; i < 4; i++) k(`f-u${i}`, 250 + (i % 2) * 34, 140 + Math.floor(i / 2) * 22, 26, 14, '#3a3c40', ['LOC1', 'LOC2', 'STO', 'RCL'][i], '#ffb02e', 5.5);
+  rect(320, 132, 70, 56, '#111214', 'rx="2"'); text(355, 146, 'LOCATOR', 6, '#9a9ea3', 'middle', 800);
+  // lower tier: red LED display, function keys, keypad, transport, shuttle
+  rect(24, 272, 200, 40, '#120403', 'rx="2"');
+  p(`<text id="a8r-tc" x="124" y="300" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="800" fill="#ff3b2f" text-anchor="middle" filter="url(#glowSm)">00:03:42:00</text>`);
+  for (let i = 0; i < 12; i++) k(`f-l${i}`, 24 + (i % 6) * 34, 326 + Math.floor(i / 6) * 22, 26, 14, '#3a3c40', ['ZERO', 'RTZ', 'LOOP', 'AUTO', 'SPD', 'VAR', 'IN', 'OUT', 'MEM', 'TC', 'CLR', 'ENT'][i], '#ffb02e', 5.5);
+  for (let i = 0; i < 12; i++) { const l = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'C', '0', 'E'][i]; k(`kp${l}`, 250 + (i % 3) * 32, 272 + Math.floor(i / 3) * 26, 26, 20, '#3a3c40', l, '#ffb02e', 9); }
+  [['rew2', '◁'], ['ff2', '▷'], ['play2', 'PLAY'], ['stop2', 'STOP'], ['rec2', 'REC']].forEach(([n, l], i) => k(n, 24 + i * 40, 420, 34, 26, '#e9eaec', l, n === 'rec2' ? '#ff5a3c' : n === 'play2' ? '#7dff9a' : '#fff4d6', l.length > 1 ? 7.5 : 11));
+  rect(240, 428, 120, 26, '#0d0d0e', 'rx="3"'); p('<rect id="a8r-shuttle" x="290" y="424" width="20" height="34" rx="3" fill="#d8d9d5"/>'); text(300, 470, 'SHUTTLE', 6.5, '#9a9ea3', 'middle', 800);
   p('</svg>');
 });
 const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture, vu, remote224 }, { tapeNames, tapeDb });
@@ -1354,7 +1396,7 @@ ${scenes3d.join('\n')}
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
   ${a827}
-  <div class="sls-area" style="left:1344px;top:20px;width:420px;height:590px"><b>AUTOLOCATOR</b><span>A827 remote</span></div>
+  ${a827Remote}
   ${a827Bridge}
   ${slsConsole}
 </div>

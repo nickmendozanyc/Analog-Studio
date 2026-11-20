@@ -83,8 +83,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   // ---------- flat deck surface (plan-view SVG) ----------
   let deckSvg = '';
   deckSvg += `<defs>
-    ${A8 ? `<linearGradient id="dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2f33"/><stop offset="0.55" stop-color="#34373c"/><stop offset="1" stop-color="#3b3f44"/></linearGradient>
-    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9b7b0"/><stop offset="1" stop-color="#cfcdc6"/></linearGradient>` : `<linearGradient id="dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6963"/><stop offset="0.55" stop-color="#7d7770"/><stop offset="1" stop-color="#8a847c"/></linearGradient>
+    ${A8 ? `<linearGradient id="dk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d4d6d9"/><stop offset="0.5" stop-color="#c3c6c9"/><stop offset="1" stop-color="#b3b6ba"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b3f22"/><stop offset="0.04" stop-color="#9a6438"/><stop offset="0.06" stop-color="#a7abaf"/><stop offset="0.94" stop-color="#a7abaf"/><stop offset="0.96" stop-color="#9a6438"/><stop offset="1" stop-color="#6b3f22"/></linearGradient>` : `<linearGradient id="dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6963"/><stop offset="0.55" stop-color="#7d7770"/><stop offset="1" stop-color="#8a847c"/></linearGradient>
     <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4541"/><stop offset="1" stop-color="#5a5550"/></linearGradient>`}
     <filter id="dsh" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
     <filter id="dsh2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
@@ -253,9 +253,9 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       svg(w, h, `<rect x="0" y="0" width="${w}" height="3" fill="#555" opacity="0.6"/>`));
     // lid (brushed silver) with vents and screws
     const lid = [];
-    lid.push(A8 ? `<defs><linearGradient id="lidg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a9ea4"/><stop offset="0.5" stop-color="#7d8187"/><stop offset="1" stop-color="#666a70"/></linearGradient></defs>` : `<defs><linearGradient id="lidg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4e5e7"/><stop offset="0.5" stop-color="#b9bcc0"/><stop offset="1" stop-color="#9da1a6"/></linearGradient></defs>`);
+    lid.push(A8 ? `<defs><linearGradient id="lidg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eceef0"/><stop offset="0.5" stop-color="#d3d6d9"/><stop offset="1" stop-color="#b9bdc1"/></linearGradient></defs>` : `<defs><linearGradient id="lidg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4e5e7"/><stop offset="0.5" stop-color="#b9bcc0"/><stop offset="1" stop-color="#9da1a6"/></linearGradient></defs>`);
     lid.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="6" fill="#151517"/><rect x="12" y="10" width="${w - 24}" height="${d - 22}" rx="3" fill="url(#lidg)"/>`);
-    if (A8) { lid.push(`<rect x="26" y="22" width="${w - 52}" height="${d - 46}" rx="4" fill="none" stroke="#4c5055" stroke-width="2"/>`); lid.push(txt(w / 2, d / 2 + 9, 'STAUDER', 26, '#3a3d42', 'middle', 900, 'letter-spacing="8"')); }
+    if (A8) { lid.push(`<rect x="26" y="22" width="${w - 52}" height="${d - 46}" rx="4" fill="none" stroke="#4c5055" stroke-width="2"/>`); for (let k = 0; k < 3; k++) lid.push(`<line x1="${w * 0.42 + k * 18}" y1="20" x2="${w * 0.36 + k * 18}" y2="${d - 20}" stroke="#9a9ea3" stroke-width="1.5"/>`); }
     else for (let k = 0; k < 10; k++) lid.push(`<rect x="${34 + k * 35}" y="28" width="18" height="${d - 60}" rx="3" fill="#5c5f63" opacity="0.65"/>`);
     for (const [sx, sy] of [[24, 22], [w - 24, 22], [24, d - 24], [w - 24, d - 24]]) lid.push(`<circle cx="${sx}" cy="${sy}" r="4" fill="#777"/><line x1="${sx - 3}" y1="${sy}" x2="${sx + 3}" y2="${sy}" stroke="#333" stroke-width="1.4"/>`);
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform:translateZ(${h}px)`)}">${svg(w, d, lid.join(''))}</div>`);
@@ -336,46 +336,43 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
 
   // ---------- A827 front panel: tape timer, transport keys with lamps, speed keys, big shuttle wheel ----------
   function a827Strip() {
+    // A827 front strip as photographed: brushed silver, black STUDER plate, "A 827 MULTICHANNEL RECORDER",
+    // light-grey keys < > PLAY STOP REC EDIT, red LED counter, two rows of small function keys / lamps, green LCD
     const { x, y, w, d, zFront, slope } = STRIP;
     const s = [];
     s.push(`<defs>
-      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3c3f44"/><stop offset="1" stop-color="#2a2d31"/></linearGradient>
-      <linearGradient id="bt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></linearGradient>
-      <radialGradient id="whl" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#f4f5f6"/><stop offset="0.55" stop-color="#a9adb3"/><stop offset="1" stop-color="#5b5f65"/></radialGradient>
+      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e4e6"/><stop offset="1" stop-color="#b8bbbf"/></linearGradient>
+      <linearGradient id="bt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.7"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.1"/><stop offset="1" stop-color="#000" stop-opacity="0.25"/></linearGradient>
       <filter id="gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="bs" x="-30%" y="-30%" width="160%" height="200%"><feGaussianBlur stdDeviation="2"/></filter>
     </defs>`);
-    s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="6" fill="url(#fp)"/><rect x="10" y="8" width="${w - 20}" height="${d - 16}" rx="4" fill="none" stroke="#5a5e64" stroke-width="1.5"/>`);
-    // key: off cap + a lit copy the page fades in (id lk-<name>)
-    const key = (name, bx, by, bw, bh, on, off, glyph, label) => {
-      s.push(`<rect x="${bx + 1}" y="${by + 4}" width="${bw}" height="${bh}" rx="3" fill="#000" opacity="0.6" filter="url(#bs)"/>`);
-      s.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="${off}"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="url(#bt)"/>`);
-      s.push(`<g id="lk-${name}" opacity="0"><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="${on}" filter="url(#gl)"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="3" fill="url(#bt)"/></g>`);
-      if (glyph) s.push(txt(bx + bw / 2, by + bh / 2 + 6, glyph, 16, '#14110e', 'middle', 900));
-      if (label) s.push(txt(bx + bw / 2, by + bh + 14, label, 7.5, '#e6e7e9', 'middle', 800, 'letter-spacing="0.8"'));
+    s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="4" fill="url(#fp)"/><rect x="0" y="0" width="${w}" height="2" fill="#fff" opacity="0.8"/>`);
+    const key = (name, bx, by, bw, bh, on, glyph, gcol = '#1a1a1a', gsize = 13) => {
+      s.push(`<rect x="${bx + 1}" y="${by + 3}" width="${bw}" height="${bh}" rx="2" fill="#000" opacity="0.45" filter="url(#bs)"/>`);
+      s.push(`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="#e9eaec" stroke="#8d9095" stroke-width="1"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="url(#bt)"/>`);
+      s.push(`<g id="lk-${name}" opacity="0"><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="${on}" filter="url(#gl)"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="url(#bt)"/></g>`);
+      if (glyph) s.push(txt(bx + bw / 2, by + bh / 2 + gsize * 0.36, glyph, gsize, gcol, 'middle', 900));
     };
-    // tape timer (live)
-    s.push(`<rect x="30" y="20" width="200" height="46" rx="3" fill="#050505"/><rect x="30" y="20" width="200" height="16" rx="3" fill="#fff" opacity="0.05"/>`);
-    s.push(`<text id="tctr" x="130" y="54" font-family="'JetBrains Mono', monospace" font-size="30" font-weight="800" fill="#ff3b2f" text-anchor="middle">00:03:42</text>`);
-    s.push(txt(130, 82, 'TAPE TIME', 7.5, '#e6e7e9', 'middle', 800, 'letter-spacing="1.2"'));
-    // speed and vari keys
-    [['7.5', '7½'], ['15', '15'], ['30', '30']].forEach(([n, l], i) => key(`ips${n}`, 254 + i * 40, 26, 34, 24, '#ffb02e', '#8c8f94', l, ''));
-    s.push(txt(312, 66, 'SPEED · IPS', 7.5, '#e6e7e9', 'middle', 800, 'letter-spacing="1"'));
-    key('vari', 384, 26, 40, 24, '#ffb02e', '#8c8f94', 'VAR', '');
+    // STUDER plate and model line
+    s.push(`<rect x="28" y="10" width="150" height="30" rx="2" fill="#1c1d20"/>`); s.push(txt(103, 31, 'STAUDER', 18, '#eceef0', 'middle', 900, 'letter-spacing="4"'));
+    s.push(txt(28, 56, 'A 827   MULTICHANNEL RECORDER', 9, '#2a2c30', 'start', 800, 'letter-spacing="1.2"'));
     // transport keys
-    [['rew', '◀◀', 'REW'], ['ff', '▶▶', 'FWD'], ['stop', '■', 'STOP'], ['rplay', '◀', 'REV PLAY'], ['play', '▶', 'PLAY']].forEach(([n, g, l], i) => key(n, 470 + i * 72, 20, 58, 42, n === 'play' || n === 'rplay' ? '#5cf08a' : '#fff4d6', n === 'play' || n === 'rplay' ? '#3f8f5a' : '#d9dbde', g, l));
-    key('rec', 836, 20, 58, 42, '#ff3b2f', '#9a2a22', '●', 'REC');
-    key('lift', 920, 26, 46, 30, '#5fb4ff', '#8c8f94', '', 'LIFT');
-    // big shuttle wheel
-    const wx = w - 110, wy = d / 2;
-    s.push(`<circle cx="${wx + 3}" cy="${wy + 5}" r="44" fill="#000" opacity="0.55" filter="url(#bs)"/><circle cx="${wx}" cy="${wy}" r="44" fill="#16171a"/><circle cx="${wx}" cy="${wy}" r="40" fill="url(#whl)"/>`);
-    s.push(`<circle cx="${wx + 18}" cy="${wy - 14}" r="8" fill="#6a6e74"/><circle cx="${wx + 17}" cy="${wy - 15}" r="6" fill="#4a4e54"/>`);
-    s.push(txt(wx - 70, wy + 4, 'SHUTTLE', 7.5, '#e6e7e9', 'middle', 800, 'letter-spacing="1"'));
+    [['rew', '◁'], ['ff', '▷'], ['play', 'PLAY'], ['stop', 'STOP'], ['rec', 'REC'], ['edit', 'EDIT']].forEach(([n, g], i) => key(n, 28 + i * 58, 64, 52, 30, n === 'rec' ? '#ff5a3c' : n === 'play' ? '#7dff9a' : '#fff4d6', g, n === 'rec' ? '#c8261b' : '#1a1a1a', g.length > 1 ? 12 : 16));
+    // red LED counter
+    s.push(`<rect x="420" y="40" width="190" height="44" rx="3" fill="#1a0806"/><rect x="420" y="40" width="190" height="14" rx="3" fill="#fff" opacity="0.05"/>`);
+    s.push(`<text id="tctr" x="515" y="74" font-family="'JetBrains Mono', monospace" font-size="30" font-weight="800" fill="#ff3b2f" text-anchor="middle" filter="url(#gl)">00:03:42</text>`);
+    // two rows of small function keys with lamps (speed, vari, lift and locator functions)
+    const smk = (name, bx, by, lab, lamp = '#ff3b2f') => { s.push(`<rect x="${bx}" y="${by}" width="34" height="11" rx="1.5" fill="#2a2b2e"/>`); s.push(`<g id="lk-${name}" opacity="0"><rect x="${bx}" y="${by}" width="34" height="11" rx="1.5" fill="${lamp}" filter="url(#gl)"/></g>`); if (lab) s.push(txt(bx + 17, by + 22, lab, 7, '#2a2c30', 'middle', 800)); };
+    [['ips7.5', '7½'], ['ips15', '15'], ['ips30', '30'], ['vari', 'VAR'], ['lift', 'LIFT'], ['', ''], ['', '']].forEach(([n, l], i) => smk(n || `fx${i}`, 640 + i * 42, 34, l, n.startsWith('ips') || n === 'vari' ? '#59f07a' : '#ff3b2f'));
+    for (let i = 0; i < 7; i++) smk(`fy${i}`, 640 + i * 42, 66, ['LOC', 'STORE', 'ZERO', 'RTZ', 'AUTO', 'SAFE', 'MON'][i]);
+    // green LCD
+    s.push(`<rect x="${w - 170}" y="34" width="130" height="40" rx="3" fill="#13180e"/><rect x="${w - 164}" y="39" width="118" height="30" rx="2" fill="#8ccf3a"/><rect x="${w - 164}" y="39" width="118" height="10" rx="2" fill="#fff" opacity="0.2"/>`);
+    s.push(`<text id="a8-lcd" x="${w - 105}" y="60" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700" fill="#22300f" text-anchor="middle">30 IPS  NAB</text>`);
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform-origin:50% 100%;transform:translateZ(${zFront}px) rotateX(${slope}deg)`)}">${svg(w, d, s.join(''))}</div>`);
     const zBack = zFront + d * Math.sin(-slope * Math.PI / 180);
-    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#3c3f44,#25272b)');
-    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#3c3f44,#25272b)');
-    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#3c3f44,#25272b)');
+    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#c9ccd0,#9a9ea3)');
+    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#c9ccd0,#9a9ea3)');
+    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#c9ccd0,#9a9ea3)');
   }
 
   // ---------- draw, roughly back to front (preserve-3d sorts by depth anyway) ----------
@@ -434,7 +431,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const cab = [];
   const LIPH = 44, WOODY = FRONT + LIPH;
   cab.push(`<defs>
-    ${A8 ? '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dedcd5"/><stop offset="0.15" stop-color="#c9c7c0"/><stop offset="1" stop-color="#a9a7a0"/></linearGradient>' : '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c5752"/><stop offset="0.15" stop-color="#4a4541"/><stop offset="1" stop-color="#36322f"/></linearGradient>'}
+    ${A8 ? '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ea"/><stop offset="0.15" stop-color="#cfd2d5"/><stop offset="1" stop-color="#a3a7ab"/></linearGradient>' : '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c5752"/><stop offset="0.15" stop-color="#4a4541"/><stop offset="1" stop-color="#36322f"/></linearGradient>'}
     <linearGradient id="lam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e482b"/><stop offset="0.35" stop-color="#9a6b42"/><stop offset="0.7" stop-color="#875a36"/><stop offset="1" stop-color="#5e3d24"/></linearGradient>
     <filter id="grainV"><feTurbulence type="fractalNoise" baseFrequency="0.0025 0.21" numOctaves="5" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.035  0 0 0 0 0.0  0 0 0 2.4 -0.85"/><feComposite in2="SourceGraphic" operator="in"/></filter>
     <linearGradient id="shadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
@@ -444,7 +441,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   cab.push(txt(CI + 92, FRONT + 29, A8 ? 'STAUDER' : 'CMI', A8 ? 13 : 17, '#e3e5e8', 'middle', 900, A8 ? 'letter-spacing="3"' : 'font-style="italic" letter-spacing="4"'));
   // drawer front: woodgrain laminate inside a dark frame (A827: Studer-grey panel), small model tag at right
   if (A8) {
-    cab.push(`<rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="${Math.max(0, TH - WOODY)}" fill="#b3b1aa"/><rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="10" fill="#000" opacity="0.18"/>`);
+    cab.push(`<rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="${Math.max(0, TH - WOODY)}" fill="#2c2d30"/><rect x="${CI + 30}" y="${WOODY + 8}" width="${TW - 2 * CI - 60}" height="${Math.max(0, TH - WOODY - 8)}" fill="#3a3c40"/><rect x="${CI + 30}" y="${WOODY + 8}" width="${TW - 2 * CI - 60}" height="2" fill="#fff" opacity="0.12"/><rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="6" fill="#000" opacity="0.35"/>`);
     cab.push(`<rect x="${TW - CI - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2c30"/>`);
     cab.push(txt(TW - CI - 87, TH - 17, 'A827', 10, '#e6e7e9', 'middle', 800, 'letter-spacing="1"'));
   } else {
@@ -457,7 +454,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   cab.push(txt(TW - CI - 87, TH - 17, 'HJ-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
   }
   // cabinet side frames
-  cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#9d9b95' : '#3a3633'}"/><rect x="${TW - CI - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#94928c' : '#33302d'}"/>`);
+  cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#7a4a28' : '#3a3633'}"/><rect x="${TW - CI - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#6d4122' : '#33302d'}"/>`);
 
   let html = `<div id="jh24" style="position:absolute;left:${TX}px;top:${TY}px;width:${TW}px;height:${TH}px;overflow:hidden;perspective:1650px;perspective-origin:50% -20%;">
   ${svg(TW, TH, cab.join(''))}

@@ -230,7 +230,27 @@
   const a8ctr = document.getElementById('a8-tctr');
   const a8lamp = (n, on) => { const g = document.getElementById(`a8-lk-${n}`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
   const slsTc = document.getElementById('sls-tc');
+  // A827 remote: keys drive the shared transport and the autolocator's track states
+  const a8r = document.querySelector('#sls');
+  if (a8r) a8r.addEventListener('click', (e) => {
+    const g = e.target.closest('[data-a8r]'); if (!g) return;
+    let n = g.dataset.a8r.replace(/2$/, '');
+    const t = /^(rdy|inp|safe)(\d+)$/.exec(n);
+    if (t) { const i = +t[2]; if (t[1] === 'rdy') AS_PRESS(`ready${i}`); else if (t[1] === 'inp') AS_PRESS(`input${i}`); else if (AL.ready.has(i)) AS_PRESS(`ready${i}`); return; }
+    if (n === 'all') { const any = AL.ready.size > 0; for (let i = 0; i < 24; i++) if (AL.ready.has(i) === any) AS_PRESS(`ready${i}`); return; }
+    if (n === 'rec') n = 'record';
+    if (['rew', 'ff', 'play', 'stop', 'record'].includes(n)) AS_PRESS(n);
+    else if (n === 'f-u0') AS_PRESS('loc0'); else if (n === 'f-l1') tr.locateTo(tr.zero);
+  });
+  const a8rOn = (id, on) => { const e = document.getElementById(`a8r-l-${id}`); if (e) e.setAttribute('opacity', on ? 0.9 : 0); };
   function drawA827() {
+    const rtc = document.getElementById('a8r-tc');
+    if (rtc) { const c = Math.max(0, tr.counter), fr = Math.floor((c % 1) * 30); rtc.textContent = `${String(Math.floor(c / 3600)).padStart(2, '0')}:${String(Math.floor(c / 60) % 60).padStart(2, '0')}:${String(Math.floor(c) % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`;
+      const m = tr.mode; for (const sfx of ['', '2']) { a8rOn(`play${sfx}`, m === 'play' || m === 'rec'); a8rOn(`stop${sfx}`, m === 'stop'); a8rOn(`rec${sfx}`, m === 'rec'); a8rOn(`ff${sfx}`, m === 'ff' || (m === 'locate' && tr.v > 0)); a8rOn(`rew${sfx}`, m === 'rew' || (m === 'locate' && tr.v < 0)); }
+      for (let i = 0; i < 24; i++) { a8rOn(`rdy${i}`, AL.ready.has(i)); a8rOn(`inp${i}`, AL.inMon.has(i)); a8rOn(`safe${i}`, !AL.ready.has(i)); }
+      const sh = document.getElementById('a8r-shuttle'); if (sh) sh.setAttribute('x', 290 + Math.max(-1, Math.min(1, tr.v / 13)) * 48);
+      const lcd = document.getElementById('a8-lcd'); if (lcd) lcd.textContent = `${tr.speedIPS} IPS ${tr.varispeed ? 'VAR' : 'NAB'}`;
+    }
     if (slsTc) {   // Studio Computer screen: timecode from the tape position (01:00:00:00 at zero, 30 fps)
       const t = Math.max(0, 3600 + tr.counter), fr = Math.floor((t % 1) * 30);
       slsTc.textContent = `${String(Math.floor(t / 3600)).padStart(2, '0')}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(Math.floor(t) % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`;
