@@ -18,8 +18,12 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
 
   // SSL knob: white knurled body, coloured cap insert on top (E-channel colour code), white pointer line down the body.
   // Cap colours: light grey for filters / compressor / utility, red HF, green HMF + expander/gate, blue LMF, black LF.
+  let KS = 1, TAG = null, CHN = 0;   // TAG: id of the next control drawn (pop-ups find and drive it)
+  const tg = (id) => { TAG = id; };
   const KCOL = { '#e9eaec': '#cfd0cb', '#d9dbde': '#cfd0cb', '#c9ccd1': '#cfd0cb', '#c8352a': '#b3262b', '#3f9a58': '#1f6e3d', '#3577c2': '#1f6dac', '#1e1f22': '#8b4a28', '#8a8f97': '#cfd0cb', '#e0b23a': '#e2b43a' };   // E-series caps, LF brown
   const sk = (cx, cy, r0, col0, ang = 0, lab = '', labY = null) => {
+    const kid = TAG; TAG = null;
+    if (kid) p(`<g data-kid="${kid}" data-ch="${CHN}" data-a0="${ang.toFixed(1)}" data-cx="${cx}" data-cy="${cy}">`);
     const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#cfd0cb' || col === '#e2b43a';
     if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.4) * Math.cos(a)).toFixed(1), (cy + (r + 3.4) * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
     circle(cx + 1.3, cy + 2, r * 1.02, '#000', 'opacity="0.45"');                     // cast shadow
@@ -29,16 +33,25 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     circle(cx, cy, r * 0.8, col);                                                      // large cap: thin white rim shows                                                      // coloured cap
     circle(cx - r * 0.22, cy - r * 0.26, r * 0.28, '#fff', 'opacity="0.22"');          // gloss
     const a = (ang - 90) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    p('<g class="kptr">');
     p(`<line x1="${(cx + r * 0.8 * ca).toFixed(1)}" y1="${(cy + r * 0.8 * sa).toFixed(1)}" x2="${(cx + r * 0.96 * ca).toFixed(1)}" y2="${(cy + r * 0.94 * sa).toFixed(1)}" stroke="#141416" stroke-width="${Math.max(1, r * 0.15).toFixed(1)}" stroke-linecap="round"/>`);
     p(`<line x1="${cx}" y1="${cy}" x2="${(cx + r * 0.76 * ca).toFixed(1)}" y2="${(cy + r * 0.76 * sa).toFixed(1)}" stroke="${light ? '#141416' : '#ffffff'}" stroke-width="${Math.max(1, r * 0.13).toFixed(1)}" stroke-linecap="round"/>`);
+    p('</g>');
+    if (kid) p('</g>');
     if (lab) text(cx, labY ?? cy + r + 9, lab, 6.5, INK2, 'middle', 700, 'letter-spacing="0.3"');
   };
-  const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
+  const key = (x, y, w, hh, col, lit, lab, size = 6) => {
+    const bid = TAG; TAG = null;
+    if (!bid) return button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
+    p(`<g data-bid="${bid}" data-ch="${CHN}" data-on="${lit ? 1 : 0}">`);
+    button(x, y, w, hh, col, false, lab, { size, pastel: col !== 'red' && col !== 'yellow' });
+    p(`<g class="klit" opacity="${lit ? 1 : 0}">`); button(x, y, w, hh, col, true, lab, { size }); p('</g></g>');
+  };
   const sect = (x, y, w, lab) => { rect(x, y, w, 1, LINE); if (lab) text(x + w / 2, y + 9, lab, 6.2, '#3a3c40', 'middle', 800, 'letter-spacing="1.2"'); };
   const ang = () => -120 + rnd() * 240;
 
   return capture(() => {
-    p(`<svg xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}" viewBox="0 0 ${CW} ${CH}" style="position:absolute;left:24px;top:634px;overflow:visible">`);
+    p(`<svg id="sls-svg" xmlns="http://www.w3.org/2000/svg" width="${CW}" height="${CH}" viewBox="0 0 ${CW} ${CH}" style="position:absolute;left:24px;top:634px;overflow:visible">`);
     // console body: dark grey frame, wooden end cheeks
     rect(0, 0, CW, CH, '#1b1c1f', 'rx="10"');
     rect(0, 0, 18, CH, 'url(#woodH)', 'rx="6"'); rect(CW - 18, 0, 18, CH, 'url(#woodH)', 'rx="6"');
@@ -48,33 +61,34 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     for (let i = 0; i < N; i++) {
       // SL 611G I/O module, 72 px wide (38 mm module: 1.9 px per mm). Control placement follows the module drawings
       // in the G Series operator's manual (section 2) and the user's close-up photos.
-      const x0 = stripX(i), cx = x0 + SW / 2, L = x0 + 19, R = x0 + SW - 19;
+      const x0 = stripX(i), cx = x0 + SW / 2, L = x0 + 19, R = x0 + SW - 19; CHN = i;
       rect(x0 + 1, 4, SW - 2, CH - 8, PANEL, 'rx="3"');
       rect(x0 + 1, 4, 1, CH - 8, '#fff', 'opacity="0.08"'); rect(x0 + SW - 2, 4, 1, CH - 8, '#000', 'opacity="0.18"');
       const led = (lx, ly, on, col = '#ff3b2f') => { circle(lx, ly, 1.9, '#000', 'opacity="0.4"'); circle(lx, ly, 1.6, on ? col : '#4a2a26', on ? 'filter="url(#glowSm)"' : ''); };
       const lab = (lx, ly, s, sz = 4.6, anchor = 'middle') => text(lx, ly, s, sz, INK2, anchor, 700);
+      const ledT = (lx, ly, on, col = '#ff3b2f') => { led(lx, ly, false, col); p(`<g class="klit" opacity="${on ? 1 : 0}">`); led(lx, ly, true, col); p('</g>'); };
       // tall section-routing key with its LED underneath (CH IN / CH OUT / MON style)
       const tall = (kx, ky, l1, l2, on) => { key(kx, ky, 16, 20, 'white', false, '', 4); lab(kx + 8, ky + 9, l1, 3.9); if (l2) lab(kx + 8, ky + 15, l2, 3.9); led(kx + 8, ky + 25, on); };
       p('<g transform="translate(0 178) scale(1 0.944) translate(0 -120)">');   // module controls sit below the taller meter bridge
       // ---- routing matrix: round buttons with an LED above, 4 columns x 6 rows (24 groups), quad bus row, PAN pot + PAN key
       for (let b = 0; b < 24; b++) {
         const bx = x0 + 13 + (b % 4) * 15.5, by = 140 + Math.floor(b / 4) * 12.5, on = i < 24 && b === i;
-        led(bx + 3.5, by - 5.5, on);
-        circle(bx + 0.5, by + 1, 4.6, '#000', 'opacity="0.45"'); circle(bx, by, 4.6, '#d9d6cc'); circle(bx, by, 4.6, 'url(#capHiDark)');
+        p(`<g data-bid="bus${b + 1}" data-ch="${i}" data-on="${on ? 1 : 0}">`); ledT(bx + 3.5, by - 5.5, on);
+        circle(bx + 0.5, by + 1, 4.6, '#000', 'opacity="0.45"'); circle(bx, by, 4.6, '#d9d6cc'); circle(bx, by, 4.6, 'url(#capHiDark)'); p('</g>');
         lab(bx - 6.5, by - 3.5, String(b + 1), 3.8, 'end');
       }
       p('<g transform="translate(0 -14)">');   // quad row, group output and channel input moved up under the tighter matrix
-      ['LF', 'RF', 'LB', 'RB'].forEach((q, k) => { const bx = x0 + 13 + k * 15.5, on = i >= 24 && k < 2; led(bx + 3.5, 223.5, on, '#ffb02e'); circle(bx + 0.5, 230, 4.6, '#000', 'opacity="0.45"'); circle(bx, 229, 4.6, '#d9d6cc'); lab(bx, 241, q, 3.9); });
-      sk(L, 256, 7, '#d9dbde', ang()); lab(L - 9, 270, 'ODD', 3.8); lab(L + 9, 270, 'EVEN', 3.8);
-      key(R - 10, 250, 22, 12, 'white', i >= 24, 'PAN', 5);
+      ['LF', 'RF', 'LB', 'RB'].forEach((q, k) => { const bx = x0 + 13 + k * 15.5, on = i >= 24 && k < 2; p(`<g data-bid="q_${q.toLowerCase()}" data-ch="${i}" data-on="${on ? 1 : 0}">`); ledT(bx + 3.5, 223.5, on, '#ffb02e'); circle(bx + 0.5, 230, 4.6, '#000', 'opacity="0.45"'); circle(bx, 229, 4.6, '#d9d6cc'); p('</g>'); lab(bx, 241, q, 3.9); });
+      tg('rpan'); sk(L, 256, 7, '#d9dbde', ang()); lab(L - 9, 270, 'ODD', 3.8); lab(L + 9, 270, 'EVEN', 3.8);
+      tg('panbus'); key(R - 10, 250, 22, 12, 'white', i >= 24, 'PAN', 5);
       // ---- group output: TRIM (pull for solo isolate), FLOAT, DIRECT
       sect(x0 + 4, 276, SW - 8, '');
-      sk(L, 294, 7, '#d9dbde', 140); lab(L, 309, 'TRIM');
-      key(R - 12, 282, 26, 10, 'white', false, 'FLOAT', 4.6); key(R - 12, 296, 26, 10, 'white', false, 'DIRECT', 4.2);
+      tg('gtrim'); sk(L, 294, 7, '#d9dbde', 140); lab(L, 309, 'TRIM');
+      tg('float'); key(R - 12, 282, 26, 10, 'white', false, 'FLOAT', 4.6); tg('direct'); key(R - 12, 296, 26, 10, 'white', false, 'DIRECT', 4.2);
       // ---- channel input: LINE trim (+ green LED), FLIP, SUB GP, phase
       sect(x0 + 4, 314, SW - 8, '');
-      sk(L, 332, 7, '#d9dbde', ang()); lab(L, 347, 'LINE'); led(L + 10, 322, true, '#4fe07a');
-      key(R - 12, 318, 26, 9, 'white', false, 'FLIP', 4.6); key(R - 12, 330, 26, 9, 'white', false, 'SUB GP', 4.1); key(R - 12, 342, 26, 9, 'white', false, 'Ø', 6);
+      tg('line'); sk(L, 332, 7, '#d9dbde', ang()); lab(L, 347, 'LINE'); led(L + 10, 322, true, '#4fe07a');
+      tg('flip'); key(R - 12, 318, 26, 9, 'white', false, 'FLIP', 4.6); tg('subgp'); key(R - 12, 330, 26, 9, 'white', false, 'SUB GP', 4.1); tg('phase'); key(R - 12, 342, 26, 9, 'white', false, 'Ø', 6);
       p('</g>');
       // ---- dynamics, filters and equaliser laid out like the user's SSL 4000 E channel strip picture:
       //      printed scales round every knob, the strip's wording, its keys and stepped section lines.
@@ -89,60 +103,60 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       };
       const ttl = (yl, t, tx = x0 + 6) => text(tx, Y(yl) + 3, t, 6, INK, 'start', 900, 'letter-spacing="0.3"');
       const divider = (yl1, yl2, xm = cx + 4) => p(`<polyline points="${x0 + 4},${Y(yl1)} ${xm - 6},${Y(yl1)} ${xm + 6},${Y(yl2)} ${x0 + SW - 4},${Y(yl2)}" fill="none" stroke="${LINE}" stroke-width="1"/>`);
-      const tall3 = (yl, keys) => keys.forEach(([a1, a2, on, lc], k) => { const kx = x0 + 9 + k * 19; key(kx, Y(yl), 16, 17, 'white', false, '', 4); text(kx + 8, Y(yl) + 7.5, a1, 3.7, INK2, 'middle', 700); text(kx + 8, Y(yl) + 13, a2, 3.7, INK2, 'middle', 700); led(kx + 8, Y(yl) + 21.5, on, lc); });
+      const tall3 = (yl, keys) => keys.forEach(([a1, a2, on, lc, bid], k) => { const kx = x0 + 9 + k * 19; p(`<g data-bid="${bid}" data-ch="${i}" data-on="${on ? 1 : 0}">`); key(kx, Y(yl), 16, 17, 'white', false, '', 4); text(kx + 8, Y(yl) + 7.5, a1, 3.7, INK2, 'middle', 700); text(kx + 8, Y(yl) + 13, a2, 3.7, INK2, 'middle', 700); ledT(kx + 8, Y(yl) + 21.5, on, lc); p('</g>'); });
       const kL = x0 + 17, kR = x0 + SW - 17;
       const GAIN = ['-15', '12', '9', '6', '3', '0', '3', '6', '9', '12', '+15'];
       // DYNAMICS
       sect(x0 + 4, Y(-4), SW - 8, ''); ttl(4, 'DYNAMICS');
-      key(kR - 12, Y(4), 24, 9, 'white', false, 'LINK', 4.6);
-      kn(kL, 30, 7.5, '#e9eaec', ['1', '2', '3', '5', '8', '20', '∞'], 'RATIO', 'COMPRESS');
-      kn(kR, 48, 7.5, '#e9eaec', ['+10', '+5', '0', '-5', '-10', '-15', '-20'], 'THRESHOLD');
-      kn(kL, 82, 7.5, '#e9eaec', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(98), 'F.ATK', 3.3, INK2, 'middle', 700);
+      tg('link'); key(kR - 12, Y(4), 24, 9, 'white', false, 'LINK', 4.6);
+      tg('c_ratio'); kn(kL, 30, 7.5, '#e9eaec', ['1', '2', '3', '5', '8', '20', '∞'], 'RATIO', 'COMPRESS');
+      tg('c_thr'); kn(kR, 48, 7.5, '#e9eaec', ['+10', '+5', '0', '-5', '-10', '-15', '-20'], 'THRESHOLD');
+      tg('c_rel'); kn(kL, 82, 7.5, '#e9eaec', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(98), 'F.ATK', 3.3, INK2, 'middle', 700);
       divider(98, 90, cx + 2);
-      kn(kR, 110, 7.5, '#3f9a58', ['-30', '-25', '-20', '-12', '-4', '+5', '+10'], 'THRESHOLD');
-      kn(kL, 132, 7.5, '#3f9a58', ['0', '5', '10', '20', '30', '35', '40'], 'RANGE', 'EXPAND');
-      key(kR - 13, Y(136), 26, 9, 'white', false, 'SELECT', 4.2);
+      tg('g_thr'); kn(kR, 110, 7.5, '#3f9a58', ['-30', '-25', '-20', '-12', '-4', '+5', '+10'], 'THRESHOLD');
+      tg('g_rng'); kn(kL, 132, 7.5, '#3f9a58', ['0', '5', '10', '20', '30', '35', '40'], 'RANGE', 'EXPAND');
+      tg('g_gate'); key(kR - 13, Y(136), 26, 9, 'white', false, 'SELECT', 4.2);
       ['EX', 'G1', 'G2'].forEach((l, k) => { led(kR - 9 + k * 9, Y(152), k === 0, '#ffd23a'); text(kR - 9 + k * 9, Y(158), l, 3.2, INK2, 'middle', 700); });
       const gr = Math.floor(rnd() * 4), gg = Math.floor(rnd() * 3);
       ['20', '14', '10', '6', '3'].forEach((v, k) => { const ly = Y(166 + k * 9); led(kR - 7, ly, 4 - k < gg, '#4fe07a'); text(kR, ly + 1.4, v, 3.3, INK2, 'middle', 700); led(kR + 7, ly, 4 - k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); });
-      kn(kL, 182, 7.5, '#3f9a58', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(198), 'F.ATK', 3.3, INK2, 'middle', 700);
+      tg('g_rel'); kn(kL, 182, 7.5, '#3f9a58', ['.1', '.15', '.2', '.4', '1', '2', '4'], 'RELEASE'); text(kL - 14, Y(198), 'F.ATK', 3.3, INK2, 'middle', 700);
       text(cx, Y(212), 'DYNAMICS', 3.7, INK, 'middle', 800);
-      tall3(216, [['DYN', 'IN', i % 5 === 0, '#4fe07a'], ['EXP', 'IN', false, '#ff3b2f'], ['CMP', 'IN', i % 5 === 0, '#ffd23a']]);
+      tall3(216, [['DYN', 'IN', i % 5 === 0, '#4fe07a', 'dyn_in'], ['EXP', 'IN', false, '#ff3b2f', 'exp_in'], ['CMP', 'IN', i % 5 === 0, '#ffd23a', 'cmp_in']]);
       // FILTERS
       sect(x0 + 4, Y(246), SW - 8, ''); ttl(254, 'FILTERS');
-      key(x0 + 6, Y(262), 24, 9, 'white', false, 'DYN SC', 3.8);
-      kn(kR, 270, 7, '#c9ccd1', ['OUT', '12', '8', '5', '4', '3.5', '3'], 'kHz');
-      kn(kL, 298, 7, '#c9ccd1', ['OUT', '20', '70', '120', '200', '300', '350'], 'Hz');
-      key(kR - 13, Y(302), 26, 9, 'white', false, 'PRE DYN', 3.7);
+      tg('fdyn'); key(x0 + 6, Y(262), 24, 9, 'white', false, 'DYN SC', 3.8);
+      tg('lpf'); kn(kR, 270, 7, '#c9ccd1', ['OUT', '12', '8', '5', '4', '3.5', '3'], 'kHz');
+      tg('hpf'); kn(kL, 298, 7, '#c9ccd1', ['OUT', '20', '70', '120', '200', '300', '350'], 'Hz');
+      tg('prefilt'); key(kR - 13, Y(302), 26, 9, 'white', false, 'PRE DYN', 3.7);
       // EQUALISER
       sect(x0 + 4, Y(322), SW - 8, '');
-      ttl(330, 'HF'); key(kR - 12, Y(324), 24, 9, 'white', false, 'BELL', 4.6);
-      kn(kL, 350, 7.5, '#c8352a', GAIN, 'dB');
-      kn(kR, 370, 6.8, '#c8352a', ['1.5', '2', '5', '8', '10', '14', '16'], 'kHz');
+      ttl(330, 'HF'); tg('hf_bell'); key(kR - 12, Y(324), 24, 9, 'white', false, 'BELL', 4.6);
+      tg('hf_g'); kn(kL, 350, 7.5, '#c8352a', GAIN, 'dB');
+      tg('hf_f'); kn(kR, 370, 6.8, '#c8352a', ['1.5', '2', '5', '8', '10', '14', '16'], 'kHz');
       divider(388, 398, cx - 4);
       ttl(402, 'HMF', x0 + 40);
-      kn(kL, 412, 7.5, '#3f9a58', GAIN, 'dB');
-      kn(kR, 432, 6.8, '#3f9a58', ['.6', '.8', '1.5', '3', '4.5', '6', '7'], 'kHz');
-      kn(kL, 456, 6.5, '#3f9a58', ['3', '2', '1.5', '1', '.5'], '');
-      text(kR, Y(458), 'EQUALISER', 3.8, INK, 'middle', 900); key(kR - 13, Y(462), 26, 9, 'white', false, 'SELECT', 4.2);
+      tg('hm_g'); kn(kL, 412, 7.5, '#3f9a58', GAIN, 'dB');
+      tg('hm_f'); kn(kR, 432, 6.8, '#3f9a58', ['.6', '.8', '1.5', '3', '4.5', '6', '7'], 'kHz');
+      tg('hm_q'); kn(kL, 456, 6.5, '#3f9a58', ['3', '2', '1.5', '1', '.5'], '');
+      text(kR, Y(458), 'EQUALISER', 3.8, INK, 'middle', 900); tg('eq_blk'); key(kR - 13, Y(462), 26, 9, 'white', false, 'SELECT', 4.2);
       led(kR - 7, Y(478), false, '#ffd23a'); led(kR + 7, Y(478), true, '#ffd23a'); text(kR, Y(485), 'BLK/BRN', 3.1, INK2, 'middle', 700);
       ttl(490, 'LMF', x0 + 40);
-      kn(kL, 504, 7.5, '#3577c2', GAIN, 'dB');
-      kn(kR, 524, 6.8, '#3577c2', ['.2', '.3', '.8', '1', '1.5', '2', '2.5'], 'kHz');
-      kn(kL, 548, 6.5, '#3577c2', ['3', '2', '1.5', '1', '.5'], '');
+      tg('lm_g'); kn(kL, 504, 7.5, '#3577c2', GAIN, 'dB');
+      tg('lm_f'); kn(kR, 524, 6.8, '#3577c2', ['.2', '.3', '.8', '1', '1.5', '2', '2.5'], 'kHz');
+      tg('lm_q'); kn(kL, 548, 6.5, '#3577c2', ['3', '2', '1.5', '1', '.5'], '');
       divider(566, 556, cx + 4);
       ttl(572, 'LF', x0 + 6);
-      kn(kR, 576, 6.8, '#1e1f22', ['30', '50', '100', '200', '300', '450'], 'Hz');
-      kn(kL, 602, 7.5, '#1e1f22', GAIN, 'dB');
-      key(kR - 12, Y(608), 24, 9, 'white', false, 'BELL', 4.6);
+      tg('lf_f'); kn(kR, 576, 6.8, '#1e1f22', ['30', '50', '100', '200', '300', '450'], 'Hz');
+      tg('lf_g'); kn(kL, 602, 7.5, '#1e1f22', GAIN, 'dB');
+      tg('lf_bell'); key(kR - 12, Y(608), 24, 9, 'white', false, 'BELL', 4.6);
       text(cx, Y(624), 'EQUALIZER', 3.7, INK, 'middle', 800);
-      tall3(628, [['EQ', 'IN', i % 3 !== 2, '#4fe07a'], ['DYN', 'SC', false, '#ff3b2f'], ['PRE', 'DYN', false, '#ffd23a']]);
+      tall3(628, [['EQ', 'IN', i % 3 !== 2, '#4fe07a', 'eq_in'], ['DYN', 'SC', false, '#ff3b2f', 'eqdynsc'], ['PRE', 'DYN', false, '#ffd23a', 'eqpredyn']]);
       led(cx + 12, Y(656), i === 19); text(cx + 8, Y(656) + 1.4, 'OVERLOAD', 3.5, INK, 'end', 800);
       KS = 1.4;
       // ---- cues: stereo pan, stereo send and sends 1-4, each with PRE and SMALL FADER keys
       sect(x0 + 4, 888, SW - 8, 'CUES');
-      sk(kL, 905, 5.5, '#e0b23a', ang()); lab(kL - 11, 913, 'L', 3.8); lab(kL + 11, 913, 'R', 3.8);
-      const send = (ky, col, l) => { sk(kL, ky, 6.2, col, ang()); lab(kL - 13, ky - 6, l, 4.2, 'start'); key(kR - 15, ky - 8.5, 30, 7.5, 'white', false, 'PRE', 4); key(kR - 15, ky + 0.5, 30, 7.5, 'white', false, 'SM FDR', 3.6); };
+      tg('stp'); sk(kL, 905, 5.5, '#e0b23a', ang()); lab(kL - 11, 913, 'L', 3.8); lab(kL + 11, 913, 'R', 3.8);
+      const send = (ky, col, l) => { const id = l === 'ST' ? 'st' : `c${l}`; tg(id); sk(kL, ky, 6.2, col, ang()); lab(kL - 13, ky - 6, l, 4.2, 'start'); tg(`${id}_pre`); key(kR - 15, ky - 8.5, 30, 7.5, 'white', false, 'PRE', 4); tg(`${id}_sm`); key(kR - 15, ky + 0.5, 30, 7.5, 'white', false, 'SM FDR', 3.6); };
       send(925, '#e0b23a', 'ST'); send(944, '#e9eaec', '1'); send(963, '#e9eaec', '2'); send(982, '#e9eaec', '3'); send(1001, '#e9eaec', '4');
       // ---- monitor input: READY GROUP, READY TAPE (square keys), RECORD (large red, track number)
       sect(x0 + 4, 1016, SW - 8, '');

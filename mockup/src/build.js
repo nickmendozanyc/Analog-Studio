@@ -34,7 +34,8 @@ const polar = (cx, cy, r, deg) => [cx + r * Math.cos(rad(deg)), cy + r * Math.si
 
 // Rotary knob. ang: -150..150 (0 = 12 o'clock)
 function knob(cx, cy, r, cap = '#d9d4c7', ang = 0, opts = {}) {
-  const { ticks = r >= 13, skirt = '#1b1c1f', pointer = '#ffffff', label, labelColor = '#cfcabd', labelSize, dark = false } = opts;
+  const { ticks = r >= 13, skirt = '#1b1c1f', pointer = '#ffffff', label, labelColor = '#cfcabd', labelSize, dark = false, kid, ch } = opts;
+  if (kid) p(`<g data-kid="${kid}" data-ch="${ch}" data-a0="${ang.toFixed(1)}" data-cx="${cx}" data-cy="${cy}">`);
   if (ticks) {
     for (let i = 0; i <= 10; i++) {
       const a = -150 + i * 30;
@@ -51,7 +52,8 @@ function knob(cx, cy, r, cap = '#d9d4c7', ang = 0, opts = {}) {
   p(`<circle cx="${cx}" cy="${cy}" r="${r * 0.8}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="0.8"/>`);
   const [px1, py1] = polar(cx, cy, r * 0.25, ang);
   const [px2, py2] = polar(cx, cy, r * 1.02, ang);
-  p(`<line x1="${px1.toFixed(1)}" y1="${py1.toFixed(1)}" x2="${px2.toFixed(1)}" y2="${py2.toFixed(1)}" stroke="${pointer}" stroke-width="${Math.max(1.4, r * 0.13)}" stroke-linecap="round"/>`);
+  p(`<g class="kptr"><line x1="${px1.toFixed(1)}" y1="${py1.toFixed(1)}" x2="${px2.toFixed(1)}" y2="${py2.toFixed(1)}" stroke="${pointer}" stroke-width="${Math.max(1.4, r * 0.13)}" stroke-linecap="round"/></g>`);
+  if (kid) p('</g>');
   if (label) text(cx, cy + r * 1.38 + (labelSize || 9) + 1, label, labelSize || 9, labelColor, 'middle', 700, 'letter-spacing="0.6"');
 }
 
@@ -326,7 +328,7 @@ function remote224(ox, oy, sc, opts = {}) {
 }
 
 // ---------- defs ----------
-p(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`);
+p(`<svg id="room-svg" xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`);
 p(`<defs>
   <radialGradient id="kShadow"><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
   <radialGradient id="kSkirt" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#6a6d73" stop-opacity="0.7"/><stop offset="0.6" stop-color="#2a2b2e" stop-opacity="0.2"/><stop offset="1" stop-color="#000" stop-opacity="0.6"/></radialGradient>
@@ -690,7 +692,8 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
   const upKnobs = [], fdCaps = [];
   // FLAT = true: the console is drawn as a flat front view (2D shaded knobs and caps) in the main SVG
   const FLAT = true;
-  const K = (x, y, r, cap, ang, o = {}) => { if (FLAT) knob(x, y, r, cap, ang, { ticks: false, dark: o.dark }); else upKnobs.push(knob3d(x, y, r, cap, ang, o)); };
+  let CH_NOW = 0;
+  const K = (x, y, r, cap, ang, o = {}) => { if (FLAT) knob(x, y, r, cap, ang, { ticks: false, dark: o.dark, kid: o.kid, ch: CH_NOW }); else upKnobs.push(knob3d(x, y, r, cap, ang, o)); };
   const CAP_SVG = { black: 'url(#faderCapBlack)', yellow: 'url(#faderCapYellow)', green: 'url(#faderCapGreen)', white: 'url(#faderCapWhite)', red: 'url(#faderCapRed)' };
   const capFlat = (x, y, w, d, key, idx) => {
     rect(x - w / 2 + 3, y - d / 2 + 8, w, d, '#000', 'rx="4" opacity="0.5" filter="url(#soft)"');
@@ -705,11 +708,12 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     // HJ-600 series channel strip, laid out from the user's reference photos (top to bottom)
     const GOLD = '#d8c27c', WH = '#ece6da';
     const tx = (x, y, s2, size, col = WH, anchor = 'middle', w = 800) => text(x, y, s2, size, col, anchor, w);
-    const blk = (x, y, w, h, label, lit = false, litCol = '#ff3b2f') => {
+    const blk = (x, y, w, h, label, lit = false, litCol = '#ff3b2f', bid) => {
+      if (bid) p(`<g data-bid="${bid}" data-ch="${CH_NOW}" data-on="${lit ? 1 : 0}">`);
       rect(x - 0.5, y + 1.5, w + 1, h + 1, '#000', 'rx="2" opacity="0.6"');
-      rect(x, y, w, h, lit ? litCol : '#151515', `rx="2" ${lit ? 'filter="url(#glow)"' : ''}`);
-      rect(x, y, w, h, 'url(#btnOff)', 'rx="2"');
-      tx(x + w / 2, y + h / 2 + 3.4, label, 9.5, lit ? '#1a0c08' : WH, 'middle', 800);
+      rect(x, y, w, h, '#151515', 'rx="2"'); rect(x, y, w, h, 'url(#btnOff)', 'rx="2"'); tx(x + w / 2, y + h / 2 + 3.4, label, 9.5, WH, 'middle', 800);
+      p(`<g class="klit" opacity="${lit ? 1 : 0}">`); rect(x, y, w, h, litCol, 'rx="2" filter="url(#glow)"'); rect(x, y, w, h, 'url(#btnOff)', 'rx="2"'); tx(x + w / 2, y + h / 2 + 3.4, label, 9.5, '#1a0c08', 'middle', 800); p('</g>');
+      if (bid) p('</g>');
     };
     const wht = (x, y, w, h, label, lit = false) => {
       rect(x - 0.5, y + 1.5, w + 1, h + 1, '#000', 'rx="2" opacity="0.6"');
@@ -718,17 +722,24 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       tx(x + w / 2, y + h / 2 + 4, label, 11, '#1b1b1b', 'middle', 800);
     };
     const rnd2 = (cx, cy, r, col) => { circle(cx + 0.8, cy + 1.6, r + 0.8, '#000', 'opacity="0.55"'); circle(cx, cy, r, col); circle(cx, cy, r, 'url(#capHi)', 'opacity="0.7"'); };
+    // round key with a lit layer (green dot, cream cap or red LED) for the pop-ups to switch
+    const rkey = (bid, cx, cy, r, col, on, litKind) => {
+      p(`<g data-bid="${bid}" data-ch="${CH_NOW}" data-on="${on ? 1 : 0}">`); rnd2(cx, cy, r, col);
+      p(`<g class="klit" opacity="${on ? 1 : 0}">`);
+      if (litKind === 'cream') { circle(cx, cy, r, '#fff8d8', 'filter="url(#glow)"'); circle(cx, cy, r, 'url(#capHi)', 'opacity="0.7"'); } else circle(cx, cy, 2, '#59f07a', 'filter="url(#glowSm)"');
+      p('</g></g>');
+    };
     const led = (cx, cy, on) => circle(cx, cy, 2.6, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
     // printed knob scale: tick marks plus numerals at given angles
     const scale = (cx, cy, r, marks, col = WH) => {
       for (let i = 0; i <= 10; i++) { const a = -150 + i * 30; const [x1, y1] = polar(cx, cy, r * 1.22, a), [x2, y2] = polar(cx, cy, r * 1.38, a); p(`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${GOLD}" stroke-width="0.9"/>`); }
       for (const [a, lab] of marks) { const [mx2, my2] = polar(cx, cy, r * 1.72, a); tx(mx2, my2 + 2.8, lab, 7.5, col, 'middle', 700); }
     };
-    const KN = (cx, cy, r, col, ang, marks, dark = false) => { scale(cx, cy, r, marks); K(cx, cy, r, col, ang, { dark }); };
+    const KN = (cx, cy, r, col, ang, marks, dark = false, kid) => { scale(cx, cy, r, marks); K(cx, cy, r, col, ang, { dark, kid }); };
     const BLUE = '#3f8fd9', SAGE = '#7fa392', RED = '#e3452f', YEL = '#ecd03a', BLK = '#1a1a1c';
     const GAIN14 = [[-150, '-14'], [-75, '6'], [0, '0'], [75, '6'], [150, '+14']];
     for (let ch = 0; ch < NCH; ch++) {
-      const x0 = ch * STRIP, ret = ch >= 24, cm = x0 + STRIP / 2;
+      const x0 = ch * STRIP, ret = ch >= 24, cm = x0 + STRIP / 2; CH_NOW = ch;
       rect(x0, 0, STRIP, UD, ret ? 'url(#jh600alt)' : 'url(#jh600)');
       rect(x0, 0, STRIP, UD, '#000', 'filter="url(#brushed)" opacity="0.06"');
       rect(x0, 0, 1.5, UD, '#000', 'opacity="0.75"'); rect(x0 + 1.5, 0, 1, UD, '#fff', 'opacity="0.08"');
@@ -737,25 +748,25 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       for (let i = 0; i < 12; i++) {
         const y = 16 + i * 12.6;
         for (const [k, bx, lx, nx, an] of [[2 * i + 1, x0 + 20, x0 + 32, x0 + 8, 'middle'], [2 * i + 2, x0 + 52, x0 + 64, x0 + 77, 'middle']]) {
-          rnd2(bx, y, 4.8, '#141414'); led(lx, y, readyTracks.has(ch) && ch + 1 === k);
+          { const on = (busLit(ch).includes(k - 1)); p(`<g data-bid="bus${k}" data-ch="${ch}" data-on="${on ? 1 : 0}">`); rnd2(bx, y, 4.8, '#141414'); led(lx, y, false); p(`<g class="klit" opacity="${on ? 1 : 0}">`); led(lx, y, true); p('</g></g>'); }
           tx(nx, y + 2.8, String(k), 7.5, WH, an, 700);
         }
       }
       p('<g transform="translate(0 -26)">');
       // INPUT / TAPE source select
-      blk(x0 + 4, 186, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e'); blk(x0 + 44, 186, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e');
+      blk(x0 + 4, 186, 37, 15, 'INPUT', readyTracks.has(ch), '#ffb02e', 'src_in'); blk(x0 + 44, 186, 37, 15, 'TAPE', ch < 24 && !readyTracks.has(ch), '#ffb02e', 'src_tape');
       p('<g transform="translate(0 -58)">');   // trim through sends move up into the space the mic controls left
-      KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']]);
+      KN(x0 + 22, 274, 11, RED, -30 + rnd() * 60, [[-150, '-'], [150, '+']], false, 'trim');
       tx(x0 + 22, 299, 'TRIM', 8, WH);
-      KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']]);
+      KN(x0 + 60, 290, 10, RED, ch % 2 ? 40 : -40, [[-150, 'O'], [0, 'C'], [150, 'E']], false, 'oddeven');
       tx(x0 + 60, 314, 'ODD·EVEN', 7, WH, 'middle', 700);
       // pan toggle, direct out level + LED
       rect(x0 + 13, 330, 14, 8, '#0d0d0d', 'rx="4"'); rect(x0 + 17, 320, 6, 14, 'url(#chrome)', 'rx="3"');
       tx(x0 + 20, 348, 'PAN', 7.5, GOLD);
       tx(x0 + 56, 324, 'DIRECT', 7, GOLD);
-      K(x0 + 56, 337, 7.5, BLK, -60, { dark: true }); led(x0 + 76, 334, ch < 24 && ch % 7 === 3);
+      K(x0 + 56, 337, 7.5, BLK, -60, { dark: true, kid: 'direct' }); led(x0 + 76, 334, ch < 24 && ch % 7 === 3);
       // DUMP + channel number key
-      blk(x0 + 5, 354, 36, 17, 'DUMP'); wht(x0 + 45, 354, 35, 17, String(ch + 1));
+      blk(x0 + 5, 354, 36, 17, 'DUMP', false, '#ff3b2f', 'dump'); wht(x0 + 45, 354, 35, 17, String(ch + 1));
       // EQ: three bands in a gold bracket, frequency up-right, gain down-left
       p(`<rect x="${x0 + 3.5}" y="380" width="78" height="252" rx="2" fill="none" stroke="${GOLD}" stroke-width="1.1"/>`);
       const bands = [
@@ -767,34 +778,34 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         const by = 384 + bi * 82;
         tx(x0 + 8, by + 13, bn, 10, WH, 'start', 800);
         if (bi === 0) circle(x0 + 30, by + 9, 2.4, '#0a0a0a');
-        KN(x0 + 58, by + 28, 11, col, -100 + rnd() * 200, fm);
-        KN(x0 + 25, by + 62, 11, col, (rnd() - 0.5) * 140, GAIN14);
+        KN(x0 + 58, by + 28, 11, col, -100 + rnd() * 200, fm, false, ['hf_f', 'mf_f', 'lf_f'][bi]);
+        KN(x0 + 25, by + 62, 11, col, (rnd() - 0.5) * 140, GAIN14, false, ['hf_g', 'mf_g', 'lf_g'][bi]);
       });
       // EQ in, filters, phase, channel
       const eqOn = ![5, 6, 15, 24, 25, 31].includes(ch);
-      rnd2(x0 + 28, 648, 6, eqOn ? '#2a2a2a' : '#141414'); if (eqOn) circle(x0 + 28, 648, 2, '#59f07a', 'filter="url(#glowSm)"');
-      rnd2(x0 + 58, 648, 6, '#141414'); rnd2(x0 + 28, 668, 6, ch === 2 ? '#fff8d8' : '#e9e7e0'); rnd2(x0 + 58, 668, 6, '#141414'); rnd2(x0 + 28, 688, 6, '#d8cfae');
+      rkey('eq_in', x0 + 28, 648, 6, '#2a2a2a', eqOn, 'dot');
+      rkey('hpf', x0 + 58, 648, 6, '#141414', false, 'dot'); rkey('phase', x0 + 28, 668, 6, '#e9e7e0', ch === 2, 'cream'); rkey('lpf', x0 + 58, 668, 6, '#141414', false, 'dot'); rkey('chn', x0 + 28, 688, 6, '#d8cfae', false, 'cream');
       tx(x0 + 9, 651, 'IN', 7.5, WH, 'middle', 800); tx(x0 + 9, 671, 'Ø', 9, WH, 'middle', 800); tx(x0 + 10, 691, 'CHN', 6.5, WH, 'middle', 800);
       p(`<path d="M${x0 + 69} 652 L${x0 + 72} 645 L${x0 + 78} 645" fill="none" stroke="${WH}" stroke-width="1"/><path d="M${x0 + 69} 665 L${x0 + 75} 665 L${x0 + 78} 672" fill="none" stroke="${WH}" stroke-width="1"/>`);
       // sends: 1-2 yellow levels (PRE, WET); 3-4 and 5-6 pan + level (PRE, 2MIX)
       const sendHead = (y, nm) => { rect(x0 + 4, y, 77, 1.1, GOLD); tx(x0 + 80, y + 12, 'SEND', 9, GOLD, 'end', 800); tx(x0 + 80, y + 23, nm, 9, GOLD, 'end', 800); };
       const lv = (on) => (on ? -40 + rnd() * 120 : -150);
       sendHead(702, '1-2');
-      KN(x0 + 22, 722, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-150, '∞'], [0, '1'], [150, '+3']]);
-      blk(x0 + 4, 741, 30, 14, 'PRE'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-150, '∞'], [0, '2'], [150, '+3']]);
-      blk(x0 + 4, 759, 30, 14, 'WET');
+      KN(x0 + 22, 722, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-150, '∞'], [0, '1'], [150, '+3']], false, 's1');
+      blk(x0 + 4, 741, 30, 14, 'PRE', false, '#ff3b2f', 's12pre'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-150, '∞'], [0, '2'], [150, '+3']], false, 's2');
+      blk(x0 + 4, 759, 30, 14, 'WET', false, '#ff3b2f', 's12wet');
       sendHead(778, '3-4');
-      KN(x0 + 22, 798, 11, BLUE, 0, [[0, 'C'], [-150, '3'], [150, '4']]);
-      blk(x0 + 4, 817, 30, 14, 'PRE'); KN(x0 + 56, 828, 11, BLUE, lv(ch < 24), [[-150, '∞'], [0, 'LVL'], [150, '+3']]);
+      KN(x0 + 22, 798, 11, BLUE, 0, [[0, 'C'], [-150, '3'], [150, '4']], false, 's34p');
+      blk(x0 + 4, 817, 30, 14, 'PRE', false, '#ff3b2f', 's34pre'); KN(x0 + 56, 828, 11, BLUE, lv(ch < 24), [[-150, '∞'], [0, 'LVL'], [150, '+3']], false, 's34');
       sendHead(848, '5-6');
-      KN(x0 + 22, 868, 11, RED, 0, [[0, 'C'], [-150, '5'], [150, '6']]);
-      blk(x0 + 4, 887, 30, 14, 'PRE'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-150, '∞'], [0, 'LVL'], [150, '+3']]);
-      blk(x0 + 4, 905, 30, 14, '2MIX');
+      KN(x0 + 22, 868, 11, RED, 0, [[0, 'C'], [-150, '5'], [150, '6']], false, 's56p');
+      blk(x0 + 4, 887, 30, 14, 'PRE', false, '#ff3b2f', 's56pre'); KN(x0 + 56, 898, 11, RED, lv(ch < 24 && ch % 3 === 0), [[-150, '∞'], [0, 'LVL'], [150, '+3']], false, 's56');
+      blk(x0 + 4, 905, 30, 14, '2MIX', false, '#ff3b2f', 's562mix');
       rect(x0 + 4, 924, 77, 1.1, GOLD);
       p('</g>');
       // BUS level rotary below sends 5-6: feeds the assigned buses through the odd/even pan
       tx(x0 + 5, 880, 'BUS', 10, GOLD, 'start', 800); tx(x0 + 5, 892, 'LVL', 10, GOLD, 'start', 800);
-      KN(x0 + 50, 897, 18, '#1d1d1f', 60, [[60, '0']], true);   // black; normally set to 0 dB (2 o'clock)
+      KN(x0 + 50, 897, 18, '#1d1d1f', 60, [[60, '0']], true, 'buslvl');   // black; normally set to 0 dB (2 o'clock)
       tx(x0 + 27, 926, '∞', 8, WH, 'middle', 700); tx(x0 + 74, 926, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 930, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 930, 36, 18, String(ch + 1), soloed.has(ch));

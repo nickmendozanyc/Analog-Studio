@@ -62,9 +62,9 @@
     },
   };
   const ORDER = { cmi: ['input', 'bus', 'eq', 'sends'], sls: ['input', 'bus', 'dyn', 'eq', 'sends'] };
-  let ST = {}; try { ST = JSON.parse(localStorage.getItem('as-strip-v1') || '{}'); } catch (e) {}
+  let ST = {};
   const saveST = () => { try { localStorage.setItem('as-strip-v1', JSON.stringify(ST)); } catch (e) {} };
-  function chState(con, ch) {
+  let chState = function (con, ch) {
     const key = `${con}${ch}`;
     if (!ST[key]) {
       const s = {};
@@ -125,39 +125,6 @@
   const esc2 = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const T = (x, y, t, size, fill, anchor = 'middle', w = 800, extra = '') => `<text x="${x}" y="${y}" font-family="Archivo, Arial, sans-serif" font-size="${size}" font-weight="${w}" fill="${fill}" text-anchor="${anchor}" ${extra}>${esc2(t)}</text>`;
   const LITC = { white: '#fff6e0', amber: '#ffb02e', green: '#59f07a', red: '#ff3b2f' };
-  function knobSvg(c, v, x, y, r, th) {
-    const f = toFrac(c, v), ang = -150 + 300 * f, a = (ang - 90) * Math.PI / 180;
-    let s = `<g data-k="${c.id}" style="cursor:ns-resize">`;
-    for (let k = 0; k <= 10; k++) { const t = (-150 + k * 30 - 90) * Math.PI / 180; s += `<line x1="${(x + (r + 12) * Math.cos(t)).toFixed(1)}" y1="${(y + (r + 12) * Math.sin(t)).toFixed(1)}" x2="${(x + (r + 28) * Math.cos(t)).toFixed(1)}" y2="${(y + (r + 28) * Math.sin(t)).toFixed(1)}" stroke="${th.gold}" stroke-width="3"/>`; }
-    const lo = fmtV(c, c.min), hi = fmtV(c, c.max);
-    s += T((x + (r + 46) * Math.cos(-240 * Math.PI / 180)).toFixed(0), (y + (r + 46) * Math.sin(-240 * Math.PI / 180) + 8).toFixed(0), lo.replace(' dB', '').replace(' Hz', '').replace(' kHz', 'k'), 20, th.ink, 'middle', 700);
-    s += T((x + (r + 46) * Math.cos(60 * Math.PI / 180)).toFixed(0), (y + (r + 46) * Math.sin(60 * Math.PI / 180) + 8).toFixed(0), hi.replace(' dB', '').replace(' Hz', '').replace(' kHz', 'k'), 20, th.ink, 'middle', 700);
-    s += `<circle cx="${x + 4}" cy="${y + 10}" r="${r + 4}" fill="#000" opacity="0.45"/>`;
-    if (th.knob === 'sls') {
-      s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#efefea"/><circle cx="${x}" cy="${y}" r="${r - 3}" fill="none" stroke="#b9bab4" stroke-width="5" stroke-dasharray="3 4"/>`;
-      s += `<circle cx="${x}" cy="${y}" r="${r * 0.8}" fill="${c.col}"/><circle cx="${x}" cy="${y}" r="${r * 0.8}" fill="url(#capHiDark)" opacity="0.35"/>`;
-    } else {
-      s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#111214"/><circle cx="${x}" cy="${y}" r="${r * 0.78}" fill="${c.col}"/><circle cx="${x}" cy="${y}" r="${r * 0.78}" fill="url(#capHiDark)" opacity="0.6"/>`;
-    }
-    const light = c.col === '#cfd0cb' || c.col === '#e2b43a' || c.col === '#ecd03a';
-    s += `<line x1="${x}" y1="${y}" x2="${(x + r * 0.92 * Math.cos(a)).toFixed(1)}" y2="${(y + r * 0.92 * Math.sin(a)).toFixed(1)}" stroke="${light ? '#141416' : '#ffffff'}" stroke-width="${r * 0.13}" stroke-linecap="round"/>`;
-    s += `<circle cx="${x}" cy="${y}" r="${r + 30}" fill="transparent"/></g>`;
-    s += T(x, y + r + 74, c.label, 26, th.ink, 'middle', 900, 'letter-spacing="2"');
-    s += `<rect x="${x - 100}" y="${y + r + 88}" width="200" height="44" rx="6" fill="#0b0c0d"/>` + T(x, y + r + 120, fmtV(c, v), 26, '#7dffd6', 'middle', 700, `font-family="'JetBrains Mono', monospace"`);
-    return s;
-  }
-  function keySvg(c, on, x, y, w, h, th) {
-    const lit = LITC[c.col] || LITC.white;
-    return `<g data-b="${c.id}" style="cursor:pointer"><rect x="${x + 3}" y="${y + 6}" width="${w}" height="${h}" rx="8" fill="#000" opacity="0.5"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${on ? lit : th.knob === 'sls' ? '#d8d5cb' : '#1a1a1a'}" ${on ? 'filter="url(#glow)"' : ''}/><rect x="${x}" y="${y}" width="${w}" height="${h * 0.42}" rx="8" fill="#fff" opacity="${on ? 0.35 : 0.12}"/>${T(x + w / 2, y + h / 2 + 11, c.label, 30, on ? '#1a1208' : th.knob === 'sls' ? '#1e1f22' : th.ink, 'middle', 900)}</g>`;
-  }
-  function busSvg(s, x, y, th, con) {
-    let o = T(x, y - 20, con === 'sls' ? 'GROUPS 1 – 24' : 'BUSES 1 – 24', 26, th.ink, 'start', 900, 'letter-spacing="3"');
-    for (let b = 0; b < 24; b++) {
-      const bx = x + (b % 12) * 150, by = y + Math.floor(b / 12) * 150, on = s.bus.includes(b + 1);
-      o += `<g data-bus="${b + 1}" style="cursor:pointer"><circle cx="${bx + 56}" cy="${by + 64}" r="50" fill="#000" opacity="0.45"/><circle cx="${bx + 52}" cy="${by + 58}" r="50" fill="${on ? '#ff5a3c' : con === 'sls' ? '#d9d6cc' : '#141414'}" ${on ? 'filter="url(#glow)"' : ''}/><circle cx="${bx + 52}" cy="${by + 58}" r="50" fill="url(#capHiDark)" opacity="0.5"/>${T(bx + 52, by + 70, String(b + 1), 36, on ? '#1a0a05' : con === 'sls' ? '#1e1f22' : '#ece6da', 'middle', 900)}</g>`;
-    }
-    return o;
-  }
   function graphSvg(con, s, sec, gx, gy, gw, gh, th) {
     let o = `<rect x="${gx}" y="${gy}" width="${gw}" height="${gh}" rx="10" fill="#0a0b0c"/>`;
     if (sec === 'eq') {
@@ -184,68 +151,130 @@
     }
     return o;
   }
+  // ---- the pop-up shows the real console section, magnified (an <svg><use> of the console itself), and drives the
+  //      console's own tagged controls: data-kid knobs (pointer group .kptr) and data-bid keys (lit layer .klit).
+  //      What you turn in the pop-up turns on the console, so they always match.
+  const DEF = { cmi: {}, sls: {} };
+  for (const con of ['cmi', 'sls']) for (const sec of ORDER[con]) for (const row of SPEC[con][sec].rows) for (const c of row) if (c.id) DEF[con][c.id] = c;
+  Object.assign(DEF.sls, { hf_bell: { label: 'HF BELL' }, lf_bell: { label: 'LF BELL' }, eqdynsc: { label: 'EQ → DYN S/C' }, eqpredyn: { label: 'EQ PRE DYN' }, g_gate: { label: 'GATE SELECT' }, link: { label: 'LINK' }, q_lf: { label: 'QUAD LF' }, q_rf: { label: 'QUAD RF' }, q_lb: { label: 'QUAD LB' }, q_rb: { label: 'QUAD RB' } });
+  for (const [k, l] of Object.entries({ hf_bell: 'HF BELL', lf_bell: 'LF BELL' })) if (DEF.sls[k]) DEF.sls[k].label = l;
+  const ROOT = (con) => document.getElementById(con === 'cmi' ? 'room-svg' : 'sls-svg');
+  const angOf = (c, v) => -150 + 300 * Math.max(0, Math.min(1, toFrac(c, v)));
+  const knobDef = (con, id) => (DEF[con][id] && DEF[con][id].min !== undefined ? DEF[con][id] : null) || { id, label: id.toUpperCase(), min: 0, max: 1, def: 0.5, unit: '' };
+  function els(con, ch) { const r = ROOT(con); return r ? { k: [...r.querySelectorAll(`[data-kid][data-ch="${ch}"]`)], b: [...r.querySelectorAll(`[data-bid][data-ch="${ch}"]`)] } : { k: [], b: [] }; }
+  ST = {}; try { ST = JSON.parse(localStorage.getItem('as-strip-v2') || '{}'); } catch (e) {}
+  const saveST2 = () => { try { localStorage.setItem('as-strip-v2', JSON.stringify(ST)); } catch (e) {} };
+  // state for a channel: what the console drawing shows, overridden by anything saved
+  chState = function (con, ch) {
+    const key = `${con}${ch}`;
+    if (ST[key] && ST[key].__init) return ST[key];
+    const s = Object.assign({}, ST[key] || {}), E = els(con, ch);
+    for (const sec of ORDER[con]) for (const row of SPEC[con][sec].rows) for (const c of row) if (c.id && c.t !== 'bus24' && s[c.id] === undefined) s[c.id] = c.def;
+    for (const el of E.k) { const id = el.dataset.kid; if ((ST[key] || {})[id] === undefined) { const c = knobDef(con, id); s[id] = fromFrac(c, (+el.dataset.a0 + 150) / 300); } }
+    if (!ST[key] || !ST[key].bus) s.bus = E.b.filter((el) => /^bus\d+$/.test(el.dataset.bid) && el.dataset.on === '1').map((el) => +el.dataset.bid.slice(3));
+    for (const el of E.b) { const id = el.dataset.bid; if (!/^bus\d+$/.test(id) && (ST[key] || {})[id] === undefined) s[id] = el.dataset.on === '1'; }
+    s.__init = true; ST[key] = s; return s;
+  };
+  function applyCh(con, ch) {
+    const s = chState(con, ch), E = els(con, ch);
+    for (const el of E.k) { const c = knobDef(con, el.dataset.kid), pg = el.querySelector('.kptr'); if (pg && s[el.dataset.kid] !== undefined) pg.setAttribute('transform', `rotate(${(angOf(c, s[el.dataset.kid]) - +el.dataset.a0).toFixed(2)} ${el.dataset.cx} ${el.dataset.cy})`); }
+    for (const el of E.b) { const id = el.dataset.bid, on = /^bus\d+$/.test(id) ? s.bus.includes(+id.slice(3)) : !!s[id], l = el.querySelector('.klit'); if (l) l.setAttribute('opacity', on ? 1 : 0); }
+  }
+  // saved settings show on the consoles at load
+  for (const key of Object.keys(ST)) { const m = /^(cmi|sls)(\d+)$/.exec(key); if (m) { ST[key].__init = false; applyCh(m[1], +m[2]); } }
+  // section rectangles on the stage (same bands as the click targets)
+  function panelsFor(con, ch, sec) {
+    if (con === 'cmi') { const x0 = 46 + ch * 85, B = { input: [950, 138], eq: [1088, 326], sends: [1414, 222] }; return sec === 'bus' ? [[x0, 804, 85, 146], [x0, 1636, 85, 66]] : [[x0, B[sec][0], 85, B[sec][1]]]; }
+    const x0 = ch < 16 ? 48 + ch * 72 : 24 + 2072 + (ch - 16) * 72, B2 = { bus: [870, 1000], input: [1000, 1072], dyn: [1072, 1262], eq: [1262, 1592], sends: [1592, 1712] }[sec];
+    return [[x0, B2[0], 72, B2[1] - B2[0]]];
+  }
+  const stageBox = (el) => { const r = el.getBoundingClientRect(), sr = stage.getBoundingClientRect(), k = sr.width / 3840; return { x: (r.left - sr.left) / k, y: (r.top - sr.top) / k, w: r.width / k, h: r.height / k }; };
+  let PANELS = [], CTRLS = [];
+  function sideSvg() {
+    const { con, ch, sec } = SP, sp = SPEC[con], ss = sp[sec], s = chState(con, ch);
+    let o = '';
+    if (ss.graph) o += graphSvg(con, s, ss.graph, 2080, 210, 1680, 1060, sp.theme);
+    const ly0 = ss.graph ? 1320 : 210, lh = ss.graph ? 760 : 1820;
+    o += `<rect x="2080" y="${ly0}" width="1680" height="${lh}" rx="10" fill="#1d1b19"/>`;
+    const ids = CTRLS.map((c) => c.id).filter((id, i, a) => a.indexOf(id) === i);
+    const busIds = ids.filter((id) => /^bus\d+$/.test(id)), rest = ids.filter((id) => !/^bus\d+$/.test(id));
+    let y = ly0 + 60, col = 0;
+    const put = (lab, val) => { const x = 2120 + col * 820; o += T(x, y, lab, 26, '#9c9384', 'start', 800, 'letter-spacing="1"') + T(x + 760, y, val, 28, '#7dffd6', 'end', 700, `font-family="'JetBrains Mono', monospace"`); col++; if (col > 1) { col = 0; y += 52; } };
+    if (busIds.length) put(con === 'sls' ? 'GROUPS' : 'BUSES', s.bus.length ? s.bus.join(' · ') : 'none');
+    for (const id of rest) { const c = DEF[con][id]; const isKey = CTRLS.find((q) => q.id === id).t === 'key'; put((c && c.label) || id.replace(/_/g, ' ').toUpperCase(), isKey ? (s[id] ? 'IN' : 'OUT') : fmtV(knobDef(con, id), s[id])); }
+    if (col) y += 52;
+    const words = ss.note.split(' '); let line = ''; y += 30;
+    for (const w of words) { if ((line + w).length > 92) { o += T(2120, y, line, 24, '#d9d3c7', 'start', 600); y += 36; line = ''; } line += w + ' '; }
+    o += T(2120, y, line, 24, '#d9d3c7', 'start', 600);
+    o += T(2120, ly0 + lh - 30, 'Drag a knob up / down or use the wheel · double-click resets · click a key · ← → steps channels', 22, '#9c9384', 'start', 700);
+    return o;
+  }
   function renderStrip() {
     if (!STRIP_SVG) return;
-    const { con, ch, sec } = SP, sp = SPEC[con], ss = sp[sec], th = sp.theme, s = chState(con, ch);
-    const graph = !!ss.graph, PX0 = 140, PW = graph ? 2000 : 3560;
+    const { con, ch, sec } = SP, sp = SPEC[con], ss = sp[sec];
+    chState(con, ch); applyCh(con, ch);
     let o = `<rect width="3840" height="2104" fill="#141210"/>`;
-    o += `<rect x="80" y="210" width="${PW + 120}" height="1820" rx="14" fill="${th.panel}"/><rect x="80" y="210" width="${PW + 120}" height="6" fill="#fff" opacity="0.12"/>`;
-    // header: console, channel, name, section tabs, channel stepper
     o += T(90, 92, `${sp.name}  ·  CHANNEL ${String(ch + 1).padStart(2, '0')}`, 44, '#efe8dc', 'start', 900, 'letter-spacing="3"');
     o += `<rect x="90" y="112" width="300" height="56" rx="4" fill="#f2eee2"/>` + T(240, 152, NAMES[ch], 36, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', sans-serif"`);
     o += `<g data-nav="-1" style="cursor:pointer"><rect x="420" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(468, 150, '◀', 30, '#efe8dc')}</g><g data-nav="1" style="cursor:pointer"><rect x="530" y="112" width="96" height="56" rx="6" fill="#2b2c30"/>${T(578, 150, '▶', 30, '#efe8dc')}</g>`;
     ORDER[con].forEach((k, i) => { const on = k === sec, x = 700 + i * 300; o += `<g data-tab="${k}" style="cursor:pointer"><rect x="${x}" y="108" width="280" height="64" rx="6" fill="${on ? '#ffb02e' : '#2b2c30'}"/>${T(x + 140, 150, SPEC[con][k].title.split(' · ')[0], 26, on ? '#1a1208' : '#efe8dc', 'middle', 900, 'letter-spacing="2"')}</g>`; });
-    // rows of controls
-    const rows = ss.rows, rowH = Math.min(420, 1700 / rows.length);
-    rows.forEach((row, ri) => {
-      const y0 = 260 + ri * rowH;
-      if (row[0].t === 'bus24') { o += busSvg(s, PX0 + 60, y0 + 60, th, con); return; }
-      const n = row.length, cw = PW / n;
-      row.forEach((c, ci) => {
-        const cx = PX0 + cw * ci + cw / 2;
-        if (c.t === 'knob') { const r = Math.min(86, rowH * 0.2); o += knobSvg(c, s[c.id], cx, y0 + rowH * 0.36, r, th); }
-        else if (c.t === 'key') { const w = Math.min(240, cw - 30), h = Math.min(110, rowH * 0.3); o += keySvg(c, !!s[c.id], cx - w / 2, y0 + rowH * 0.36 - h / 2, w, h, th); }
-      });
-      if (ri < rows.length - 1) o += `<line x1="${PX0}" y1="${y0 + rowH - 10}" x2="${PX0 + PW}" y2="${y0 + rowH - 10}" stroke="${th.knob === 'sls' ? '#6f7574' : '#4a4640'}" stroke-width="2"/>`;
-    });
-    if (graph) o += graphSvg(con, s, ss.graph, 2320, 210, 1440, 1180, th);
-    const nx = graph ? 2320 : 90, ny = graph ? 1460 : 2070;
-    if (graph) { o += `<rect x="${nx}" y="${ny - 50}" width="1440" height="620" rx="10" fill="#1d1b19"/>`; const words = ss.note.split(' '); let line = '', ly = ny + 10; for (const w of words) { if ((line + w).length > 70) { o += T(nx + 40, ly, line, 28, '#d9d3c7', 'start', 600); ly += 44; line = ''; } line += w + ' '; } o += T(nx + 40, ly, line, 28, '#d9d3c7', 'start', 600); o += T(nx + 40, ny + 520, 'Drag a knob up / down · double-click resets · ◀ ▶ or ← → steps channels', 24, '#9c9384', 'start', 700); }
-    else o += T(nx, 2080, ss.note + '   Drag a knob up / down · double-click resets · ← → steps channels', 26, '#9c9384', 'start', 600);
+    // magnified section(s) of the console itself
+    const rects = panelsFor(con, ch, sec), AW = 1900, AH = 1820, gap = 60;
+    const tw = rects.reduce((a, r) => a + r[2], 0), th = Math.max(...rects.map((r) => r[3]));
+    const sc = Math.min(AH / th, (AW - gap * (rects.length - 1)) / tw);
+    let px = 110 + (AW - (tw * sc + gap * (rects.length - 1))) / 2;
+    PANELS = [];
+    for (const [x, y, w, h] of rects) {
+      const pw = w * sc, ph = h * sc, py = 210 + (AH - ph) / 2, vx = con === 'cmi' ? x : x - 24, vy = con === 'cmi' ? y : y - 690;
+      o += `<rect x="${px - 14}" y="${py - 14}" width="${pw + 28}" height="${ph + 28}" rx="10" fill="#000" opacity="0.6"/>`;
+      o += `<svg x="${px}" y="${py}" width="${pw}" height="${ph}" viewBox="${vx} ${vy} ${w} ${h}" style="overflow:hidden"><use href="#${con === 'cmi' ? 'room-svg' : 'sls-svg'}"/></svg>`;
+      PANELS.push({ px, py, pw, ph, x, y, w, h, sc });
+      px += pw + gap;
+    }
+    // the controls inside those sections (positions from the console itself)
+    const E = els(con, ch); CTRLS = [];
+    const inP = (b) => rects.some(([x, y, w, h]) => b.x + b.w / 2 >= x && b.x + b.w / 2 <= x + w && b.y + b.h / 2 >= y && b.y + b.h / 2 <= y + h);
+    for (const el of E.k) { const b = stageBox(el.querySelector('.kptr') ? el : el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
+    for (const el of E.b) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'key', id: el.dataset.bid, el, ...b }); }
+    o += `<g id="strip-side">${sideSvg()}</g>`;
     STRIP_SVG.innerHTML = o;
     const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `${sp.name} · CH ${ch + 1} · ${NAMES[ch]} · ${ss.title}`;
   }
+  const refreshSide = () => { const g = document.getElementById('strip-side'); if (g) g.innerHTML = sideSvg(); };
   function openStrip(con, ch, sec) { SP.con = con; SP.ch = ch; SP.sec = sec; show('strip'); renderStrip(); }
   window.AS_OPEN_STRIP = openStrip;
+  // popup point -> console control
+  function hitCtrl(e) {
+    const q = svgPt(STRIP_SVG, e);
+    const P = PANELS.find((p) => q.x >= p.px && q.x <= p.px + p.pw && q.y >= p.py && q.y <= p.py + p.ph); if (!P) return null;
+    const sx = P.x + (q.x - P.px) / P.sc, sy = P.y + (q.y - P.py) / P.sc;
+    let best = null, bd = 1e9;
+    for (const c of CTRLS) {
+      if (c.t === 'knob') { const d = Math.hypot(sx - c.cx, sy - c.cy); if (d < c.r * 1.05 && d < bd) { bd = d; best = c; } }
+      else if (sx >= c.x - 1 && sx <= c.x + c.w + 1 && sy >= c.y - 1 && sy <= c.y + c.h + 1) { best = c; bd = 0; }
+    }
+    return best;
+  }
   if (STRIP_SVG) {
-    const pt = (e) => svgPt(STRIP_SVG, e);
     let drag = null;
     STRIP_SVG.addEventListener('pointerdown', (e) => {
-      const g = e.target.closest('[data-k],[data-b],[data-bus],[data-tab],[data-nav]'); if (!g) return;
-      const s = chState(SP.con, SP.ch), sec = SPEC[SP.con][SP.sec];
-      const find = (id) => { for (const r of sec.rows) for (const c of r) if (c.id === id) return c; return null; };
-      if (g.dataset.k) { const c = find(g.dataset.k); drag = { c, y: pt(e).y, f: toFrac(c, s[c.id]) }; STRIP_SVG.setPointerCapture(e.pointerId); return; }
-      if (g.dataset.b) { const c = find(g.dataset.b); if (c.radio) { for (const r of sec.rows) for (const k of r) if (k.radio === c.radio) s[k.id] = false; s[c.id] = true; } else s[c.id] = !s[c.id]; }
-      else if (g.dataset.bus) { const b = +g.dataset.bus; s.bus = s.bus.includes(b) ? s.bus.filter((x) => x !== b) : [...s.bus, b].sort((a, c) => a - c); }
-      else if (g.dataset.tab) SP.sec = g.dataset.tab;
-      else if (g.dataset.nav) SP.ch = (SP.ch + +g.dataset.nav + 32) % 32;
-      saveST(); renderStrip();
+      const nav = e.target.closest('[data-tab],[data-nav]');
+      if (nav) { if (nav.dataset.tab) SP.sec = nav.dataset.tab; else SP.ch = (SP.ch + +nav.dataset.nav + 32) % 32; renderStrip(); return; }
+      const c = hitCtrl(e); if (!c) return;
+      const s = chState(SP.con, SP.ch);
+      if (c.t === 'knob') { const d = knobDef(SP.con, c.id); drag = { c, d, y: svgPt(STRIP_SVG, e).y, f: toFrac(d, s[c.id]) }; STRIP_SVG.setPointerCapture(e.pointerId); return; }
+      if (/^bus\d+$/.test(c.id)) { const b = +c.id.slice(3); s.bus = s.bus.includes(b) ? s.bus.filter((x) => x !== b) : [...s.bus, b].sort((a, z) => a - z); }
+      else if (c.id === 'src_in' || c.id === 'src_tape') { s.src_in = c.id === 'src_in'; s.src_tape = !s.src_in; }
+      else s[c.id] = !s[c.id];
+      applyCh(SP.con, SP.ch); saveST2(); refreshSide();
     });
     STRIP_SVG.addEventListener('pointermove', (e) => {
-      if (!drag) return;
-      const s = chState(SP.con, SP.ch); s[drag.c.id] = fromFrac(drag.c, drag.f + (drag.y - pt(e).y) / 500); renderStrip();
+      if (drag) { const s = chState(SP.con, SP.ch); s[drag.c.id] = fromFrac(drag.d, drag.f + (drag.y - svgPt(STRIP_SVG, e).y) / 600); applyCh(SP.con, SP.ch); refreshSide(); return; }
+      STRIP_SVG.style.cursor = hitCtrl(e) ? (hitCtrl(e).t === 'knob' ? 'ns-resize' : 'pointer') : 'default';
     });
-    STRIP_SVG.addEventListener('pointerup', () => { if (drag) { drag = null; saveST(); } });
-    STRIP_SVG.addEventListener('dblclick', (e) => {
-      const g = e.target.closest('[data-k]'); if (!g) return;
-      for (const r of SPEC[SP.con][SP.sec].rows) for (const c of r) if (c.id === g.dataset.k) chState(SP.con, SP.ch)[c.id] = c.def;
-      saveST(); renderStrip();
-    });
-    STRIP_SVG.addEventListener('wheel', (e) => {
-      const g = e.target.closest('[data-k]'); if (!g) return; e.preventDefault();
-      for (const r of SPEC[SP.con][SP.sec].rows) for (const c of r) if (c.id === g.dataset.k) { const s = chState(SP.con, SP.ch); s[c.id] = fromFrac(c, toFrac(c, s[c.id]) - Math.sign(e.deltaY) * 0.02); }
-      renderStrip();
-    }, { passive: false });
+    STRIP_SVG.addEventListener('pointerup', () => { if (drag) { drag = null; saveST2(); } });
+    STRIP_SVG.addEventListener('dblclick', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; chState(SP.con, SP.ch)[c.id] = knobDef(SP.con, c.id).def; applyCh(SP.con, SP.ch); saveST2(); refreshSide(); });
+    STRIP_SVG.addEventListener('wheel', (e) => { const c = hitCtrl(e); if (!c || c.t !== 'knob') return; e.preventDefault(); const s = chState(SP.con, SP.ch), d = knobDef(SP.con, c.id); s[c.id] = fromFrac(d, toFrac(d, s[c.id]) - Math.sign(e.deltaY) * 0.02); applyCh(SP.con, SP.ch); saveST2(); refreshSide(); }, { passive: false });
     addEventListener('keydown', (e) => { if (open && open.dataset.view === 'strip' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { SP.ch = (SP.ch + (e.key === 'ArrowLeft' ? 31 : 1)) % 32; renderStrip(); } });
   }
   // ---- click targets on the consoles: work out channel and section from the click position ----
