@@ -530,6 +530,7 @@ const elecCss = `
   .el-plate.on i{background:#ff3b2f;box-shadow:0 0 10px #ff3b2f}
 `;
 
+
 // ---------------- AL-III autolocator face (400 x 340 units, modelled on the CMI AutoLocator III) ----------------
 // live = true draws the clickable pop-up version: every control is a <g data-al="..."> and every lamp a hidden lit copy
 const AL_W = 400, AL_H = 340;
@@ -1387,6 +1388,30 @@ if (globalThis.JH_CI !== TCI) throw new Error(`cabinet inset is ${globalThis.JH_
 const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
 if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
 const a827 = require('./jh24.js')({ TX: 24 - TCI, TY: 20, TW, TH, skin: 'a827' });
+
+// ---------------- tape machine pop-up: the studio-view deck itself, magnified, with working panel keys ----------------
+// The same CSS-3D drawing as the studio (jh24.js) under its own ids (jhp- / a8p-), so the page script drives its reels,
+// packs and blur exactly like the studio's. Panel key positions are the studio-view ones (stage coordinates).
+const tapeView = (() => {
+  const clone = (html, rootFrom, rootTo, pre, from) => {
+    let h = html.replace(`<div id="${rootFrom}"`, `<div id="${rootTo}"`).split(`${from}-`).join(`${pre}-`);
+    const ids = new Set([...h.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]).filter((id) => !id.startsWith(pre) && id !== rootTo));
+    for (const id of ids) h = h.split(`id="${id}"`).join(`id="${pre}-${id}"`).split(`url(#${id})`).join(`url(#${pre}-${id})`);
+    return h;
+  };
+  const K = 3840 / 1296, OY = Math.round((OVH - 590 * K) / 2);
+  const view = (skin, html, y0, keys) => `<div class="tpv" data-skin="${skin}" hidden>
+    <div style="position:absolute;left:0;top:0;transform-origin:0 0;transform:translate(0px,${OY}px) scale(${K.toFixed(4)}) translate(-24px,${-y0}px)">${html}</div>
+    ${keys.map(([n, x, y, w, h, t]) => `<button type="button" class="tpk" data-tk="${n}" title="${t}" style="left:${((x - w / 2 - 24) * K).toFixed(0)}px;top:${((y - h / 2 - y0) * K + OY).toFixed(0)}px;width:${(w * K).toFixed(0)}px;height:${(h * K).toFixed(0)}px"></button>`).join('')}
+  </div>`;
+  const hjKeys = [['rew', 405, 578, 40, 30, 'REWIND (,)'], ['ff', 455, 578, 40, 30, 'FAST FORWARD (.)'], ['stop', 505, 578, 40, 30, 'STOP (space)'], ['rplay', 554, 578, 40, 30, 'REVERSE PLAY'], ['play', 604, 578, 40, 30, 'PLAY (space)'], ['record', 664, 575, 46, 32, 'RECORD (R): the record-ready tracks'],
+    ['lift', 836, 560, 38, 28, 'LIFT: tape lifters defeated (hear the tape while winding)'], ['edit', 880, 560, 38, 28, 'EDIT'], ['s7.5', 928, 560, 32, 24, '7½ ips'], ['s15', 960, 560, 32, 24, '15 ips'], ['s30', 992, 560, 32, 24, '30 ips'], ['elec', 1213, 560, 42, 26, 'ELECTRONICS: the channel cards']];
+  const a8Keys = [['rew', 128, 541, 50, 30, 'REWIND (,)'], ['ff', 181, 541, 50, 30, 'FAST FORWARD (.)'], ['play', 235, 541, 50, 30, 'PLAY (space)'], ['stop', 290, 541, 50, 30, 'STOP (space)'], ['record', 343, 541, 50, 30, 'RECORD (R): the record-ready tracks'], ['edit', 397, 541, 50, 30, 'EDIT'],
+    ['s7.5', 686, 507, 32, 14, '7½ ips'], ['s15', 726, 507, 32, 14, '15 ips'], ['s30', 765, 507, 32, 14, '30 ips'], ['vari', 803, 507, 32, 14, 'VARI-SPEED on / off'], ['lift', 840, 507, 32, 14, 'LIFT: lifters defeated'], ['elec', 918, 507, 34, 14, 'ELECTRONICS: the channel cards'],
+    ['loc', 686, 535, 32, 14, 'LOC: locate to the locate position'], ['sto', 726, 535, 32, 14, 'STORE: then a memory number on the autolocator'], ['rsttape', 765, 535, 32, 14, 'ZERO: tape position zeroed here'], ['rtz', 803, 535, 32, 14, 'RTZ: return to zero (Z)'], ['auto', 840, 535, 32, 14, 'AUTO monitoring'], ['safe', 878, 535, 32, 14, 'SAFE: all tracks out of record ready'], ['mon', 918, 535, 32, 14, 'MON: monitor TAPE / INPUT / AUTO']];
+  return `<div id="tapeview">${view('cmi', clone(jh24, 'jh24', 'jh24p', 'jhp', 'jh'), 76, hjKeys)}${view('sls', clone(a827, 'a827', 'a827p', 'a8p', 'a8'), 20, a8Keys)}</div>`;
+})();
+
 // A827 meter bridge: Studer-grey housing, 24 VU meters in two rows with track ready / safe lamps
 // A827 meter bridge as photographed: charcoal housing with wood cheeks, 24 amber-lit meters in three rows of 8,
 // "- n -" track legends, STAUDER logo bottom right
@@ -1487,6 +1512,11 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #stage{position:absolute;left:0;top:0;width:3840px;height:2160px;transform-origin:0 0}
   #stage>svg{display:block}
   .hot.elkey{z-index:56}
+  #tapeview{position:absolute;inset:0;overflow:hidden;background:#1c1916}
+  #tapeview .tpv{position:absolute;inset:0}
+  #tapeview .tpk{position:absolute;background:transparent;border:0;border-radius:10px;cursor:pointer;outline:0 solid rgba(255,214,140,0);transition:outline-color .15s, background .15s}
+  #tapeview .tpk:hover{outline:4px solid rgba(255,214,140,.75);background:rgba(255,214,140,.08)}
+  #tapeview .tpk.dn{background:rgba(255,255,255,.18)}
   .hot{position:absolute;z-index:50;cursor:pointer;border-radius:10px;outline:0 solid rgba(255,214,140,0);transition:outline-color .15s, background .15s}
   .hot span{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 16px;border-radius:6px;background:rgba(20,18,16,.85);color:#f1ece3;font:700 20px Archivo,Arial,sans-serif;letter-spacing:1px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none}
   .hot:hover{outline:4px solid rgba(255,214,140,.75);background:rgba(255,214,140,.05)} .hot:hover span{opacity:1}
@@ -1547,7 +1577,7 @@ ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
-${overlay('tape', 'CMI HJ-24 · 24 TRACK', '<iframe title="HJ-24 tape machine" data-src="tape-machine.html"></iframe>')}
+${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id="tp-msg"></span>')}
 ${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>')}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>')}

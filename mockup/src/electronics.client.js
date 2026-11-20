@@ -47,6 +47,7 @@
   }
   // per frame: transport and status
   function elecTick() {
+    tapeViewTick();
     if (!EL.node || !EL.on) return;
     elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
@@ -137,3 +138,26 @@
     });
   }
 
+  // ---------------- tape machine pop-up: the magnified studio deck's panel keys ----------------
+  const tpMsg = document.getElementById('tp-msg'), tpOv = document.getElementById('ov-tape');
+  document.querySelectorAll('#tapeview .tpk').forEach((b) => {
+    b.addEventListener('pointerdown', () => b.classList.add('dn')); ['pointerup', 'pointerleave'].forEach((ev) => b.addEventListener(ev, () => b.classList.remove('dn')));
+    b.addEventListener('click', () => {
+      const n = b.dataset.tk;
+      if (['rew', 'ff', 'stop', 'play', 'record', 'loc', 'sto', 'rsttape', 'auto'].includes(n)) press(n);
+      else if (n === 'rtz') { AL.rehPunch = false; tr.locateTo(tr.zero, 'stop'); }
+      else if (n === 'safe') AL.ready.clear();
+      else if (n === 'mon') press(AL.mon === 'tape' ? 'input' : AL.mon === 'input' ? 'auto' : 'tape');
+      else if (n === 'rplay') { AL.rehPunch = false; tr.command('rplay'); }
+      else if (n === 'lift') tr.liftDefeat = !tr.liftDefeat;
+      else if (n === 'vari') press('mode');
+      else if (n.startsWith('s')) tr.setSpeed(+n.slice(1));
+      else if (n === 'elec') show('elec');
+      else if (n === 'edit') { if (tpMsg) tpMsg.textContent = 'EDIT (dump edit) is not modelled yet'; }
+    });
+  });
+  function tapeViewTick() {
+    if (!tpMsg || tpOv.hidden) return;
+    const c = tr.counter, a = Math.abs(c), names = { stop: 'STOP', play: 'PLAY', rec: 'RECORD', rplay: 'REV PLAY', ff: 'F FWD', rew: 'REWIND', locate: 'LOCATE', shuttle: 'SHUTTLE' };
+    tpMsg.textContent = `${c < 0 ? '-' : ''}${String(Math.floor(a / 60)).padStart(2, '0')}:${String(Math.floor(a % 60)).padStart(2, '0')} · ${names[tr.mode] || tr.mode.toUpperCase()} · ${tr.speedIPS} ips${tr.varispeed ? ` ${tr.varispeed > 0 ? '+' : ''}${(tr.varispeed * 100).toFixed(1)} %` : ''}${tr.liftDefeat ? ' · LIFT' : ''} · space play/stop · , rewind · . fast forward · Z zero`;
+  }

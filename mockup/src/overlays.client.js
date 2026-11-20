@@ -18,7 +18,7 @@
     if (open) hide();
     const o = views[v]; if (!o) return;
     o.hidden = false; open = o;
-    if (v === 'tape') { const f = o.querySelector('iframe'); if (!f.getAttribute('src')) f.setAttribute('src', f.dataset.src); }
+    if (v === 'tape') o.querySelectorAll('.tpv').forEach((d) => { d.hidden = d.dataset.skin !== (document.body.dataset.studio === 'sls' ? 'sls' : 'cmi'); });
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
@@ -224,13 +224,13 @@
   const TAPE = tr.tape;
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
   // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
-  const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
+  const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE], ['jhp', window.JH_LIVE], ['a8p', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
     k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
   })));
   // A827 front panel: live tape timer and key lamps
   const a8ctr = document.getElementById('a8-tctr');
-  const a8lamp = (n, on) => { const g = document.getElementById(`a8-lk-${n}`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
+  const a8lamp = (n, on) => { for (const p of ['a8', 'a8p']) { const g = document.getElementById(`${p}-lk-${n}`); if (g) g.setAttribute('opacity', on ? 1 : 0); } };   // studio deck and its pop-up
   const slsTc = document.getElementById('sls-tc');
   // A827 remote: keys drive the shared transport and the autolocator's track states
   const a8r = document.querySelector('#sls');
@@ -251,7 +251,7 @@
       const m = tr.mode; for (const sfx of ['', '2']) { a8rOn(`play${sfx}`, m === 'play' || m === 'rec'); a8rOn(`stop${sfx}`, m === 'stop'); a8rOn(`rec${sfx}`, m === 'rec'); a8rOn(`ff${sfx}`, m === 'ff' || (m === 'locate' && tr.v > 0)); a8rOn(`rew${sfx}`, m === 'rew' || (m === 'locate' && tr.v < 0)); }
       for (let i = 0; i < 24; i++) { a8rOn(`rdy${i}`, AL.ready.has(i)); a8rOn(`inp${i}`, AL.inMon.has(i)); a8rOn(`safe${i}`, !AL.ready.has(i)); }
       const sh = document.getElementById('a8r-shuttle'); if (sh) sh.setAttribute('x', 290 + Math.max(-1, Math.min(1, tr.v / 13)) * 48);
-      const lcd = document.getElementById('a8-lcd'); if (lcd) lcd.textContent = `${tr.speedIPS} IPS ${tr.varispeed ? 'VAR' : 'NAB'}`;
+      for (const p of ['a8', 'a8p']) { const lcd = document.getElementById(`${p}-lcd`); if (lcd) lcd.textContent = `${tr.speedIPS} IPS ${tr.varispeed ? 'VAR' : 'NAB'}`; }
     }
     if (slsTc) {   // Studio Computer screen: timecode from the tape position (01:00:00:00 at zero, 30 fps)
       const t = Math.max(0, 3600 + tr.counter), fr = Math.floor((t % 1) * 30);
@@ -259,7 +259,8 @@
     }
     if (!a8ctr) return;
     const c = tr.counter, a = Math.abs(c), hh = Math.floor(a / 3600), mm = Math.floor(a / 60) % 60, ss = Math.floor(a % 60);
-    a8ctr.textContent = `${c < -0.5 ? '-' : ''}${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+    const ctrTxt = `${c < -0.5 ? '-' : ''}${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+    a8ctr.textContent = ctrTxt; const a8pc = document.getElementById('a8p-tctr'); if (a8pc) a8pc.textContent = ctrTxt;
     const m = tr.mode;
     a8lamp('play', m === 'play' || m === 'rec'); a8lamp('rplay', m === 'rplay'); a8lamp('stop', m === 'stop'); a8lamp('rec', m === 'rec');
     a8lamp('ff', m === 'ff' || (m === 'locate' && tr.v > 0) || (m === 'shuttle' && tr.v > 0)); a8lamp('rew', m === 'rew' || (m === 'locate' && tr.v < 0) || (m === 'shuttle' && tr.v < 0));
