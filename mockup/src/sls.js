@@ -20,7 +20,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
   // Cap colours: light grey for filters / compressor / utility, red HF, green HMF + expander/gate, blue LMF, black LF.
   const KCOL = { '#e9eaec': '#d9d9d4', '#d9dbde': '#d9d9d4', '#c9ccd1': '#d9d9d4', '#c8352a': '#c8262b', '#3f9a58': '#1d8a55', '#3577c2': '#2a8fc2', '#1e1f22': '#2c2d31', '#8a8f97': '#d9d9d4', '#e0b23a': '#e2b43a' };
   const sk = (cx, cy, r0, col0, ang = 0, lab = '', labY = null) => {
-    const r = r0 * KS, col = KCOL[col0] || col0, light = col === '#d9d9d4' || col === '#e2b43a';
+    const r = r0 * KS * (KS === 1 ? 0.95 : 1), col = KCOL[col0] || col0, light = col === '#d9d9d4' || col === '#e2b43a';
     if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.4) * Math.cos(a)).toFixed(1), (cy + (r + 3.4) * Math.sin(a)).toFixed(1), 0.65, '#1e2022'); }
     circle(cx + 1.3, cy + 2, r * 1.02, '#000', 'opacity="0.45"');                     // cast shadow
     circle(cx, cy, r, '#151618');                                                      // black body
@@ -44,7 +44,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     rect(0, 0, 18, CH, 'url(#woodH)', 'rx="6"'); rect(CW - 18, 0, 18, CH, 'url(#woodH)', 'rx="6"');
     rect(18, 0, CW - 36, CH, PANEL2);
 
-    KS = 1.4;
+    KS = 1.33;
     for (let i = 0; i < N; i++) {
       // SL 611G I/O module, 72 px wide (38 mm module: 1.9 px per mm). Control placement follows the module drawings
       // in the G Series operator's manual (section 2) and the user's close-up photos.
