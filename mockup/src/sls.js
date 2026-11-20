@@ -138,16 +138,49 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       text(cx, 1432, String(i + 1), 8.5, INK2, 'middle', 800);
     }
 
-    // =================== VU meter bridge across the top (black, two rows, one meter per channel: odd top, even bottom) ===================
+    // =================== VU meter bridge: SSL VU modules (black panel, 8 meters = 4 across x 2 rows, screws between rows) ===================
+    // Meter face as on the user's SSL VU module photo: wide cream face, dB scale over the arc with a thick red 0..+3 band,
+    // 0-100 % scale under it, "VU" in the corners. Needle angle follows a real VU (linear in voltage).
+    const sslVu = (vx, vy, vw, vh, db, num) => {
+      const id = `svu${num}`, cx = vx + vw / 2, cy = vy + vh * 2.25, R = vh * 1.95;
+      const ang = (d) => { const pct = Math.pow(10, d / 20) * 100; return (-31 + 60 * Math.min(pct, 141) / 141) * Math.PI / 180; };
+      const pt = (a, r) => [(cx + r * Math.sin(a)).toFixed(1), (cy - r * Math.cos(a)).toFixed(1)];
+      rect(vx - 2, vy - 2, vw + 4, vh + 4, '#050505', 'rx="2"');
+      p(`<clipPath id="${id}"><rect x="${vx}" y="${vy}" width="${vw}" height="${vh}" rx="1.5"/></clipPath><g clip-path="url(#${id})">`);
+      p(`<rect x="${vx}" y="${vy}" width="${vw}" height="${vh}" fill="#ecdfae"/><rect x="${vx}" y="${vy}" width="${vw}" height="${vh * 0.45}" fill="#fff" opacity="0.18"/>`);
+      // arc, red band, ticks and dB legends
+      const [ax0, ay0] = pt(ang(-20), R), [ax1, ay1] = pt(ang(0), R), [ax2, ay2] = pt(ang(3), R);
+      p(`<path d="M${ax0} ${ay0} A${R} ${R} 0 0 1 ${ax1} ${ay1}" fill="none" stroke="#2a2520" stroke-width="1"/>`);
+      const [rx1, ry1] = pt(ang(0), R + 3), [rx2, ry2] = pt(ang(3), R + 3);
+      p(`<path d="M${rx1} ${ry1} A${R + 3} ${R + 3} 0 0 1 ${rx2} ${ry2}" fill="none" stroke="#c8261b" stroke-width="3.5"/>`);
+      [[-20, '20'], [-10, '10'], [-7, '7'], [-5, '5'], [-3, '3'], [-2, ''], [-1, '1'], [0, '0'], [1, '1'], [2, ''], [3, '3']].forEach(([d, l]) => {
+        const a = ang(d), [t1x, t1y] = pt(a, R), [t2x, t2y] = pt(a, R + (l ? 7 : 5)), [lx, ly] = pt(a, R + 13);
+        p(`<line x1="${t1x}" y1="${t1y}" x2="${t2x}" y2="${t2y}" stroke="${d > 0 ? '#c8261b' : '#2a2520'}" stroke-width="1"/>`);
+        if (l) text(+lx, +ly + 2.5, (d > 0 ? '+' : d < 0 ? '-' : '') + l, 6.5, d > 0 ? '#c8261b' : '#2a2520', 'middle', 700);
+      });
+      // percent scale under the arc
+      [0, 20, 40, 60, 80, 100].forEach((v) => { const d = v ? 20 * Math.log10(v / 100) : -40; const a = ang(Math.max(d, -26)), [tx, ty] = pt(a, R - 4), [lx, ly] = pt(a, R - 12); p(`<line x1="${pt(a, R)[0]}" y1="${pt(a, R)[1]}" x2="${tx}" y2="${ty}" stroke="#2a2520" stroke-width="0.8"/>`); if (v >= 20) text(+lx, +ly + 2, String(v), 5.2, '#2a2520', 'middle', 600); });
+      text(vx + 6, vy + 10, 'VU', 6.5, '#2a2520', 'start', 800); text(vx + vw - 6, vy + 10, 'VU', 6.5, '#2a2520', 'end', 800);
+      text(vx + 7, vy + vh - 6, String(num), 13, '#2a2520', 'start', 900);   // track number on the face
+      // needle
+      const [nx, ny] = pt(ang(Math.max(-22, Math.min(3.2, db))), R + 6);
+      p(`<line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}" stroke="#141210" stroke-width="1.2"/>`);
+      p('</g>');
+      rect(vx, vy, vw, 1.5, '#000', 'opacity="0.35"');
+    };
     for (const [a0, a1] of [[0, 15], [16, 31]]) {
       const bx = stripX(a0), bw = stripX(a1) + SW - bx;
-      rect(bx, 4, bw, 172, '#16171a', 'rx="3"'); rect(bx, 4, bw, 2, '#fff', 'opacity="0.08"');
+      rect(bx, 4, bw, 172, '#121213', 'rx="3"'); rect(bx, 4, bw, 2, '#fff', 'opacity="0.08"');
+      for (let m8 = a0; m8 <= a1; m8 += 8) {   // one SSL VU module per 8 channels
+        const px = stripX(m8), pw = 8 * SW;
+        rect(px + 1, 6, pw - 2, 168, '#18181a', 'rx="2"'); rect(px + pw - 1, 6, 1, 168, '#000');
+        for (const [sx3, sy3] of [[px + pw * 0.25, 13], [px + pw * 0.75, 13], [px + pw * 0.25, 167], [px + pw * 0.75, 167]]) { circle(sx3, sy3, 4, '#8f9296'); circle(sx3 - 0.8, sy3 - 0.8, 1.6, '#d9dbde'); }
+        for (let k = 1; k < 4; k++) { const sx3 = px + k * (pw / 4); circle(sx3, 90, 3.6, '#8f9296'); circle(sx3 - 0.7, 89.3, 1.4, '#d9dbde'); }
+      }
       for (let i = a0; i <= a1; i += 2) {
         for (const [k, ch] of [[0, i], [1, i + 1]]) {
-          // real VU proportions (about 1.6 : 1), centred over the channel pair
-          const vw = 138, vh = 76, mx = stripX(i) + SW - vw / 2, my = 9 + k * 82, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
-          vu(mx, my, vw, vh, db, { brand: '' });
-          text(mx + 9, my + 19, String(ch + 1), 15, '#2a2520', 'start', 900);   // track number on the meter face (top left, clear of the scale)
+          const vw = 132, vh = 58, mx = stripX(i) + SW - vw / 2, my = 24 + k * 80, db = ch < 24 ? tapeDb[ch] : -18 + rnd() * 8;
+          sslVu(mx, my, vw, vh, db, ch + 1);
         }
       }
     }
@@ -164,7 +197,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     text(x + 30, 84, 'SLS', 46, '#c9a54a', 'start', 900, 'font-style="italic" letter-spacing="2"');
     for (let k = 0; k < 9; k++) rect(x + 16, 46 + k * 5, 60 - k * 5, 2, '#c9a54a', 'opacity="0.8"');
     text(x + 32, 110, '4000 G · 32 CHANNEL', 11, '#c9a54a', 'start', 800, 'letter-spacing="3"');
-    [['MAIN L', -4], ['MAIN R', -5]].forEach(([l, db], k) => { vu(x + 330 + k * 160, 14, 148, 82, db, { brand: '' }); text(x + 404 + k * 160, 116, l, 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); });
+    [['MAIN L', -4], ['MAIN R', -5]].forEach(([l, db], k) => { sslVu(x + 330 + k * 160, 20, 148, 70, db, ''); text(x + 404 + k * 160, 112, l, 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); });
     rect(MXM + 120, 14, 150, 82, '#efe6cc', 'rx="4"');
     { const gx = MXM + 195, gy = 108; for (let k = 0; k <= 10; k++) { const a = (-50 + k * 10) * Math.PI / 180; p(`<line x1="${(gx + 66 * Math.sin(a)).toFixed(1)}" y1="${(gy - 66 * Math.cos(a)).toFixed(1)}" x2="${(gx + 76 * Math.sin(a)).toFixed(1)}" y2="${(gy - 76 * Math.cos(a)).toFixed(1)}" stroke="#2a2520" stroke-width="1.3"/>`); }
       text(gx, 70, 'COMPRESSION', 8, '#2a2520', 'middle', 800, 'letter-spacing="1"'); p(`<line x1="${gx}" y1="104" x2="${gx + 30}" y2="40" stroke="#b3261b" stroke-width="2"/>`); text(gx, 116, 'BUS COMP', 9, '#d9d6cc', 'middle', 800, 'letter-spacing="1"'); }
