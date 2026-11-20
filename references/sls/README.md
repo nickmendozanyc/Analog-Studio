@@ -28,4 +28,14 @@ Rough page map (manual page numbers; first mention, approximate):
 | 13 | SL 681E tape remotes | ~120-143 |
 | 14 | SL 622G patchable VCAs, SL 615E dual mic amps, custom modifications | 314 |
 
+## Owner's manual
+
+SL 4000 G Series Console Operator's Manual (1988, 113 scanned pages, no text layer):
+
+- https://archive.org/download/SSL_4000G_Series_owners_manual/SSL_4000G_Series_owners_manual.pdf (link the user gave: https://dn760004.eu.archive.org/0/items/SSL_4000G_Series_owners_manual/SSL_4000G_Series_owners_manual.pdf)
+
+Sections: 1 Introduction, 2 SL 611G I/O module (PDF pages ~8-26: every control with panel drawings),
+3 SL 611S stereo module, 4 Centre section (SL 651G master), 5 Meter bridge, 6 Patch, 7 Routing and signal flow,
+8 Signal processor routing, 9 Cue and aux sends, 10 Applications, 11 Fault finding, 12 Index.
+
 Naming: in the app this studio is "SLS" and the gear gets fictional names (see the naming rules in the spec).

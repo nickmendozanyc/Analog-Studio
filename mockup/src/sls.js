@@ -1,8 +1,8 @@
 // SLS 4000 G console (the SLS studio's board), drawn as one SVG for the console area of the SLS room.
-// Strip layout follows the SL 611G I/O module top to bottom: bargraph meter, channel routing, dynamics,
-// filters, four-band equaliser, cue sends, small fader (monitor path), pan / solo / cut, VCA fader with
-// automation status. Sized for the app: 32 channels plus the SL 651G-style master section in 3242 x 1446.
-// Audio routing and matrices match the CMI room (24 multitrack buses, VCA groups, same automation modes).
+// Strip layout follows the SL 611G I/O module drawings in the SSL G Series operator's manual: routing matrix,
+// group output, channel input, dynamics, filters, G Series EQ, cues, monitor input + small fader, quad pans,
+// VCA fader with automation status (plus a short channel bargraph on top). Sized for the app: 32 channels plus the SL 651G-style master section in 3242 x 1446.
+// Routing shows the real 32 groups + quad bus; the app's audio routing is the same engine as the CMI room.
 
 module.exports = function buildSLS(h, { tapeNames }) {
   const { p, rect, text, circle, button, fader, capture } = h;
@@ -21,7 +21,7 @@ module.exports = function buildSLS(h, { tapeNames }) {
     p(`<line x1="${(cx + r * 0.25 * Math.cos(a)).toFixed(1)}" y1="${(cy + r * 0.25 * Math.sin(a)).toFixed(1)}" x2="${(cx + r * 0.95 * Math.cos(a)).toFixed(1)}" y2="${(cy + r * 0.95 * Math.sin(a)).toFixed(1)}" stroke="#fff" stroke-width="${Math.max(1.4, r * 0.16).toFixed(1)}" stroke-linecap="round"/>`);
     if (lab) text(cx, labY ?? cy + r + 9, lab, 6.5, INK2, 'middle', 700, 'letter-spacing="0.3"');
   };
-  const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit });
+  const key = (x, y, w, hh, col, lit, lab, size = 6) => button(x, y, w, hh, col, lit, lab, { size, pastel: !lit && col !== 'red' && col !== 'yellow' });
   const sect = (x, y, w, lab) => { rect(x, y, w, 1, LINE); if (lab) text(x + w / 2, y + 9, lab, 6.2, '#8d939c', 'middle', 800, 'letter-spacing="1.2"'); };
   const ang = () => -120 + rnd() * 240;
 
@@ -33,81 +33,93 @@ module.exports = function buildSLS(h, { tapeNames }) {
     rect(18, 0, CW - 36, CH, PANEL2);
 
     for (let i = 0; i < N; i++) {
+      // Layout from the SL 611G I/O module drawings in the G Series operator's manual (section 2), top to bottom.
       const x0 = 24 + i * SW, cx = x0 + SW / 2, L = x0 + 22, R = x0 + SW - 22;
       rect(x0 + 1, 4, SW - 2, CH - 8, PANEL, 'rx="3"');
       rect(x0 + 1, 4, 1, CH - 8, '#fff', 'opacity="0.06"');
-      // ---- bargraph meter (SL 674E style)
-      rect(x0 + 8, 10, SW - 16, 108, '#0b0b0c', 'rx="3"');
-      text(cx, 22, String(i + 1), 9, INK, 'middle', 800);
+      const led = (lx, ly, on, col = '#ff3b2f') => circle(lx, ly, 2.2, on ? col : '#3a2420', on ? 'filter="url(#glowSm)"' : '');
+      // ---- channel bargraph (meter bridge strip, shortened)
+      rect(x0 + 8, 8, SW - 16, 62, '#0b0b0c', 'rx="3"');
+      text(x0 + 14, 20, String(i + 1), 8.5, INK, 'start', 800);
       const lvl = i < 24 ? 0.35 + rnd() * 0.5 : 0.2 + rnd() * 0.3;
-      for (let s = 0; s < 24; s++) {
-        const y = 110 - s * 3.6, on = s / 24 < lvl, col = s >= 21 ? '#ff3b2f' : s >= 17 ? '#ffd23a' : '#4fe07a';
-        rect(cx - 7, y, 14, 2.4, col, on ? '' : 'opacity="0.13"');
+      for (let s = 0; s < 18; s++) {
+        const y = 64 - s * 2.9, on = s / 18 < lvl, col = s >= 16 ? '#ff3b2f' : s >= 13 ? '#ffd23a' : '#4fe07a';
+        rect(cx + 2, y, 16, 1.9, col, on ? '' : 'opacity="0.13"');
       }
-      // ---- channel routing: 24 bus keys, PAN key and routing pan
-      sect(x0 + 4, 124, SW - 8, 'ROUTING');
-      for (let b = 0; b < 24; b++) {
-        const bx = x0 + 8 + (b % 4) * 17, by = 138 + Math.floor(b / 4) * 13;
-        const on = (i < 24 && b === i) || (i >= 24 && false);
-        rect(bx, by, 15, 10, on ? '#ff5a3c' : '#5a5e66', `rx="1.5" ${on ? 'filter="url(#glow)"' : ''}`);
-        text(bx + 7.5, by + 7.4, String(b + 1), 5.6, on ? '#1a0a05' : '#e3e5e8', 'middle', 800);
+      // ---- routing matrix: 32 groups (button + LED), quad bus LF RF LB RB, PAN pot (odd / even) and PAN key
+      for (let b = 0; b < 32; b++) {
+        const bx = x0 + 9 + (b % 4) * 17, by = 80 + Math.floor(b / 4) * 13;
+        const on = i < 24 && b === i;
+        rect(bx, by, 14, 9, on ? '#ff5a3c' : '#5a5e66', `rx="1.5" ${on ? 'filter="url(#glowSm)"' : ''}`);
+        text(bx + 7, by + 6.8, String(b + 1), 5.2, on ? '#1a0a05' : '#e3e5e8', 'middle', 800);
       }
-      key(x0 + 8, 220, 26, 11, 'white', false, 'PAN', 5.6);
-      sk(R + 4, 226, 7, '#8a8f97', ang());
-      // ---- dynamics: compressor / limiter and expander / gate with gain-reduction LEDs
-      sect(x0 + 4, 240, SW - 8, 'DYNAMICS');
-      sk(L, 266, 10.5, '#e6e7e9', ang(), 'RATIO'); sk(R, 266, 10.5, '#e6e7e9', ang(), 'THRESH');
-      sk(L, 302, 10.5, '#e6e7e9', ang(), 'RELEASE');
-      key(R - 13, 294, 26, 10, 'white', rnd() > 0.7, 'F.ATT', 5.4); key(R - 13, 307, 26, 10, 'white', false, 'PK', 5.4);
-      for (let k = 0; k < 5; k++) circle(x0 + 76, 258 + k * 9, 2.2, k < Math.floor(rnd() * 4) ? '#ffd23a' : '#3a3220');
-      rect(x0 + 8, 322, SW - 16, 1, LINE, 'opacity="0.6"');
-      sk(L, 344, 10.5, '#3f9a58', ang(), 'RANGE'); sk(R, 344, 10.5, '#3f9a58', ang(), 'THRESH');
-      sk(L, 380, 10.5, '#3f9a58', ang(), 'RELEASE');
-      key(R - 13, 372, 26, 10, 'white', rnd() > 0.8, 'GATE', 5.4); key(R - 13, 385, 26, 10, 'white', false, 'F.ATT', 5.4);
-      key(x0 + 8, 404, 30, 11, 'green', i % 5 === 0, 'DYN', 5.6); key(x0 + 44, 404, 30, 11, 'white', false, 'S/C', 5.6);
-      // ---- filters
-      sect(x0 + 4, 422, SW - 8, 'FILTERS');
-      sk(L, 446, 9.5, '#b9bcc2', ang(), 'HPF'); sk(R, 446, 9.5, '#b9bcc2', ang(), 'LPF');
-      key(x0 + 8, 470, 20, 10, 'white', false, 'Ø', 7); key(x0 + 31, 470, 20, 10, 'white', false, 'DYN', 5); key(x0 + 54, 470, 20, 10, 'white', false, 'EQ', 5);
-      // ---- equaliser: HF red, HMF green, LMF blue, LF black
-      sect(x0 + 4, 486, SW - 8, 'EQUALISER');
-      sk(L, 512, 10.5, '#c8352a', ang(), 'HF'); sk(R, 512, 8.5, '#c8352a', ang(), 'kHz');
-      key(x0 + 26, 532, 30, 9, 'white', false, 'BELL', 5.2);
-      rect(x0 + 8, 546, SW - 16, 1, LINE, 'opacity="0.6"');
-      sk(L, 566, 10.5, '#3f9a58', ang(), 'HMF'); sk(R, 566, 8.5, '#3f9a58', ang(), 'kHz'); sk(cx, 596, 7.5, '#3f9a58', ang(), 'Q');
-      rect(x0 + 8, 616, SW - 16, 1, LINE, 'opacity="0.6"');
-      sk(L, 636, 10.5, '#3577c2', ang(), 'LMF'); sk(R, 636, 8.5, '#3577c2', ang(), 'kHz'); sk(cx, 666, 7.5, '#3577c2', ang(), 'Q');
-      rect(x0 + 8, 686, SW - 16, 1, LINE, 'opacity="0.6"');
-      sk(L, 706, 10.5, '#1e1f22', ang(), 'LF'); sk(R, 706, 8.5, '#1e1f22', ang(), 'Hz');
-      key(x0 + 8, 726, 30, 9, 'white', false, 'BELL', 5.2); key(x0 + 44, 726, 30, 9, 'green', i % 3 !== 2, 'EQ IN', 5.2);
-      // ---- cue sends: stereo cue (level + pan) and cues 1-4
-      sect(x0 + 4, 744, SW - 8, 'CUES');
-      sk(L, 768, 9.5, '#e0b23a', ang(), 'ST CUE'); sk(R, 768, 8, '#e0b23a', ang(), 'PAN');
-      sk(L, 804, 9, '#d9dbde', ang(), 'CUE 1'); sk(R, 804, 9, '#d9dbde', ang(), 'CUE 2');
-      sk(L, 840, 9, '#d9dbde', ang(), 'CUE 3'); sk(R, 840, 9, '#d9dbde', ang(), 'CUE 4');
-      key(x0 + 8, 862, 20, 9, 'white', false, 'PRE', 5); key(x0 + 31, 862, 20, 9, 'white', false, 'PRE', 5); key(x0 + 54, 862, 20, 9, 'white', false, 'PRE', 5);
-      // ---- small fader (monitor path) with FLIP and monitor keys
-      sect(x0 + 4, 878, SW - 8, 'MONITOR');
-      fader(x0 + 22, 896, 966, 0.25 + rnd() * 0.4, { capW: 18, capH: 22, scale: false, capFill: 'url(#faderCapBlack)' });
-      key(x0 + 40, 892, 34, 11, 'amber', false, 'FLIP', 5.6);
-      key(x0 + 40, 908, 34, 11, 'white', false, 'M.SOLO', 5.2);
-      key(x0 + 40, 924, 34, 11, 'red', false, 'M.CUT', 5.4);
-      key(x0 + 40, 940, 16, 11, 'white', false, 'G', 5.6); key(x0 + 58, 940, 16, 11, 'white', i < 24, 'T', 5.6);
-      sk(x0 + 57, 966, 7, '#8a8f97', ang(), 'M.PAN', 980);
-      // ---- channel pan, solo, cut, record status
-      sect(x0 + 4, 988, SW - 8, '');
-      sk(x0 + 24, 1012, 12, '#c9ccd1', -20 + rnd() * 40, 'PAN');
-      key(x0 + 44, 1000, 30, 12, 'yellow', false, 'SOLO', 5.6);
-      key(x0 + 44, 1016, 30, 12, 'red', i === 2, 'CUT', 5.6);
+      ['LF', 'RF', 'LB', 'RB'].forEach((q, k) => { const bx = x0 + 9 + k * 17, on = i >= 24 && k < 2; rect(bx, 186, 14, 9, on ? '#ffb02e' : '#6b6f77', `rx="1.5" ${on ? 'filter="url(#glowSm)"' : ''}`); text(bx + 7, 193, q, 5, on ? '#1a1208' : '#e3e5e8', 'middle', 800); });
+      sk(L, 210, 7.5, '#8a8f97', ang(), ''); text(L - 10, 224, 'ODD', 4.8, INK2, 'middle', 700); text(L + 10, 224, 'EVEN', 4.8, INK2, 'middle', 700);
+      key(R - 13, 204, 26, 11, 'white', i >= 24, 'PAN', 5.4);
+      // ---- group output: TRIM (pull for solo isolate), FLOAT, DIRECT
+      sect(x0 + 4, 230, SW - 8, '');
+      sk(L, 246, 8.5, '#8a8f97', 140, 'TRIM', 262);
+      key(R - 15, 236, 30, 10, 'white', false, 'FLOAT', 5.2); key(R - 15, 250, 30, 10, 'white', false, 'DIRECT', 4.8);
+      // ---- channel input: LINE trim, FLIP, SUB GP, phase (mic preamps are external in this app)
+      sect(x0 + 4, 268, SW - 8, '');
+      sk(L, 286, 8.5, '#e6e7e9', ang(), 'LINE', 302); led(L + 12, 276, true, '#4fe07a');
+      key(R - 15, 274, 30, 9, 'white', false, 'FLIP', 5.2); key(R - 15, 286, 30, 9, 'white', false, 'SUB GP', 4.6); key(R - 15, 298, 30, 9, 'white', false, 'Ø', 6.5);
+      // ---- dynamics: compressor (RATIO, THRESHOLD, RELEASE + LINK), expander/gate (RANGE, THRESHOLD, RELEASE + GATE)
+      sect(x0 + 4, 312, SW - 8, 'DYNAMICS');
+      sk(L, 334, 9.5, '#e6e7e9', ang(), 'RATIO'); sk(R, 334, 9.5, '#e6e7e9', ang(), 'THRESH');
+      sk(L, 366, 9.5, '#e6e7e9', ang(), 'RELEASE'); key(R - 13, 358, 26, 10, 'white', false, 'LINK', 5.4);
+      const gr = Math.floor(rnd() * 4);
+      [20, 14, 10, 6, 3].forEach((v, k) => { led(R - 8 + (k % 3) * 7 - 7, 375 + Math.floor(k / 3) * 6, k < gr, k < 2 ? '#ff3b2f' : '#ffd23a'); });
+      rect(x0 + 8, 390, SW - 16, 1, LINE, 'opacity="0.6"');
+      sk(L, 410, 9.5, '#1e1f22', ang(), 'RANGE'); sk(R, 410, 9.5, '#1e1f22', ang(), 'THRESH');
+      sk(L, 442, 9.5, '#1e1f22', ang(), 'RELEASE'); key(R - 13, 434, 26, 10, 'white', rnd() > 0.8, 'GATE', 5.4);
+      [0, 1, 2, 3, 4].forEach((k) => led(R - 14 + k * 6, 452, k < Math.floor(rnd() * 3), '#4fe07a'));
+      [['CH IN', i % 5 === 0], ['CH OUT', false], ['MON', false]].forEach(([l, on], k) => key(x0 + 7 + k * 23, 462, 21, 10, 'white', on, l, 4.4));
+      // ---- filters: HPF (Hz), LPF (kHz), SPLIT
+      sect(x0 + 4, 478, SW - 8, 'FILTERS');
+      sk(L, 498, 8.5, '#b9bcc2', ang(), 'Hz'); sk(R, 498, 8.5, '#b9bcc2', ang(), 'kHz');
+      key(cx - 14, 514, 28, 9, 'white', false, 'SPLIT', 5);
+      // ---- G Series equaliser: HF shelf, HMF (Q, x3), LMF (Q, ÷3), LF shelf, insert PRE / IN, routing CH / FLT DYN S-C / MON, overload
+      sect(x0 + 4, 528, SW - 8, '');
+      sk(L, 546, 9.5, '#c8352a', ang(), 'HF'); sk(R, 546, 8, '#c8352a', ang(), 'kHz');
+      sk(L, 580, 9.5, '#3f9a58', ang(), 'HMF'); sk(R, 580, 8, '#3f9a58', ang(), 'kHz');
+      sk(L, 610, 7, '#3f9a58', ang(), 'Q', 622); key(R - 12, 604, 24, 9, 'white', false, 'x3', 6);
+      key(x0 + 10, 628, 28, 9, 'white', false, 'PRE', 5); key(x0 + 44, 628, 28, 9, 'white', false, 'IN', 5.4); text(cx, 645, 'INSERT', 4.8, '#8d939c', 'middle', 800, 'letter-spacing="0.8"');
+      sk(L, 664, 9.5, '#3577c2', ang(), 'LMF'); sk(R, 664, 8, '#3577c2', ang(), 'kHz');
+      sk(L, 694, 7, '#3577c2', ang(), 'Q', 706); key(R - 12, 688, 24, 9, 'white', false, '÷3', 6);
+      sk(L, 726, 9.5, '#1e1f22', ang(), 'LF'); sk(R, 726, 8, '#1e1f22', ang(), 'Hz');
+      [['CH', i % 3 !== 2], ['FLT S-C', false], ['MON', false]].forEach(([l, on], k) => key(x0 + 7 + k * 23, 748, 21, 10, 'white', on, l, k === 1 ? 3.8 : 4.6));
+      led(cx, 768, i === 19, '#ff3b2f'); text(cx + 6, 770, 'OVLD', 4.6, INK2, 'start', 700);
+      // ---- cues: stereo (level + pan) and 1-4, each with PRE and SMALL FADER keys
+      sect(x0 + 4, 776, SW - 8, 'CUES');
+      sk(L, 796, 8.5, '#e0b23a', ang(), 'STEREO', 811); sk(R, 796, 7, '#e0b23a', ang(), 'L·R', 811);
+      sk(L, 828, 8, '#d9dbde', ang(), '1', 843); sk(R, 828, 8, '#d9dbde', ang(), '2', 843);
+      sk(L, 858, 8, '#d9dbde', ang(), '3', 873); sk(R, 858, 8, '#d9dbde', ang(), '4', 873);
+      for (let k = 0; k < 5; k++) { const kx = x0 + 6 + k * 14.4; rect(kx, 878, 12, 6, k === 0 ? '#c9b26a' : '#9a9ea6', 'rx="1"'); rect(kx, 886, 12, 6, '#6b6f77', 'rx="1"'); }
+      text(x0 + 6, 900, 'PRE / SMALL FADER', 4.4, '#8d939c', 'start', 700);
+      // ---- monitor input: READY GROUP, READY TAPE, RECORD (track number)
+      sect(x0 + 4, 904, SW - 8, '');
       const rdy = i >= 19 && i <= 21;
-      key(x0 + 8, 1036, 20, 9, 'red', rdy, 'RDY', 4.8); key(x0 + 31, 1036, 20, 9, 'white', false, 'GRP', 4.8); key(x0 + 54, 1036, 20, 9, 'white', false, 'TAPE', 4.6);
+      key(x0 + 8, 910, 32, 13, 'white', false, 'R.GRP', 5); key(x0 + 42, 910, 32, 13, 'white', rdy || i < 24, 'R.TAPE', 4.8);
+      key(x0 + 12, 928, 58, 18, 'red', rdy, i < 24 ? `REC ${i + 1}` : 'RECORD', 6.5);
+      // ---- small fader with INPUT / OUTPUT, SOLO and CUT
+      fader(x0 + 22, 956, 1030, 0.25 + rnd() * 0.4, { capW: 18, capH: 22, scale: false, capFill: 'url(#faderCapBlack)' });
+      led(x0 + 22, 1040, i >= 24, '#4fe07a');
+      key(x0 + 40, 952, 34, 10, 'white', false, 'INPUT', 5.2); key(x0 + 40, 965, 34, 10, 'white', false, 'OUTPUT', 4.8);
+      key(x0 + 40, 984, 34, 11, 'yellow', false, 'SOLO', 5.4); key(x0 + 40, 999, 34, 11, 'red', false, 'CUT', 5.4);
+      // ---- quad pans: front/back + IN, large L/R pan, large SOLO and CUT
+      sk(x0 + 57, 1024, 6.5, '#8a8f97', 0, ''); text(x0 + 47, 1026, 'F', 4.8, INK2, 'middle', 700); text(x0 + 67, 1026, 'B', 4.8, INK2, 'middle', 700);
+      key(x0 + 48, 1036, 18, 8, 'white', false, 'IN', 4.8);
+      sect(x0 + 4, 1050, SW - 8, '');
+      sk(cx, 1070, 12.5, '#c9ccd1', -20 + rnd() * 40, ''); text(cx - 17, 1086, 'L', 5.4, INK2, 'middle', 700); text(cx + 17, 1086, 'R', 5.4, INK2, 'middle', 700);
+      key(x0 + 7, 1092, 33, 14, 'yellow', false, 'SOLO', 6); key(x0 + 42, 1092, 33, 14, 'red', i === 2, 'CUT', 6);
       // ---- VCA group window, VCA fader and automation status keys (Off Read Write Touch Latch Trim)
-      rect(x0 + 8, 1052, 30, 14, '#0b0b0c', 'rx="2"');
-      text(x0 + 23, 1063, `G${1 + Math.floor(i / 4) % 8}`, 8.5, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
+      rect(x0 + 8, 1112, 30, 13, '#0b0b0c', 'rx="2"');
+      text(x0 + 23, 1122, `G${1 + Math.floor(i / 4) % 8}`, 8, '#ff6a50', 'middle', 800, `font-family="'JetBrains Mono', monospace"`);
       const modes = [['O', 'grey'], ['R', 'green'], ['W', 'red'], ['T', 'amber'], ['L', 'blue'], ['Tr', 'yellow']];
       const m = i % 9 === 4 ? 2 : i % 7 === 3 ? 3 : 1;
-      modes.forEach(([lab, col], k) => key(x0 + 62, 1084 + k * 18, 14, 14, col, k === m, lab, 6));
-      fader(x0 + 32, 1084, 1376, 0.3 + rnd() * 0.25, { capW: 24, capH: 40, scaleColor: '#aeb2b9' });
+      modes.forEach(([lab, col], k) => key(x0 + 62, 1136 + k * 17, 14, 13, col, k === m, lab, 6));
+      fader(x0 + 32, 1136, 1380, 0.3 + rnd() * 0.25, { capW: 24, capH: 38, scaleColor: '#aeb2b9' });
       // ---- scribble strip
       rect(x0 + 5, 1396, SW - 10, 22, '#e9e4d6', 'rx="2"');
       text(cx, 1411.5, names[i], 9.5, '#1c2a6e', 'middle', 700, `font-family="'Permanent Marker', 'Comic Neue', sans-serif"`);
