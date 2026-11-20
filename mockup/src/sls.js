@@ -18,7 +18,9 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
 
   // SSL knob (as the 611EQ / G+ photos): tall light-grey ribbed body, large coloured cap on top, white pointer line on the cap,
   // scale dots printed round it on the panel. The body's side shows as a darker crescent below the cap (seen from the front).
-  const sk = (cx, cy, r, col, ang = 0, lab = '', labY = null) => {
+  let KS = 1;   // knob size factor: 1.4 on the channel strips, where SSL knobs fill the module width
+  const sk = (cx, cy, r0, col, ang = 0, lab = '', labY = null) => {
+    const r = r0 * KS;
     if (r >= 6) for (let k = 0; k <= 10; k++) { const a = (-150 + k * 30 - 90) * Math.PI / 180; circle((cx + (r + 3.2) * Math.cos(a)).toFixed(1), (cy + (r + 3.2) * Math.sin(a)).toFixed(1), 0.6, '#1e2022'); }
     circle(cx + 1.2, cy + r * 0.38 + 1.4, r * 1.02, '#000', 'opacity="0.38"');        // cast shadow
     circle(cx, cy + r * 0.3, r, '#8e9292');                                           // side of the body
@@ -42,6 +44,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
     rect(0, 0, 18, CH, 'url(#woodH)', 'rx="6"'); rect(CW - 18, 0, 18, CH, 'url(#woodH)', 'rx="6"');
     rect(18, 0, CW - 36, CH, PANEL2);
 
+    KS = 1.4;
     for (let i = 0; i < N; i++) {
       // SL 611G I/O module, 72 px wide (38 mm module: 1.9 px per mm). Control placement follows the module drawings
       // in the G Series operator's manual (section 2) and the user's close-up photos.
@@ -143,6 +146,7 @@ module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
       text(cx, 1432, String(i + 1), 8.5, INK2, 'middle', 800);
     }
 
+    KS = 1;
     // =================== VU meter bridge: SSL VU modules (black panel, 8 meters = 4 across x 2 rows, screws between rows) ===================
     // Meter face as on the user's SSL VU module photo: wide cream face, dB scale over the arc with a thick red 0..+3 band,
     // 0-100 % scale under it, "VU" in the corners. Needle angle follows a real VU (linear in voltage).
