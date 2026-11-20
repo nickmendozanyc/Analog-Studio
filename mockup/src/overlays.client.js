@@ -221,10 +221,24 @@
   const tr = window.AS_TRANSPORT, LIVE = window.JH_LIVE;
   const TAPE = tr.tape;
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
-  const reels = ['s', 't'].map((k) => ({
-    k, d: LIVE[k], rotors: [...document.querySelectorAll(`.jh-rotor[data-reel="${k}"]`)],
-    packs: [...document.querySelectorAll(`.jh-pack-${k}`)], strand: document.getElementById(`jh-strand-${k}`), lastR: -1,
-  }));
+  // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
+  const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
+    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)],
+    packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
+  })));
+  // A827 front panel: live tape timer and key lamps
+  const a8ctr = document.getElementById('a8-tctr');
+  const a8lamp = (n, on) => { const g = document.getElementById(`a8-lk-${n}`); if (g) g.setAttribute('opacity', on ? 1 : 0); };
+  function drawA827() {
+    if (!a8ctr) return;
+    const c = tr.counter, a = Math.abs(c), hh = Math.floor(a / 3600), mm = Math.floor(a / 60) % 60, ss = Math.floor(a % 60);
+    a8ctr.textContent = `${c < -0.5 ? '-' : ''}${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+    const m = tr.mode;
+    a8lamp('play', m === 'play' || m === 'rec'); a8lamp('rplay', m === 'rplay'); a8lamp('stop', m === 'stop'); a8lamp('rec', m === 'rec');
+    a8lamp('ff', m === 'ff' || (m === 'locate' && tr.v > 0) || (m === 'shuttle' && tr.v > 0)); a8lamp('rew', m === 'rew' || (m === 'locate' && tr.v < 0) || (m === 'shuttle' && tr.v < 0));
+    a8lamp('ips7.5', tr.speedIPS === 7.5); a8lamp('ips15', tr.speedIPS === 15); a8lamp('ips30', tr.speedIPS === 30);
+    a8lamp('vari', tr.varispeed !== 0); a8lamp('lift', tr.liftDefeat);
+  }
   // tangent between a pack (circle) and the roller the strand runs to, with the sides chosen at build time
   function tangent(A, B, { sa, sb, sg }) {
     const dx = B.cx - A.cx, dy = B.cy - A.cy, D = Math.hypot(dx, dy), ra = sa * A.r, rb = sb * B.r, k = (ra - rb) / D;
@@ -406,6 +420,7 @@
     const dt = Math.min(0.25, (now - last) / 1000); last = now;   // tape time keeps up with real time even on a slow frame
     tr.advance(dt);
     drawConsoleReels();
+    if (document.body.dataset.studio === 'sls') drawA827();
     postState();
     if (open && open.dataset.view === 'al') alRender(now);
     requestAnimationFrame(studio);

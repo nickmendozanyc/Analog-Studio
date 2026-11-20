@@ -1268,6 +1268,28 @@ if (globalThis.JH_CI !== TCI) throw new Error(`cabinet inset is ${globalThis.JH_
 // copy the live reel prototype next to the mockup so the tape machine view can load it
 const protoSrc = path.join(__dirname, '..', '..', 'prototype', 'reels', 'dist', 'jh24-reels-local.html');
 if (fs.existsSync(protoSrc)) fs.copyFileSync(protoSrc, path.join(__dirname, '..', 'tape-machine.html'));
+const a827 = require('./jh24.js')({ TX: 24 - TCI, TY: 20, TW, TH, skin: 'a827' });
+// A827 meter bridge: Studer-grey housing, 24 VU meters in two rows with track ready / safe lamps
+const a827Bridge = capture(() => {
+  const BX = 1788, BW = 1478, BH = 590, cw = (BW - 40) / 12;
+  p(`<svg xmlns="http://www.w3.org/2000/svg" width="${BW}" height="${BH}" viewBox="0 0 ${BW} ${BH}" style="position:absolute;left:${BX}px;top:20px">`);
+  rect(0, 0, BW, BH, '#c9c7c0', 'rx="10"'); rect(0, 0, BW, 3, '#fff', 'opacity="0.5" rx="2"'); rect(0, BH - 6, BW, 6, '#000', 'opacity="0.2"');
+  rect(14, 14, BW - 28, 36, '#2a2c30', 'rx="4"');
+  text(30, 39, 'STAUDER', 18, '#e6e7e9', 'start', 900, 'letter-spacing="5"');
+  text(BW - 30, 39, 'A827 · 24 TRACK · METER PANEL', 14, '#b9bcc2', 'end', 800, 'letter-spacing="2"');
+  for (let i = 0; i < 24; i++) {
+    const c = i % 12, r = Math.floor(i / 12), x = 20 + c * cw, y = 64 + r * 262, on = readyTracks.has(i);
+    rect(x + 4, y, cw - 8, 250, '#2a2c30', 'rx="6"');
+    vu(x + 14, y + 12, cw - 28, 92, tapeDb[i], { brand: 'STAUDER' });
+    text(x + cw / 2, y + 136, String(i + 1), 22, '#e6e7e9', 'middle', 900);
+    rect(x + 12, y + 146, cw - 24, 24, '#e9e4d6', 'rx="2"');
+    text(x + cw / 2, y + 163, tapeNames[i], 12, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+    button(x + 12, y + 180, (cw - 30) / 2, 24, 'red', on, 'READY', { size: 8.5 });
+    button(x + 18 + (cw - 30) / 2, y + 180, (cw - 30) / 2, 24, 'white', !on, 'SAFE', { size: 8.5 });
+    [['INP', on], ['SYNC', false], ['REP', !on]].forEach(([l, lit], k) => { const lx = x + 22 + k * ((cw - 44) / 2); circle(lx, y + 222, 4, lit ? '#59f07a' : '#1d3b25', lit ? 'filter="url(#glowSm)"' : ''); text(lx, y + 240, l, 8, '#b9bcc2', 'middle', 800); });
+  }
+  p('</svg>');
+});
 const slsConsole = require('./sls.js')({ p, rect, text, circle, button, fader, capture }, { tapeNames });
 const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px" title="${label}"><span>${label}</span></div>`;
 const overlay = (view, title, body, extra = '') => `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
@@ -1306,9 +1328,10 @@ ${jh24}
 ${scenes3d.join('\n')}
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
-  <div class="sls-area" style="left:24px;top:20px;width:1500px;height:590px"><b>STAUDER A827</b><span>24-track tape machine · transport on one side, meter bridge on the other</span></div>
-  <div class="sls-area" style="left:1548px;top:20px;width:420px;height:590px"><b>AUTOLOCATOR</b><span>A827 remote</span></div>
-  <div class="sls-area" style="left:1992px;top:20px;width:1274px;height:590px"><b>STUDIO COMPUTER</b><span>SLS computer and meter bridge</span></div>
+  <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
+  ${a827}
+  <div class="sls-area" style="left:1344px;top:20px;width:420px;height:590px"><b>AUTOLOCATOR</b><span>A827 remote</span></div>
+  ${a827Bridge}
   ${slsConsole}
 </div>
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
@@ -1324,7 +1347,7 @@ ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" vie
 ${overlay('224', 'LEXIMAN 224X DIGITAL REVERB', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>')}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
 </div>
-<script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))}; window.JH_LIVE = ${JSON.stringify(globalThis.JH_LIVE)};</script>
+<script>window.TAPE_DB = ${JSON.stringify(tapeDb.map((v) => Math.round(v * 10) / 10))}; window.JH_LIVE = ${JSON.stringify(globalThis.JH_LIVE)}; window.A8_LIVE = ${JSON.stringify(globalThis.A8_LIVE)};</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'reels', 'physics.js'), 'utf8').replace(/^export /gm, '')}
 // one transport for the whole studio: console reels, autolocator and the tape machine view all use it
 window.AS_TRANSPORT = new Transport({ totalLength: ROLL_FT * FT, onTakeup: 222 * 30 * IPS, speedIPS: 30 }); window.AS_TRANSPORT.zero = 0;</script>
