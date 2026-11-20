@@ -56,7 +56,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH }) {
   // ---------- geometry ----------
   const headX = DW / 2;
   const TAPE_Z0 = 26, TAPE_Z1 = 98;            // 2" tape = 72 units
-  const RS = 14 / 10.5;   // reel drawing size the user approved (the 14" fitment picture)
+  const RS = process.env.REEL14 ? 14 / 10.5 : 1;   // 10.5" reels; REEL14=1 draws 14" reels on the same hubs for a fitment check
   const R = 250 * RS, hubR = 250 * 0.36, holeR = 250 * 0.27;
   const supply = { cx: 300 + IN, cy: 292 - 2 * IN, pack: 213 * RS, rot: 18, labelAt: 198 * RS, style: 'a499' };   // 2500 ft on a 10.5" reel, 03:42 in at 30 IPS
   const takeup = { cx: DW - 300 - IN, cy: 292 - 2 * IN, pack: 145 * RS, rot: -27, style: 'gp9' };
