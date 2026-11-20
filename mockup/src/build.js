@@ -1288,10 +1288,28 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .ov-bar button.ov-close{margin-left:auto}
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
+  .modes{position:absolute;left:1236px;top:8px;height:40px;display:flex;align-items:center;gap:10px;z-index:70;font-family:Archivo,Arial,sans-serif}
+  .modes .lbl{color:#8b8778;font-size:11px;font-weight:700;letter-spacing:2px;margin-right:4px}
+  .modes button{width:112px;height:40px;border-radius:4px;border:1px solid #000;cursor:pointer;font:900 17px Archivo,Arial,sans-serif;letter-spacing:3px;color:#d8d0c0;background:linear-gradient(#3a3b3f,#232427);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 3px rgba(0,0,0,.6)}
+  .modes button:hover{color:#fff}
+  .modes button[aria-pressed="true"]{color:#1a1208;background:linear-gradient(#ffd27a,#ffb02e);box-shadow:0 0 14px rgba(255,176,46,.55),inset 0 1px 0 rgba(255,255,255,.5)}
+  .modes button:focus-visible{outline:3px solid #5fb4ff;outline-offset:2px}
+  #sls{position:absolute;left:0;top:56px;width:3290px;height:2104px;z-index:60;background:#171615}
+  #sls[hidden]{display:none}
+  .sls-area{position:absolute;border:2px dashed #4a4744;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#cfc8b8;font-family:Archivo,Arial,sans-serif;text-align:center;background:rgba(255,255,255,.02)}
+  .sls-area b{font-size:44px;font-weight:900;letter-spacing:4px;color:#ece6da}
+  .sls-area span{font-size:22px;font-weight:600;color:#9c9384;max-width:80%}
 </style></head><body><div id="stage">
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
+<div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
+<div id="sls" hidden aria-label="SLS studio">
+  <div class="sls-area" style="left:24px;top:20px;width:1500px;height:590px"><b>STAUDER A827</b><span>24-track tape machine · transport on one side, meter bridge on the other</span></div>
+  <div class="sls-area" style="left:1548px;top:20px;width:420px;height:590px"><b>AUTOLOCATOR</b><span>A827 remote</span></div>
+  <div class="sls-area" style="left:1992px;top:20px;width:1274px;height:590px"><b>STUDIO COMPUTER</b><span>SLS computer and meter bridge</span></div>
+  <div class="sls-area" style="left:24px;top:634px;width:3242px;height:1446px"><b>SLS 4000 G CONSOLE · 32 CHANNELS</b><span>Same routing and matrices as the CMI room. Layout in design: send the next details.</span></div>
+</div>
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
 ${hot(AX, 76, Math.round(AW * ALK), 590, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}

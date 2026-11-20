@@ -385,6 +385,21 @@
     tapeFrame.contentWindow.postMessage({ as: 'state', s: st }, '*');
   }
 
+  // ---------------- studio modes: CMI / SLS (the rack stays; console, tape machine and autolocator swap) ----------------
+  const slsLayer = document.getElementById('sls');
+  const modeKeys = [...document.querySelectorAll('.modes button')];
+  function setStudio(mode) {
+    if (mode !== 'sls') mode = 'cmi';
+    if (slsLayer) slsLayer.hidden = mode !== 'sls';
+    modeKeys.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    document.body.dataset.studio = mode;
+    try { localStorage.setItem('as-studio', mode); } catch (e) {}
+  }
+  modeKeys.forEach((b) => b.addEventListener('click', () => { if (open) hide(); setStudio(b.dataset.mode); }));
+  let savedMode = 'cmi'; try { savedMode = localStorage.getItem('as-studio') || 'cmi'; } catch (e) {}
+  setStudio(savedMode);
+  window.AS_SET_STUDIO = setStudio;
+
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
