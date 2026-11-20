@@ -84,8 +84,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   let deckSvg = '';
   deckSvg += `<defs>
     ${A8 ? `<linearGradient id="dk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d4d6d9"/><stop offset="0.5" stop-color="#c3c6c9"/><stop offset="1" stop-color="#b3b6ba"/></linearGradient>
-    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b3f22"/><stop offset="0.04" stop-color="#9a6438"/><stop offset="0.06" stop-color="#a7abaf"/><stop offset="0.94" stop-color="#a7abaf"/><stop offset="0.96" stop-color="#9a6438"/><stop offset="1" stop-color="#6b3f22"/></linearGradient>` : `<linearGradient id="dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f6963"/><stop offset="0.55" stop-color="#7d7770"/><stop offset="1" stop-color="#8a847c"/></linearGradient>
-    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4541"/><stop offset="1" stop-color="#5a5550"/></linearGradient>`}
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6b3f22"/><stop offset="0.04" stop-color="#9a6438"/><stop offset="0.06" stop-color="#a7abaf"/><stop offset="0.94" stop-color="#a7abaf"/><stop offset="0.96" stop-color="#9a6438"/><stop offset="1" stop-color="#6b3f22"/></linearGradient>` : `<linearGradient id="dk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f4943"/><stop offset="0.55" stop-color="#57514b"/><stop offset="1" stop-color="#5d5650"/></linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#433d38"/><stop offset="1" stop-color="#504a44"/></linearGradient>`}
     <filter id="dsh" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
     <filter id="dsh2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
     <filter id="tex"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.10"/></feComponentTransfer></filter>
@@ -120,7 +120,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     gp9: {
       face: `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`,
       edge: 'linear-gradient(90deg,#8a2414,#e85a3e 40%,#7a1e10)', back: '#9c2e1b', ink: '#1b1b1b',
-      avg: '#d6452b', blurSlot: 'rgba(205,66,40,0.93)', blurLabel: 'rgba(220,120,100,0.97)',
+      smearSlot: 'rgba(40,10,4,A)', smearLabel: 'rgba(255,236,228,A)',
     },
   };
   const slot = (cx, cy, rIn, rOut, w, ang, c) => {
@@ -148,6 +148,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     rotor();
     const flange = (z, bg) => add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${bg};clip-path:path(evenodd,'${d}')`)}"></div>`);
     flange(20, st.edge); flange(21.5, st.edge); flange(23, st.back);
+    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:radial-gradient(circle, transparent ${f(R * 0.47)}px, rgba(0,0,0,0.12) ${f(R * 0.51)}px, rgba(0,0,0,0.1) ${f(R * 0.83)}px, transparent ${f(R * 0.87)}px), ${st.back}`)}"></div>`);   // back flange smears too
     add('</div>');
     // hub ring (black plastic) between the flanges
     for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
@@ -181,14 +182,22 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     lab.push(`<path d="${d}" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2"/>`);
     lab.push(`<circle cx="${c}" cy="${c}" r="${R - 1.5}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>`);
     lab.push(`<circle cx="${c}" cy="${c}" r="${hubR}" fill="none" stroke="#0d0d0e" stroke-width="8"/>`);
-    add(`<div style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, lab.join(''))}</div>`);
-    // motion blur (fast winds): the spinning flange smears into concentric bands; faded in with reel speed
-    const avg = st.avg || '#b9bcc1', pr = (x) => f(R * x);
-    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);background:radial-gradient(circle, transparent ${f(hubR - 1)}px, #0d0d0e ${f(hubR)}px, #0d0d0e ${f(hubR + 4)}px, ${avg} ${f(hubR + 7)}px, ${avg} ${pr(0.39)}px, rgba(20,20,20,0.55) ${pr(0.42)}px, ${avg} ${pr(0.45)}px, ${st.blurSlot || 'rgba(185,188,193,0.93)'} ${pr(0.5)}px, ${st.blurLabel || 'rgba(200,198,190,0.97)'} ${pr(0.62)}px, ${st.blurSlot || 'rgba(185,188,193,0.93)'} ${pr(0.84)}px, ${avg} ${pr(0.86)}px, ${avg} ${pr(0.97)}px, rgba(255,255,255,0.6) ${pr(0.985)}px, ${avg} ${f(R - 0.5)}px, transparent ${f(R)}px)`)}"></div>`);
+    add(`<div class="jh-lab" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(103.6px)`)}">${svg(2 * R, 2 * R, lab.join(''))}</div>`);
+    // motion blur (fast winds): what a spinning reel really looks like. Lighting and the flange finish stay put (they
+    // belong to the room light), the brushed texture goes smooth, and the two slots, the label and the screws smear into
+    // faint soft rings in proportion to how much of each circle they cover. Faded in with reel speed.
+    const base = st.face.replace(/repeating-conic-gradient\([^()]*\),\s*/, '');
+    const pr = (x) => f(R * x), band = (c, a, b, fa, fb) => `${c.replace('A', 0)} ${pr(a)}px, ${c.replace('A', fa)} ${pr(a + 0.03)}px, ${c.replace('A', fb)} ${pr(b - 0.03)}px, ${c.replace('A', 0)} ${pr(b)}px`;
+    const smear = [
+      `radial-gradient(circle, transparent ${pr(0.36)}px, ${band('rgba(0,0,0,A)', 0.385, 0.455, 0.16, 0.16)}, transparent ${pr(0.46)}px)`,   // screw circle
+      `radial-gradient(circle, transparent ${pr(0.47)}px, ${band(st.smearSlot || 'rgba(26,18,12,A)', 0.48, 0.86, 0.13, 0.11)}, transparent ${pr(0.87)}px)`,   // slots: ~8 % of the circle is see-through
+      `radial-gradient(circle, transparent ${pr(0.49)}px, ${band(st.smearLabel || 'rgba(150,118,62,A)', 0.5, 0.76, 0.16, 0.14)}, transparent ${pr(0.77)}px)`,   // the printed label
+    ].join(', ');
+    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(103.8px);-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);mask-image:radial-gradient(circle, transparent ${f(hubR + 3)}px, #000 ${f(hubR + 4)}px);background:${smear}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`)}"></div>`);
     // black hold-down knob on the spindle
     cylinder(cx, cy, 30, 100, 128, 'linear-gradient(90deg,#050505,#3a3a3c 35%,#0b0b0c 70%,#000)', 'radial-gradient(circle at 40% 35%, #4a4a4d, #111 60%)', 2);
     const lobes = [0, 1, 2].map((k) => { const a = (rl.rot + k * 120) * Math.PI / 180; return `<circle cx="${f(44 + 26 * Math.cos(a))}" cy="${f(44 + 26 * Math.sin(a))}" r="13" fill="#0e0e0f"/>`; }).join('');
-    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 6px, #2a2a2c 8px, #141416 29px, rgba(14,14,15,0.75) 31px, rgba(14,14,15,0.35) 38px, transparent 40px)`)}"></div>`);
+    add(`<div class="jh-blur" data-reel="${key}" style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;border-radius:50%;opacity:0;transform:translateZ(128.8px);background:radial-gradient(circle, #c9ccd0 0 5px, #3a3a3d 7.5px, #17171a 13px, #141416 28px, rgba(14,14,15,0.7) 31px, rgba(14,14,15,0.32) 37px, rgba(14,14,15,0) 41px)`)}"></div>`);
     add(`<div style="${box(`left:${f(cx - 44)}px;top:${f(cy - 44)}px;width:88px;height:88px;transform:translateZ(128.5px)`)}">${svg(88, 88, `${lobes}<circle cx="44" cy="44" r="30" fill="#141416"/><circle cx="44" cy="44" r="30" fill="url(#none)"/><circle cx="38" cy="36" r="18" fill="#fff" opacity="0.08"/><circle cx="44" cy="44" r="7" fill="#c9ccd0"/><circle cx="43" cy="43" r="3" fill="#fff" opacity="0.7"/>`)}</div>`);
     add('</div>');
   }
@@ -284,7 +293,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     const s = [];
     const ink = '#2a2624';
     s.push(`<defs>
-      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7e7871"/><stop offset="1" stop-color="#6a645e"/></linearGradient>
+      <linearGradient id="fp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d5650"/><stop offset="1" stop-color="#4a443f"/></linearGradient>
       <linearGradient id="bt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.6"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/><stop offset="1" stop-color="#000" stop-opacity="0.35"/></linearGradient>
       <radialGradient id="kn" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#55555a"/><stop offset="1" stop-color="#0b0b0c"/></radialGradient>
       <filter id="gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -294,8 +303,8 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     const stepA = w * 0.55, stepB = w * 0.61;
     const outline = `M12 ${d - 10} L12 30 L${stepA} 30 L${stepB} 8 L${w - 12} 8 L${w - 12} ${d - 10} Z`;
     s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="6" fill="url(#fp)"/>`);
-    s.push(`<path d="${outline}" fill="#77716a" stroke="#000" stroke-opacity="0.35" stroke-width="5" transform="translate(1 2)"/>`);
-    s.push(`<path d="${outline}" fill="#77716a" stroke="#e6e1d8" stroke-width="3" stroke-linejoin="round"/>`);
+    s.push(`<path d="${outline}" fill="#544d47" stroke="#000" stroke-opacity="0.35" stroke-width="5" transform="translate(1 2)"/>`);
+    s.push(`<path d="${outline}" fill="#544d47" stroke="#e6e1d8" stroke-width="3" stroke-linejoin="round"/>`);
     const btn = (bx, by, bw, bh, col, lit, glyph, label, bezel = false) => {
       if (bezel) s.push(`<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 14}" rx="4" fill="#111"/><rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="2" fill="#555"/>`);
       s.push(`<rect x="${bx + 2}" y="${by + 5}" width="${bw}" height="${bh}" rx="3" fill="#000" opacity="0.55" filter="url(#bs)"/>`);
@@ -334,9 +343,9 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     btn(stepB + 440, ry + 2, 32, 24, '#e8a840', false, '', 'BYPASS');
     add(`<div style="${box(`left:${x}px;top:${y}px;width:${w}px;height:${d}px;transform-origin:50% 100%;transform:translateZ(${zFront}px) rotateX(${slope}deg)`)}">${svg(w, d, s.join(''))}</div>`);
     const zBack = zFront + d * Math.sin(-slope * Math.PI / 180);
-    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#77716a,#5a554f)');
-    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#77716a,#5a554f)');
-    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#77716a,#5a554f)');
+    front(x, y + d, w, 0, zFront, 'linear-gradient(180deg,#5d5650,#4a443f)');
+    side(x, y, d, 0, zBack, 'linear-gradient(180deg,#5d5650,#4a443f)');
+    side(x + w, y, d, 0, zBack, 'linear-gradient(180deg,#5d5650,#4a443f)');
   }
 
   // ---------- A827 front panel: tape timer, transport keys with lamps, speed keys, big shuttle wheel ----------
@@ -436,7 +445,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const cab = [];
   const LIPH = 44, WOODY = FRONT + LIPH;
   cab.push(`<defs>
-    ${A8 ? '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ea"/><stop offset="0.15" stop-color="#cfd2d5"/><stop offset="1" stop-color="#a3a7ab"/></linearGradient>' : '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5c5752"/><stop offset="0.15" stop-color="#4a4541"/><stop offset="1" stop-color="#36322f"/></linearGradient>'}
+    ${A8 ? '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e8ea"/><stop offset="0.15" stop-color="#cfd2d5"/><stop offset="1" stop-color="#a3a7ab"/></linearGradient>' : '<linearGradient id="lip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d5650"/><stop offset="0.15" stop-color="#4a443f"/><stop offset="1" stop-color="#36312d"/></linearGradient>'}
     <linearGradient id="lam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e482b"/><stop offset="0.35" stop-color="#9a6b42"/><stop offset="0.7" stop-color="#875a36"/><stop offset="1" stop-color="#5e3d24"/></linearGradient>
     <filter id="grainV"><feTurbulence type="fractalNoise" baseFrequency="0.0025 0.21" numOctaves="5" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.035  0 0 0 0 0.0  0 0 0 2.4 -0.85"/><feComposite in2="SourceGraphic" operator="in"/></filter>
     <linearGradient id="shadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>

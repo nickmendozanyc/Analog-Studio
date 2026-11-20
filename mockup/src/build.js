@@ -544,7 +544,7 @@ function al3(live = false, st = {}) {
 }
 
 // ---------------- AL-III autolocator on its pedestal ----------------
-const AX = TX + TW - 2 * TCI + 22, AY = 76, AW = 400, AH = 676, ALK = Math.min((1692 - AX) / AW, 590 / AH);   // fills the gap between the tape machine and the meter bridge
+const AX = TX + TW - 2 * TCI + 22, AW = 400, ALK = Math.min((1692 - AX) / AW, 590 / 676), ALDROP = 40, AY = 76 + ALDROP, AH = 676 - Math.round(ALDROP / ALK);   // dropped under the SMPTE wall clock   // fills the gap between the tape machine and the meter bridge
 {
   const FW = 376, FD = Math.round(AL_H * FW / AL_W), LIP = 34, TOP = 60, SLOPE = 30;
   const face = capture(() => { p(`<g transform="scale(${FW / AL_W})">`); al3(false); p('</g>'); });
@@ -1321,12 +1321,39 @@ const a827Bridge = capture(() => {
   circle(BW - 22 - 18, BH - 31, 9, '#2a2b2e');
   p('</svg>');
 });
+// SMPTE wall clock: hangs on the wall above the autolocator (both rooms), red LED time code read off track 24
+function wallClock(cx, top) {
+  const W = 330, H = 104;
+  const segs = '88:88:88:88';
+  return `<svg class="smpte-clock" width="${W}" height="${H + 14}" viewBox="0 0 ${W} ${H + 14}" style="position:absolute;left:${cx - W / 2}px;top:${top}px;overflow:visible" aria-label="SMPTE time code wall clock">
+    <defs><linearGradient id="wcCase" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3b3e"/><stop offset="0.08" stop-color="#202124"/><stop offset="1" stop-color="#0d0d0f"/></linearGradient>
+    <filter id="wcGlow" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="wcSh"><feGaussianBlur stdDeviation="7"/></filter></defs>
+    <rect x="10" y="14" width="${W - 10}" height="${H}" rx="8" fill="#000" opacity="0.55" filter="url(#wcSh)"/>
+    <rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="url(#wcCase)" stroke="#000" stroke-width="2"/>
+    <rect x="1.5" y="1.5" width="${W - 3}" height="2" rx="1" fill="#fff" opacity="0.12"/>
+    <rect x="14" y="22" width="${W - 28}" height="${H - 40}" rx="4" fill="#160404" stroke="#050505" stroke-width="2"/>
+    <rect x="14" y="22" width="${W - 28}" height="${H - 40}" rx="4" fill="#5a0d08" opacity="0.18"/>
+    <text x="${W / 2}" y="${H / 2 + 19}" text-anchor="middle" font-family="'DSEG7 Classic','JetBrains Mono',monospace" font-size="43" font-weight="700" fill="#ff2a14" opacity="0.08" letter-spacing="1">${segs}</text>
+    <text class="wc-tc" x="${W / 2}" y="${H / 2 + 19}" text-anchor="middle" font-family="'DSEG7 Classic','JetBrains Mono',monospace" font-size="43" font-weight="700" fill="#ff3a1e" filter="url(#wcGlow)" letter-spacing="1">01:00:00:00</text>
+    <text x="16" y="15" font-family="Archivo,Arial,sans-serif" font-size="9.5" font-weight="900" fill="#d9d6cc" letter-spacing="2.5">SMPTE TIME CODE</text>
+    <circle class="wc-lock" cx="${W - 96}" cy="11.5" r="3.4" fill="#123d1c"/><text x="${W - 89}" y="15" font-family="Archivo,Arial,sans-serif" font-size="8.5" font-weight="800" fill="#9c9790" letter-spacing="1">LOCK</text>
+    <text class="wc-fps" x="${W - 16}" y="15" text-anchor="end" font-family="Archivo,Arial,sans-serif" font-size="8.5" font-weight="800" fill="#9c9790" letter-spacing="1">30 FPS</text>
+    <text x="16" y="${H - 7}" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2">HRS</text>
+    <text x="${W / 2 - 52}" y="${H - 7}" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2">MIN</text>
+    <text x="${W / 2 + 26}" y="${H - 7}" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2">SEC</text>
+    <text x="${W - 16}" y="${H - 7}" text-anchor="end" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2">FRM</text>
+    <text class="wc-src" x="${W / 2}" y="${H - 7}" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-size="7.5" font-weight="800" fill="#6f6b66" letter-spacing="2" opacity="0"></text>
+  </svg>`;
+}
+
 // A827 remote controller (autolocator slot), from the user's photo: black two-tier panel on a wood pedestal with a leather
 // armrest. Upper tier: ALL, 24 track keys in three coloured rows (ready / input / safe), transport keys. Lower tier: red
 // LED tape-time display, function keys, keypad, transport keys, shuttle. Keys are live: data-a8r drives the tape transport.
 const a827Remote = capture(() => {
   const RX = 1344, RW = 420, RH = 590;
-  p(`<svg xmlns="http://www.w3.org/2000/svg" width="${RW}" height="${RH}" viewBox="0 0 ${RW} ${RH}" style="position:absolute;left:${RX}px;top:20px">`);
+  const RS8 = 0.84;   // scaled and lowered under the SMPTE wall clock
+  p(`<svg xmlns="http://www.w3.org/2000/svg" width="${RW * RS8}" height="${RH * RS8}" viewBox="0 0 ${RW} ${RH}" style="position:absolute;left:${RX + RW * (1 - RS8) / 2}px;top:${610 - RH * RS8}px">`);
   rect(0, 0, RW, RH, '#6d4122', 'rx="8"'); rect(0, 0, 14, RH, 'url(#woodH)', 'rx="6"'); rect(RW - 14, 0, 14, RH, 'url(#woodH)', 'rx="6"');
   rect(14, 0, RW - 28, 250, '#202124'); rect(14, 254, RW - 28, 268, '#1b1c1e'); rect(14, 250, RW - 28, 4, '#000');
   rect(14, RH - 66, RW - 28, 66, '#7a3f22', 'rx="0"'); rect(14, RH - 66, RW - 28, 8, '#000', 'opacity="0.35"');
@@ -1407,11 +1434,13 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
+${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
 <div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
   ${a827}
   ${a827Remote}
+  ${wallClock(1554, 4)}
   ${a827Bridge}
   ${slsConsole}
 </div>
@@ -1419,7 +1448,7 @@ ${scenes3d.join('\n')}
 <div id="strip-hot-sls" class="shot" hidden style="left:24px;top:860px;width:3242px;height:860px" title="Click a section of any channel"></div>
 <div id="strip-hl" hidden><span></span></div>
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
-${hot(AX, 76, Math.round(AW * ALK), 590, 'al', 'Open the AutoLocator III')}
+${hot(AX, AY + 60, Math.round(AW * ALK), 590 - 60 - ALDROP, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
 ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}

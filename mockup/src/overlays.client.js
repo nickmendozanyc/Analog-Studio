@@ -223,7 +223,7 @@
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
   // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
-    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0,
+    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)],
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
   })));
   // A827 front panel: live tape timer and key lamps
@@ -277,8 +277,13 @@
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
       // motion blur: at wind speed the flange slots and label smear into bands (fades in above play speed)
       const w = Math.abs(tr.v / (rl.k === 's' ? tr.rS : tr.rT));   // rad/s
-      const op = Math.min(1, Math.max(0, (w - 14) / 30)), ops = op * op * (3 - 2 * op);
-      if (Math.abs(ops - rl.blurOp) > 0.01 || (ops === 0) !== (rl.blurOp === 0)) { rl.blurOp = ops; for (const b of rl.blurs) b.style.opacity = ops.toFixed(3); }
+      // natural ramp: slots start to strobe and smear past ~2 rev/s, a full smear from ~10 rev/s
+      const op = Math.min(1, Math.max(0, (w - 12) / 50)), ops = op * op * (3 - 2 * op);
+      if (Math.abs(ops - rl.blurOp) > 0.01 || (ops === 0) !== (rl.blurOp === 0)) {
+        rl.blurOp = ops; for (const b of rl.blurs) b.style.opacity = ops.toFixed(3);
+        const px = Math.min(4, ops * 5);   // the moving label softens as it smears
+        for (const l of rl.labs) l.style.filter = px > 0.2 ? `blur(${px.toFixed(1)}px)` : '';
+      }
       const r = packPx(rl.k === 's' ? tr.rS : tr.rT);
       if (Math.abs(r - rl.lastR) < 0.25) continue;
       rl.lastR = r;
@@ -427,6 +432,8 @@
   try { const sv = JSON.parse(localStorage.getItem('as-sbx-map') || 'null'); if (sv && sv.bars) { SBX.bars = sv.bars; SBX.offset = sv.offset ?? 2; } } catch (e) {}
   const sbxMsg = (t, sec = 2.2) => { SBX.msg = t; SBX.msgT = sec; };
   const fps = () => FRS[SBX.frI][0];
+  const wallClocks = [...document.querySelectorAll('.smpte-clock')].map((el) => ({ tc: el.querySelector('.wc-tc'), lock: el.querySelector('.wc-lock'), fps: el.querySelector('.wc-fps') }));
+  let wcLast = {};
   const tapeCode = (take) => { for (const s of SBX.stripes) if (take >= s.take0 && take <= s.take1) return s.code0 + (take - s.take0) / s.speed; return null; };
   const barLen = (b) => b.num * (60 / b.bpm) * (4 / b.den);
   // song time (s from bar 1) -> position in the tempo map (or at the MANUAL tempo)
@@ -538,6 +545,17 @@
     }
     // ---- reader (EXT) or internal clock (INT)
     const code = SBX.seg ? SBX.seg.code0 + (tr.take - SBX.seg.take0) / SBX.seg.speed : tapeCode(tr.take);
+    // SMPTE wall clocks (above the autolocator in both rooms): the code read off track 24; dashes on uncoded tape
+    if (wallClocks.length) {
+      const F = fps(), rate = F === 29.97 ? 30 : Math.round(F);
+      let txt = '--:--:--:--';
+      if (code != null) { const c = 3600 + code, n = Math.floor(c * rate + 1e-6), fr = n % rate, sec = Math.floor(n / rate); txt = `${String(Math.floor(sec / 3600) % 24).padStart(2, '0')}:${String(Math.floor(sec / 60) % 60).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`; }
+      const lock = code != null && Math.abs(tr.v) > 0.05;
+      if (txt !== wcLast.txt || lock !== wcLast.lock || F !== wcLast.F) {
+        wcLast = { txt, lock, F };
+        for (const w of wallClocks) { w.tc.textContent = txt; if (w.lock) w.lock.setAttribute('fill', lock ? '#3dff6a' : '#123d1c'); if (w.fps) w.fps.textContent = F === 29.97 ? '29.97 DF' : `${F} FPS`; }
+      }
+    }
     const fwd = (tr.mode === 'play' || tr.mode === 'rec') && tr.v > 0.5 * tr.nominalSpeed;
     let ratio = 1, run = false;
     if (SBX.src === 'smpte') {
