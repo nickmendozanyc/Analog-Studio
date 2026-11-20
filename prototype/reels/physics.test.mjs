@@ -43,7 +43,7 @@ test('stop from wind coasts down gracefully: gentle deceleration and a soft sett
   const t = new Transport({ onTakeup: 1000 * FT });
   t.command('ff'); t.advance(5);
   t.command('stop'); t.advance(1);
-  assert.ok(t.v > 6, 'still winding well 1 s after STOP');
+  assert.ok(t.v > 4, 'still winding 1 s after STOP');
   let prev = t.v, maxDecel = 0;
   for (let k = 0; k < 800; k++) { t.advance(0.01); maxDecel = Math.max(maxDecel, (prev - t.v) / 0.01); prev = t.v; }
   assert.ok(maxDecel <= MACHINE.stopDecel + 0.05, `deceleration capped (${maxDecel.toFixed(2)} m/s^2)`);
@@ -54,8 +54,8 @@ test('the last stretch of a wind stop eases in (no abrupt halt near zero)', () =
   const t = new Transport(); t.locate(t.total / 2);
   t.command('rew'); t.advance(6); t.command('stop');
   while (Math.abs(t.v) > 0.5) t.advance(0.001);
-  const v0 = Math.abs(t.v); t.advance(0.25);
-  assert.ok(Math.abs(t.v) > 0.05 && Math.abs(t.v) < v0, 'still easing 0.25 s after dropping below 0.5 m/s');
+  const v0 = Math.abs(t.v); t.advance(0.1);
+  assert.ok(Math.abs(t.v) > 0.05 && Math.abs(t.v) < v0, 'still easing 0.1 s after dropping below 0.5 m/s');
 });
 
 test('PLAY during a wind brakes first, then the pinch roller engages near play speed', () => {
@@ -130,7 +130,8 @@ test('the transport ramps smoothly (jerk limited) and comes to rest', () => {
   const t = new Transport({ onTakeup: 1000 * FT }); let last = 0, peak = 0;
   t.command('ff');
   for (let i = 0; i < 12000; i++) { if (i === 4000) t.command('stop'); t.step(0.001); peak = Math.max(peak, Math.abs(t.acc - last) / 0.001); last = t.acc; }
-  assert.ok(peak <= MACHINE.jerk * 3, `jerk stays near ${MACHINE.jerk} m/s^3 (${peak.toFixed(1)})`);
+  const J = Math.max(MACHINE.jerk, MACHINE.stopJerk ?? 0);   // the wind-stop brake has its own (quicker) ramp
+  assert.ok(peak <= J * 3, `jerk stays near ${J} m/s^3 (${peak.toFixed(1)})`);
   close(t.v, 0, 1e-9, 'at rest');
 });
 
@@ -163,9 +164,9 @@ test('auto play after locate starts playing at the cue point', () => {
   assert.equal(t.mode, 'play'); assert.ok(t.capstanDriving, 'playing through the capstan');
 });
 
-test('a stop from full wind speed takes about 2.5 s', () => {
+test('a stop from full wind speed takes about 2 s', () => {
   const t = new Transport(); t.locate(t.total / 2);
   t.command('ff'); t.advance(10); t.command('stop');
   let s = 0; while (Math.abs(t.v) > 0.01 && s < 10) { t.advance(0.01); s += 0.01; }
-  assert.ok(s > 2.2 && s < 2.8, `stopped in ${s.toFixed(2)} s`);
+  assert.ok(s > 1.8 && s < 2.2, `stopped in ${s.toFixed(2)} s`);
 });
