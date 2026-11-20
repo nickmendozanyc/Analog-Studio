@@ -11,6 +11,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.osc = { on: false, f: 1000, db: 0, to: 'ready', ph: 0 };
     this.live = { on: false };
     this.mix = { gain: 0.5, solo: -1, mute: false };
+    this.mech = new MechSound(sampleRate); this.mechLevel = 0.6;   // the machine's own sound (motors, air, solenoids)
     this.align = { on: false, f: 1000, std: 'NAB' };   // alignment tape playing: standard-flux tones on every track
     this.vuT = 0; this.vu = new Float32Array(this.N);
     this.port.onmessage = (e) => this.msg(e.data);
@@ -29,6 +30,7 @@ class JH24Processor extends AudioWorkletProcessor {
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
     else if (d.type === 'mix') Object.assign(this.mix, d);
+    else if (d.type === 'machine') this.mechLevel = d.level;
     else if (d.type === 'alignTape') Object.assign(this.align, d);
     else if (d.type === 'load') { m.loadTransfer(d.track, d.data, d.u0, d.ips); this.port.postMessage({ type: 'loaded', track: d.track }); }
     else if (d.type === 'clear') { m.tracks[d.track].pieces = []; }
@@ -68,7 +70,9 @@ class JH24Processor extends AudioWorkletProcessor {
       const err = T.take - m.take, jump = Math.abs(err) > Math.max(0.3, Math.abs(T.v) * 0.6);
       if (jump) { ctl.take = T.take; this.jumps = (this.jumps || 0) + 1; }
       const capstan = (T.mode === 'play' || T.mode === 'rec' || T.mode === 'rplay') && Math.abs(Math.abs(T.v) - T.ips * IPS * (1 + (T.vari || 0))) < 0.002 * T.ips * IPS;
-      if (capstan && !jump) {
+      if (T.mode === 'stop' && Math.abs(T.v) < 1e-4) {   // stopped: the tape stands still at exactly the transport's position
+        ctl.take = T.take; ctl.v = 0; this.locked = false;
+      } else if (capstan && !jump) {
         // QUARTZ LOCK: the capstan runs at exactly the selected speed off the audio clock (the crystal). The screen's
         // transport is only a reference for phase: a correction of at most ±0.02 %, far below wow & flutter
         const ref = Math.sign(T.v) * T.ips * IPS * (1 + (T.vari || 0)), trim = Math.max(-0.0002, Math.min(0.0002, err * 0.02));
@@ -109,6 +113,8 @@ class JH24Processor extends AudioWorkletProcessor {
       const y = this.out[i];
       for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
     }
+    // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
+    if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }
     // VU levels (average-responding, ~300 ms; 0 VU = 0 dB) and what each channel is monitoring, ~30 times a second
     const kv = 1 / (0.1 * sampleRate);
     for (let i = 0; i < this.N; i++) { const y = this.out[i]; let v = this.vu[i]; for (let k = 0; k < n; k++) v += (Math.abs(y[k]) - v) * kv; this.vu[i] = v; }

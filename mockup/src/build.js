@@ -474,6 +474,7 @@ const elecView = (() => {
     <button type="button" id="el-power" class="pw" title="JH-24D audio power supply: starts the audio engine">POWER</button>
     <label>MONITOR <input id="el-gain" type="range" min="0" max="1" step="0.01" value="0.5"></label>
     <button type="button" id="el-mute" class="t">MUTE</button>
+    <button type="button" id="el-mech-on" class="t on" title="The machine's own sound in the room: reel motors, tape and air, lifter / brake / pinch solenoids, tail flap">MACHINE</button><input id="el-mech" type="range" min="0" max="1.5" step="0.01" value="0.6" title="Machine sound level">
     <span class="sep"></span>
     <label>OSCILLATOR ${sel('el-osc-f', [['100', '100 Hz'], ['1000', '1 kHz'], ['10000', '10 kHz'], ['15000', '15 kHz']], '1000')} ${sel('el-osc-db', [['-10', '-10 VU'], ['0', '0 VU'], ['4', '+4 VU'], ['12.4', 'MOL +12.4']], '0')} ${sel('el-osc-to', [['off', 'OFF'], ['ready', 'TO READY TRACKS'], ['all', 'TO ALL INPUTS']], 'off')}</label>
     <label>ALIGNMENT TAPE ${sel('el-mrl', [['off', 'OFF'], ['1000', '1 kHz level'], ['10000', '10 kHz'], ['15000', '15 kHz'], ['100', '100 Hz'], ['50', '50 Hz']], 'off')} ${sel('el-mrl-std', [['NAB', 'NAB tape'], ['IEC', 'IEC tape']], 'NAB')}</label>
@@ -1669,7 +1670,7 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${['ltc.js', 'midiclock.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
 <script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;

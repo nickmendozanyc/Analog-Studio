@@ -36,7 +36,7 @@
         const d = window.DEMO(EL.ctx.sampleRate, encode);
         d.tracks.forEach((x, t) => { if (x) elPost({ type: 'load', track: t, data: x, u0: tr.zero, ips: tr.speedIPS }, [x.buffer]); });
         EL.quietLoads = d.tracks.filter(Boolean).length;
-        if (tr.mode === 'stop') tr.locate(tr.zero); else tr.locateTo(tr.zero, tr.playingMode ? 'play' : 'stop');
+        if (tr.mode === 'stop') tr.locate(tr.zero); else if (tr.playingMode) tr.locateTo(tr.zero, 'play');   // a wind is left alone
         elMsg(`Demo tape loaded: 1 kick · 2 snare · 3 hats · 4 toms · 5-6 overheads · 7 bass · 8 guitar · 24 SMPTE 30 fps (from 01:00:00:00), 1:00 at ${tr.speedIPS} ips, ${d.bpm} BPM.`);
       }
     } catch (err) { elMsg(`Audio could not start: ${err.message}`); }
@@ -66,7 +66,7 @@
       const est = EL.aTake + tr.v * (performance.now() - EL.aTime) / 1000, e = est - tr.take;
       if (Math.abs(e) < 0.3) tr.take += e * 0.25;
     }
-    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS, vari: tr.varispeed || 0 });
+    elPost({ type: 'transport', take: tr.take, v: tr.v, lift: tr.lift, mode: tr.mode, ips: tr.speedIPS, vari: tr.varispeed || 0, rS: tr.rS, rT: tr.rT, acc: tr.acc, eot: tr.endOfTape });
     const master = { tape: AL.mon === 'tape', input: AL.mon === 'input', auto: AL.mon === 'auto' };
     const key = `${AL.mon}|${[...AL.ready].join(',')}|${[...AL.inMon].join(',')}|${[...EL.cue].join(',')}`;
     if (key !== EL.statusKey) { EL.statusKey = key; elPost({ type: 'status', master, ready: [...AL.ready], cue: [...EL.cue], inputs: [...AL.inMon] }); }
@@ -116,6 +116,9 @@
     $('el-power').addEventListener('click', elPower);
     $('el-plate').addEventListener('dblclick', (e) => { e.stopPropagation(); elPower(); });
     $('el-gain').addEventListener('input', (e) => elPost({ type: 'mix', gain: +e.target.value }));
+    const mech = () => elPost({ type: 'machine', level: $('el-mech-on').classList.contains('on') ? +$('el-mech').value : 0 });
+    $('el-mech').addEventListener('input', mech);
+    $('el-mech-on').addEventListener('click', (e) => { e.currentTarget.classList.toggle('on'); mech(); });
     $('el-mute').addEventListener('click', (e) => { const on = e.currentTarget.classList.toggle('on'); elPost({ type: 'mix', mute: on }); });
     const osc = () => { const to = $('el-osc-to').value; elPost({ type: 'osc', on: to !== 'off', to, f: +$('el-osc-f').value, db: +$('el-osc-db').value }); };
     ['el-osc-f', 'el-osc-db', 'el-osc-to'].forEach((id) => $(id).addEventListener('change', osc));
@@ -253,3 +256,4 @@
   // PLAY or RECORD with the electronics off powers them up (the click or key press lets the browser start audio)
   window.AS_AUTOPOWER = () => { if (!EL.on && !EL.starting) { EL.starting = true; elPower().finally(() => { EL.starting = false; }); } };
   tr.locate(tr.zero);   // the session reel starts parked at the counter zero (the head of the demo)
+  window.JH24_NODE = () => EL.node && [EL.ctx, EL.node];   // for testing

@@ -21,6 +21,11 @@ Tape formulations (`TAPES`, made-up names after real reels): Amtex 456 and 499, 
 ATX Master Tape and BAFS Studio Master 900. Each sets the MOL, noise, 1 kHz and 10 kHz sensitivity and the bias it
 wants; `Machine.setTape()` threads one without realigning (the meters show the mismatch until you align for it).
 
+`mechsound.js` is the machine itself in the room (not on tape): two reel-motor whines at each reel's turns x
+armature slots (they glide apart through a wind as the packs trade size, louder under load), tape and air rush with
+speed, rumble and once-per-turn wobble, lifter / brake / pinch-roller solenoid clunks, and the tail flapping when tape
+runs off a reel. Voiced by ear, not measured from a JH-24; MACHINE level and on/off in the electronics window.
+
 Tape transfers (audio files) load as already-reproduced pieces; recording over them erases them like any track.
 Numbers marked (approx) in the source are plausible values, not MCI data.
 

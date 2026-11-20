@@ -360,7 +360,7 @@
   function locate(sec, why) { AL.rehPunch = false; tr.locateTo(counterTake(sec), AL.apl ? 'play' : 'stop'); alMsg(`Locating ${why || ''} ${show2(fmt(sec))}`); }
   const recording = () => tr.mode === 'rec';
   function press(n) {
-    if ((n === 'play' || n === 'record') && window.AS_AUTOPOWER) window.AS_AUTOPOWER();   // a key press may start the audio engine
+    if (['play', 'record', 'rew', 'ff'].includes(n) && window.AS_AUTOPOWER) window.AS_AUTOPOWER();   // a key press may start the audio engine
     if (AL.rep && n !== 'rep' && n !== 'tvi') { AL.rep = false; if (n !== 'stop' && n !== 'play' && n !== 'rew' && n !== 'ff') alMsg('Repeat cancelled'); }
     const d = /^d(\d)$/.exec(n);
     if (d) {
