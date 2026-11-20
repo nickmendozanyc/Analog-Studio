@@ -24,17 +24,17 @@ export const SPEED = {
 };
 export const SPEEDS = [7.5, 15, 30];
 // tape formulations (made-up brand names). ol: recommended operating level, mol: 3 % third harmonic at 1 kHz (nWb/m),
-// noise: hiss relative to the reference tape (dB), sens: 1 kHz sensitivity (dB), bias: extra bias it wants for the
+// ft: length on the reel (5000 ft only on the 14" GP9), noise: hiss relative to the reference tape (dB), sens: 1 kHz sensitivity (dB), bias: extra bias it wants for the
 // same overbias (dB), hf: 10 kHz sensitivity (dB). Relative to a 456-type tape; all (approx).
 export const TAPES = {
-  a456: { short: 'Amtex 456', name: 'Amtex 456 Grand Master', reel: 'a456', ol: 320, mol: 1040, noise: 0, sens: 0, bias: 0, hf: 0 },
-  a499: { short: 'Amtex 499', name: 'Amtex 499 Gold Master', reel: 'a499', ol: 370, mol: 1300, noise: -1, sens: 0.5, bias: 0.5, hf: 0.5 },
-  gp9: { short: 'Quantica GP9', name: 'Quantica GP9 Grand Master Platinum', reel: 'gp9', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5 },
-  gp9_14: { short: 'Quantica GP9 14"', name: 'Quantica GP9 Grand Master Platinum on a 14" reel', reel: 'gp14', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5 },
-  maxwell: { short: 'Maxwell UD', name: 'Maxwell UD Studio', reel: 'maxwell', ol: 320, mol: 1150, noise: -1, sens: 0.3, bias: 0.3, hf: 1 },
-  scotia: { short: 'Scotia 250', name: 'Scotia 250', reel: 'scotia', ol: 250, mol: 1000, noise: 1, sens: -0.5, bias: -0.5, hf: -0.5 },
-  atx: { short: 'ATX Master', name: 'ATX Magnetics Master Tape', reel: 'atx', ol: 400, mol: 1650, noise: -2, sens: 1.5, bias: 1.5, hf: 0 },
-  bafs: { short: 'BAFS SM 900', name: 'BAFS Studio Master 900 maxima', reel: 'bafs', ol: 370, mol: 1500, noise: -2.5, sens: 1, bias: 2, hf: -0.5 },
+  a456: { short: 'Amtex 456', name: 'Amtex 456 Grand Master', reel: 'a456', ol: 320, mol: 1040, noise: 0, sens: 0, bias: 0, hf: 0, ft: 2500 },
+  a499: { short: 'Amtex 499', name: 'Amtex 499 Gold Master', reel: 'a499', ol: 370, mol: 1300, noise: -1, sens: 0.5, bias: 0.5, hf: 0.5, ft: 2500 },
+  gp9: { short: 'Quantica GP9', name: 'Quantica GP9 Grand Master Platinum', reel: 'gp9', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5, ft: 2500 },
+  gp9_14: { short: 'Quantica GP9 14"', name: 'Quantica GP9 Grand Master Platinum on a 14" reel', reel: 'gp14', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5, ft: 5000 },
+  maxwell: { short: 'Maxwell UD', name: 'Maxwell UD Studio', reel: 'maxwell', ol: 320, mol: 1150, noise: -1, sens: 0.3, bias: 0.3, hf: 1, ft: 2500 },
+  scotia: { short: 'Scotia 250', name: 'Scotia 250', reel: 'scotia', ol: 250, mol: 1000, noise: 1, sens: -0.5, bias: -0.5, hf: -0.5, ft: 2500 },
+  atx: { short: 'ATX Master', name: 'ATX Magnetics Master Tape', reel: 'atx', ol: 400, mol: 1650, noise: -2, sens: 1.5, bias: 1.5, hf: 0, ft: 2500 },
+  bafs: { short: 'BAFS SM 900', name: 'BAFS Studio Master 900 maxima', reel: 'bafs', ol: 370, mol: 1500, noise: -2.5, sens: 1, bias: 2, hf: -0.5, ft: 2500 },
 };
 // equalisation standards, playback time constants (s). The JH-24's HI speed (30 ips) is AES; LO switches NAB / IEC.
 export const STANDARD = {

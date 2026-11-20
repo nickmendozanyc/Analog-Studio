@@ -208,6 +208,7 @@
     TP.store[TP.key] = { take: tr.take, zero: tr.zero, stripes: SBX.stripes };
     const sv = TP.store[key] || { take: 0.6, zero: 0.6, stripes: [] };   // a fresh reel: at the head, leader on, no code yet
     TP.key = key;
+    tr.total = t.ft * FT;   // 2500 ft on a 10½" reel, 5000 ft on the 14" GP9
     tr.locate(sv.take); tr.zero = sv.zero; SBX.stripes = sv.stripes;
     setReelSkin('s', t.reel);
     elPost({ type: 'tape', key, params: t });
