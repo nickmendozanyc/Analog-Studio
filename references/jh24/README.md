@@ -56,5 +56,6 @@ AutoLocator III (2.2.4, 2.2.5, 2.3.3):
 - The app offers 7½ ips on the HJ-24 as well; the JH-24 has only 15 and 30.
 - Wind and stop timing are set by the user's requests (winds about 13 m/s, stop from full wind about 2 s), faster
   than the stock machine (85 s rewind of 2500 ft, 4 s stop).
-- The AL-III face has STO / RCL / REH; the manual's unit has STO / RCL / **REP** (8/9 repeat loop), plus **TVI** and
-  **MODE** keys and the TAPE SPEED pot with VAR / FIX LEDs. ←, →, LOC, RST and the keypad match.
+- AL-III now follows section 2: STO stores the locate position, ← / → shift between the displays, 8/9/REP loop,
+  MODE (FIX / VAR), TVI (held: ips and ¼-semitone pitch), TAPE SPEED pot. The A.PLAY and LOC 0 keys are gone
+  (Z still returns to zero from the keyboard).

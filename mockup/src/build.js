@@ -504,8 +504,8 @@ function al3(live = false, st = {}) {
   key('rsttape', 66, 72, 22, 16, 'red', 'RST', 6);
   key('rstloc', 194, 72, 22, 16, 'red', 'RST', 6);
   key('loc', 130, 84, 22, 16, 'blue', 'LOC', 6);
-  key('aplay', 96, 100, 22, 16, 'white', 'A.PLAY', 4.6);
-  key('loc0', 164, 100, 22, 16, 'white', 'LOC 0', 4.6);
+  key('mode', 96, 100, 22, 16, 'white', 'MODE', 5);   // fixed / variable capstan reference (manual 2.2.5)
+  key('tvi', 164, 100, 22, 16, 'white', 'TVI', 6);     // hold: tape velocity (ips) and pitch (¼ semitones)
   // tape speed
   if (live) p('<g data-al="vari" style="cursor:pointer">');
   circle(30, 104, 11, '#000', 'opacity="0.4"'); circle(29, 102, 10, '#171717'); circle(29, 102, 10, 'url(#capHiDark)');
@@ -521,7 +521,7 @@ function al3(live = false, st = {}) {
   // keypad
   const pad = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['◀', '0', '▶']];
   pad.forEach((row, r) => row.forEach((k, c) => key(k === '◀' ? 'left' : k === '▶' ? 'right' : `d${k}`, 286 + c * 34, 10 + r * 26, 28, 21, k.length === 1 && /\d/.test(k) ? 'grey' : 'blue', k, 10)));
-  [['sto', 'STO'], ['rcl', 'RCL'], ['reh', 'REH']].forEach(([n, l], c) => key(n, 286 + c * 34, 114, 28, 21, 'white', l, 7));
+  [['sto', 'STO'], ['rcl', 'RCL'], ['rep', 'REP']].forEach(([n, l], c) => key(n, 286 + c * 34, 114, 28, 21, 'white', l, 7));
   p(`<path d="M318 57 H383 V139 H350" fill="none" stroke="${INK}" stroke-opacity="0.7" stroke-width="0.9"/>`);
   // transport bay
   led('ready', 12, 297, '#ffd23a', 4, 4); text(18, 299, 'RECORD READY', 4.8, INK, 'start', 700);
