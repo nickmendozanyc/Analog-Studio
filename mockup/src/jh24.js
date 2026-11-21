@@ -142,6 +142,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       labels: [0, 180].map((a) => [a, () => `<g>${T(0, 44, 'm', 150, '#111', 'transform="scale(1.18 1)" letter-spacing="-4"')}<text transform="translate(-86 -6) rotate(-90)" font-family="${SANS}" font-size="15" font-weight="800" fill="#111" text-anchor="middle">maxwell</text></g>`]),
       labRGB: '30,30,30', labK: 0.35,
     },
+    m996: {
+      // the 996 as photographed: gold anodised aluminium, three narrow tapered windows, a pale-yellow paper label at the
+      // rim between the top two windows, six small screws round the hub
+      name: '4M 996', ...SILVER, face: silver('#d7ad66', '#dbb26c', '#d2a860', '#dfb773'), edge: 'linear-gradient(90deg,#8d6a2e,#e6c181 40%,#7b5a24)', back: '#9a7638',
+      win: { n: 3, rIn: 0.47, rOut: 0.84, wIn: 0.2, wOut: 0.34, c: 0.07, a0: 60 },
+      labels: [[0, () => `<g><rect x="-40" y="-52" width="80" height="78" rx="2" fill="#f2d98f"/><rect x="-40" y="-52" width="80" height="78" rx="2" fill="none" stroke="#c9a856" stroke-width="0.8"/>${T(0, -27, '4M', 25, '#151515', 'letter-spacing="-1.5"')}<rect x="-30" y="-20" width="62" height="1.6" fill="#151515"/><text x="-28" y="-4" font-family="${SANS}" font-size="15" fill="#151515" font-weight="500">996</text><text x="-28" y="7" font-family="${SANS}" font-size="8" fill="#151515" font-weight="500">Audio</text><text x="-28" y="17" font-family="${SANS}" font-size="8" fill="#151515" font-weight="500">Mastering Tape</text></g>`],
+        ...[22, 78, 148, 208, 262, 322].map((a) => [a, () => `<g><circle cx="0" cy="44" r="4.2" fill="#8f8a78"/><circle cx="0" cy="44" r="3.3" fill="#d8d3c0"/><path d="M-2 42 L2 46 M2 42 L-2 46" stroke="#6d6858" stroke-width="0.9"/></g>`])],
+      labRGB: '242,217,143', labK: 0.45,
+    },
     scotia: {
       // the 250 as photographed: matte aluminium, three wide windows, a solid dark-grey logo between the top two, the
       // number on a small brass plate under it, and three brass screws round the hub (one under the plate, two lower)

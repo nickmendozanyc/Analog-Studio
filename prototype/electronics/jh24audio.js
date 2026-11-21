@@ -32,6 +32,7 @@ export const TAPES = {
   gp9: { short: 'Quantica GP9', name: 'Quantica GP9 Grand Master Platinum', reel: 'gp9', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5, ft: 2500 },
   gp9_14: { short: 'Quantica GP9 14"', name: 'Quantica GP9 Grand Master Platinum on a 14" reel', reel: 'gp14', ol: 400, mol: 1550, noise: -2, sens: 1, bias: 1, hf: 0.5, ft: 5000 },
   maxwell: { short: 'Maxwell UD', name: 'Maxwell UD Studio', reel: 'maxwell', ol: 320, mol: 1150, noise: -1, sens: 0.3, bias: 0.3, hf: 1, ft: 2500 },
+  m996: { short: '4M 996', name: '4M 996 Audio Mastering Tape', reel: 'm996', ol: 400, mol: 1500, noise: -1.5, sens: 1, bias: 1, hf: 0.5, ft: 2500 },
   scotia: { short: 'Scotia 250', name: 'Scotia 250', reel: 'scotia', ol: 250, mol: 1000, noise: 1, sens: -0.5, bias: -0.5, hf: -0.5, ft: 2500 },
   atx: { short: 'ATX Master', name: 'ATX Magnetics Master Tape', reel: 'atx', ol: 400, mol: 1650, noise: -2, sens: 1.5, bias: 1.5, hf: 0, ft: 2500 },
   bafs: { short: 'BAFS SM 900', name: 'BAFS Studio Master 900 maxima', reel: 'bafs', ol: 370, mol: 1500, noise: -2.5, sens: 1, bias: 2, hf: -0.5, ft: 2500 },
