@@ -28,6 +28,15 @@
   .overlay.float .ov-bar button.ov-close{padding:6px 12px}
   .overlay.float .ov-body{position:relative;left:auto;top:auto;width:auto;height:auto}
   .overlay.float .ov-body>svg{display:block}
+  .ovsync{padding:0 0 18px;background:#141210}.ovsync>svg{display:block}
+  .ovsync .sk{display:flex;flex-wrap:wrap;gap:10px;padding:16px 22px 6px;align-items:center}
+  .ovsync .sk button{font:900 17px Archivo,Arial;letter-spacing:1.2px;padding:12px 16px;border-radius:6px;border:1px solid #000;background:#e9e3d3;color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  .ovsync .sk button.on{background:#ffcf5a;box-shadow:0 0 14px rgba(255,190,60,.6),0 4px 0 #0c0b0a}
+  .ovsync .sk button .v{font-family:'JetBrains Mono',monospace;color:#7a4a10;margin-left:6px}
+  .ovsync .sk .gap{width:16px}
+  .ovsync .note{margin:8px 22px 0;max-width:1400px;font:600 16px Archivo,Arial;color:#cfc6b6;line-height:1.5}
+  .ovsync .rd{display:flex;gap:34px;padding:10px 22px 0;font:800 15px Archivo,Arial;letter-spacing:1.5px;color:#a9a594}
+  .ovsync .rd b{font:700 22px 'JetBrains Mono',monospace;color:#7dffd6;margin-left:8px;letter-spacing:0}
   .ov-pick{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#ffb02e;border:0;border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px}
   select.ov-pick{background:#efece4}
   .shot{position:absolute;z-index:50}
@@ -35272,7 +35281,7 @@
 <circle id="rk-sbx-beat" cx="408" cy="18" r="4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
 <text x="408" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#3f5477" text-anchor="middle" font-weight="800" >BEAT</text>
 <text x="430" y="50" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="10" fill="#3f5477" text-anchor="end" font-weight="900" font-style="italic" letter-spacing="1">SYNC BOX</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:50px;top:944px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#1a1b1e" rx="2"/>
+<div style="position:absolute;transform-style:preserve-3d;left:50px;top:910px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#000" rx="2"/>
 <rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.14"/>
 <rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.55"/>
 <circle cx="14" cy="16" r="6" fill="#000" opacity="0.5"/>
@@ -35281,11 +35290,45 @@
 <circle cx="436" cy="16" r="6" fill="#000" opacity="0.5"/>
 <circle cx="436" cy="15" r="5" fill="url(#chrome)" />
 <line x1="436.03008285952905" y1="18.999886876095694" x2="435.96991714047095" y2="11.000113123904308" stroke="#333" stroke-width="1.5"/>
-<rect x="30" y="6" width="390" height="44" fill="#26292e" rx="3"/>
-<text x="44" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="start" font-weight="800" >VST3</text>
-<text x="96" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="16" fill="#e8e4d8" text-anchor="start" font-weight="600" >Plate Reverb</text>
-<text x="406" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="end" font-weight="800" >AUX 2 ▸</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:50px;top:1004px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#121315" rx="2"/>
+<rect x="0" y="0" width="450" height="56" fill="url(#rackBlack)" />
+<text x="24" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#e9e4d6" text-anchor="start" font-weight="900" letter-spacing="2">HOLLIS</text>
+<text x="24" y="36" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#e8a33a" text-anchor="start" font-weight="900" >SG-24</text>
+<text x="24" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.5" fill="#a9a594" text-anchor="start" font-weight="800" letter-spacing="1">MASTER SYNC</text>
+<rect x="104" y="8" width="150" height="40" fill="#120905" rx="2"/>
+<rect x="106" y="10" width="146" height="36" fill="#1c0d06" rx="1.5"/>
+<text class="sg-d1" x="112" y="24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#ffb347" filter="url(#glowSm)">48k 30</text>
+<text class="sg-d2" x="112" y="40" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ffb347" filter="url(#glowSm)">01:00:00:00</text>
+<circle cx="268" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-ref" cx="268" cy="18" r="3.4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="268" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >REF</text>
+<circle cx="292" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-wc" cx="292" cy="18" r="3.4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="292" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >WC</text>
+<circle cx="316" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-bb" cx="316" cy="18" r="3.4" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="316" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >BB</text>
+<circle cx="340" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-tri" cx="340" cy="18" r="3.4" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="340" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >TRI</text>
+<circle cx="364" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-ltc" cx="364" cy="18" r="3.4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
+<text x="364" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >LTC</text>
+<circle cx="388" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-mtc" cx="388" cy="18" r="3.4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
+<text x="388" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >MTC</text>
+<circle cx="412" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-cap" cx="412" cy="18" r="3.4" fill="#59a8ff" opacity="0" filter="url(#glowSm)"/>
+<text x="412" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >CAP</text>
+<circle cx="268" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="268" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="292" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="292" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="316" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="316" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="340" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="340" cy="45" r="2.4" fill="#8d8f94" />
+<text x="364" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="5.5" fill="#77746a" text-anchor="start" font-weight="700" >WORD · BB · TRI</text></svg></div>
+<div style="position:absolute;transform-style:preserve-3d;left:50px;top:970px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#000" rx="2"/>
 <rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.14"/>
 <rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.55"/>
 <circle cx="14" cy="16" r="6" fill="#000" opacity="0.5"/>
@@ -35294,23 +35337,150 @@
 <circle cx="436" cy="16" r="6" fill="#000" opacity="0.5"/>
 <circle cx="436" cy="15" r="5" fill="url(#chrome)" />
 <line x1="436.8863147448976" y1="11.099430019474458" x2="435.1136852551024" y2="18.900569980525542" stroke="#333" stroke-width="1.5"/>
+<rect x="0" y="0" width="450" height="56" fill="#cfcdc7" />
+<rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.5"/>
+<rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.25"/>
+<circle cx="22" cy="12" r="2.2" fill="#5a5652" />
+<circle class="dz-l-wref" cx="22" cy="12" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="13.8" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >WREF</text>
+<circle cx="22" cy="20.4" r="2.2" fill="#5a5652" />
+<circle class="dz-l-mtc" cx="22" cy="20.4" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="22.2" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >MTC</text>
+<circle cx="22" cy="28.8" r="2.2" fill="#5a5652" />
+<circle class="dz-l-efc" cx="22" cy="28.8" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="30.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >EFC</text>
+<circle cx="22" cy="37.2" r="2.2" fill="#5a5652" />
+<circle class="dz-l-chase" cx="22" cy="37.2" r="2.2" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="39" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >CHASE</text>
+<circle cx="22" cy="45.6" r="2.2" fill="#5a5652" />
+<circle class="dz-l-lock" cx="22" cy="45.6" r="2.2" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="47.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >LOCK</text>
+<text x="76" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" letter-spacing="0.6">ENABLE</text>
+<rect x="52" y="10" width="48" height="0.8" fill="#2a2622" />
+<rect x="54.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="54" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="54" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="60.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >W/REC</text>
+<text x="60.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MASTER</text>
+<circle cx="60.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-master" cx="60.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="70.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="70" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="70" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="76.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >S/REC</text>
+<text x="76.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SLAVE</text>
+<circle cx="76.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-slave" cx="76.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="86.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="86" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="86" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="92.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >LEARN</text>
+<text x="92.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MIDI</text>
+<circle cx="92.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-none" cx="92.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="108.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="108" y="28" width="14" height="15" fill="#e0392c" rx="1.5"/>
+<rect x="108" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="115" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SHIFT</text>
+<text x="141" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >GEN    SYSTEM</text>
+<rect x="128.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="128" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="128" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="134" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >COPY</text>
+<text x="134" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >RUN</text>
+<rect x="143.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="143" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="143" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="149" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >GOTO</text>
+<text x="149" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >STOP</text>
+<text x="225" y="10" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.2" fill="#1e3c74" text-anchor="end" font-weight="900" letter-spacing="0.4">ADDISON•SMYTH</text>
+<text x="230" y="10" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.2" fill="#1e3c74" text-anchor="start" font-weight="900" letter-spacing="0.4">DELTA-THREE</text>
+<rect x="164" y="15" width="136" height="17" fill="#1a0503" rx="1"/>
+<rect x="165" y="16" width="134" height="15" fill="#2a0806" rx="1"/>
+<text class="dz-disp" x="168" y="27.6" font-family="'JetBrains Mono', monospace" font-size="11.2" font-weight="700" fill="#ff3a24" filter="url(#glowSm)" letter-spacing="0.6">G_TC 01:00:00:00</text>
+<text x="172" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >DEST</text>
+<text x="196" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >BIN</text>
+<text x="220" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >HOURS</text>
+<text x="244" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >MINUTES</text>
+<text x="268" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >SEC/BAR</text>
+<text x="292" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >FRAMES/BEAT</text>
+<text x="232" y="48" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.8" fill="#3a3632" text-anchor="middle" font-weight="800" letter-spacing="0.3">AUDIO · VIDEO · MIDI   SYNCHRONIZER / CONTROLLER / EMULATOR</text>
+<text x="325" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >DISPLAY</text>
+<rect x="311.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="311" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="311" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="317.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SELECT</text>
+<text x="317.5" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >GROUP</text>
+<rect x="327.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="327" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="327" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="333" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >⧗</text>
+<rect x="346.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="346" y="28" width="14" height="15" fill="#e0392c" rx="1.5"/>
+<rect x="346" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="353" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SHIFT</text>
+<text x="397" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >CURSOR</text>
+<rect x="367.6" y="29.2" width="11" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="367" y="28" width="11" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="367" y="28" width="11" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="372.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >◀</text>
+<rect x="380.6" y="29.2" width="11" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="380" y="28" width="11" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="380" y="28" width="11" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="385.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >▶</text>
+<rect x="393.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="393" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="393" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="399.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >PREV</text>
+<text x="399.5" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MENU</text>
+<rect x="409.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="409" y="28" width="14" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="409" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="416" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >CLEAR</text>
+<text x="416" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >CAPT</text>
+<circle cx="8" cy="10" r="2.6" fill="#8a8780" />
+<circle cx="8" cy="46" r="2.6" fill="#8a8780" />
+<circle cx="442" cy="10" r="2.6" fill="#8a8780" />
+<circle cx="442" cy="46" r="2.6" fill="#8a8780" /></svg></div>
+<div style="position:absolute;transform-style:preserve-3d;left:50px;top:1064px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#1a1b1e" rx="2"/>
+<rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.14"/>
+<rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.55"/>
+<circle cx="14" cy="16" r="6" fill="#000" opacity="0.5"/>
+<circle cx="14" cy="15" r="5" fill="url(#chrome)" />
+<line x1="17.443429152515733" y1="12.96461412218597" x2="10.556570847484268" y2="17.03538587781403" stroke="#333" stroke-width="1.5"/>
+<circle cx="436" cy="16" r="6" fill="#000" opacity="0.5"/>
+<circle cx="436" cy="15" r="5" fill="url(#chrome)" />
+<line x1="439.99080388367355" y1="15.27107999198741" x2="432.00919611632645" y2="14.72892000801259" stroke="#333" stroke-width="1.5"/>
+<rect x="30" y="6" width="390" height="44" fill="#26292e" rx="3"/>
+<text x="44" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="start" font-weight="800" >VST3</text>
+<text x="96" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="16" fill="#e8e4d8" text-anchor="start" font-weight="600" >Plate Reverb</text>
+<text x="406" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="end" font-weight="800" >AUX 2 ▸</text></svg></div>
+<div style="position:absolute;transform-style:preserve-3d;left:50px;top:1124px;width:450px;height:56px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#121315" rx="2"/>
+<rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.14"/>
+<rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.55"/>
+<circle cx="14" cy="16" r="6" fill="#000" opacity="0.5"/>
+<circle cx="14" cy="15" r="5" fill="url(#chrome)" />
+<line x1="17.482964205786537" y1="13.033032704590703" x2="10.517035794213465" y2="16.966967295409297" stroke="#333" stroke-width="1.5"/>
+<circle cx="436" cy="16" r="6" fill="#000" opacity="0.5"/>
+<circle cx="436" cy="15" r="5" fill="url(#chrome)" />
+<line x1="438.44133812687255" y1="11.831424902218917" x2="433.55866187312745" y2="18.168575097781083" stroke="#333" stroke-width="1.5"/>
 <rect x="30" y="6" width="390" height="44" fill="none" rx="3" stroke="#5a5c60" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="225" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#8a877c" text-anchor="middle" font-weight="700" >+ drop a VST3 / AU plugin</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:50px;top:1074px;width:450px;height:116px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="116" viewBox="0 0 450 116" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="116" fill="url(#rackBlack)" rx="2"/>
+<div style="position:absolute;transform-style:preserve-3d;left:50px;top:1194px;width:450px;height:116px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="116" viewBox="0 0 450 116" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="116" fill="url(#rackBlack)" rx="2"/>
 <rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.14"/>
 <rect x="0" y="114" width="450" height="2" fill="#000" opacity="0.55"/>
 <circle cx="14" cy="16" r="6" fill="#000" opacity="0.5"/>
 <circle cx="14" cy="15" r="5" fill="url(#chrome)" />
-<line x1="17.443429152515733" y1="12.96461412218597" x2="10.556570847484268" y2="17.03538587781403" stroke="#333" stroke-width="1.5"/>
+<line x1="14.92597605310874" y1="11.108654686478062" x2="13.07402394689126" y2="18.89134531352194" stroke="#333" stroke-width="1.5"/>
 <circle cx="14" cy="102" r="6" fill="#000" opacity="0.5"/>
 <circle cx="14" cy="101" r="5" fill="url(#chrome)" />
-<line x1="17.99080388367358" y1="101.2710799919874" x2="10.009196116326423" y2="100.7289200080126" stroke="#333" stroke-width="1.5"/>
+<line x1="16.43625601777305" y1="104.17248429718173" x2="11.563743982226951" y2="97.82751570281827" stroke="#333" stroke-width="1.5"/>
 <circle cx="436" cy="16" r="6" fill="#000" opacity="0.5"/>
 <circle cx="436" cy="15" r="5" fill="url(#chrome)" />
-<line x1="439.4829642057865" y1="13.033032704590703" x2="432.5170357942135" y2="16.966967295409297" stroke="#333" stroke-width="1.5"/>
+<line x1="439.9999799803081" y1="15.012655320398833" x2="432.0000200196919" y2="14.987344679601167" stroke="#333" stroke-width="1.5"/>
 <circle cx="436" cy="102" r="6" fill="#000" opacity="0.5"/>
 <circle cx="436" cy="101" r="5" fill="url(#chrome)" />
-<line x1="438.44133812687255" y1="97.83142490221891" x2="433.55866187312745" y2="104.16857509778109" stroke="#333" stroke-width="1.5"/>
+<line x1="439.892390551893" y1="100.0784275440673" x2="432.107609448107" y2="101.9215724559327" stroke="#333" stroke-width="1.5"/>
 <text x="225" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#cfcfcf" text-anchor="middle" font-weight="800" letter-spacing="2">PATCHBAY · INSERTS</text>
 <circle cx="34" cy="46" r="5.6" fill="#5d6066" />
 <circle cx="34" cy="46" r="3.4" fill="#050505" />
@@ -35410,10 +35580,10 @@
 <circle cx="413.5" cy="86" r="5.6" fill="#5d6066" />
 <circle cx="413.5" cy="86" r="3.4" fill="#050505" />
 <text x="18" y="90" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="middle" font-weight="800" >R</text></svg></div>
-      <div style="position:absolute;transform-style:preserve-3d;left:0;top:918px;width:550px;transform:translateZ(2px);text-align:center;font:800 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:3px;color:#d9d3c7">PLUGIN SLOTS</div>
-      <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;transform:translateZ(12px)"><svg width="550" height="2100" style="position:absolute;left:0;top:0;overflow:visible"><path d="M282 1120 C282 1200 84 1240 84 1160" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M282 1120 C282 1200 84 1240 84 1160" fill="none" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/><path d="M282 1120 C282 1200 84 1240 84 1160" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="282" cy="1120" r="7" fill="#c9ccd0"/><circle cx="84" cy="1160" r="7" fill="#c9ccd0"/><path d="M397.5 1120 C397.5 1220 100.5 1260 100.5 1160" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M397.5 1120 C397.5 1220 100.5 1260 100.5 1160" fill="none" stroke="#2f6fb3" stroke-width="7" stroke-linecap="round"/><path d="M397.5 1120 C397.5 1220 100.5 1260 100.5 1160" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="397.5" cy="1120" r="7" fill="#c9ccd0"/><circle cx="100.5" cy="1160" r="7" fill="#c9ccd0"/><path d="M183 1120 C183 1190 414 1230 414 1160" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M183 1120 C183 1190 414 1230 414 1160" fill="none" stroke="#e8c34a" stroke-width="7" stroke-linecap="round"/><path d="M183 1120 C183 1190 414 1230 414 1160" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="183" cy="1120" r="7" fill="#c9ccd0"/><circle cx="414" cy="1160" r="7" fill="#c9ccd0"/></svg></div>
-      <div style="position:absolute;transform-style:preserve-3d;left:50px;top:1218px;width:450px;height:760px;transform:translateZ(2px)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="760" viewBox="0 0 450 760" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="760" fill="#141517" rx="6"/>
-<rect x="0" y="0" width="450" height="760" fill="none" rx="6" stroke="#2c2e32" stroke-width="1.5"/>
+      <div style="position:absolute;transform-style:preserve-3d;left:0;top:1038px;width:550px;transform:translateZ(2px);text-align:center;font:800 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:3px;color:#d9d3c7">PLUGIN SLOTS</div>
+      <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;transform:translateZ(12px)"><svg width="550" height="2100" style="position:absolute;left:0;top:0;overflow:visible"><path d="M282 1240 C282 1320 84 1360 84 1280" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M282 1240 C282 1320 84 1360 84 1280" fill="none" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/><path d="M282 1240 C282 1320 84 1360 84 1280" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="282" cy="1240" r="7" fill="#c9ccd0"/><circle cx="84" cy="1280" r="7" fill="#c9ccd0"/><path d="M397.5 1240 C397.5 1340 100.5 1380 100.5 1280" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M397.5 1240 C397.5 1340 100.5 1380 100.5 1280" fill="none" stroke="#2f6fb3" stroke-width="7" stroke-linecap="round"/><path d="M397.5 1240 C397.5 1340 100.5 1380 100.5 1280" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="397.5" cy="1240" r="7" fill="#c9ccd0"/><circle cx="100.5" cy="1280" r="7" fill="#c9ccd0"/><path d="M183 1240 C183 1310 414 1350 414 1280" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M183 1240 C183 1310 414 1350 414 1280" fill="none" stroke="#e8c34a" stroke-width="7" stroke-linecap="round"/><path d="M183 1240 C183 1310 414 1350 414 1280" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="183" cy="1240" r="7" fill="#c9ccd0"/><circle cx="414" cy="1280" r="7" fill="#c9ccd0"/></svg></div>
+      <div style="position:absolute;transform-style:preserve-3d;left:50px;top:1338px;width:450px;height:640px;transform:translateZ(2px)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="640" viewBox="0 0 450 640" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="640" fill="#141517" rx="6"/>
+<rect x="0" y="0" width="450" height="640" fill="none" rx="6" stroke="#2c2e32" stroke-width="1.5"/>
 <text x="20" y="38" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="18" fill="#e9e3d0" text-anchor="start" font-weight="800" letter-spacing="3">PLUGINS</text>
 <rect x="337" y="15" width="94" height="35" fill="#000" rx="2.5" opacity="0.55"/>
 <rect x="338" y="16" width="92" height="32" fill="#4d3510" rx="2"/>
@@ -35458,17 +35628,7 @@
 <text x="53" y="560" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#c49bff" text-anchor="middle" font-weight="800" >AU</text>
 <text x="88" y="561" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="600" >Vintage EQ</text>
 <text x="416" y="561" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="end" font-weight="600" >⠿ drag</text>
-<rect x="20" y="580" width="410" height="38" fill="#1c1d20" rx="3"/>
-<rect x="30" y="589" width="46" height="20" fill="#1c2a44" rx="2"/>
-<text x="53" y="604" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="middle" font-weight="800" >VST3</text>
-<text x="88" y="605" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="600" >Spring Reverb</text>
-<text x="416" y="605" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="end" font-weight="600" >⠿ drag</text>
-<rect x="20" y="624" width="410" height="38" fill="#17181b" rx="3"/>
-<rect x="30" y="633" width="46" height="20" fill="#1c2a44" rx="2"/>
-<text x="53" y="648" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="middle" font-weight="800" >VST3</text>
-<text x="88" y="649" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="600" >De-Esser</text>
-<text x="416" y="649" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="end" font-weight="600" >⠿ drag</text>
-<text x="225" y="736" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="middle" font-weight="600" >Scan · list · drag into a rack slot</text></svg></div>
+<text x="225" y="616" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="middle" font-weight="600" >Scan · list · drag into a rack slot</text></svg></div>
     </div>
   </div>
 <svg class="smpte-clock" width="330" height="118" viewBox="0 0 330 118" style="position:absolute;left:1351.5562130177514px;top:66px;overflow:visible" aria-label="SMPTE time code wall clock">
@@ -95961,8 +96121,10 @@
 <div class="hot" data-open="meters" style="left:1704px;top:60px;width:1578px;height:606px" title="Open the meter bridge"><span>Open the meter bridge</span></div>
 <div class="hot" data-open="224" style="left:3340px;top:130px;width:450px;height:176px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
 <div class="hot" data-open="224" style="left:2857px;top:1280px;width:296px;height:462px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
-<div class="hot" data-open="patchbay" style="left:3340px;top:1134px;width:450px;height:116px" title="Open the patchbay"><span>Open the patchbay</span></div>
+<div class="hot" data-open="patchbay" style="left:3340px;top:1254px;width:450px;height:116px" title="Open the patchbay"><span>Open the patchbay</span></div>
 <div class="hot" data-open="sbx" style="left:3340px;top:910px;width:450px;height:56px" title="Open the SBX-80 sync box"><span>Open the SBX-80 sync box</span></div>
+<div class="hot" data-open="sg" style="left:3340px;top:970px;width:450px;height:56px" title="Open the SG-24 master sync generator"><span>Open the SG-24 master sync generator</span></div>
+<div class="hot" data-open="dz" style="left:3340px;top:1030px;width:450px;height:56px" title="Open the Delta-Three synchronizer"><span>Open the Delta-Three synchronizer</span></div>
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:664px;top:624px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 <div class="hot" data-open="patchbay" style="left:3480px;top:8px;width:160px;height:40px" title="Open the patchbay"><span>Open the patchbay</span></div>
@@ -100634,6 +100796,153 @@
 <text x="500" y="1637" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#f1f2f4" text-anchor="middle" font-weight="800" letter-spacing="0.4">TAP</text>
 <text x="665" y="1637" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#f1f2f4" text-anchor="middle" font-weight="800" letter-spacing="0.4">SUB TAP</text>
 <text id="sbx-msg" x="133.15" y="1759.1000000000001" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700" fill="#55606f">MANUAL</text></svg></div></div></div>
+<div class="overlay float" id="ov-sg" data-view="sg" hidden><div class="ov-win"><div class="ov-bar"><b>HOLLIS SG-24 MASTER SYNC GENERATOR</b><span class="ov-msg" id="sg-msg"></span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56"><rect x="0" y="0" width="450" height="56" fill="url(#rackBlack)" />
+<text x="24" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#e9e4d6" text-anchor="start" font-weight="900" letter-spacing="2">HOLLIS</text>
+<text x="24" y="36" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#e8a33a" text-anchor="start" font-weight="900" >SG-24</text>
+<text x="24" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.5" fill="#a9a594" text-anchor="start" font-weight="800" letter-spacing="1">MASTER SYNC</text>
+<rect x="104" y="8" width="150" height="40" fill="#120905" rx="2"/>
+<rect x="106" y="10" width="146" height="36" fill="#1c0d06" rx="1.5"/>
+<text class="sg-d1" x="112" y="24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#ffb347" filter="url(#glowSm)">48k 30</text>
+<text class="sg-d2" x="112" y="40" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ffb347" filter="url(#glowSm)">01:00:00:00</text>
+<circle cx="268" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-ref" cx="268" cy="18" r="3.4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="268" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >REF</text>
+<circle cx="292" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-wc" cx="292" cy="18" r="3.4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="292" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >WC</text>
+<circle cx="316" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-bb" cx="316" cy="18" r="3.4" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="316" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >BB</text>
+<circle cx="340" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-tri" cx="340" cy="18" r="3.4" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="340" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >TRI</text>
+<circle cx="364" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-ltc" cx="364" cy="18" r="3.4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
+<text x="364" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >LTC</text>
+<circle cx="388" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-mtc" cx="388" cy="18" r="3.4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
+<text x="388" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >MTC</text>
+<circle cx="412" cy="18" r="3.4" fill="#1d1512" />
+<circle class="sg-l-cap" cx="412" cy="18" r="3.4" fill="#59a8ff" opacity="0" filter="url(#glowSm)"/>
+<text x="412" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6" fill="#cfc8b8" text-anchor="middle" font-weight="800" >CAP</text>
+<circle cx="268" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="268" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="292" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="292" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="316" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="316" cy="45" r="2.4" fill="#8d8f94" />
+<circle cx="340" cy="45" r="4.2" fill="#0b0b0c" />
+<circle cx="340" cy="45" r="2.4" fill="#8d8f94" />
+<text x="364" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="5.5" fill="#77746a" text-anchor="start" font-weight="700" >WORD · BB · TRI</text></svg>
+  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 9.6 kHz capstan reference into the HJ-24's EXT input">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
+  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 9.6 kHz capstan reference. Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div></div></div></div>
+<div class="overlay float" id="ov-dz" data-view="dz" hidden><div class="ov-win"><div class="ov-bar"><b>ADDISON-SMYTH DELTA-THREE SYNCHRONIZER</b><span class="ov-msg" id="dz-msg"></span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56"><rect x="0" y="0" width="450" height="56" fill="#cfcdc7" />
+<rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.5"/>
+<rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.25"/>
+<circle cx="22" cy="12" r="2.2" fill="#5a5652" />
+<circle class="dz-l-wref" cx="22" cy="12" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="13.8" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >WREF</text>
+<circle cx="22" cy="20.4" r="2.2" fill="#5a5652" />
+<circle class="dz-l-mtc" cx="22" cy="20.4" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="22.2" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >MTC</text>
+<circle cx="22" cy="28.8" r="2.2" fill="#5a5652" />
+<circle class="dz-l-efc" cx="22" cy="28.8" r="2.2" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="30.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >EFC</text>
+<circle cx="22" cy="37.2" r="2.2" fill="#5a5652" />
+<circle class="dz-l-chase" cx="22" cy="37.2" r="2.2" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="39" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >CHASE</text>
+<circle cx="22" cy="45.6" r="2.2" fill="#5a5652" />
+<circle class="dz-l-lock" cx="22" cy="45.6" r="2.2" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="27" y="47.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#3a3632" text-anchor="start" font-weight="800" >LOCK</text>
+<text x="76" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" letter-spacing="0.6">ENABLE</text>
+<rect x="52" y="10" width="48" height="0.8" fill="#2a2622" />
+<rect x="54.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="54" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="54" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="60.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >W/REC</text>
+<text x="60.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MASTER</text>
+<circle cx="60.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-master" cx="60.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="70.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="70" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="70" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="76.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >S/REC</text>
+<text x="76.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SLAVE</text>
+<circle cx="76.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-slave" cx="76.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="86.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="86" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="86" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="92.5" y="17" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >LEARN</text>
+<text x="92.5" y="21.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MIDI</text>
+<circle cx="92.5" cy="25.2" r="1.6" fill="#4a2a22" />
+<circle class="dz-k-none" cx="92.5" cy="25.2" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>
+<rect x="108.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="108" y="28" width="14" height="15" fill="#e0392c" rx="1.5"/>
+<rect x="108" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="115" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SHIFT</text>
+<text x="141" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >GEN    SYSTEM</text>
+<rect x="128.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="128" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="128" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="134" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >COPY</text>
+<text x="134" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >RUN</text>
+<rect x="143.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="143" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="143" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="149" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >GOTO</text>
+<text x="149" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >STOP</text>
+<text x="225" y="10" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.2" fill="#1e3c74" text-anchor="end" font-weight="900" letter-spacing="0.4">ADDISON•SMYTH</text>
+<text x="230" y="10" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.2" fill="#1e3c74" text-anchor="start" font-weight="900" letter-spacing="0.4">DELTA-THREE</text>
+<rect x="164" y="15" width="136" height="17" fill="#1a0503" rx="1"/>
+<rect x="165" y="16" width="134" height="15" fill="#2a0806" rx="1"/>
+<text class="dz-disp" x="168" y="27.6" font-family="'JetBrains Mono', monospace" font-size="11.2" font-weight="700" fill="#ff3a24" filter="url(#glowSm)" letter-spacing="0.6">G_TC 01:00:00:00</text>
+<text x="172" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >DEST</text>
+<text x="196" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >BIN</text>
+<text x="220" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >HOURS</text>
+<text x="244" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >MINUTES</text>
+<text x="268" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >SEC/BAR</text>
+<text x="292" y="37.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.4" fill="#3a3632" text-anchor="middle" font-weight="800" >FRAMES/BEAT</text>
+<text x="232" y="48" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.8" fill="#3a3632" text-anchor="middle" font-weight="800" letter-spacing="0.3">AUDIO · VIDEO · MIDI   SYNCHRONIZER / CONTROLLER / EMULATOR</text>
+<text x="325" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >DISPLAY</text>
+<rect x="311.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="311" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="311" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="317.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SELECT</text>
+<text x="317.5" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >GROUP</text>
+<rect x="327.6" y="29.2" width="12" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="327" y="28" width="12" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="327" y="28" width="12" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="333" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >⧗</text>
+<rect x="346.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="346" y="28" width="14" height="15" fill="#e0392c" rx="1.5"/>
+<rect x="346" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="353" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >SHIFT</text>
+<text x="397" y="9" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.6" fill="#2a2622" text-anchor="middle" font-weight="900" >CURSOR</text>
+<rect x="367.6" y="29.2" width="11" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="367" y="28" width="11" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="367" y="28" width="11" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="372.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >◀</text>
+<rect x="380.6" y="29.2" width="11" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="380" y="28" width="11" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="380" y="28" width="11" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="385.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >▶</text>
+<rect x="393.6" y="29.2" width="13" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="393" y="28" width="13" height="15" fill="#2f7fd0" rx="1.5"/>
+<rect x="393" y="28" width="13" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="399.5" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >PREV</text>
+<text x="399.5" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >MENU</text>
+<rect x="409.6" y="29.2" width="14" height="15" fill="#000" opacity="0.35" rx="1.5"/>
+<rect x="409" y="28" width="14" height="15" fill="#9a9a96" rx="1.5"/>
+<rect x="409" y="28" width="14" height="5.25" fill="#fff" opacity="0.2" rx="1.5"/>
+<text x="416" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >CLEAR</text>
+<text x="416" y="26.4" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#2a2622" text-anchor="middle" font-weight="900" >CAPT</text>
+<circle cx="8" cy="10" r="2.6" fill="#8a8780" />
+<circle cx="8" cy="46" r="2.6" fill="#8a8780" />
+<circle cx="442" cy="10" r="2.6" fill="#8a8780" />
+<circle cx="442" cy="46" r="2.6" fill="#8a8780" /></svg>
+  <div class="sk"><button type="button" data-dz="chase" title="Slave the HJ-24 to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
+  <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div></div></div></div></div>
 <div class="overlay float" id="ov-strip" data-view="strip" hidden><div class="ov-win"><div class="ov-bar"><b>CHANNEL</b><span class="ov-msg" id="strip-title"></span><span class="ov-msg" id="strip-val"></span><button class="ov-close" type="button">✕</button></div><div class="ov-body"><svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg></div></div></div>
 <div class="overlay" id="ov-meters" data-view="meters" hidden><div class="ov-bar"><b>HJ-24 METER BRIDGE</b><button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body"><svg width="3840" height="2104" viewBox="0 0 3840 2104" style="display:block"><rect x="0" y="0" width="3840" height="2104" fill="url(#deck)" />
 <rect x="0" y="0" width="3840" height="2104" fill="#000" opacity="0.45"/>
@@ -102609,22 +102918,22 @@
 <rect x="3250" y="680" width="40" height="14" fill="#0b0b0c" rx="3"/>
 <circle cx="1940" cy="691" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1940" cy="690" r="12" fill="url(#chrome)" />
-<line x1="1942.222342527461" y1="680.6607712475474" x2="1937.777657472539" y2="699.3392287524526" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1946.53346217119" y1="697.033766562634" x2="1933.46653782881" y2="682.966233437366" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="3620" cy="691" r="13" fill="#000" opacity="0.5"/>
 <circle cx="3620" cy="690" r="12" fill="url(#chrome)" />
-<line x1="3625.847014442655" y1="697.6139623132361" x2="3614.152985557345" y2="682.3860376867639" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="3629.434727534198" y1="688.2263268746907" x2="3610.565272465802" y2="691.7736731253093" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="1940" cy="1239" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1940" cy="1238" r="12" fill="url(#chrome)" />
-<line x1="1949.5999519527395" y1="1238.0303727689572" x2="1930.4000480472605" y2="1237.9696272310428" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1948.7597961966937" y1="1234.0724090599467" x2="1931.2402038033063" y2="1241.9275909400533" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="3620" cy="1239" r="13" fill="#000" opacity="0.5"/>
 <circle cx="3620" cy="1238" r="12" fill="url(#chrome)" />
-<line x1="3629.3417373245434" y1="1235.7882261057614" x2="3610.6582626754566" y2="1240.2117738942384" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="3629.316658036862" y1="1240.3151421174896" x2="3610.683341963138" y2="1235.6848578825104" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="2780" cy="675" r="13" fill="#000" opacity="0.5"/>
 <circle cx="2780" cy="674" r="12" fill="url(#chrome)" />
-<line x1="2786.53346217119" y1="681.033766562634" x2="2773.46653782881" y2="666.966233437366" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="2789.590393687527" y1="674.4293587290889" x2="2770.409606312473" y2="673.5706412709111" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="2780" cy="1255" r="13" fill="#000" opacity="0.5"/>
 <circle cx="2780" cy="1254" r="12" fill="url(#chrome)" />
-<line x1="2789.434727534198" y1="1252.2263268746908" x2="2770.565272465802" y2="1255.7736731253092" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="2784.3455670510893" y1="1262.5601429313117" x2="2775.6544329489107" y2="1245.4398570686883" stroke="#333" stroke-width="3.5999999999999996"/>
 <rect x="2120" y="899.2" width="1320" height="110.16000000000001" fill="#2f6db3" />
 <rect x="2160" y="919.2" width="220" height="70.16000000000001" fill="none" stroke="#f2f4f8" stroke-width="4"/>
 <text x="2270" y="976.2800000000001" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="60" fill="#f2f4f8" text-anchor="middle" font-weight="900" >leximan</text>
@@ -104397,6 +104706,138 @@ class ClockOut {
     }
   }
 }
+
+// Chase synchronizer: makes a slave tape transport follow master time code, the job of a two-machine synchronizer
+// (Adams-Smith Zeta-Three style). Renderer-independent: the app, the Node tests and the native engine share it.
+//
+//   master code ──> CodeTracker (flywheel PLL: smooth position + speed from jittery MTC quarter frames / LTC frames)
+//                         │
+//   slave code ───────────┼──> Chaser: error = master + offset − slave
+//                         │     PARK   master stopped: wind the slave to the master position, stop there
+//                         │     CUE    master rolling, slave far: wind to a lead-in point ahead, wait, drop into play
+//                         │     PULL   playing, error under a second: speed loop on the capstan (vari-speed / ext ref)
+//                         │     LOCK   error inside the phase window: resolve (speed held, slow trim only)
+//                         └──> commands to the slave: locate / play / stop / capstan speed
+//
+// Times are in seconds of time code. Speeds are ratios (1 = nominal play speed).
+
+class CodeTracker {
+  // fps: the code's frame rate (sets the quantisation the tracker expects); flywheel: seconds to coast without code
+  constructor({ fps = 30, flywheel = 0.5, bw = 2.0 } = {}) {
+    this.fps = fps; this.flywheel = flywheel; this.bw = bw;
+    this.pos = null; this.rate = 0; this.lastIn = -1e9; this.t = 0; this.locked = false;
+  }
+  // a code value arrived at local time t (seconds)
+  input(t, code) {
+    if (this.pos === null || Math.abs(code - this.predict(t)) > 0.5) {   // first code, or a jump: restart the flywheel
+      this.pos = code; this.t = t; this.rate = this.lastCode != null && t > this.lastIn && t - this.lastIn < 0.2 ? Math.max(-2, Math.min(2, (code - this.lastCode) / (t - this.lastIn))) : this.rate;
+      this.lastIn = t; this.lastCode = code; this.locked = false; return;
+    }
+    // second-order tracking loop (critically damped): phase and frequency follow the code, jitter is filtered out
+    const p = this.predict(t), e = code - p, dt = Math.max(1e-4, t - this.t);
+    const w = 2 * Math.PI * this.bw, kp = Math.min(1, 2 * w * dt), ki = w * w * dt;
+    this.pos = p + kp * e; this.rate += ki * e; this.t = t;
+    this.lastIn = t; this.lastCode = code; this.locked = true;
+  }
+  predict(t) { return this.pos === null ? null : this.pos + this.rate * (t - this.t); }
+  // the master's position and speed now; running = code still arriving (or coasting through a short dropout)
+  read(t) {
+    if (this.pos === null) return { valid: false, running: false, pos: null, rate: 0 };
+    const coasting = t - this.lastIn, running = coasting < this.flywheel && Math.abs(this.rate) > 0.05;
+    if (!running && coasting >= this.flywheel) { this.pos = this.predict(this.lastIn); this.t = this.lastIn; this.rate = 0; }
+    return { valid: true, running, pos: running ? this.predict(t) : this.pos, rate: running ? this.rate : 0 };
+  }
+}
+
+const CHASE = {
+  parkWindow: 2 / 30,      // s: a stopped slave within this of its target stays parked
+  cueLead: 3.0,            // s: when chasing from far away, cue this far ahead of the master and wait for it
+  playWindow: 1.0,         // s: farther than this while rolling = wind (cue) instead of the speed loop
+  spinup: 0.3,             // s: time the slave takes from STOP to play speed
+  windRate: 9,             // code seconds per second the slave covers in a wind, on average (first cue estimate)
+  windSettle: 3.5,         // s: a wind's spool-up and easing onto the cue
+  pullKp: 3.0,             // 1/s: speed loop gain while pulling in
+  pullKi: 1.5,            // 1/s^2
+  maxPull: 0.12,           // max speed correction while pulling in (fraction)
+  lockIn: 0.1 / 30,        // s: inside a tenth of a frame for lockHold seconds = LOCK (phase lock)
+  lockOut: 2 / 30,         // s: drifting past this drops back to PULL
+  lockHold: 1.0,
+  resolveKp: 0.3,          // 1/s: in LOCK only a slow trim moves the capstan: tape speed stays steady
+  resolveMax: 0.002,       // ±0.2 % trim at most
+  resolveTau: 3.0,
+  resolveKpRef: 0.06,      // 1/s: with a house reference nothing can drift, so the phase trim can be much gentler         // s: in LOCK the master's speed is averaged this long before it moves the capstan
+};
+
+class Chaser {
+  constructor(opts = {}) {
+    this.c = { ...CHASE, ...opts };
+    this.offset = 0;           // slave = master + offset
+    this.state = 'IDLE';       // IDLE | PARK | CUE | WAIT | PULL | LOCK
+    this.integ = 0; this.speed = 0; this.inWin = 0; this.cueAt = null; this.enabled = true;
+    this.ref = null;           // house reference speed ratio (1 = nominal, 1.001 = pulled up) when master and slave share a sync generator
+    this.time = 0; this.lead = this.c.cueLead; this.locStart = 0;   // the cue lead adapts to how long this slave takes to wind
+  }
+  // m: { running, pos, rate } (CodeTracker.read) ; s: { code (slave time code or null), mode, playing (capstan locked
+  // at speed), stopped }. Returns commands: { locate?: code, play?: true, stop?: true, speed: fraction }.
+  update(dt, m, s) {
+    const c = this.c, out = { speed: this.speed }; this.time += dt;
+    const cue = (target, rate) => {
+      if (!this.learned) { const far = Math.abs(target - s.code); this.lead = Math.max(c.cueLead, (far / c.windRate + c.windSettle) * 1.15 + c.spinup); }   // first wind: estimate from the distance
+      this.cueAt = target + this.lead * rate; this.locStart = this.time; this.state = 'CUE'; return this.cueAt;
+    };
+    if (!this.enabled || !m.valid) { this.state = 'IDLE'; this.speed = 0; this.integ = 0; this.rateAvg = null; return { speed: 0 }; }
+    const target = m.pos + this.offset;
+    if (s.code == null) { this.state = 'CUE'; return out; }   // no code under the slave's heads yet
+    const err = target - s.code;   // + = slave behind
+    if (!m.running) {
+      // master stopped: park the slave on the same frame
+      this.integ = 0; this.speed = 0; out.speed = 0;
+      if (Math.abs(err) > c.parkWindow) { if (this.state !== 'PARK' || s.stopped) out.locate = target; this.state = 'PARK'; }
+      else { if (!s.stopped) out.stop = true; this.state = 'PARK'; }
+      return out;
+    }
+    // master rolling
+    if (this.state === 'WAIT') {
+      // parked on the cue point: drop into play when the master arrives (minus the slave's spin-up)
+      const eta = (this.cueAt - target) / Math.max(0.1, m.rate);
+      if (eta < 0) { if (!this.justLearned) this.lead = Math.min(60, this.lead * 1.3 + 0.5); this.justLearned = false; out.locate = cue(target, m.rate); return out; }   // the master beat us here: cue further ahead
+      this.justLearned = false;   // the master beat us here: cue further ahead
+      if (eta <= c.spinup) { out.play = true; this.state = 'PULL'; this.integ = 0; }
+      return out;
+    }
+    if (!s.playing && !(this.state === 'PULL' && s.starting)) {
+      if (Math.abs(err) < c.playWindow && s.stopped) { out.play = true; this.state = 'PULL'; this.integ = 0; return out; }
+      if (this.state === 'CUE' && s.stopped && this.cueAt != null && Math.abs(s.code - this.cueAt) < c.parkWindow * 3) {
+        // arrived on the cue: learn how long that wind took, so the next cue is placed far enough ahead
+        const took = this.time - this.locStart; this.lead = Math.max(c.cueLead, Math.min(60, took * 1.2 + c.spinup + 0.5)); this.learned = true;
+        this.state = 'WAIT'; this.justLearned = true; return out;
+      }
+      if (this.state !== 'CUE') out.locate = cue(target, m.rate);
+      return out;
+    }
+    if (Math.abs(err) > c.playWindow) { out.locate = cue(target, m.rate); this.integ = 0; this.speed = 0; out.speed = 0; return out; }
+    // speed loop on the capstan: feed-forward the master's speed, PI on the position error. The master's speed is
+    // averaged (fast while pulling in, slow once locked) so MTC delivery jitter never reaches the capstan
+    const tau = this.state === 'LOCK' ? c.resolveTau : 0.25;
+    this.rateAvg = this.rateAvg == null ? m.rate : this.rateAvg + (m.rate - this.rateAvg) * Math.min(1, dt / tau);
+    // with a house reference the master's speed is known exactly (both run off the same crystal): resolve to it
+    const ff = (this.ref != null && m.running ? this.ref : this.rateAvg) - 1;
+    if (this.state === 'LOCK') {
+      const kp = this.ref != null ? c.resolveKpRef : c.resolveKp;
+      this.speed = ff + Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + kp * err));
+      this.integ = Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + kp * 0.15 * err * dt));
+      if (Math.abs(err) > c.lockOut) { this.state = 'PULL'; this.inWin = 0; }
+    } else {
+      this.integ = Math.max(-c.maxPull, Math.min(c.maxPull, this.integ + c.pullKi * err * dt));
+      this.speed = ff + Math.max(-c.maxPull, Math.min(c.maxPull, c.pullKp * err + this.integ));
+      this.state = 'PULL';
+      this.inWin = Math.abs(err) < c.lockIn ? this.inWin + dt : 0;
+      if (this.inWin > c.lockHold) { this.state = 'LOCK'; this.integ = 0; }   // the speed feed-forward already carries the master's speed: lock starts from no trim
+    }
+    out.speed = this.speed; out.err = err;
+    return out;
+  }
+}
 </script>
 <script>// Analog Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
 (() => {
@@ -105937,13 +106378,167 @@ class ClockOut {
       } catch (err) { fsay(`${err.code ? `${err.code}: ` : ''}${err.message || err}`); }
     });
   }
+  // ---------------- house sync generator (Hollis SG-24) and two-machine synchronizer (Addison-Smyth Delta-Three) ------
+  // SG-24: the studio's master clock. Word clock, black burst (NTSC / PAL), tri-level, a capstan reference for the tape
+  // machine and a time-code generator (LTC + MTC). Pull-up / pull-down moves all of them together.
+  // Delta-Three: chases the HJ-24 (slave, code read off track 24) to a master: the SG-24's generator, or MTC from a DAW.
+  // With the SG-24's reference on the capstan and the master on the same house sync, it resolves to the reference.
+  const SG = {
+    rates: [44100, 48000, 88200, 96000, 176400, 192000], rateI: 1,
+    pulls: [0, 0.001, -0.001, 0.04, -0.04], pullI: 0,
+    videos: [['NTSC', 29.97, true], ['NTSC', 29.97, false], ['PAL', 25, false], ['FILM', 24, false], ['TC', 30, false]], videoI: 4,
+    run: false, tc: 3600, start: 3600, capRef: true, mtcOut: null, lastQF: null, phase: 0,
+  };
+  const DZ = { on: false, src: 'gen', ref: true, trk: new CodeTracker({ flywheel: 0.6 }), ch: new Chaser(), mtc: { pieces: [], F: null, fps: 30, k: -1 }, msg: '' };
+  const sgRef = () => 1 + SG.pulls[SG.pullI];
+  const sgFps = () => SG.videos[SG.videoI][1];
+  const tcStr = (sec, fps) => { const f = Math.round(fps), n = Math.floor(sec * fps + 1e-6); const fr = ((n % f) + f) % f, s = Math.floor(n / f); return `${String(Math.floor(s / 3600) % 24).padStart(2, '0')}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`; };
+  // the slave's code on tape <-> its tape position (the stripes on the reel, as the SBX reads them)
+  // (the stripes hold code relative to 01:00:00:00, as the wall clock shows it; the synchronizer works in absolute time code)
+  const slaveCode = () => { const c = tapeCode(tr.take); return c == null ? null : 3600 + c; };
+  const codeToTake = (abs) => { const code = abs - 3600; for (const s of SBX.stripes) { const tk = s.take0 + (code - s.code0) * s.speed; if (tk >= s.take0 - 1 && tk <= s.take1 + 1) return Math.max(0, Math.min(tr.total, tk)); } return null; };
+  // MIDI: MTC in (quarter frames + full frame), MTC out from the generator
+  let sgMidi = null;
+  async function sgMidiAccess() { if (sgMidi) return sgMidi; if (!navigator.requestMIDIAccess) throw new Error('this browser has no Web MIDI (use Chrome or Edge)'); sgMidi = await navigator.requestMIDIAccess({ sysex: true }).catch(() => navigator.requestMIDIAccess()); return sgMidi; }
+  function mtcIn(e) {
+    const d = e.data, t = (e.timeStamp || performance.now()) / 1000, M = DZ.mtc;
+    if (d[0] === 0xf1) {   // quarter frame: piece n carries a nibble; piece 0 goes out at the start of the frame it describes
+      const n = d[1] >> 4, v = d[1] & 15; M.pieces[n] = v;
+      if (n === 7) {
+        const p = M.pieces, fr = p[0] | (p[1] << 4), sc = p[2] | (p[3] << 4), mn = p[4] | (p[5] << 4), hr = p[6] | ((p[7] & 1) << 4), ty = (p[7] >> 1) & 3;
+        M.fps = [24, 25, 29.97, 30][ty]; M.F = ((hr * 60 + mn) * 60 + sc) + fr / Math.round(M.fps) + 2 / M.fps;   // the set described 2 frames ago
+        M.base = M.F - 8 / 4 / M.fps;
+      }
+      if (M.F != null) { const pos = M.base + (n + 8 * (n < 7 ? 1 : 0)) / 4 / M.fps; DZ.trk.input(t, pos); }
+    } else if (d[0] === 0xf0 && d[1] === 0x7f && d[3] === 0x01 && d[4] === 0x01) {   // full frame: a locate on the master
+      const ty = (d[5] >> 5) & 3, hr = d[5] & 31; M.fps = [24, 25, 29.97, 30][ty];
+      const pos = ((hr * 60 + d[6]) * 60 + d[7]) + d[8] / Math.round(M.fps); M.F = null; DZ.trk.pos = null; DZ.trk.input(t, pos);
+    }
+  }
+  async function dzListen(on) {
+    try { const m = await sgMidiAccess(); for (const i of m.inputs.values()) i.onmidimessage = on ? mtcIn : null; sgSay(on ? `Listening for MTC on ${[...m.inputs.values()].map((i) => i.name).join(', ') || 'no MIDI inputs'}` : ''); }
+    catch (err) { sgSay(`MTC in: ${err.message}`); }
+  }
+  // generator: time code advances at the reference speed; MTC quarter frames go to the tracker (and the MIDI port)
+  function sgTick(dt, now) {
+    const ref = sgRef(), fps = sgFps();
+    SG.phase = (SG.phase + dt * ref * fps) % 2;   // drives the frame / field LEDs
+    if (SG.run) {
+      const t0 = SG.tc; SG.tc += dt * ref;
+      const q = 1 / (4 * fps);   // quarter frame
+      for (let k = Math.ceil(t0 / q); k * q <= SG.tc; k++) {
+        const tq = now / 1000 - (SG.tc - k * q) / ref;
+        if (DZ.src === 'gen') DZ.trk.input(tq, k * q);
+        if (SG.mtcOut) sgSendQF(k, fps, tq);
+      }
+    } else if (DZ.src === 'gen' && (!DZ.trk.lastStop || now - DZ.trk.lastStop > 200)) { DZ.trk.lastStop = now; DZ.trk.pos = null; DZ.trk.input(now / 1000, SG.tc); }
+  }
+  function sgSendQF(k, fps, tq) {
+    const f = Math.round(fps), n = k % 8, base = Math.floor(k / 8) * 8 / 4 / fps, sec = Math.floor(base + 1e-9), fr = Math.round((base - sec) * fps) % f;
+    const hr = Math.floor(sec / 3600) % 24, mn = Math.floor(sec / 60) % 60, sc = sec % 60, ty = fps === 24 ? 0 : fps === 25 ? 1 : fps === 30 ? 3 : 2;
+    const nib = [fr & 15, fr >> 4, sc & 15, sc >> 4, mn & 15, mn >> 4, hr & 15, (hr >> 4) | (ty << 1)][n];
+    try { SG.mtcOut.send([0xf1, (n << 4) | nib], tq * 1000); } catch (e) { /* port went away */ }
+  }
+  // synchronizer servo: runs at 100 Hz inside the transport's time step, whatever the screen's frame rate
+  function syncAdvance(dt, now) {
+    if (!DZ.on) { tr.advance(dt); return; }
+    const h = 0.01; let t = 0;
+    // master and slave are read at the same instant: the start of each 10 ms step, before the tape moves
+    while (t < dt - 1e-9) { const st = Math.min(h, dt - t); dzStep(st, now / 1000 - (dt - t)); tr.advance(st); t += st; }
+  }
+  function dzStep(dt, tNow) {
+    const m = DZ.trk.read(tNow);
+    DZ.ch.ref = DZ.ref && SG.capRef ? sgRef() : null;
+    {
+      const ps = tr.playSpeed, atSpeed = tr.mode === 'play' && tr.pinch > 0.5 && Math.abs(tr.v - ps) < 0.01 * ps;
+      const code = slaveCode();
+      const o = DZ.ch.update(dt, m, { code, playing: atSpeed, starting: tr.mode === 'play' && !atSpeed, stopped: tr.mode === 'stop' && Math.abs(tr.v) < 1e-3 });
+      if (o.locate != null) { const tk = codeToTake(o.locate); if (tk != null) { AL.rehPunch = false; tr.locateTo(tk, 'stop'); } }
+      if (o.play) tr.command('play');
+      if (o.stop) tr.command('stop');
+      tr.setVarispeed(o.speed || 0);
+      DZ.err = code != null && m.valid ? m.pos + DZ.ch.offset - code : null;
+    }
+  }
+  // every frame: the generator's reference on the capstan when not chasing, and the displays
+  function dzTick(dt) {
+    const m = DZ.trk.read(performance.now() / 1000);
+    if (DZ.on) { /* the servo runs in syncAdvance */ } else if (SG.capRef) {
+      // not chasing, but the capstan runs off the SG-24's reference: pull-up / down moves the tape too
+      tr.setVarispeed(SG.pulls[SG.pullI] + (AL.varOn ? AL.vari : 0));
+    }
+    dzDraw(m);
+  }
+  // ---- displays and lamps (rack units and their pop-ups share classes)
+  const sgAll = (sel, f) => document.querySelectorAll(sel).forEach(f);
+  const sgLamp = (cls, on) => sgAll(cls, (e) => { const v = on ? 1 : 0; if (e._v !== v) { e._v = v; e.setAttribute('opacity', v); } });
+  const sgTxt = (cls, s) => sgAll(cls, (e) => { if (e.textContent !== s) e.textContent = s; });
+  const sgSay = (s) => { DZ.msg = s; const el = document.getElementById('sg-msg'); if (el) el.textContent = s; const z = document.getElementById('dz-msg'); if (z) z.textContent = s; };
+  function dzDraw(m) {
+    const fps = sgFps(), v = SG.videos[SG.videoI], r = SG.rates[SG.rateI], pull = SG.pulls[SG.pullI];
+    sgTxt('.sg-d1', `${(r / 1000).toFixed(r % 1000 ? 1 : 0)}k ${v[0]} ${v[1]}${v[2] ? 'DF' : ''} ${pull ? (pull > 0 ? '+' : '') + (pull * 100).toFixed(1) + '%' : ''}`.trim());
+    sgTxt('.sg-d2', tcStr(SG.tc, fps));
+    const blink = SG.phase % 1 < 0.5;
+    sgLamp('.sg-l-ref', true); sgLamp('.sg-l-wc', true); sgLamp('.sg-l-bb', blink); sgLamp('.sg-l-tri', !blink); sgLamp('.sg-l-ltc', SG.run && blink); sgLamp('.sg-l-mtc', SG.run && !!SG.mtcOut); sgLamp('.sg-l-cap', SG.capRef);
+    // synchronizer: G_TC (generator / master) or the slave's offset error
+    const st = DZ.ch.state, locked = DZ.on && st === 'LOCK', chasing = DZ.on && st !== 'IDLE';
+    let line;
+    if (!DZ.on) line = `${DZ.src === 'gen' ? 'G' : 'M'}_TC ${m.valid ? tcStr(m.pos, fps) : '--:--:--:--'}`;
+    else if (DZ.err != null && Math.abs(DZ.err) < 10) line = `${st.padEnd(4)} ${DZ.err >= 0 ? '+' : '-'}${(Math.abs(DZ.err) * fps).toFixed(2).padStart(5, '0')}F`;
+    else line = `${st.padEnd(4)} ${m.valid ? tcStr(m.pos, fps) : '--:--:--:--'}`;
+    sgTxt('.dz-disp', line.slice(0, 16));
+    sgLamp('.dz-l-wref', DZ.ref && SG.capRef); sgLamp('.dz-l-mtc', DZ.src === 'mtc' && m.running); sgLamp('.dz-l-efc', DZ.src === 'gen' && m.running);
+    sgLamp('.dz-l-chase', chasing && !locked); sgLamp('.dz-l-lock', locked);
+    sgLamp('.dz-k-master', DZ.on); sgLamp('.dz-k-slave', DZ.on && chasing);
+    // pop-up readouts
+    sgTxt('#dz-state', DZ.on ? ({ PARK: 'PARKED', CUE: 'WINDING TO CUE', WAIT: 'WAITING FOR MASTER', PULL: 'PULLING IN', LOCK: 'LOCKED', IDLE: 'NO MASTER' })[st] || st : 'OFF');
+    sgTxt('#dz-off', `${DZ.ch.offset >= 0 ? '+' : '-'}${tcStr(Math.abs(DZ.ch.offset), fps)}`);
+    sgTxt('#dz-err', DZ.err != null && DZ.on ? `${(DZ.err * 1000).toFixed(2)} ms` : '—');
+    sgTxt('#dz-spd', `${((tr.varispeed || 0) * 100).toFixed(3)} %`);
+  }
+  // ---- controls (pop-up keys)
+  document.querySelectorAll('[data-sg]').forEach((b) => b.addEventListener('click', async () => {
+    const k = b.dataset.sg;
+    if (k === 'rate') SG.rateI = (SG.rateI + 1) % SG.rates.length;
+    else if (k === 'pull') SG.pullI = (SG.pullI + 1) % SG.pulls.length;
+    else if (k === 'video') SG.videoI = (SG.videoI + 1) % SG.videos.length;
+    else if (k === 'run') { SG.run = !SG.run; sgSay(SG.run ? 'Time code running' : 'Time code stopped'); }
+    else if (k === 'reset') { SG.tc = SG.start; DZ.trk.pos = null; }
+    else if (k === 'cap') { SG.capRef = !SG.capRef; if (!SG.capRef && !DZ.on) tr.setVarispeed(AL.varOn ? AL.vari : 0); sgSay(SG.capRef ? 'Capstan reference to the HJ-24: on' : 'Capstan reference off: the HJ-24 runs on its own crystal'); }
+    else if (k === 'mtcout') {
+      if (SG.mtcOut) { SG.mtcOut = null; sgSay('MTC out off'); }
+      else try { const m = await sgMidiAccess(); const outs = [...m.outputs.values()]; if (!outs.length) throw new Error('no MIDI outputs'); SG.mtcOut = outs[0]; sgSay(`MTC out to ${outs[0].name}`); } catch (err) { sgSay(`MTC out: ${err.message}`); }
+    }
+    b.closest('.ovsync') && sgKeys();
+  }));
+  document.querySelectorAll('[data-dz]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.dz, fps = sgFps();
+    if (k === 'chase') { DZ.on = !DZ.on; DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset }); if (!DZ.on) tr.setVarispeed(0); sgSay(DZ.on ? 'Chase on: the HJ-24 follows the master' : 'Chase off'); }
+    else if (k === 'src') { DZ.src = DZ.src === 'gen' ? 'mtc' : 'gen'; DZ.trk = new CodeTracker({ flywheel: 0.6 }); dzListen(DZ.src === 'mtc'); }
+    else if (k === 'ref') DZ.ref = !DZ.ref;
+    else if (k === 'capture') { const m = DZ.trk.read(performance.now() / 1000), c = slaveCode(); if (m.valid && c != null) { DZ.ch.offset = Math.round((c - m.pos) * fps) / fps; sgSay(`Offset captured: ${tcStr(Math.abs(DZ.ch.offset), fps)}${DZ.ch.offset < 0 ? ' (slave behind)' : ''}`); } }
+    else if (k === 'zero') DZ.ch.offset = 0;
+    else if (k === 'nudge+' || k === 'nudge-') DZ.ch.offset += (k === 'nudge+' ? 1 : -1) / fps / 4;   // a quarter frame at a time
+    sgKeys();
+  }));
+  function sgKeys() {
+    const on = (sel, v) => sgAll(sel, (e) => e.classList.toggle('on', !!v));
+    on('[data-sg="run"]', SG.run); on('[data-sg="cap"]', SG.capRef); on('[data-sg="mtcout"]', SG.mtcOut);
+    on('[data-dz="chase"]', DZ.on); on('[data-dz="ref"]', DZ.ref);
+    sgTxt('[data-dz="src"] .v', DZ.src === 'gen' ? 'SG-24 GEN' : 'MTC IN'); sgTxt('[data-sg="rate"] .v', `${SG.rates[SG.rateI] / 1000} kHz`);
+    sgTxt('[data-sg="pull"] .v', SG.pulls[SG.pullI] ? `${SG.pulls[SG.pullI] > 0 ? '+' : ''}${SG.pulls[SG.pullI] * 100}%` : '0'); sgTxt('[data-sg="video"] .v', `${SG.videos[SG.videoI][0]} ${SG.videos[SG.videoI][1]}${SG.videos[SG.videoI][2] ? ' DF' : ''}`);
+  }
+  sgKeys();
+  window.AS_SYNC = { SG, DZ };
+
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
     const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
-    tr.advance(dt);
+    sgTick(dt, now); syncAdvance(dt, now);   // the synchronizer's servo steps the transport at 100 Hz while it chases
     drawConsoleReels();
     sbxTick(dt, now);
+    dzTick(dt);
     if (document.body.dataset.studio === 'sls') drawA827();
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

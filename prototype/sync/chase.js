@@ -55,7 +55,8 @@ export const CHASE = {
   lockHold: 1.0,
   resolveKp: 0.3,          // 1/s: in LOCK only a slow trim moves the capstan: tape speed stays steady
   resolveMax: 0.002,       // ±0.2 % trim at most
-  resolveTau: 3.0,         // s: in LOCK the master's speed is averaged this long before it moves the capstan
+  resolveTau: 3.0,
+  resolveKpRef: 0.06,      // 1/s: with a house reference nothing can drift, so the phase trim can be much gentler         // s: in LOCK the master's speed is averaged this long before it moves the capstan
 };
 
 export class Chaser {
@@ -64,6 +65,7 @@ export class Chaser {
     this.offset = 0;           // slave = master + offset
     this.state = 'IDLE';       // IDLE | PARK | CUE | WAIT | PULL | LOCK
     this.integ = 0; this.speed = 0; this.inWin = 0; this.cueAt = null; this.enabled = true;
+    this.ref = null;           // house reference speed ratio (1 = nominal, 1.001 = pulled up) when master and slave share a sync generator
     this.time = 0; this.lead = this.c.cueLead; this.locStart = 0;   // the cue lead adapts to how long this slave takes to wind
   }
   // m: { running, pos, rate } (CodeTracker.read) ; s: { code (slave time code or null), mode, playing (capstan locked
@@ -109,10 +111,12 @@ export class Chaser {
     // averaged (fast while pulling in, slow once locked) so MTC delivery jitter never reaches the capstan
     const tau = this.state === 'LOCK' ? c.resolveTau : 0.25;
     this.rateAvg = this.rateAvg == null ? m.rate : this.rateAvg + (m.rate - this.rateAvg) * Math.min(1, dt / tau);
-    const ff = this.rateAvg - 1;
+    // with a house reference the master's speed is known exactly (both run off the same crystal): resolve to it
+    const ff = (this.ref != null && m.running ? this.ref : this.rateAvg) - 1;
     if (this.state === 'LOCK') {
-      this.speed = ff + Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + c.resolveKp * err));
-      this.integ = Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + c.resolveKp * 0.15 * err * dt));
+      const kp = this.ref != null ? c.resolveKpRef : c.resolveKp;
+      this.speed = ff + Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + kp * err));
+      this.integ = Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + kp * 0.15 * err * dt));
       if (Math.abs(err) > c.lockOut) { this.state = 'PULL'; this.inWin = 0; }
     } else {
       this.integ = Math.max(-c.maxPull, Math.min(c.maxPull, this.integ + c.pullKi * err * dt));

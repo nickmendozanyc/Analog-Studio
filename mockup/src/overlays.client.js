@@ -777,9 +777,10 @@
   let last = performance.now();
   function studio(now) {
     const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
-    tr.advance(dt);
+    sgTick(dt, now); syncAdvance(dt, now);   // the synchronizer's servo steps the transport at 100 Hz while it chases
     drawConsoleReels();
     sbxTick(dt, now);
+    dzTick(dt);
     if (document.body.dataset.studio === 'sls') drawA827();
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

@@ -20,9 +20,9 @@ function rig() {
   return { tr, code, apply, status };
 }
 // The master: a DAW sending MTC (quarter frames every 1/120 s, with up to ±1.5 ms of delivery jitter).
-function run({ seconds, start = 3630, rate = 1, offset = 0, rollAt = 0.5, stopAt = Infinity, seed = 7 }) {
-  const R = rig(), trk = new CodeTracker({ fps: 30 }), ch = new Chaser(); ch.offset = offset;
-  let rnd = seed; const jit = () => { rnd = (rnd * 1103515245 + 12345) & 0x7fffffff; return (rnd / 0x7fffffff - 0.5) * 0.003; };
+function run({ seconds, start = 3630, rate = 1, offset = 0, rollAt = 0.5, stopAt = Infinity, seed = 7, ref = null, jitter = 0.003 }) {
+  const R = rig(), trk = new CodeTracker({ fps: 30 }), ch = new Chaser(); ch.offset = offset; ch.ref = ref;
+  let rnd = seed; const jit = () => { rnd = (rnd * 1103515245 + 12345) & 0x7fffffff; return (rnd / 0x7fffffff - 0.5) * jitter; };
   const dt = 0.002, log = []; let nextQF = 0, masterPos = start, nb = Math.ceil(start * 120) / 120;
   for (let t = 0; t < seconds; t += dt) {
     const rolling = t >= rollAt && t < stopAt;
@@ -73,4 +73,12 @@ test('the master position tracker smooths MTC jitter and coasts through a dropou
   assert.ok(e < 0.004, `position error ${(e * 1000).toFixed(2)} ms`);
   const r = trk.read(3.3); assert.ok(r.running && Math.abs(r.pos - 103.3) < 0.01, 'coasts 0.3 s without code');
   assert.ok(!trk.read(4).running, 'stops after the flywheel runs out');
+});
+
+test('house reference: with master and slave on one sync generator, lock is steadier still, even with bad MTC jitter', () => {
+  const stats = (o) => { const { log } = run({ seconds: 40, ...o }); const tl = firstLock(log), tail = log.filter((r) => r.t > tl + 5), sp = tail.map((r) => r.speed), m = sp.reduce((a, b) => a + b, 0) / sp.length;
+    return { tl, maxErr: Math.max(...tail.map((r) => Math.abs(r.err))), sd: Math.sqrt(sp.reduce((a, b) => a + (b - m) ** 2, 0) / sp.length) }; };
+  const free = stats({ jitter: 0.008 }), ref = stats({ jitter: 0.008, ref: 1 });
+  assert.ok(ref.maxErr < 0.1 / 30, `error with reference ${(ref.maxErr * 1000).toFixed(2)} ms`);
+  assert.ok(ref.sd < free.sd * 0.5, `speed wobble ${(ref.sd * 100).toFixed(4)} % with reference vs ${(free.sd * 100).toFixed(4)} % without`);
 });

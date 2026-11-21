@@ -1179,6 +1179,45 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
 // =====================================================================
 // OUTBOARD RACK — CSS 3D cabinet, seen from the left; units with 3D knobs
 // =====================================================================
+
+// ---------------- house sync generator + synchronizer faces (450 x 56, used in the rack and, magnified, in the pop-ups)
+const MONO2 = `'JetBrains Mono', monospace`;
+function sgFace(w, h) {
+  rect(0, 0, w, h, 'url(#rackBlack)');
+  text(24, 22, 'HOLLIS', 13, '#e9e4d6', 'start', 900, 'letter-spacing="2"');
+  text(24, 36, 'SG-24', 12, '#e8a33a', 'start', 900); text(24, 47, 'MASTER SYNC', 6.5, '#a9a594', 'start', 800, 'letter-spacing="1"');
+  rect(104, 8, 150, 40, '#120905', 'rx="2"'); rect(106, 10, 146, 36, '#1c0d06', 'rx="1.5"');
+  p(`<text class="sg-d1" x="112" y="24" font-family="${MONO2}" font-size="10" font-weight="700" fill="#ffb347" filter="url(#glowSm)">48k 30</text>`);
+  p(`<text class="sg-d2" x="112" y="40" font-family="${MONO2}" font-size="12" font-weight="700" fill="#ffb347" filter="url(#glowSm)">01:00:00:00</text>`);
+  [['REF', 'ref', '#4fe07a'], ['WC', 'wc', '#4fe07a'], ['BB', 'bb', '#ffd23a'], ['TRI', 'tri', '#ffd23a'], ['LTC', 'ltc', '#ff6a3c'], ['MTC', 'mtc', '#ff6a3c'], ['CAP', 'cap', '#59a8ff']].forEach(([l, c, col], i) => {
+    const x = 268 + i * 24; circle(x, 18, 3.4, '#1d1512'); p(`<circle class="sg-l-${c}" cx="${x}" cy="18" r="3.4" fill="${col}" opacity="0" filter="url(#glowSm)"/>`);
+    text(x, 33, l, 6, '#cfc8b8', 'middle', 800);
+  });
+  for (let k = 0; k < 4; k++) { circle(268 + k * 24, 45, 4.2, '#0b0b0c'); circle(268 + k * 24, 45, 2.4, '#8d8f94'); }
+  text(364, 47, 'WORD · BB · TRI', 5.5, '#77746a', 'start', 700);
+}
+function dzFace(w, h) {
+  rect(0, 0, w, h, '#cfcdc7'); rect(0, 0, w, 2, '#fff', 'opacity="0.5"'); rect(0, h - 2, w, 2, '#000', 'opacity="0.25"');
+  [['WREF', 'wref', '#4fe07a'], ['MTC', 'mtc', '#4fe07a'], ['EFC', 'efc', '#4fe07a'], ['CHASE', 'chase', '#ffd23a'], ['LOCK', 'lock', '#ff3b2f']].forEach(([l, c, col], i) => {
+    const y = 12 + i * 8.4; circle(22, y, 2.2, '#5a5652'); p(`<circle class="dz-l-${c}" cx="22" cy="${y}" r="2.2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(27, y + 1.8, l, 4.6, '#3a3632', 'start', 800);
+  });
+  const key = (x, y, ww, hh, col, l1, l2, cls = '') => { rect(x + 0.6, y + 1.2, ww, hh, '#000', 'opacity="0.35" rx="1.5"'); rect(x, y, ww, hh, col, 'rx="1.5"'); rect(x, y, ww, hh * 0.35, '#fff', 'opacity="0.2" rx="1.5"'); if (l1) text(x + ww / 2, y - (cls === 'led' ? 11 : 6), l1, 4.2, '#2a2622', 'middle', 900); if (l2) text(x + ww / 2, y - (cls === 'led' ? 6.4 : 1.6), l2, 4.2, '#2a2622', 'middle', 900); };
+  const kled = (x, y, cls) => { circle(x, y, 1.6, '#4a2a22'); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>`); };
+  text(76, 9, 'ENABLE', 4.6, '#2a2622', 'middle', 900, 'letter-spacing="0.6"'); rect(52, 10, 48, 0.8, '#2a2622');
+  [['W/REC', 'MASTER', 'dz-k-master'], ['S/REC', 'SLAVE', 'dz-k-slave'], ['LEARN', 'MIDI', '']].forEach(([a, b, c], i) => { const x = 54 + i * 16; key(x, 28, 13, 15, '#2f7fd0', a, b, 'led'); kled(x + 6.5, 25.2, c || 'dz-k-none'); });
+  key(108, 28, 14, 15, '#e0392c', '', 'SHIFT');
+  text(141, 9, 'GEN    SYSTEM', 4.6, '#2a2622', 'middle', 900); key(128, 28, 12, 15, '#9a9a96', 'COPY', 'RUN'); key(143, 28, 12, 15, '#9a9a96', 'GOTO', 'STOP');
+  text(225, 10, 'ADDISON•SMYTH', 6.2, '#1e3c74', 'end', 900, 'letter-spacing="0.4"'); text(230, 10, 'DELTA-THREE', 6.2, '#1e3c74', 'start', 900, 'letter-spacing="0.4"');
+  rect(164, 15, 136, 17, '#1a0503', 'rx="1"'); rect(165, 16, 134, 15, '#2a0806', 'rx="1"');
+  p(`<text class="dz-disp" x="168" y="27.6" font-family="${MONO2}" font-size="11.2" font-weight="700" fill="#ff3a24" filter="url(#glowSm)" letter-spacing="0.6">G_TC 01:00:00:00</text>`);
+  ['DEST', 'BIN', 'HOURS', 'MINUTES', 'SEC/BAR', 'FRAMES/BEAT'].forEach((l, i) => text(172 + i * 24, 37.5, l, 3.4, '#3a3632', 'middle', 800));
+  text(232, 48, 'AUDIO · VIDEO · MIDI   SYNCHRONIZER / CONTROLLER / EMULATOR', 3.8, '#3a3632', 'middle', 800, 'letter-spacing="0.3"');
+  text(325, 9, 'DISPLAY', 4.6, '#2a2622', 'middle', 900); key(311, 28, 13, 15, '#2f7fd0', 'SELECT', 'GROUP'); key(327, 28, 12, 15, '#9a9a96', '', '⧗');
+  key(346, 28, 14, 15, '#e0392c', '', 'SHIFT');
+  text(397, 9, 'CURSOR', 4.6, '#2a2622', 'middle', 900); key(367, 28, 11, 15, '#9a9a96', '◀', ''); key(380, 28, 11, 15, '#9a9a96', '▶', '');
+  key(393, 28, 13, 15, '#2f7fd0', 'PREV', 'MENU'); key(409, 28, 14, 15, '#9a9a96', 'CLEAR', 'CAPT');
+  for (const [sx, sy] of [[8, 10], [8, 46], [w - 8, 10], [w - 8, 46]]) circle(sx, sy, 2.6, '#8a8780');
+}
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
   const U = 60, UX = 50, UW = RW - 100, DEPTH = 70;
@@ -1280,6 +1319,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     [['LOCK', 'rk-sbx-lock', '#4fe07a'], ['BEAT', 'rk-sbx-beat', '#ff6a3c']].forEach(([l, id, c], k) => { circle(378 + k * 30, 18, 4, '#2a1c1a'); p(`<circle id="${id}" cx="${378 + k * 30}" cy="18" r="4" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); text(378 + k * 30, 34, l, 8, '#3f5477', 'middle', 800); });
     text(w - 20, 50, 'SYNC BOX', 10, '#3f5477', 'end', 900, 'font-style="italic" letter-spacing="1"');
   });
+  globalThis.RACK_SG_Y = RY + uy; unit(1, '#000', (w, h) => sgFace(w, h));
+  globalThis.RACK_DZ_Y = RY + uy; unit(1, '#000', (w, h) => dzFace(w, h));
   const slotsY = uy + 8; uy += 34;
   unit(1, '#1a1b1e', (w, h) => {
     rect(30, 6, w - 60, h - 12, '#26292e', 'rx="3"');
@@ -1599,6 +1640,15 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .overlay.float .ov-bar button.ov-close{padding:6px 12px}
   .overlay.float .ov-body{position:relative;left:auto;top:auto;width:auto;height:auto}
   .overlay.float .ov-body>svg{display:block}
+  .ovsync{padding:0 0 18px;background:#141210}.ovsync>svg{display:block}
+  .ovsync .sk{display:flex;flex-wrap:wrap;gap:10px;padding:16px 22px 6px;align-items:center}
+  .ovsync .sk button{font:900 17px Archivo,Arial;letter-spacing:1.2px;padding:12px 16px;border-radius:6px;border:1px solid #000;background:#e9e3d3;color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  .ovsync .sk button.on{background:#ffcf5a;box-shadow:0 0 14px rgba(255,190,60,.6),0 4px 0 #0c0b0a}
+  .ovsync .sk button .v{font-family:'JetBrains Mono',monospace;color:#7a4a10;margin-left:6px}
+  .ovsync .sk .gap{width:16px}
+  .ovsync .note{margin:8px 22px 0;max-width:1400px;font:600 16px Archivo,Arial;color:#cfc6b6;line-height:1.5}
+  .ovsync .rd{display:flex;gap:34px;padding:10px 22px 0;font:800 15px Archivo,Arial;letter-spacing:1.5px;color:#a9a594}
+  .ovsync .rd b{font:700 22px 'JetBrains Mono',monospace;color:#7dffd6;margin-left:8px;letter-spacing:0}
   .ov-pick{font:800 18px Archivo,Arial,sans-serif;color:#1a1208;background:#ffb02e;border:0;border-radius:4px;padding:8px 16px;cursor:pointer;letter-spacing:1px}
   select.ov-pick{background:#efece4}
   .shot{position:absolute;z-index:50}
@@ -1671,6 +1721,8 @@ ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
 ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
 ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
+${hot(3340, Math.round(globalThis.RACK_SG_Y), 450, 56, 'sg', 'Open the SG-24 master sync generator')}
+${hot(3340, Math.round(globalThis.RACK_DZ_Y), 450, 56, 'dz', 'Open the Delta-Three synchronizer')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
@@ -1678,6 +1730,12 @@ ${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id
 ${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
+${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
+  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 9.6 kHz capstan reference into the HJ-24's EXT input">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
+  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 9.6 kHz capstan reference. Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
+${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
+  <div class="sk"><button type="button" data-dz="chase" title="Slave the HJ-24 to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
+  <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div></div>`, '<span class="ov-msg" id="dz-msg"></span>', true)}
 ${overlay('strip', 'CHANNEL', '<svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg>', '<span class="ov-msg" id="strip-title"></span><span class="ov-msg" id="strip-val"></span>', true)}
 ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
 ${overlay('224', 'LEXIMAN 224X', `<svg width="${Math.round(1070 * 0.95)}" height="${Math.round(1640 * 0.95)}" viewBox="480 190 1070 1640" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>', true)}
@@ -1695,8 +1753,8 @@ return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
 <script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
-<script>${['ltc.js', 'midiclock.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
 // artifact version: the same page without the document wrapper (the host adds it), title first
