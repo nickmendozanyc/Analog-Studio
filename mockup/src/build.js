@@ -1240,51 +1240,57 @@ function dzFace(w, h) {
 // dbk 160X compressor / limiter (1U, after the 160X manual's panel drawing: logo, BYPASS, SLAVE, THRESHOLD, the three
 // threshold lamps over OVER EASY, RATIO, OUTPUT GAIN, DISPLAY, 19-LED level meter over a 12-LED gain-reduction row)
 const C160_LV = [-40, -30, -20, -15, -10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 4, 6, 10, 20];
-const C160_KNOBS = { threshold: { min: -40, max: 20, sweep: 300, ticks: [[-40, '-40'], [-30, '-30'], [-20, '-20'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20']] },
-  ratio: { min: 0, max: 1, sweep: 320, ticks: [[0, '1'], [0.13, '2'], [0.27, '3'], [0.38, '4'], [0.5, '6'], [0.62, '10'], [0.7, '∞'], [0.79, '-5'], [0.9, '-2'], [1, '-1']] },
-  outGain: { min: -20, max: 20, sweep: 300, ticks: [[-20, '-20'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20']] } };
+const C160_KNOBS = { threshold: { min: -40, max: 20, sweep: 300, ticks: [[-40, '-40 dBm'], [-30, '-30'], [-20, '-20'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20 dBm']] },
+  ratio: { min: 0, max: 1, sweep: 320, ticks: [[0, '1:1'], [0.13, '2:1'], [0.27, '3:1'], [0.38, '4:1'], [0.5, '6:1'], [0.62, '10:1'], [0.7, '∞:1'], [0.79, '-5:1'], [0.9, '-2:1'], [1, '-1:1']] },
+  outGain: { min: -20, max: 20, sweep: 300, ticks: [[-20, '-20 dB'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20 dB']] } };
 globalThis.C160_KNOBS = C160_KNOBS;
 function c160Face(w, h, u) {
-  const W = '#e9e6de', DIM = '#2a2826', id = (k) => `c160-${u}-${k}`;
-  rect(0, 0, w, h, '#151515'); rect(0, 0, w, 1.5, '#fff', 'opacity="0.12"'); rect(0, h - 2, w, 2, '#000', 'opacity="0.5"');
-  for (const [sx, sy] of [[7, 9], [7, 47], [w - 7, 9], [w - 7, 47]]) { circle(sx, sy, 2.6, '#6a6862'); circle(sx, sy, 1, '#2a2826'); }
-  text(20, 27, 'dbk', 21, W, 'start', 900, 'letter-spacing="-0.8"'); text(21, 38, '160X', 7.5, W, 'start', 800, 'letter-spacing="0.6"');
-  text(21, 47, u === 'A' ? 'UNIT A' : 'UNIT B', 4, '#a9a594', 'start', 800, 'letter-spacing="0.5"');
-  const led = (x, y, col, cls, r = 1.7) => { circle(x, y, r, DIM); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
-  const btn = (x, y, k, label) => { p(`<g data-cb="${u}:${k}" style="cursor:pointer">`); rect(x - 7.5, y, 15, 6.5, '#000', 'rx="0.8"'); rect(x - 7, y + 0.3, 14, 5.5, '#262626', 'rx="0.6"'); rect(x - 7, y + 0.3, 14, 1.4, '#fff', 'opacity="0.12" rx="0.6"'); p('</g>'); text(x, y + 13, label, 3.5, W, 'middle', 800, 'letter-spacing="0.3"'); };
-  led(76, 16, '#ff3b2f', id('bypass')); btn(76, 24, 'bypass', 'BYPASS');
-  led(103, 16, '#ffd23a', id('slave')); btn(103, 24, 'slave', 'SLAVE');
+  // laid out from a photo of the real 160X (positions measured across the panel; this 1U drawing is less wide, so
+  // the knobs keep their round shape while the spacing follows the photo)
+  const W = '#e4e3e6', id = (k) => `c160-${u}-${k}`, X = (px) => (px - 40) * 0.476, Y = (py) => (py - 45) * 0.675;
+  rect(0, 0, w, h, '#232127'); for (let yy = 1; yy < h; yy += 1.3) rect(0, yy, w, 0.35, '#fff', `opacity="${(0.015 + 0.02 * ((yy * 7.3) % 1)).toFixed(3)}"`);   // brushed
+  rect(0, 0, w, 1.2, '#fff', 'opacity="0.1"'); rect(0, h - 1.5, w, 1.5, '#000', 'opacity="0.5"');
+  for (const ex of [0, w - 17]) { rect(ex, 0, 17, h, '#1b1a1e'); rect(ex + (ex ? 0 : 16), 0, 1, h, '#000', 'opacity="0.5"'); for (const ey of [10, h - 10]) rect(ex + 3.5, ey - 4, 10, 8, '#0a0a0b', 'rx="4"'); }
+  text(X(155), Y(85), 'dbk', 17, '#cfcfd4', 'middle', 700, 'letter-spacing="0.5" font-stretch="125%"'); text(X(155), Y(102), '160X', 8.5, '#cfcfd4', 'middle', 900, 'letter-spacing="0.4"');
+  const led = (x, y, col, dim, cls, r = 1.45) => { circle(x, y, r, dim); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
+  const btn = (x, k, label) => { const y = Y(88); p(`<g data-cb="${u}:${k}" style="cursor:pointer">`); rect(x - 7.5, y, 15, 7, '#000', 'rx="0.8"'); rect(x - 6.9, y + 0.4, 13.8, 5.9, '#1c1c1e', 'rx="0.6"'); rect(x - 6.9, y + 0.4, 13.8, 1.4, '#fff', 'opacity="0.13" rx="0.6"'); p('</g>'); text(x, Y(116), label, 3.6, W, 'middle', 900, 'letter-spacing="0.3"'); };
+  led(X(240), Y(70), '#ff3b2f', '#3a1412', id('bypass')); btn(X(240), 'bypass', 'BYPASS');
+  led(X(287), Y(70), '#ffd23a', '#33301a', id('slave')); btn(X(287), 'slave', 'SLAVE');
+  const COL = { threshold: '#d93a2e', ratio: '#2381da', outGain: '#33894f' };
   const knob = (cx, k, l1, l2) => {
-    const K = C160_KNOBS[k], cy = 24, r = 9.5, ang = (v) => -K.sweep / 2 + (v - K.min) / (K.max - K.min) * K.sweep;
-    if (k === 'ratio') { const a0 = ang(0.7), a1 = ang(1), P = (a, rr) => [cx + rr * Math.sin(a * Math.PI / 180), cy - rr * Math.cos(a * Math.PI / 180)]; const [x0, y0] = P(a0, r + 2.2), [x1, y1] = P(a1, r + 2.2); p(`<path d="M${x0} ${y0} A${r + 2.2} ${r + 2.2} 0 0 1 ${x1} ${y1}" fill="none" stroke="${W}" stroke-width="1.3"/>`); }
+    const K = C160_KNOBS[k], cy = Y(86), r = 7.6, ang = (v) => -K.sweep / 2 + (v - K.min) / (K.max - K.min) * K.sweep;
+    const P = (a, rr) => [cx + rr * Math.sin(a * Math.PI / 180), cy - rr * Math.cos(a * Math.PI / 180)];
+    if (k === 'ratio') { const [x0, y0] = P(ang(0.7), r + 2.1), [x1, y1] = P(ang(1), r + 2.1); p(`<path d="M${x0} ${y0} A${r + 2.1} ${r + 2.1} 0 0 1 ${x1} ${y1}" fill="none" stroke="#b9b8bd" stroke-width="2.2"/>`); }
     for (const [v, lab] of K.ticks) {
-      const a = ang(v) * Math.PI / 180, sx = Math.sin(a), cyy = -Math.cos(a);
-      p(`<line x1="${cx + sx * (r + 1)}" y1="${cy + cyy * (r + 1)}" x2="${cx + sx * (r + 2.6)}" y2="${cy + cyy * (r + 2.6)}" stroke="${W}" stroke-width="0.5"/>`);
-      text(cx + sx * (r + 5.4), cy + cyy * (r + 5.4) + 1.1, lab, 3.1, W, 'middle', 700);
+      const a = ang(v); const [x1, y1] = P(a, r + 1), [x2, y2] = P(a, r + 3.2), [tx, ty] = P(a, r + (k === 'ratio' ? 7.2 : 6.6));
+      p(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${W}" stroke-width="0.55"/>`);
+      text(tx, ty + 1.1, lab, 3.1, W, 'middle', 700);
     }
     p(`<g data-ck="${u}:${k}" style="cursor:ns-resize">`);
-    circle(cx, cy + 0.8, r + 0.4, '#000', 'opacity="0.6"'); circle(cx, cy, r, '#1d1d1d'); circle(cx, cy, r - 1.6, '#262626'); circle(cx, cy, r - 1.6, 'url(#bezelHi)', 'opacity="0.35"');
-    p(`<g class="${id('k-' + k)}" transform="rotate(${ang(k === 'ratio' ? 0.38 : k === 'threshold' ? -10 : 0)} ${cx} ${cy})"><rect x="${cx - 0.55}" y="${cy - r + 0.6}" width="1.1" height="${r * 0.62}" rx="0.5" fill="${W}"/></g>`);
+    circle(cx + 0.5, cy + 0.9, r + 0.3, '#000', 'opacity="0.55"'); circle(cx, cy, r, COL[k]); circle(cx - r * 0.28, cy - r * 0.32, r * 0.62, '#fff', 'opacity="0.16"'); circle(cx, cy, r, 'none', 'stroke="#000" stroke-opacity="0.35" stroke-width="0.5"');
+    p(`<g class="${id('k-' + k)}" transform="rotate(${ang(k === 'ratio' ? 0.38 : k === 'threshold' ? -10 : 0)} ${cx} ${cy})"><rect x="${cx - 0.45}" y="${cy - r + 0.5}" width="0.9" height="${r * 0.9}" rx="0.45" fill="#f4f4f4"/></g>`);
     p(`<circle cx="${cx}" cy="${cy}" r="${r + 6}" fill="transparent"/></g>`);
-    text(cx, 47.5, l1, 3.4, W, 'middle', 800, 'letter-spacing="0.3"'); if (l2) text(cx, 51.5, l2, 3.4, W, 'middle', 800, 'letter-spacing="0.3"');
+    text(cx, Y(116), l1, 3.6, W, 'middle', 900, 'letter-spacing="0.3"'); if (l2) text(cx, Y(123), l2, 3.6, W, 'middle', 900, 'letter-spacing="0.3"');
   };
-  knob(140, 'threshold', 'THRESHOLD', 'dBu');
-  text(178, 9.5, 'THRESHOLD', 3.2, W, 'middle', 800); led(171.5, 15, '#4fe07a', id('th-below')); led(178, 15, '#ffb02e', id('th-knee')); led(184.5, 15, '#ff3b2f', id('th-above'));
-  text(171.5, 21, 'BELOW', 2.4, W, 'middle', 700); text(184.5, 21, 'ABOVE', 2.4, W, 'middle', 700);
-  btn(178, 24, 'overEasy', 'OVER EASY');
-  knob(214, 'ratio', 'COMPRESSION', 'RATIO');
-  knob(254, 'outGain', 'OUTPUT', 'GAIN');
-  text(286, 7.5, 'INPUT', 2.6, W, 'middle', 700); led(286, 11.5, '#ff3b2f', id('d-in'), 1.4); led(286, 17.5, '#ff3b2f', id('d-out'), 1.4); text(286, 22.3, 'OUTPUT', 2.6, W, 'middle', 700);
-  p(`<path d="M288 11.5 H292 V14.5 H297 M288 17.5 H292 V14.5" fill="none" stroke="${W}" stroke-width="0.4"/>`);
-  btn(286, 24, 'display', 'DISPLAY');
-  // meters: 19 level LEDs (yellow to -1, red from 0), scale between the rows, 12 gain-reduction LEDs under the left 12
-  const lx = (i) => 300 + i * 5.55;
-  C160_LV.forEach((d, i) => { rect(lx(i) - 1.7, 12.2, 3.4, 4.4, DIM, 'rx="0.5"'); p(`<rect class="${id('lv' + i)}" x="${lx(i) - 1.7}" y="12.2" width="3.4" height="4.4" rx="0.5" fill="${d < 0 ? '#ffd23a' : '#ff3b2f'}" opacity="0" filter="url(#glowSm)"/>`); text(lx(i), 21.6, d > 0 ? `+${d}` : String(d), 2.3, W, 'middle', 700); });
-  text(lx(18) + 5, 15.8, 'LEVEL', 3, W, 'start', 800);
-  [40, 30, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1].forEach((d, j) => { rect(lx(j) - 1.7, 24, 3.4, 4.4, DIM, 'rx="0.5"'); p(`<rect class="${id('gr' + (11 - j))}" x="${lx(j) - 1.7}" y="24" width="3.4" height="4.4" rx="0.5" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); });
-  p(`<line x1="${lx(11) + 3}" y1="26.2" x2="${lx(18) + 3}" y2="26.2" stroke="${W}" stroke-width="0.4"/>`); text(lx(18) + 5, 27.4, 'GAIN REDUCTION', 3, W, 'start', 800);
-  text(355, 41, 'COMPRESSOR / LIMITER', 4.2, W, 'middle', 800, 'letter-spacing="1.2"');
-  p(`<text class="${id('route')}" x="355" y="49.5" font-family="'JetBrains Mono', monospace" font-size="3.6" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+  knob(X(345), 'threshold', 'THRESHOLD');
+  const tx = X(410); text(tx, Y(62), 'THRESHOLD', 3.4, W, 'middle', 900);
+  led(tx - 6, Y(70), '#4fe07a', '#16301e', id('th-below'), 1.25); led(tx, Y(70), '#ffb02e', '#33281a', id('th-knee'), 1.25); led(tx + 6, Y(70), '#ff3b2f', '#3a1412', id('th-above'), 1.25);
+  text(tx - 7, Y(79), 'BELOW', 2.5, W, 'middle', 800); text(tx + 7, Y(79), 'ABOVE', 2.5, W, 'middle', 800);
+  btn(tx, 'overEasy', 'OVER EASY');
+  knob(X(485), 'ratio', 'COMPRESSION', 'RATIO');
+  knob(X(568), 'outGain', 'OUTPUT', 'GAIN');
+  const dx = X(622); text(dx, Y(61), 'INPUT', 2.7, W, 'middle', 800); led(dx, Y(67), '#ff3b2f', '#3a1412', id('d-in'), 1.15); led(dx, Y(75), '#ff3b2f', '#3a1412', id('d-out'), 1.15); text(dx, Y(83), 'OUTPUT', 2.7, W, 'middle', 800);
+  const lx = (i) => X(655) + i * 3.85, ly = Y(73), gy = Y(90);
+  p(`<path d="M${dx + 2} ${Y(67)} H${dx + 6} V${ly} H${lx(0) - 2} M${dx + 2} ${Y(75)} H${dx + 6} V${ly}" fill="none" stroke="${W}" stroke-width="0.4"/>`);
+  btn(dx, 'display', 'DISPLAY');
+  // meters: 19 round LEDs (12 yellow, 7 red), the scale under them, then 12 red gain-reduction LEDs under the left 12
+  C160_LV.forEach((d, i) => { led(lx(i), ly, d < 0 ? '#ffd23a' : '#ff3b2f', d < 0 ? '#35331c' : '#3a1614', id('lv' + i), 1.3); text(lx(i), Y(82), i === 0 ? '−40' : i === 18 ? '20+' : String(Math.abs(d)), 2.35, W, 'middle', 800); });
+  text(lx(18) + 4, ly + 1.2, 'LEVEL', 3.2, W, 'start', 900);
+  for (let j = 0; j < 12; j++) led(lx(j), gy, '#ff3b2f', '#3a1614', id('gr' + (11 - j)), 1.3);
+  p(`<line x1="${lx(11) + 2.5}" y1="${gy}" x2="${lx(15)}" y2="${gy}" stroke="${W}" stroke-width="0.5"/>`); text(lx(15) + 2, gy + 1.2, 'GAIN REDUCTION', 3.2, W, 'start', 900);
+  text(X(735), Y(108), 'COMPRESSOR/LIMITER', 3.8, W, 'middle', 900, 'letter-spacing="0.4"');
+  p(`<text class="${id('route')}" x="${X(735)}" y="${Y(123)}" font-family="'JetBrains Mono', monospace" font-size="3.2" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+  text(w - 21, Y(123), u, 4, '#8e8c92', 'end', 900);
 }
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
@@ -1325,7 +1331,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
   });
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
-  for (const u of ['A', 'B']) { globalThis['RACK_C160_' + u] = RY + uy; unit(1, '#151515', (w, h) => c160Face(w, h, u)); }
+  for (const u of ['A', 'B']) { globalThis['RACK_C160_' + u] = RY + uy; unit(1, '#232127', (w, h) => c160Face(w, h, u)); }
   // Unified Audio 1176LN x2 (2U)
   for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
     text(26, 30, 'UNIFIED AUDIO', 14, '#cfcfcf', 'start', 800);
