@@ -183,7 +183,7 @@
 
   // ---------------- patchbay ----------------
   const L = (pre, n, from = 1) => Array.from({ length: n }, (_, k) => `${pre}${k + from}`);
-  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'S900', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
+  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'S900', 'SP1200', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
   // rows come in output / input pairs; "normal" means the pair is wired through until you patch the input
   const ROWS = [
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
@@ -889,7 +889,7 @@
     c160Tick();
     im90Tick();
     spxTick();
-    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick(); consoleTick(); junoTick(); if (++studio.n % 20 === 0) patchGate();
+    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick(); consoleTick(); junoTick(); spTick(); if (++studio.n % 20 === 0) patchGate();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

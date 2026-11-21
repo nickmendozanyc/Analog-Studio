@@ -26,6 +26,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.pcm = [new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 42), new PCM4x(sampleRate, 42)]; this.pcmch = [null, null, null, null];
     this.pcmOut = this.pcm.map(() => new Float32Array(128));
     // the Akita S900 sampler: records from the channel patched to its input, plays to the mix (its own line return)
+    this.sp = new SP1200(sampleRate); this.spL = new Float32Array(128); this.spR = new Float32Array(128); this.spIn = null;   // the SP-1200 (into the mix)
     this.ju = new Juno(sampleRate); this.juL = new Float32Array(128); this.juR = new Float32Array(128); this.juVol = 0.8;   // the JUNO-1060 (into the mix)
     this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-9090 on the desk (into the mix)
     this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-8080 (into the mix)
@@ -66,6 +67,21 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
     }
     else if (d.type === 's900') this.s9msg(d);
+    else if (d.type === 'sp1200') {
+      const u = this.sp;
+      if (d.sound) { u.sounds[d.sound.i] = d.sound.data ? spSound(d.sound.data, d.sound.name) : null; if (u.sounds[d.sound.i] && d.sound.o) Object.assign(u.sounds[d.sound.i], d.sound.o); }
+      if (d.soundSet) Object.assign(u.sounds[d.soundSet.i] || {}, d.soundSet.set);
+      if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) u.patterns[d.patIx] = d.pattern;
+      for (const k of ['pat', 'tempo', 'swing', 'quant', 'rec', 'metro', 'repeat']) if (d[k] !== undefined) u[k] = d[k];
+      if (d.erase) u.erase = new Set(d.erase);
+      if (d.hitWith) u.hitWith(d.hitWith.s, d.hitWith.ch, d.hitWith.tune, d.hitWith.v ?? 1);
+      if (d.hit != null) u.press(d.hit, d.v ?? 1); if (d.up != null) u.release(d.up);
+      if (d.play === true) u.start(); else if (d.play === false) u.stop();
+      if (d.sync !== undefined) u.sync = d.sync;
+      if (d.sampleCh !== undefined) this.spInCh = d.sampleCh;
+      if (d.sample) { this.spRec = { pad: d.sample.pad, len: Math.round(d.sample.sec * SP_FS), buf: [], ph: 0, armed: d.sample.thresh || 0 }; }
+      if (d.getPat) this.port.postMessage({ type: 'sp1200', patterns: u.patterns });
+    }
     else if (d.type === 'juno') { const u = this.ju; if (d.set) u.set(d.set); if (d.note != null) { if (d.vel > 0) u.noteOn(d.note, d.vel); else u.noteOff(d.note); } if (d.allOff) u.allOff(); if (d.vol != null) this.juVol = d.vol; }
     else if (d.type === 'tr909') {
       const u = this.t9; if (d.set) u.set(d.set); if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) u.patterns[d.patIx] = d.pattern;
@@ -243,6 +259,12 @@ class JH24Processor extends AudioWorkletProcessor {
       const g = 0.8, dl = key === 'h949' && unit.p.dlyMs > 0;
       for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; BL[k] += a * g; BR[k] += b * g; }
     }
+    // the SP-1200: its sampling input is the channel patched to SP-1200 IN (sampled at 26.04 kHz, 12 bits); output into the mix
+    if (this.spRec) { const r = this.spRec, ch = this.spInCh, x = ch != null && this.out[ch] ? this.out[ch] : null, step = SP_FS / sampleRate;
+      if (x) for (let k = 0; k < n; k++) { if (r.armed > 0) { if (Math.abs(x[k]) < r.armed) continue; r.armed = 0; } r.ph += step; while (r.ph >= 1) { r.ph -= 1; r.buf.push(x[k]); } if (r.buf.length >= r.len) break; }
+      if (r.buf.length >= r.len || !x) { const d2 = Float32Array.from(r.buf); this.sp.sounds[r.pad] = spSound(d2, 'SAMPLE ' + (r.pad + 1)); this.port.postMessage({ type: 'sp1200', sampled: r.pad, data: this.sp.sounds[r.pad].data, empty: !x }); this.spRec = null; } }
+    if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
+    this.sp.process(this.spL, this.spR, n); for (let k = 0; k < n; k++) { BL[k] += this.spL[k]; BR[k] += this.spR[k]; }
     if (this.juL.length !== n) { this.juL = new Float32Array(n); this.juR = new Float32Array(n); }
     this.ju.process(this.juL, this.juR, n); for (let k = 0; k < n; k++) { BL[k] += this.juL[k] * this.juVol; BR[k] += this.juR[k] * this.juVol; }
     if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
@@ -263,7 +285,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()), s900: this.s9.meters(), tr808: this.tr.meters(), tr909: this.t9.meters(), juno: this.ju.meters(), con: this.con.meters(VU0) });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()), s900: this.s9.meters(), tr808: this.tr.meters(), tr909: this.t9.meters(), juno: this.ju.meters(), sp1200: this.sp.meters(), con: this.con.meters(VU0) });
     }
     return true;
   }
