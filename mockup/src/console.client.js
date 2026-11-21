@@ -43,6 +43,10 @@
     const say = (ch, pos) => { if (!tip) { tip = document.createElement('div'); tip.style.cssText = 'position:absolute;z-index:9;padding:6px 10px;background:#111;color:#ffe9b0;font:700 18px JetBrains Mono,monospace;border-radius:4px;pointer-events:none'; hot.appendChild(tip); }
       tip.textContent = `${ch === 'm' ? 'STEREO' : 'CH ' + (ch + 1) + (NAMES[ch] ? ' ' + NAMES[ch] : '')} ${conDb(pos)}`; const x = ch === 'm' ? hot.offsetWidth - 300 : ch * 85 + 70; tip.style.left = Math.min(hot.offsetWidth - 280, x) + 'px'; tip.style.top = (FB.top + pos * (FB.bot - FB.top) - 50) + 'px'; tip.hidden = false; };
     hot.addEventListener('pointerdown', (e) => {
+      { const q = local(e), c = Math.floor(q.x / 85), dx = q.x - c * 85;   // the MUTE / SOLO keys above each fader
+        if (c >= 0 && c < 32 && q.y >= 69 && q.y <= 90 && dx >= 3 && dx <= 81 && window.CH_TOGGLE) { e.preventDefault(); const id = dx < 42 ? 'mute' : 'solo', on = window.CH_TOGGLE('cmi', c, id);
+          if (!tip) { tip = document.createElement('div'); tip.style.cssText = 'position:absolute;z-index:9;padding:6px 10px;background:#111;color:#ffe9b0;font:700 18px JetBrains Mono,monospace;border-radius:4px;pointer-events:none'; hot.appendChild(tip); }
+          tip.hidden = false; tip.textContent = `CH ${c + 1}${NAMES[c] ? ' ' + NAMES[c] : ''} ${id.toUpperCase()} ${on ? 'ON' : 'OFF'}`; tip.style.left = Math.min(hot.offsetWidth - 280, c * 85 + 40) + 'px'; tip.style.top = '20px'; clearTimeout(hot._mt); hot._mt = setTimeout(() => { tip.hidden = true; }, 900); return; } }
       const q = local(e), ch = pick(q.x); if (ch == null) return; e.preventDefault(); hot.setPointerCapture(e.pointerId);
       const p0 = ch === 'm' ? CON.master : CON.fader[ch];
       const capY = FB.top + p0 * (FB.bot - FB.top);

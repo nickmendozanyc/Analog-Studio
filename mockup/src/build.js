@@ -1066,6 +1066,12 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       // scribble strip
       rect(x0 + 3, 48, STRIP - 6, 20, 'url(#tapeMask)', `rx="1" transform="rotate(${((ch * 37) % 7 - 3) * 0.2} ${cm} 58)"`);
       text(cm, 63, consoleNames[ch], consoleNames[ch].length > 8 ? 10 : 11.5, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
+      // MUTE and SOLO keys right above the fader (the same state as the strip's MUTE / numbered SOLO keys)
+      for (const [bid, lab, kx, col, txt, on] of [['mute', 'MUTE', x0 + 4, '#ff3b2f', '#1a0c08', muted.has(ch)], ['solo', 'SOLO', x0 + 44, '#ffe14a', '#1a1208', soloed.has(ch)]]) {
+        p(`<g data-bid="${bid}" data-ch="${ch}" data-on="${on ? 1 : 0}">`);
+        rect(kx - 0.5, 72.5, 37, 18, '#000', 'rx="2" opacity="0.6"'); rect(kx, 71, 36, 17, '#151515', 'rx="2"'); rect(kx, 71, 36, 17, 'url(#btnOff)', 'rx="2"'); text(kx + 18, 83, lab, 9.5, WH2, 'middle', 800);
+        p(`<g class="klit" opacity="${on ? 1 : 0}">`); rect(kx, 71, 36, 17, col, 'rx="2" filter="url(#glow)"'); rect(kx, 71, 36, 17, 'url(#btnOff)', 'rx="2"'); text(kx + 18, 83, lab, 9.5, txt, 'middle', 800); p('</g></g>');
+      }
       for (const [lab, fr] of FMARK) {
         const yy = top + fr * (bot - top);
         p(`<line x1="${fx - 20}" y1="${yy}" x2="${fx - 7}" y2="${yy}" stroke="${WH2}" stroke-opacity="${fr === 0.2 ? 1 : 0.55}" stroke-width="${fr === 0.2 ? 1.6 : 1}"/>`);
