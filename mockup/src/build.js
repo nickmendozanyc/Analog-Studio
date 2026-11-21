@@ -2102,7 +2102,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #splash .word{position:absolute;left:118px;top:596px;font:900 196px/1 Archivo,Arial;letter-spacing:-6px;color:#f2eadb}
   #splash .word i{font-style:normal;color:#e8a33a}
   #splash .edition{position:absolute;left:1010px;top:648px;font:800 44px Archivo,Arial;letter-spacing:6px;text-transform:uppercase;color:#e8a33a}
-  #splash .tag{position:absolute;left:1012px;top:712px;font:600 30px Archivo,Arial;color:#b9ad95;letter-spacing:1px}
+  #splash .tag{position:absolute;left:1012px;top:706px;font:600 30px/1.35 Archivo,Arial;color:#b9ad95;letter-spacing:1px}
   #splash .bar{position:absolute;left:134px;right:134px;bottom:118px;height:6px;border-radius:3px;background:#2c2822;overflow:hidden}
   #splash .bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,#c9862c,#f0b04a);box-shadow:0 0 18px rgba(240,176,74,.6);transition:width .35s ease}
   #splash .status{position:absolute;left:134px;bottom:146px;font:600 28px 'JetBrains Mono',monospace;color:#cfc4ae}
@@ -2198,7 +2198,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .sls-area span{font-size:22px;font-weight:600;color:#9c9384;max-width:80%}
 ${elecCss}
 </style></head><body><div id="stage">
-<div id="splash" role="dialog" aria-label="OldTools is starting"><div class="card"><div class="hero" style="background-image:url(data:image/jpeg;base64,${fs.readFileSync(path.join(__dirname, 'assets', 'splash-reels.jpg')).toString('base64')})"></div><div class="presents">NMAudiowerks presents</div><div class="word">Old<i>T</i>ools</div><div class="edition">JH-Studio · Analog Edition</div><div class="tag">The way we used to work.</div><div class="status" id="spl-status">Starting…</div><div class="bar"><b id="spl-bar"></b></div><div class="foot"><span>Version 1.0 · © NMAudiowerks</span><span>Click to continue</span></div></div></div>
+<div id="splash" role="dialog" aria-label="OldTools is starting"><div class="card"><div class="hero" style="background-image:url(data:image/jpeg;base64,${fs.readFileSync(path.join(__dirname, 'assets', 'splash-reels.jpg')).toString('base64')})"></div><div class="presents">NMAudiowerks presents</div><div class="word">Old<i>T</i>ools</div><div class="edition">JH-Studio · Analog Edition</div><div class="tag">The tools we used.<br>The way we worked.</div><div class="status" id="spl-status">Starting…</div><div class="bar"><b id="spl-bar"></b></div><div class="foot"><span>Version 1.0 · © NMAudiowerks</span><span>Click to continue</span></div></div></div>
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
