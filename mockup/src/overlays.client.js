@@ -346,6 +346,7 @@
 
   // ---------------- AutoLocator III (drives the transport) ----------------
   const alSvg = document.getElementById('alSvg');
+  let trkEls = null;
   const AL = { loc: 62, entry: '', apl: false, rep: false, tvi: false, reh: false, rehPunch: false, pending: null, ready: new Set(), inMon: new Set(), mon: 'auto', vari: 0, varOn: false, mem: [0, 21, 62, 167, null, null, null, null, null, null], last: 2 };
   const SEG = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abcdfg', '-': 'g', ' ': '' };
   const fmt = (t) => { const a = Math.abs(t); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
@@ -432,6 +433,9 @@
       setSeg('loc', AL.entry ? AL.entry.padStart(4, ' ') : fmt(AL.loc));
     }
     const blink = Math.floor(now / 250) % 2 === 0, rec = recording(), punch = rec || AL.rehPunch;
+    // tape meter bridge (studio view and pop-up): READY / SAFE keys and record lamps follow the armed tracks
+    if (!trkEls) trkEls = [...document.querySelectorAll('.trk-on[data-t], .trk-off[data-t]')].map((e) => ({ e, t: +e.dataset.t, on: e.classList.contains('trk-on'), v: -1 }));
+    for (const k of trkEls) { const v = AL.ready.has(k.t) === k.on ? 1 : 0; if (k.v !== v) { k.v = v; k.e.setAttribute('opacity', v); } }
     for (let t = 0; t < 24; t++) {
       const r = AL.ready.has(t);
       led(`r${t}`, r && (rec ? true : blink));
@@ -793,5 +797,10 @@
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests
+  // READY / SAFE keys on the meter bridge pop-up arm and disarm tracks, as the autolocator's track keys do
+  document.querySelectorAll('[data-arm]').forEach((el) => el.addEventListener('click', (e) => {
+    e.stopPropagation(); const t = +el.dataset.arm, armed = AL.ready.has(t);
+    if ((el.dataset.k === 'ready') !== armed) press(`ready${t}`);
+  }));
   requestAnimationFrame(studio);
 })();

@@ -115,6 +115,18 @@ function button(x, y, w, h, color = 'grey', lit = false, label = '', opts = {}) 
   }
 }
 
+// Track READY / SAFE keys and the record lamp, drawn in both states: the SAFE state as the base, the READY state in a
+// .trk-on layer the page shows while the autolocator has the track armed. Clicking a key arms / disarms (pop-up).
+function readySafe(i, xr, xs, y, bw, h, size) {
+  button(xr, y, bw, h, 'red', false, 'READY', { size }); button(xs, y, bw, h, 'white', true, 'SAFE', { size });
+  p(`<g class="trk-on" data-t="${i}" opacity="0">`); button(xr, y, bw, h, 'red', true, 'READY', { size }); button(xs, y, bw, h, 'white', false, 'SAFE', { size }); p('</g>');
+  p(`<rect data-arm="${i}" data-k="ready" x="${xr}" y="${y}" width="${bw}" height="${h}" fill="transparent" style="cursor:pointer"><title>Track ${i + 1}: record ready</title></rect>`);
+  p(`<rect data-arm="${i}" data-k="safe" x="${xs}" y="${y}" width="${bw}" height="${h}" fill="transparent" style="cursor:pointer"><title>Track ${i + 1}: safe</title></rect>`);
+}
+function recLamp(i, cx, cy, r) {
+  circle(cx, cy, r, '#4a1612'); p(`<circle class="trk-on" data-t="${i}" cx="${cx}" cy="${cy}" r="${r}" fill="#ff3b2f" opacity="0" filter="url(#glow)"/>`);
+}
+
 // Long-throw fader. pos: 0 (top, +10dB) .. 1 (bottom, -inf)
 const FADER_MARKS = [['+10', 0], ['5', 0.1], ['0', 0.22], ['5', 0.34], ['10', 0.46], ['20', 0.62], ['30', 0.74], ['40', 0.84], ['60', 0.93], ['∞', 1]];
 function fader(cx, top, bottom, pos, opts = {}) {
@@ -735,9 +747,8 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
     rect(0, FH - 3, TW3, 3, '#000', 'opacity="0.5"');
     for (let c = 0; c < 8; c++) {
       const i = (2 - tier) * 8 + c, x = c * PITCH + 8, w = CW;
-      const on = readyTracks.has(i);
-      // lamps above each meter: red record, blue status
-      circle(x + w - 14, 14, 5.5, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+      // lamps above each meter: red record (live), blue status
+      recLamp(i, x + w - 14, 14, 5.5);
       circle(x + w - 32, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
       // recessed meter window, wide like the HJ-24 bridge meters
       rect(x + 4, 26, w - 8, 118, '#0a0908', 'rx="6"');
@@ -750,8 +761,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
       rect(x + 40, 154, w - 42, 26, 'url(#tapeMask)', `rx="1" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + w / 2} ${167})"`);
       text(x + 40 + (w - 42) / 2, 173, tapeNames[i], 14, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
       const bw = (w - 10) / 2;
-      button(x + 2, 190, bw, 30, 'red', on, 'READY', { size: 14, pastel: false });
-      button(x + 8 + bw, 190, bw, 30, 'white', !on, 'SAFE', { size: 14 });
+      readySafe(i, x + 2, x + 8 + bw, 190, bw, 30, 14);
     }
   });
   const faces = [0, 1, 2].map((t) => {
@@ -1435,18 +1445,18 @@ const OVH = 2104;   // view height below the 56 px title bar
 const meterView = capture(() => {
   rect(0, 0, W, OVH, 'url(#deck)'); rect(0, 0, W, OVH, '#000', 'opacity="0.45"'); rect(0, 0, W, OVH, '#000', 'filter="url(#brushed)" opacity="0.06"');
   for (let i = 0; i < 24; i++) {
-    const c = i % 8, r = Math.floor(i / 8), x = c * 480, y = 24 + r * 690, on = readyTracks.has(i);
+    const c = i % 8, r = Math.floor(i / 8), x = c * 480, y = 24 + r * 690;
     rect(x + 10, y, 460, 660, '#2c2926', 'rx="10"'); rect(x + 10, y, 460, 660, 'url(#bezelHi)', 'rx="10" opacity="0.5"');
-    circle(x + 430, y + 30, 11, on ? '#ff3b2f' : '#4a1612', on ? 'filter="url(#glow)"' : '');
+    recLamp(i, x + 430, y + 30, 11);
     circle(x + 396, y + 30, 11, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
     rect(x + 24, y + 54, 432, 330, '#0a0908', 'rx="10"'); rect(x + 24, y + 54, 432, 330, 'url(#bezelHi)', 'rx="10"');
     vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i, brand: 'CMI' });
     text(x + 30, y + 452, String(i + 1).padStart(2, '0'), 46, '#ece7dc', 'start', 800);
     rect(x + 112, y + 410, 344, 58, 'url(#tapeMask)', `rx="2" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 284} ${y + 439})"`);
     text(x + 284, y + 452, tapeNames[i], 34, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
-    button(x + 30, y + 500, 200, 72, 'red', on, 'READY', { size: 26 });
-    button(x + 250, y + 500, 200, 72, 'white', !on, 'SAFE', { size: 26 });
-    text(x + 240, y + 626, on ? 'RECORD READY · MONITORING INPUT' : 'SAFE · MONITORING REPRO', 20, on ? '#ff8a7a' : '#b8b1a5', 'middle', 800, 'letter-spacing="1.5"');
+    readySafe(i, x + 30, x + 250, y + 500, 200, 72, 26);
+    p(`<g class="trk-off" data-t="${i}">`); text(x + 240, y + 626, 'SAFE · MONITORING REPRO', 20, '#b8b1a5', 'middle', 800, 'letter-spacing="1.5"'); p('</g>');
+    p(`<g class="trk-on" data-t="${i}" opacity="0">`); text(x + 240, y + 626, 'RECORD READY · MONITORING INPUT', 20, '#ff8a7a', 'middle', 800, 'letter-spacing="1.5"'); p('</g>');
   }
 });
 const lexView = capture(() => {
