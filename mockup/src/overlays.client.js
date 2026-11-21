@@ -37,18 +37,44 @@
   // ---------------- live tape meters (VU ballistics) ----------------
   const VU = [[-20, -45], [-10, -28], [-7, -18], [-5, -10], [-3, 0], [-2, 6], [-1, 12], [0, 19], [1, 27], [2, 35], [3, 45]];
   const vuAngle = (db) => { db = Math.max(-20, Math.min(3, db)); for (let i = 0; i < VU.length - 1; i++) { const [d0, a0] = VU[i], [d1, a1] = VU[i + 1]; if (db <= d1) return a0 + (a1 - a0) * (db - d0) / (d1 - d0); } return 45; };
+  // Needles on their own layer: the meters are drawn inside big pictures (the bridge tiers, the whole 4K room, the meter
+  // pop-up), and a needle moved inside one makes the browser repaint all of it, glowing keys and all, every frame. Each
+  // needle (with the pivot cover and glass drawn over it) moves to a transparent SVG stacked on top of its picture,
+  // composited on its own, so a moving needle repaints only that thin layer.
+  (function liftNeedles() {
+    const NS = 'http://www.w3.org/2000/svg', layers = new Map();
+    for (const n of document.querySelectorAll('.vuN')) {
+      const clip = n.parentElement, svg = n.ownerSVGElement; if (!svg || !clip) continue;
+      let top = layers.get(svg);
+      if (!top) {
+        const wrap = document.createElement('div'), abs = svg.style.position === 'absolute';
+        wrap.style.cssText = abs ? `position:absolute;left:${svg.style.left || 0};top:${svg.style.top || 0};width:${svg.getAttribute('width')}px;height:${svg.getAttribute('height')}px`
+          : `position:relative;width:${svg.getAttribute('width')}px;height:${svg.getAttribute('height')}px`;
+        svg.parentNode.insertBefore(wrap, svg); wrap.appendChild(svg);
+        if (abs) { svg.style.left = '0'; svg.style.top = '0'; }
+        top = document.createElementNS(NS, 'svg');
+        for (const k of ['width', 'height', 'viewBox']) if (svg.getAttribute(k)) top.setAttribute(k, svg.getAttribute(k));
+        top.setAttribute('class', 'vu-layer'); top.style.cssText = 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none;will-change:transform';
+        wrap.appendChild(top); layers.set(svg, top);
+      }
+      // keep the transforms of the groups between the picture and the meter, and the meter window's clip
+      const tf = []; for (let e = clip.parentElement; e && e !== svg; e = e.parentElement) if (e.getAttribute('transform')) tf.unshift(e.getAttribute('transform'));
+      const g = document.createElementNS(NS, 'g'); if (tf.length) g.setAttribute('transform', tf.join(' '));
+      const c = document.createElementNS(NS, 'g'); if (clip.getAttribute('clip-path')) c.setAttribute('clip-path', clip.getAttribute('clip-path'));
+      g.appendChild(c); top.appendChild(g);
+      const move = [n]; for (let e = n.nextElementSibling; e; e = e.nextElementSibling) move.push(e);   // needle, pivot cover, glow, glass
+      for (const e of move) c.appendChild(e);
+    }
+  })();
   let raf = 0;
   function startMeters(sel = '#ov-meters') {
     const needles = [...document.querySelectorAll(`${sel} .vuN`)].map((g) => ({ g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45, ph: Math.random() * 10 }));
-    const base = window.TAPE_DB || [];
     let last = performance.now();
     const tick = (now) => {
-      const dt = Math.min(0.05, (now - last) / 1000), t = now / 1000; last = now;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
       for (const n of needles) {
-        const b = base[n.i] ?? -12;
-        // program-like level: phrases, beats and a little noise around the track's level
-        const live = window.JH24_VU;   // the electronics are powered: real line-output levels
-        const lvl = live ? live[n.i] ?? -40 : sel !== '#ov-meters' ? -40 : b < -25 ? -40 : b + 3.2 * Math.sin(t * 0.7 + n.ph) + 2.4 * Math.sin(t * 2.9 + n.ph * 2) + 1.8 * Math.max(0, Math.sin(t * 7.8 + n.ph)) + (Math.random() - 0.5) * 1.2;
+        // the tape machine's real line-output levels while its electronics are on, needles at rest when off (as the studio bridge)
+        const live = window.JH24_VU, lvl = live ? live[n.i] ?? -40 : -40;
         const target = vuAngle(lvl);
         n.a += (target - n.a) * (1 - Math.exp(-dt / 0.065));   // ~300 ms to 99%, like a VU movement
         n.g.setAttribute('transform', `rotate(${n.a.toFixed(2)} ${n.cx} ${n.cy})`);
