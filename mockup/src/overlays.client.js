@@ -56,7 +56,7 @@
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
   }
   function stopMeters() { cancelAnimationFrame(raf); raf = 0; }
-  // the meter bridges in the studio view (HJ-24 bridge in CMI, the A827's amber bridge in SLS): the real line-out
+  // the meter bridges in the studio view (HJ-24 bridge in the HJ room, the A827's amber bridge in SLS): the real line-out
   // levels of the tape machine when its electronics are on, needles at rest when off
   const roomNeedles = { cmi: [], sls: [] };
   document.querySelectorAll('.vuN').forEach((g) => { if (g.closest('.overlay')) return; const n = { g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45 }; (g.closest('#sls') ? roomNeedles.sls : roomNeedles.cmi).push(n); });
@@ -238,7 +238,7 @@
   const tr = window.AS_TRANSPORT, LIVE = window.JH_LIVE;
   const TAPE = tr.tape;
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
-  // both machines follow the same transport: the HJ-24 (CMI room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
+  // both machines follow the same transport: the HJ-24 (HJ room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE], ['jhp', window.JH_LIVE], ['a8p', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
     k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
@@ -762,7 +762,7 @@
     tapeFrame.contentWindow.postMessage({ as: 'state', s: st }, '*');
   }
 
-  // ---------------- studio modes: CMI / SLS (the rack stays; console, tape machine and autolocator swap) ----------------
+  // ---------------- studio modes: HJ / SLS (the rack stays; console, tape machine and autolocator swap) ----------------
   const slsLayer = document.getElementById('sls');
   const modeKeys = [...document.querySelectorAll('.modes button')];
   function setStudio(mode) {

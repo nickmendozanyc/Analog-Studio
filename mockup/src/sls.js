@@ -2,7 +2,7 @@
 // Strip layout follows the SL 611G I/O module drawings in the SSL G Series operator's manual: routing matrix,
 // group output, channel input, dynamics, filters, G Series EQ, cues, monitor input + small fader, quad pans,
 // VCA fader with automation status (plus a black VU meter bridge across the top, as on the G+ photos). Strips 72 px. Sized for the app: 32 channels plus the SL 651G-style master section in 3242 x 1446.
-// Routing: 24 groups + quad bus (the app's 24 multitrack buses, same engine as the CMI room); the real 611G has 32.
+// Routing: 24 groups + quad bus (the app's 24 multitrack buses, same engine as the HJ room); the real 611G has 32.
 
 module.exports = function buildSLS(h, { tapeNames, tapeDb }) {
   const { p, rect, text, circle, button, fader, capture, vu, remote224 } = h;

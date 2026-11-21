@@ -1,4 +1,4 @@
-// CMI HJ-24 tape machine as a CSS 3D scene (true perspective, operator's viewpoint).
+// HJ-24 tape machine as a CSS 3D scene (true perspective, operator's viewpoint).
 // Everything is laid out in "deck units" on the flat top deck (x right, y toward the
 // operator, z up out of the deck). Chromium renders the perspective; cylinders are
 // stacked discs, boxes are planes, the tape is a 2" ribbon standing on edge.
@@ -511,8 +511,10 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     <linearGradient id="shadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
   </defs>`);
   cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="${LIPH + 2}" fill="url(#lip)"/><rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="1.5" fill="#fff" opacity="0.25"/>`);
-  cab.push(`<rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
-  cab.push(txt(CI + 92, FRONT + 29, A8 ? 'STAUDER' : 'CMI', A8 ? 13 : 17, '#e3e5e8', 'middle', 900, A8 ? 'letter-spacing="3"' : 'font-style="italic" letter-spacing="4"'));
+  if (A8) {   // maker's badge (the HJ-24 carries none)
+    cab.push(`<rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
+    cab.push(txt(CI + 92, FRONT + 29, 'STAUDER', 13, '#e3e5e8', 'middle', 900, 'letter-spacing="3"'));
+  }
   // drawer front: woodgrain laminate inside a dark frame (A827: Studer-grey panel), small model tag at right
   if (A8) {
     cab.push(`<rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="${Math.max(0, TH - WOODY)}" fill="#2c2d30"/><rect x="${CI + 30}" y="${WOODY + 8}" width="${TW - 2 * CI - 60}" height="${Math.max(0, TH - WOODY - 8)}" fill="#3a3c40"/><rect x="${CI + 30}" y="${WOODY + 8}" width="${TW - 2 * CI - 60}" height="2" fill="#fff" opacity="0.12"/><rect x="${CI}" y="${WOODY}" width="${TW - 2 * CI}" height="6" fill="#000" opacity="0.35"/>`);

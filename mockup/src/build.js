@@ -485,7 +485,7 @@ const elecView = (() => {
   const sel = (id, opts, val) => `<select id="${id}">${opts.map(([v, l]) => `<option value="${v}"${v === val ? ' selected' : ''}>${l}</option>`).join('')}</select>`;
   // the machine's 24 VU meters: each drawer's eight sit right above their channel cards
   const meter = (i) => `<div class="mt"><svg viewBox="-6 -6 282 252">${capture(() => {
-    vu(0, 0, 270, 202, -20, { needleId: i, brand: 'CMI' });
+    vu(0, 0, 270, 202, -20, { needleId: i });
     text(4, 238, String(i + 1).padStart(2, '0'), 30, '#f2ead8', 'start', 900);
     text(268, 238, tapeNames[i], 24, '#cfc6b3', 'end', 700, 'letter-spacing="1"');
   })}</svg></div>`;
@@ -602,7 +602,7 @@ const elecCss = `
 `;
 
 
-// ---------------- AL-III autolocator face (400 x 340 units, modelled on the CMI AutoLocator III) ----------------
+// ---------------- AL-III autolocator face (400 x 340 units, modelled on the AutoLocator III) ----------------
 // live = true draws the clickable pop-up version: every control is a <g data-al="..."> and every lamp a hidden lit copy
 const AL_W = 400, AL_H = 340;
 function al3(live = false, st = {}) {
@@ -671,8 +671,6 @@ function al3(live = false, st = {}) {
   text(53, 99, 'VAR', 4.8, INK, 'start', 700); text(53, 109, 'FIX', 4.8, INK, 'start', 700);
   text(29, 124, 'TAPE', 5, INK, 'middle', 800); text(29, 130, 'SPEED', 5, INK, 'middle', 800);
   // badges
-  rect(16, 134, 42, 11, '#0d0d0e', 'rx="1.5"'); text(37, 142.6, 'CMI', 8.5, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="1.4"');
-  rect(180, 136, 22, 9, '#0d0d0e', 'rx="1"'); text(191, 143.3, 'CMI', 6, '#e3e5e8', 'middle', 900, 'font-style="italic"');
   text(270, 145, 'AutoLocator III', 8.5, INK, 'end', 700);
   // keypad
   const pad = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['◀', '0', '▶']];
@@ -778,8 +776,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
   const plinth = capture(() => {
     rect(0, 0, TW3 + 24, PLH, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
     rect(0, 0, TW3 + 24, PLH, '#000', 'opacity="0.15"');
-    rect(18, 12, 70, 26, '#0c0c0d', 'rx="2"'); text(53, 31, 'CMI', 16, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
-    text(104, 31, 'HJ-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
+    text(20, 31, 'HJ-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
     text(TW3 - 330, 31, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
     [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 9, 96, 32, 'green', on, k, { size: 14 }));
   });
@@ -794,7 +791,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
 }
 
 // =====================================================================
-// CONSOLE (CMI HJ-632 / HJ-600 style) — CSS 3D: knob panel + fader panel + armrest
+// CONSOLE (HJ-632 / HJ-600 style) — CSS 3D: knob panel + fader panel + armrest
 // Faces are drawn with the SVG helpers (capture); knobs and fader caps are real 3D solids.
 // Text is 14 px or larger (50" 4K legibility rule).
 // =====================================================================
@@ -1147,7 +1144,6 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     const BY = Y - BRIDGE;
     rect(X, BY, PW, BRIDGE, 'url(#jh600)'); rect(X, BY, PW, BRIDGE, '#000', 'opacity="0.22"');
     rect(X, BY - 8, PW, 10, 'url(#oakH)');
-    rect(X + 4, BY + 4, 40, 14, '#0c0c0d', 'rx="2"'); text(X + 24, BY + 15, 'CMI', 10, '#e3e5e8', 'middle', 900, 'font-style="italic" letter-spacing="2"');
     for (let j = 0; j < 16; j++) {
       const cx = X + j * 2 * 85 + 85;
       for (const [row, n] of [[0, 2 * j + 1], [1, 2 * j + 2]]) {
@@ -1450,7 +1446,7 @@ const meterView = capture(() => {
     recLamp(i, x + 430, y + 30, 11);
     circle(x + 396, y + 30, 11, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
     rect(x + 24, y + 54, 432, 330, '#0a0908', 'rx="10"'); rect(x + 24, y + 54, 432, 330, 'url(#bezelHi)', 'rx="10"');
-    vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i, brand: 'CMI' });
+    vu(x + 42, y + 70, 396, 296, tapeDb[i], { needleId: i });
     text(x + 30, y + 452, String(i + 1).padStart(2, '0'), 46, '#ece7dc', 'start', 800);
     rect(x + 112, y + 410, 344, 58, 'url(#tapeMask)', `rx="2" transform="rotate(${(((i * 37) % 7) - 3) * 0.25} ${x + 284} ${y + 439})"`);
     text(x + 284, y + 452, tapeNames[i], 34, '#1c2a6e', 'middle', 700, `font-family="${MARKER}"`);
@@ -1726,7 +1722,7 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
   <div id="files-msg">Tapes, mixes and audio</div>
 </div>
 <div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name.replace(/"/g, '&quot;')}"${k === 'a499' ? ' selected' : ''}>${t.short.replace(/"/g, '&quot;')} · ${t.ol} nWb/m</option>`).join('')}</select></label><button type="button" id="tape-align" title="Realign the machine for this tape: its operating level, then repro, sync, bias, record level and HF on every channel (manual section 7)">ALIGN</button><label class="auto" title="Realign automatically whenever a tape is threaded"><input type="checkbox" id="tape-auto" checked> AUTO</label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n.replace(/"/g, '&quot;')}</option>`).join('')}</select></label></div>
-<div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="CMI room: HJ-24, AutoLocator III, HJ-632 console">CMI</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
+<div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="HJ room: HJ-24, AutoLocator III, HJ-632 console">HJ</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
   ${a827}
@@ -1752,8 +1748,8 @@ ${hot(3340, Math.round(globalThis.RACK_DZ_Y), 450, 56, 'dz', 'Open the Delta-Thr
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id="tp-msg"></span>')}
-${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
-${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
+${overlay('elec', 'HJ-24 · AUDIO ELECTRONICS', elecView)}
+${overlay('al', 'AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
 ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the HJ-24's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>

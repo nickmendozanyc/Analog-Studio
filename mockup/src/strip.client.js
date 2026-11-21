@@ -10,7 +10,7 @@
   // ---- section specs (rows of controls) ----
   const SPEC = {
     cmi: {
-      name: 'CMI HJ-632', theme: { panel: '#2b2a28', ink: '#ece6da', gold: '#d8c27c', knob: 'cmi' },
+      name: 'HJ-632', theme: { panel: '#2b2a28', ink: '#ece6da', gold: '#d8c27c', knob: 'cmi' },
       input: { title: 'INPUT', rows: [
         [B('src_in', 'INPUT', false, 'amber', { radio: 'src' }), B('src_tape', 'TAPE', true, 'amber', { radio: 'src' }), B('phase', 'Ø', false), B('dump', 'DUMP', false, 'red')],
         [K('trim', 'TRIM', -20, 20, 0, 'dB', '#e3452f'), K('direct', 'DIRECT OUT', -60, 10, -60, 'dB', '#1a1a1c', { inf: true })],
