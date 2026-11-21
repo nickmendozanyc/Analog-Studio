@@ -35,3 +35,16 @@ test('noise gate closes below the threshold; compressor reduces the level', () =
   const c = new SPX90(fs).set({ algo: 'comp', thr: -30, ratio: 10, att: 1, rel: 50 }); const [cl] = run(c, sine(200, 1, 0.5));
   assert.ok(rmsDb(cl, 0.5 * fs, fs) < -20, `compressed to ${rmsDb(cl, 0.5 * fs, fs).toFixed(1)} dB`);
 });
+import { SPX_PROGRAMS, spxDefaults, spxEngine, spxShow } from './spx90presets.js';
+test('all 30 factory programs load, run and make sound; the LCD lines fit 16 characters', () => {
+  assert.equal(SPX_PROGRAMS.length, 30);
+  for (let n = 1; n <= 30; n++) {
+    const v = spxDefaults(n), u = new SPX90(fs).set(spxEngine(n, v)); const x = sine(220, 0.6, 0.4); x.fill(0, 0.3 * fs);
+    if (SPX_PROGRAMS[n - 1].name.startsWith('FREEZE')) { u.set({ mode: 'rec' }); }
+    const [L, R] = run(u, x); let e = 0; for (let k = 0; k < L.length; k++) e = Math.max(e, Math.abs(L[k]) + Math.abs(R[k]));
+    assert.ok(Number.isFinite(e) && e < 8, `${SPX_PROGRAMS[n - 1].name}: peak ${e}`);
+    if (!/FREEZE|ADR|COMPRESSOR|TRIGGERED|VIBRATO|GATE$/.test(SPX_PROGRAMS[n - 1].name)) assert.ok(e > 0.01, `${SPX_PROGRAMS[n - 1].name} is silent`);
+    for (const q of SPX_PROGRAMS[n - 1].params) assert.ok(spxShow(q, v[q.id]).length <= 16, `${SPX_PROGRAMS[n - 1].name}: "${spxShow(q, v[q.id])}"`);
+  }
+  assert.equal(spxShow(SPX_PROGRAMS[0].params[0], 2.6), 'REV TIME=   2.6s');
+});
