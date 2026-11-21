@@ -3,7 +3,7 @@
   // Values are kept per console and channel (localStorage 'as-strip-v1'). EQ shows its live frequency response,
   // dynamics its live transfer curve.
   const STRIP_SVG = document.getElementById('stripSvg');
-  const NAMES = ['KICK', 'SNARE', 'HATS', 'TOMS', 'OH L', 'OH R', 'BASS', 'GUITAR', ...Array(15).fill(''), 'SMPTE', '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
+  const NAMES = ['KICK', 'SNARE', 'HATS', 'TOMS', 'OH L', 'OH R', 'BASS', 'GUITAR', ...Array(15).fill(''), 'SMPTE', '224 L', '224 R', 'S900', '', '', '', 'LIVE 1', 'TALK'];
   const K = (id, label, min, max, def, unit, col, o = {}) => ({ t: 'knob', id, label, min, max, def, unit, col, ...o });
   const B = (id, label, def = false, col = 'white', o = {}) => ({ t: 'key', id, label, def, col, ...o });
   const GAP = { t: 'gap' };
@@ -18,7 +18,8 @@
       bus: { title: 'BUS ASSIGN', rows: [
         [{ t: 'bus24', id: 'bus' }],
         [B('panbus', 'PAN', true, 'amber'), K('oddeven', 'ODD · EVEN', -1, 1, 0, 'pan', '#e3452f'), K('buslvl', 'BUS LVL', -60, 10, 0, 'dB', '#1d1d1f', { inf: true })],
-      ], note: 'Press any of the 24 bus keys. With PAN in, ODD · EVEN pans between odd and even buses. BUS LVL sets the level into the buses (0 dB normal).' },
+        [K('pan', 'PAN (2-MIX)', -1, 1, 0, 'pan', '#1a1a1c', { lr: true }), B('mute', 'MUTE', false, 'red'), B('solo', 'SOLO', false, 'amber')],
+      ], note: 'PAN places the channel in the stereo mix; MUTE and SOLO as on the strip. Press any of the 24 bus keys. With PAN in, ODD · EVEN pans between odd and even buses. BUS LVL sets the level into the buses (0 dB normal).' },
       eq: { title: 'EQUALIZER', graph: 'eq', rows: [
         [K('hf_f', 'HI FREQ', 4600, 16000, 10000, 'Hz', '#3f8fd9', { log: true }), K('hf_g', 'HI GAIN', -14, 14, 0, 'dB', '#3f8fd9')],
         [K('mf_f', 'MID FREQ', 180, 10000, 1500, 'Hz', '#7fa392', { log: true }), K('mf_g', 'MID GAIN', -14, 14, 0, 'dB', '#7fa392')],
@@ -177,6 +178,7 @@
   };
   function applyCh(con, ch) {
     const s = chState(con, ch), E = els(con, ch);
+    if (window.CON_CHANGED) window.CON_CHANGED(con, ch);
     for (const el of E.k) { const c = knobDef(con, el.dataset.kid), pg = el.querySelector('.kptr'); if (pg && s[el.dataset.kid] !== undefined) pg.setAttribute('transform', `rotate(${(angOf(c, s[el.dataset.kid]) - +el.dataset.a0).toFixed(2)} ${el.dataset.cx} ${el.dataset.cy})`); }
     for (const el of E.b) { const id = el.dataset.bid, on = /^bus\d+$/.test(id) ? s.bus.includes(+id.slice(3)) : !!s[id], l = el.querySelector('.klit'); if (l) l.setAttribute('opacity', on ? 1 : 0); }
   }

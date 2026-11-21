@@ -838,9 +838,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
   const PW = CW - 68;                 // panel width between the wood cheeks
   const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
   const UD = 964, FD = 370, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
-  const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
+  const consoleNames = [...tapeNames, '224 L', '224 R', 'S900', '', '', '', 'LIVE 1', 'TALK'];
   const busLit = (i) => (i < 24 ? [i] : []);   // channel n -> bus n (tracks 1-24); 25-32 unassigned
-  const muted = new Set([2, 22, 31]), soloed = new Set([19]);
+  const muted = new Set([23, 31]), soloed = new Set();   // the console is live: what it shows is what you hear (SMPTE on 24 and talkback muted)
   const faderPos = consoleNames.map((n, i) => (i === 19 ? 0.2 : i === 31 ? 0.98 : 0.24 + rnd() * 0.2));
   const L = '#ece7dc';
   const upKnobs = [], fdCaps = [];
@@ -869,11 +869,14 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       p(`<g class="klit" opacity="${lit ? 1 : 0}">`); rect(x, y, w, h, litCol, 'rx="2" filter="url(#glow)"'); rect(x, y, w, h, 'url(#btnOff)', 'rx="2"'); tx(x + w / 2, y + h / 2 + 3.4, label, 9.5, '#1a0c08', 'middle', 800); p('</g>');
       if (bid) p('</g>');
     };
-    const wht = (x, y, w, h, label, lit = false) => {
+    const wht = (x, y, w, h, label, lit = false, bid) => {
+      if (bid) p(`<g data-bid="${bid}" data-ch="${CH_NOW}" data-on="${lit ? 1 : 0}">`);
       rect(x - 0.5, y + 1.5, w + 1, h + 1, '#000', 'rx="2" opacity="0.6"');
-      rect(x, y, w, h, lit ? '#fff7c8' : '#e9e7e0', `rx="2" ${lit ? 'filter="url(#glow)"' : ''}`);
+      rect(x, y, w, h, '#e9e7e0', 'rx="2"');
+      p(`<g class="klit" opacity="${lit ? 1 : 0}">`); rect(x, y, w, h, '#ffe14a', 'rx="2" filter="url(#glow)"'); p('</g>');
       rect(x, y, w, h, 'url(#btnOff)', 'rx="2" opacity="0.5"');
       tx(x + w / 2, y + h / 2 + 4, label, 11, '#1b1b1b', 'middle', 800);
+      if (bid) p('</g>');
     };
     const rnd2 = (cx, cy, r, col) => { circle(cx + 0.8, cy + 1.6, r + 0.8, '#000', 'opacity="0.55"'); circle(cx, cy, r, col); circle(cx, cy, r, 'url(#capHi)', 'opacity="0.7"'); };
     // round key with a lit layer (green dot, cream cap or red LED) for the pop-ups to switch
@@ -949,7 +952,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       const sendHead = (y, nm) => { rect(x0 + 4, y, 77, 1.1, GOLD); tx(x0 + 80, y + 12, 'SEND', 9, GOLD, 'end', 800); tx(x0 + 80, y + 23, nm, 9, GOLD, 'end', 800); };
       const lv = (on) => (on ? -40 + rnd() * 120 : -150);
       sendHead(702, '1-2');
-      KN(x0 + 23.5, 725, 11, YEL, lv(ch < 24 && [1, 15, 19, 20, 21].includes(ch)), [[-122, '∞'], [0, '1'], [122, '+3']], false, 's1');
+      KN(x0 + 23.5, 725, 11, YEL, lv([1, 3, 7].includes(ch)), [[-122, '∞'], [0, '1'], [122, '+3']], false, 's1');
       blk(x0 + 4, 742.5, 30, 14, 'PRE', false, '#ff3b2f', 's12pre'); KN(x0 + 56, 752, 11, YEL, lv([13, 14, 19].includes(ch)), [[-135, '∞'], [0, '2'], [135, '+3']], false, 's2');
       blk(x0 + 4, 760.5, 30, 14, 'WET', false, '#ff3b2f', 's12wet');
       sendHead(778, '3-4');
@@ -966,9 +969,9 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       KN(x0 + 50, 897, 18, '#1d1d1f', 60, [[60, '0']], true, 'buslvl');   // black; normally set to 0 dB (2 o'clock)
       tx(x0 + 27, 926, '∞', 8, WH, 'middle', 700); tx(x0 + 74, 926, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
-      blk(x0 + 4, 928, 36, 18, 'MUTE', muted.has(ch)); wht(x0 + 44, 928, 36, 18, String(ch + 1), soloed.has(ch));
-      const pan = ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
-      KN(x0 + 42, 972, 12, BLK, pan, [[0, 'C'], [-122, 'L'], [122, 'R']], true);
+      blk(x0 + 4, 928, 36, 18, 'MUTE', muted.has(ch), '#ff3b2f', 'mute'); wht(x0 + 44, 928, 36, 18, String(ch + 1), soloed.has(ch), 'solo');
+      const pan = ch === 24 ? -150 : ch === 25 ? 150 : ch === 4 ? -90 : ch === 5 ? 90 : ch === 7 || ch === 9 ? -110 : ch === 8 || ch === 10 ? 110 : ch % 2 ? 50 * (rnd() - 0.2) : -50 * (rnd() - 0.2);
+      KN(x0 + 42, 972, 12, BLK, pan, [[0, 'C'], [-122, 'L'], [122, 'R']], true, 'pan');
       p('</g>');
     }
     for (let g = 1; g < 4; g++) rect(g * 8 * STRIP - 1.5, 0, 3, UD, '#0a0a0b');
@@ -1082,8 +1085,10 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
         });
       }
       const cy = top + faderPos[ch] * (bot - top);
+      p(`<g class="cmi-fdr" data-ch="${ch}" data-y0="${cy.toFixed(2)}" data-pos="${faderPos[ch].toFixed(4)}">`);
       p(`<ellipse cx="${fx + 6}" cy="${cy + 10}" rx="22" ry="30" fill="#000" opacity="0.35" filter="url(#soft)"/>`);
       CAP(fx, cy, 34, 48, 18, 'white', ch >= 24 ? '#c89a20' : '#222');
+      p('</g>');
       text(x0 + 76, FD - 8, String(ch + 1), 9, WH2, 'end', 800);
       // VCA group selector readout (click cycles –, G1–G8)
       { const grp = ch < 11 ? 1 : ch < 13 ? 2 : ch < 16 ? 3 : ch < 19 ? 4 : ch < 22 ? 5 : ch < 24 ? 6 : ch < 30 ? 7 : 0;
@@ -1122,7 +1127,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     const mfx = mx + mw - 54;
     for (const [lab, fr] of MARKS) text(mfx - 34, top + fr * (bot - top) + 4, lab, 9, '#ece6da', 'end', 700);
     for (const ox of [-18, 18]) rect(mfx + ox - 4, top - 8, 8, bot - top + 16, '#050505', 'rx="4"');
-    CAP(mfx - 18, top + 0.22 * (bot - top), 32, 48, 22, 'yellow', '#111'); CAP(mfx + 18, top + 0.22 * (bot - top), 32, 48, 22, 'green', '#111');
+    p(`<g class="cmi-mfdr" data-y0="${(top + 0.2 * (bot - top)).toFixed(2)}">`); CAP(mfx - 18, top + 0.2 * (bot - top), 32, 48, 22, 'yellow', '#111'); CAP(mfx + 18, top + 0.2 * (bot - top), 32, 48, 22, 'green', '#111'); p('</g>');
     text(mfx, FD - 6, 'STEREO', 12, '#ece6da', 'middle', 800, 'letter-spacing="1"');
   });
 
@@ -1149,14 +1154,15 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       for (const [row, n] of [[0, 2 * j + 1], [1, 2 * j + 2]]) {
         const my = BY + 8 + row * 55;
         rect(cx - 56, my - 3, 112, 52, '#0d0c0b', 'rx="4"');
-        vu(cx - 51, my + 1, 102, 46, Math.min(1, (tapeDb[(n - 1) % 24] ?? -12) + (n > 24 ? -4 : 0)), { label: String(n), fontScale: 0.13 });
+        vu(cx - 51, my + 1, 102, 46, -20, { label: String(n), fontScale: 0.13, needleId: 'c' + (n - 1) });
       }
     }
     for (let g = 1; g < 4; g++) rect(X + g * 8 * 85 - 1.5, BY, 3, BRIDGE, '#0a0a0b');
     { const mx = X + 32 * 85, mw = PW - 32 * 85; rect(mx, BY, 3, BRIDGE, '#000');
-      vu(mx + 50, BY + 10, 156, 100, 0.4, { label: 'L', fontScale: 0.12 }); vu(mx + mw - 206, BY + 10, 156, 100, -0.6, { label: 'R', fontScale: 0.12 }); }
+      vu(mx + 50, BY + 10, 156, 100, -20, { label: 'L', fontScale: 0.12, needleId: 'mL' }); vu(mx + mw - 206, BY + 10, 156, 100, -20, { label: 'R', fontScale: 0.12, needleId: 'mR' }); }
     rect(X, Y - 3, PW, 3, '#000', 'opacity="0.6"');
     p(`<g transform="translate(${X} ${Y})">${upper}</g>`);
+    globalThis.CMI_FB = { x: X, y: Y + UD, w: PW, h: FD, top: 96, bot: 346, strip: STRIP, mfx: MXL + MWD - 54 };
     p(`<g transform="translate(${X} ${Y + UD})">${lower.replace(/<rect x="0" y="0" width="${PW}" height="${FD}" fill="url\(#faderBay\)"\/>/, `<rect x="0" y="0" width="${PW}" height="${FD}" fill="url(#faderBay)"/>`)}</g>`);
     rect(X, Y + UD, PW, 2, '#000', 'opacity="0.6"');
     for (const wx of [CX, CX + CW - 34]) { rect(wx, CY - BRIDGE - 8, 34, CH + BRIDGE + 8, 'url(#wood)', 'rx="4"'); rect(wx, CY - BRIDGE - 8, 34, CH + BRIDGE + 8, '#000', 'filter="url(#woodgrain)" opacity="0.8" rx="4"'); }
@@ -2351,6 +2357,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #racks-room .rr-sub{position:absolute;left:94px;top:170px;width:1200px;font:600 24px Archivo,Arial;color:#a9a294;line-height:1.5}
   #racks-room .rr-back{position:absolute;left:94px;top:260px;font:900 20px Archivo,Arial;letter-spacing:3px;padding:16px 30px;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
   .fm-hot{position:absolute;cursor:pointer;z-index:5}
+  body[data-studio="sls"] #cmi-fdr-hot{display:none}
   .rr-desk{position:absolute;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#6b4527,#57361d 30%,#4a2d17);box-shadow:inset 0 2px 0 rgba(255,220,180,.18),0 -6px 30px rgba(0,0,0,.6)}
   .rr-desk::before{content:'';position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 3px,rgba(255,255,255,.025) 3px 9px,rgba(0,0,0,.04) 9px 17px);opacity:.9}
   .rr-unit{position:absolute;filter:drop-shadow(0 18px 22px rgba(0,0,0,.65)) drop-shadow(0 3px 4px rgba(0,0,0,.5))}
@@ -2430,6 +2437,7 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
   ${slsConsole}
 </div>
 <div id="strip-hot-cmi" class="shot" style="left:46px;top:800px;width:2720px;height:900px" title="Click a section of any channel"></div>
+<div id="cmi-fdr-hot" style="position:absolute;left:${globalThis.CMI_FB.x}px;top:${globalThis.CMI_FB.y}px;width:${globalThis.CMI_FB.w}px;height:${globalThis.CMI_FB.h}px;z-index:3;cursor:ns-resize" title="Drag a fader (double-click: 0 dB)"></div>
 <div id="strip-hot-sls" class="shot" hidden style="left:24px;top:860px;width:3242px;height:860px" title="Click a section of any channel"></div>
 <div id="strip-hl" hidden><span></span></div>
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the JH-Tape')}
@@ -2503,13 +2511,13 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + ['h949.js', 'rmx16.js', 'pcm4x.js', 's900.js', 'tr808.js', 'tr909.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '').replace(/\bclass Line\b/g, 'class RmxLine').replace(/new Line\(/g, 'new RmxLine(').replace(/\bTAU\b/g, f === 'h949.js' ? 'H_TAU' : 'R_TAU')).join('\n') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + ['h949.js', 'rmx16.js', 'pcm4x.js', 's900.js', 'tr808.js', 'tr909.js', '../console/jhmix.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '').replace(/\bclass Line\b/g, 'class RmxLine').replace(/new Line\(/g, 'new RmxLine(').replace(/\bTAU\b/g, f === 'h949.js' ? 'H_TAU' : 'R_TAU')).join('\n') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90presets.js'), 'utf8').replace(/^export /gm, '')}</script>
-<script>${['s900.js', 's900factory.js', 'tr808.js', 'tr909.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')).join('\n')}</script>
+<script>${['s900.js', 's900factory.js', 'tr808.js', 'tr909.js', '../console/jhmix.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')).join('\n')}</script>
 <script>const RMX_PROGRAMS_UI = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'rmx16.js'), 'utf8').replace(/^export /gm, '')}; return RMX_PROGRAMS; })(); const h949Ratio = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'h949.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')}; return h949Ratio; })();</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'furman.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 's900.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr808.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr909.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'furman.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 's900.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr808.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr909.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'console.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 <script>(() => {   // the OldTools splash: names what is coming up, then fades
   const el = document.getElementById('splash'); if (!el) return;
   const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Pulling out the rack lights', 'Booting the Akita S900', 'Tuning the Rowan TR-8080', 'Setting the TR-9090 on the desk', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];

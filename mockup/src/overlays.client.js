@@ -119,13 +119,14 @@
   // the meter bridges in the studio view (JH-Tape bridge in the JH room, the A827's amber bridge in SLS): the real line-out
   // levels of the tape machine when its electronics are on, needles at rest when off
   const roomNeedles = { cmi: [], sls: [] };
-  document.querySelectorAll('.vuN').forEach((g) => { if (g.closest('.overlay')) return; const n = { g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45 }; (g.closest('#sls') ? roomNeedles.sls : roomNeedles.cmi).push(n); });
+  document.querySelectorAll('.vuN').forEach((g) => { if (g.closest('.overlay')) return; const n = { g, i: /^[cm]/.test(g.dataset.i) ? g.dataset.i : +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45 }; (g.closest('#sls') ? roomNeedles.sls : roomNeedles.cmi).push(n); });
   let roomLast = performance.now();
   function roomMeters(now) {
     const dt = Math.min(0.05, (now - roomLast) / 1000); roomLast = now;
     const live = window.JH24_VU, k = 1 - Math.exp(-dt / 0.065);
     for (const n of roomNeedles[document.body.dataset.studio === 'sls' ? 'sls' : 'cmi']) {
-      const a = n.a + (vuAngle(live ? live[n.i] ?? -40 : -40) - n.a) * k;
+      const mv = window.MIX_VU, lv = typeof n.i === 'string' ? (mv ? (n.i === 'mL' ? mv.L : n.i === 'mR' ? mv.R : mv.ch[+n.i.slice(1)]) : -40) : live ? live[n.i] ?? -40 : -40;
+      const a = n.a + (vuAngle(lv) - n.a) * k;
       if (Math.abs(a - n.a) > 0.05 || n.a === -45 && a !== -45) { n.a = a; n.g.setAttribute('transform', `rotate(${a.toFixed(2)} ${n.cx} ${n.cy})`); } else n.a = a;
     }
   }
@@ -882,7 +883,7 @@
     c160Tick();
     im90Tick();
     spxTick();
-    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick();
+    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick(); consoleTick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

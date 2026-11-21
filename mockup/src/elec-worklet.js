@@ -28,6 +28,9 @@ class JH24Processor extends AudioWorkletProcessor {
     // the Akita S900 sampler: records from the channel patched to its input, plays to the mix (its own line return)
     this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-9090 on the desk (into the mix)
     this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-8080 (into the mix)
+    // the JH-Mix console, and the 224X it sends to (an RMX16-family reverb on the hall program)
+    this.con = new JHMix(sampleRate, 32); this.lineSrc = Array(8).fill(null); this.lineBuf = []; this.rvSend = 0;
+    this.rv = new RMX16(sampleRate); this.rv.set({ prog: 3, pre: 20, decay: 2.4 }); this.rvIn = new Float32Array(128); this.rvL = new Float32Array(128); this.rvR = new Float32Array(128);
     this.s9 = new S900(sampleRate); this.s9ch = null; this.s9on = true; this.s9L = new Float32Array(128); this.s9R = new Float32Array(128); this.s9In = new Float32Array(128);
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
     this.h949 = new H949Unit(sampleRate); this.rmx = new RMX16(sampleRate); this.par = { h949: null, rmx: null };
@@ -55,6 +58,12 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
     }
     else if (d.type === 'h949' || d.type === 'rmx') { const u = d.type === 'h949' ? this.h949 : this.rmx; if (d.ch !== undefined) this.par[d.type] = d.ch; if (d.set) u.set(d.set); }
+    else if (d.type === 'con') {
+      if (d.ch != null && d.set) this.con.set(d.ch, d.set);
+      if (d.all) d.all.forEach((o, i) => { if (o) this.con.set(i, o); });
+      if (d.master != null) this.con.master = d.master; if (d.dim != null) this.con.dim = d.dim; if (d.mono != null) this.con.mono = d.mono; if (d.cut != null) this.con.cut = d.cut;
+      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
+    }
     else if (d.type === 's900') this.s9msg(d);
     else if (d.type === 'tr909') {
       const u = this.t9; if (d.set) u.set(d.set); if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) u.patterns[d.patIx] = d.pattern;
@@ -202,35 +211,43 @@ class JH24Processor extends AudioWorkletProcessor {
       if (this.spxIn[u].length !== n) { this.spxIn[u] = new Float32Array(n); this.spxL[u] = new Float32Array(n); this.spxR[u] = new Float32Array(n); this.silent = new Float32Array(n); }
       const ch = this.spxch[u]; if (ch != null && this.out[ch]) this.spxIn[u].set(ins[ch] || this.out[ch]); else this.spxIn[u].fill(0);
       this.spx[u].process(this.spxIn[u], this.spxL[u], this.spxR[u], n);
-      if (ch != null) ins[ch] = this.silent;
+      if (ch != null) { if (!this.spxRet || this.spxRet[u].length !== n) this.spxRet = [new Float32Array(n), new Float32Array(n)]; const r = this.spxRet[u], a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) r[k] = (a[k] + b[k]) * 0.5; ins[ch] = r; }   // the SPX returns on its channel (through its fader)
     }
-    if (!this.mix.mute) for (let i = 0; i < this.N; i++) {
-      if (this.mix.solo >= 0 && this.mix.solo !== i) continue;
-      const pan = this.mix.solo >= 0 ? 0.5 : 0.15 + 0.7 * (i % 8) / 7, gl = Math.cos(pan * Math.PI / 2) * this.mix.gain, gr = Math.sin(pan * Math.PI / 2) * this.mix.gain;
-      const y = ins[i] || this.out[i];
-      for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
-    }
-    // the H949 and the RMX16, alongside their channels
+    // ---- the JH-Mix console: tape returns (or their inputs) on 1-24, line inputs 25-32 from the patchbay, the stereo bus
+    const C = this.con, n2 = n;
+    if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
+    if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
+    if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
+    if (this.s9on) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }
+    if (this.lineBuf.length !== 8 || this.lineBuf[0].length !== n) this.lineBuf = Array.from({ length: 8 }, () => new Float32Array(n));
+    const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L };   // the outputs a line input can be patched from
+    let s9Patched = false;
+    for (let j = 0; j < 8; j++) { const nm = this.lineSrc[j], b2 = fxOut[nm]; if (nm === 'S900') s9Patched = true; if (b2 && b2.length === n) this.lineBuf[j].set(b2); else this.lineBuf[j].fill(0); }
+    C.process((i) => (i < 24 ? (i < this.N ? (C.ch[i].p.src === 'in' ? this.inp[i] : ins[i] || this.out[i]) : null) : this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null), n2);
+    const BL = C.L, BR = C.R;
+    // the 224X: fed from the send patched to its input (aux SEND n -> 224 L), its outputs come back on line inputs next block
+    if (this.rvIn.length !== n) { this.rvIn = new Float32Array(n); this.rvL = new Float32Array(n); this.rvR = new Float32Array(n); }
+    if (this.rvSend >= 0) this.rvIn.set(C.sends[this.rvSend]); else this.rvIn.fill(0);
+    this.rv.process(this.rvIn, this.rvL, this.rvR, n);
+    // the H949 and the RMX16, alongside their channels (effect sends of their own), the SPXs, the drum machines, the S900
     if (this.parIn.length !== n) { this.parIn = new Float32Array(n); this.parL = new Float32Array(n); this.parR = new Float32Array(n); }
     for (const [key, unit] of [['h949', this.h949], ['rmx', this.rmx]]) {
       const ch = this.par[key]; if (ch == null || !this.out[ch]) { this.parIn.fill(0); unit.process(this.parIn, this.parL, this.parR, n); continue; }
       this.parIn.set(ins[ch] || this.out[ch]); unit.process(this.parIn, this.parL, this.parR, n);
-      if (this.mix.mute || this.mix.solo >= 0) continue;
-      const g = this.mix.gain * 0.8, dl = key === 'h949' && unit.p.dlyMs > 0;
-      for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; L[k] += a * g; if (R !== L) R[k] += b * g; }
+      const g = 0.8, dl = key === 'h949' && unit.p.dlyMs > 0;
+      for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; BL[k] += a * g; BR[k] += b * g; }
     }
-    if (!this.mix.mute && this.mix.solo < 0) for (let u = 0; u < 2; u++) if (this.spxch[u] != null) { const g = this.mix.gain * 0.75, a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) { L[k] += a[k] * g; if (R !== L) R[k] += b[k] * g; } }
-    // the S900: records from its patched channel; its output joins the mix (like a line return)
-    if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
-    if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
-    if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
-    if (this.s9on) { this.s9.process(this.s9In, this.s9L, this.s9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain; for (let k = 0; k < n; k++) { L[k] += this.s9L[k] * g; if (R !== L) R[k] += this.s9R[k] * g; } } }
-    // the TR-9090 on the desk, into the mix
+    if (!s9Patched) for (let k = 0; k < n; k++) { BL[k] += this.s9L[k]; BR[k] += this.s9R[k]; }
     if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
-    this.t9.process(this.t9L, this.t9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain * 0.9; for (let k = 0; k < n; k++) { L[k] += this.t9L[k] * g; if (R !== L) R[k] += this.t9R[k] * g; } }
-    // the TR-8080: its own voices and sequencer, into the mix
+    this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { BL[k] += this.t9L[k] * 0.9; BR[k] += this.t9R[k] * 0.9; }
     if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
-    this.tr.process(this.trL, this.trR, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain * 0.9; for (let k = 0; k < n; k++) { L[k] += this.trL[k] * g; if (R !== L) R[k] += this.trR[k] * g; } }
+    this.tr.process(this.trL, this.trR, n); for (let k = 0; k < n; k++) { BL[k] += this.trL[k] * 0.9; BR[k] += this.trR[k] * 0.9; }
+    C.finish(n);
+    // to the speakers: the stereo bus at the monitor level, or one tape channel soloed on its electronics card
+    if (!this.mix.mute) {
+      if (this.mix.solo >= 0) { const y = ins[this.mix.solo] || this.out[this.mix.solo], g = this.mix.gain * Math.SQRT1_2; if (y) for (let k = 0; k < n; k++) { L[k] += y[k] * g; if (R !== L) R[k] += y[k] * g; } }
+      else { const g = this.mix.gain; for (let k = 0; k < n; k++) { L[k] += BL[k] * g; if (R !== L) R[k] += BR[k] * g; } }
+    }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
     if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }
     // VU levels (average-responding, ~300 ms; 0 VU = 0 dB) and what each channel is monitoring, ~30 times a second
@@ -239,7 +256,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()), s900: this.s9.meters(), tr808: this.tr.meters(), tr909: this.t9.meters() });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()), s900: this.s9.meters(), tr808: this.tr.meters(), tr909: this.t9.meters(), con: this.con.meters(VU0) });
     }
     return true;
   }
