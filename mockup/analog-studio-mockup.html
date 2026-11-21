@@ -23,6 +23,23 @@
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
   body.fullview #stage>:not(.overlay){visibility:hidden}
+  /* OldTools splash: a centred window over the studio while it loads; click to skip */
+  #splash{position:absolute;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);transition:opacity .9s ease}
+  #splash.gone{opacity:0;pointer-events:none}
+  #splash .card{position:relative;width:1880px;height:1060px;border-radius:14px;overflow:hidden;background:radial-gradient(120% 90% at 70% 30%,#2a2620 0%,#16140f 55%,#0d0c0a 100%);box-shadow:0 40px 140px rgba(0,0,0,.8),0 0 0 2px rgba(255,255,255,.05);font-family:Archivo,Arial,sans-serif;color:#efe6d2;cursor:pointer}
+  #splash .reels{position:absolute;right:-120px;top:-60px;width:1240px;height:1240px;opacity:.26}
+  #splash .reels .spin{transform-origin:center;transform-box:fill-box;animation:spl-spin 9s linear infinite}
+  #splash .reels .spin2{animation-duration:6.5s}
+  @keyframes spl-spin{to{transform:rotate(-360deg)}}
+  #splash .presents{position:absolute;left:130px;top:250px;font:800 30px Archivo,Arial;letter-spacing:9px;text-transform:uppercase;color:#cfc4ae}
+  #splash .word{position:absolute;left:118px;top:300px;font:900 250px/1 Archivo,Arial;letter-spacing:-6px;color:#f2eadb}
+  #splash .word i{font-style:normal;color:#e8a33a}
+  #splash .edition{position:absolute;left:132px;top:585px;font:800 44px Archivo,Arial;letter-spacing:6px;text-transform:uppercase;color:#e8a33a}
+  #splash .tag{position:absolute;left:134px;top:655px;font:600 30px Archivo,Arial;color:#b9ad95;letter-spacing:1px}
+  #splash .bar{position:absolute;left:134px;right:134px;bottom:150px;height:6px;border-radius:3px;background:#2c2822;overflow:hidden}
+  #splash .bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,#c9862c,#f0b04a);box-shadow:0 0 18px rgba(240,176,74,.6);transition:width .35s ease}
+  #splash .status{position:absolute;left:134px;bottom:180px;font:600 28px 'JetBrains Mono',monospace;color:#cfc4ae}
+  #splash .foot{position:absolute;left:134px;right:134px;bottom:70px;display:flex;justify-content:space-between;font:600 24px Archivo,Arial;color:#8f867a;letter-spacing:1px}
   .overlay.float{background:transparent;pointer-events:none}   /* the studio stays usable around floating windows */
   .overlay.float .ov-win{pointer-events:auto}
   .overlay.float .ov-bar{cursor:move;user-select:none}   /* the studio stays as it is behind a floating window (clicking it still closes the window) */
@@ -161,6 +178,7 @@
   .el-plate.on i{background:#ff3b2f;box-shadow:0 0 10px #ff3b2f}
 
 </style></head><body><div id="stage">
+<div id="splash" role="dialog" aria-label="OldTools is starting"><div class="card"><svg class="reels" viewBox="0 0 1240 1240" aria-hidden="true"><g class="spin " transform-origin="330 620"><circle cx="330" cy="620" r="300" fill="none" stroke="#e8dcc4" stroke-width="10"/><circle cx="330" cy="620" r="210" fill="none" stroke="#e8dcc4" stroke-width="3" opacity=".6"/><circle cx="330" cy="620" r="70" fill="none" stroke="#e8dcc4" stroke-width="10"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(0 330 620)"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(120 330 620)"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(240 330 620)"/></g><g class="spin spin2" transform-origin="910 620"><circle cx="910" cy="620" r="300" fill="none" stroke="#e8dcc4" stroke-width="10"/><circle cx="910" cy="620" r="210" fill="none" stroke="#e8dcc4" stroke-width="3" opacity=".6"/><circle cx="910" cy="620" r="70" fill="none" stroke="#e8dcc4" stroke-width="10"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(0 910 620)"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(120 910 620)"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(240 910 620)"/></g><path d="M30 620 Q330 1080 620 1010 T1210 620" fill="none" stroke="#e8dcc4" stroke-width="6" opacity=".7"/></svg><div class="presents">NMAudiowerks presents</div><div class="word">Old<i>T</i>ools</div><div class="edition">JH-Studio · Analog Edition</div><div class="tag">Tape. Console. Rack. No undo.</div><div class="status" id="spl-status">Starting…</div><div class="bar"><b id="spl-bar"></b></div><div class="foot"><span>Version 1.0 · © NMAudiowerks</span><span>Click to continue</span></div></div></div>
 <svg id="room-svg" xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
 <defs>
   <radialGradient id="kShadow"><stop offset="0.55" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
@@ -110532,4 +110550,13 @@ class Chaser {
   requestAnimationFrame(studio);
 })();
 </script>
+<script>(() => {   // the OldTools splash: names what is coming up, then fades
+  const el = document.getElementById('splash'); if (!el) return;
+  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for Amtex 499', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
+  const st = document.getElementById('spl-status'), bar = document.getElementById('spl-bar'); let i = 0, done = false;
+  const close = () => { if (done) return; done = true; el.classList.add('gone'); setTimeout(() => el.remove(), 1000); };
+  const tick = () => { if (done) return; st.textContent = steps[i] + (i < steps.length - 1 ? '…' : ''); bar.style.width = Math.round((i + 1) / steps.length * 100) + '%'; if (++i < steps.length) setTimeout(tick, 260 + Math.random() * 180); else setTimeout(close, 700); };
+  el.addEventListener('click', close); addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') close(); }, { once: true });
+  setTimeout(tick, 250);
+})();</script>
 </body></html>
