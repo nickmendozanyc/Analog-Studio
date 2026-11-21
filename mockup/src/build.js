@@ -1600,9 +1600,9 @@ function tr808Body(bw, bh) {
   rect(X(0.5), Y(63.4), X(99) - X(0.5), Y(35.4), '#8f8e8b', `rx="${2 * s}"`); rect(X(0.5), Y(63.4), X(99) - X(0.5), 0.8 * s, '#c8c7c2', 'opacity="0.6"');
   for (const [sx, sy] of [[1.5, 2.5], [98.5, 2.5], [1.5, 97], [98.5, 97], [21, 2.5], [60, 2.5], [21, 60.5], [60, 60.5]]) circle(X(sx), Y(sy), 1.4 * s, '#4a4a4c');
   // name: logo, Rhythm Composer, Computer Controlled
-  rect(X(64.7), Y(6.4), 7 * s, 6 * s, 'none', `stroke="${O}" stroke-width="${1.2 * s}"`); T(X(64.7) + 9 * s, Y(12.2), 'Rowan', 15, O, 'start', 600, 'letter-spacing="0.2"');
-  rect(X(21), Y(56.6), X(87) - X(21), 0.5 * s, O); T(X(74.2), Y(55.6), 'Rhythm Composer', 11, O, 'end', 500); T(X(84.6), Y(55.4), 'TR-8080', 7.6, O, 'end', 700);
-  T(X(84.6), Y(59.4), 'Computer Controlled', 6.2, '#c9c6be', 'end', 500);
+  rect(X(67.8), Y(7.4), 7 * s, 6 * s, 'none', `stroke="${O}" stroke-width="${1.2 * s}"`); T(X(67.8) + 9 * s, Y(13.2), 'Rowan', 15, O, 'start', 600, 'letter-spacing="0.2"');
+  rect(X(22), Y(59.9), X(88) - X(22), 0.5 * s, O); T(X(74.2), Y(58.4), 'Rhythm Composer', 11, O, 'end', 500); T(X(85.6), Y(58.2), 'TR-8080', 7.6, O, 'end', 700);
+  T(X(85.6), Y(62.6), 'Computer Controlled', 6.2, '#c9c6be', 'end', 500);
   // power
   T(X(6.6), Y(3.6), 'POWER', 2.4); rect(X(6.6) - 4 * s, Y(5.3), 8 * s, 5 * s, '#0b0b0c', `rx="${0.6 * s}"`); rect(X(6.6) - 3.2 * s, Y(5.6), 3.6 * s, 3.6 * s, '#3a3a3d'); T(X(6.6) + 6 * s, Y(6.8), 'ON', 1.8); T(X(6.6) + 6.2 * s, Y(9.8), 'OFF', 1.8);
   // knobs: LEVEL = yellow cap on a black skirt; the others black with a white pointer; ticks round them
@@ -1620,18 +1620,18 @@ function tr808Body(bw, bh) {
     p(`<text x="${cx}" y="${cy + 1.1 * s}" font-family="Archivo,Arial" font-weight="700" fill="#2a2522" text-anchor="middle" letter-spacing="${0.1 * s}">${sp}</text>`);
   };
   // the instrument columns
-  const CX = [25.1, 31.2, 37.2, 43.2, 49.2, 55.3, 61.2, 67.2, 73.2, 79.3, 85.3, 91.2], cw = (X(91.2) - X(25.1)) / 11;
+  const CX = Array.from({ length: 12 }, (_, i) => 26.4 + i * 6.21), cw = X(6.21) - X(0);   // measured on a straight-on photo
   const COL = [['AC', 'ACcent', []], ['BD', 'BassDrum', [['tone', 'TONE'], ['decay', 'DECAY']]], ['SD', 'SnareDrum', [['tone', 'TONE'], ['snappy', 'SNAPPY']]],
     ['LT', 'LowTom', [['tune', 'TUNING']], 'conga', 'LowConga'], ['MT', 'MidTom', [['tune', 'TUNING']], 'conga', 'MidConga'], ['HT', 'HiTom', [['tune', 'TUNING']], 'conga', 'HiConga'],
     ['RS', 'RimShot', [], 'claves', 'CLaves'], ['CP', 'handClaP', [], 'maracas', 'MAracas'], ['CB', 'CowBell', []], ['CY', 'CYmbal', [['tone', 'TONE'], ['decay', 'DECAY']]], ['OH', 'OpenHihat', [['decay', 'DECAY']]], ['CH', 'ClsdHihat', []]];
-  rect(X(22), Y(17.5) - 9 * s, X(94.3) - X(22), Y(50.5) - Y(17.5) + 9 * s, 'none', `stroke="#5a5a5d" stroke-width="${0.5 * s}"`);
+  rect(X(23.3), Y(20.5) - 9 * s, X(97.3) - X(23.3), Y(53.6) - Y(20.5) + 9 * s, 'none', `stroke="#5a5a5d" stroke-width="${0.5 * s}"`);
   COL.forEach(([k, name, ks, sw, alt], i) => {
     const cx = X(CX[i]);
-    if (i) p(`<line x1="${cx - cw / 2}" y1="${Y(17.5) - 9 * s}" x2="${cx - cw / 2}" y2="${Y(50.5)}" stroke="#5a5a5d" stroke-width="${0.5 * s}"/>`);
-    T(cx, Y(13.8), 'LEVEL', 2.3); knob(cx, Y(16.9), 3.2 * s, k === 'AC' ? 'accent' : `${k}.level`, true);
-    ks.forEach(([pk, lab], j) => { const ry = k === 'OH' || (k === 'CY' && j === 1) ? Y(38.5) : j === 0 ? Y(28.2) : Y(38.5); T(cx, ry - 3.6 * s - 1 * s, lab, 2.3); knob(cx, ry, 3 * s, `${k}.${pk}`, false); });
-    if (sw) { tag(cx, Y(38), cw * 0.86, alt, 2.9); p(`<g data-trw="${k}.${sw}" style="cursor:pointer">`); rect(cx - 1.8 * s, Y(41.3), 3.6 * s, 6.4 * s, '#0b0b0c', `rx="${0.5 * s}"`); p(`<rect class="tr-w-${k}" x="${cx - 1.3 * s}" y="${Y(41.3) + 0.5 * s}" width="${2.6 * s}" height="${2.6 * s}" fill="#3e3e41"/>`); rect(cx - 5 * s, Y(40), 10 * s, 10 * s, 'transparent'); p('</g>'); }
-    tag(cx, Y(47.2), cw * 0.86, name, 2.9);
+    if (i) p(`<line x1="${cx - cw / 2}" y1="${Y(20.5) - 9 * s}" x2="${cx - cw / 2}" y2="${Y(53.6)}" stroke="#5a5a5d" stroke-width="${0.5 * s}"/>`);
+    T(cx, Y(16.8), 'LEVEL', 2.3); knob(cx, Y(19.9), 3.2 * s, k === 'AC' ? 'accent' : `${k}.level`, true);
+    ks.forEach(([pk, lab], j) => { const ry = k === 'OH' || (k === 'CY' && j === 1) ? Y(41.2) : j === 0 ? Y(30.1) : Y(41.2); T(cx, ry - 3.6 * s - 1 * s, lab, 2.3); knob(cx, ry, 3 * s, `${k}.${pk}`, false); });
+    if (sw) { tag(cx, Y(40.9), cw * 0.86, alt, 2.9); p(`<g data-trw="${k}.${sw}" style="cursor:pointer">`); rect(cx - 1.8 * s, Y(44.2), 3.6 * s, 6.4 * s, '#0b0b0c', `rx="${0.5 * s}"`); p(`<rect class="tr-w-${k}" x="${cx - 1.3 * s}" y="${Y(44.2) + 0.5 * s}" width="${2.6 * s}" height="${2.6 * s}" fill="#3e3e41"/>`); rect(cx - 5 * s, Y(43), 10 * s, 10 * s, 'transparent'); p('</g>'); }
+    tag(cx, Y(50.3), cw * 0.86, name, 2.9);
   });
   // top-left block: PATTERN WRITE / mode rotary, INSTRUMENT-SELECT, the small red button, MEASURES
   rect(X(1.6), Y(13.2), X(21.3) - X(1.6), Y(35) - Y(13.2), 'none', `stroke="#b8b5ad" stroke-width="${0.5 * s}" rx="${1 * s}"`);
@@ -1645,8 +1645,8 @@ function tr808Body(bw, bh) {
     p(`<g data-trr="${k}" style="cursor:pointer">`); circle(cx + 0.4 * s, cy + 0.9 * s, r, '#000', 'opacity="0.6"'); circle(cx, cy, r, '#101011'); for (let i = 0; i < 16; i++) { const a = i * 22.5 * Math.PI / 180; p(`<line x1="${cx + Math.sin(a) * r * 0.72}" y1="${cy - Math.cos(a) * r * 0.72}" x2="${cx + Math.sin(a) * r * 0.98}" y2="${cy - Math.cos(a) * r * 0.98}" stroke="#2c2c2e" stroke-width="${0.6 * s}"/>`); }
     p(`<g class="tr-r-${k}" transform="rotate(-120 ${cx} ${cy})"><rect x="${cx - 0.5 * s}" y="${cy - r}" width="${1 * s}" height="${r * 0.5}" fill="#f4f2ec"/></g>`); circle(cx, cy, r + 5 * s, 'transparent'); p('</g>');
   };
-  rotary(X(6.8), Y(21.8), 4.6 * s, 'mode', ['P.CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY', 'COMPOSE'], false);
-  rotary(X(16.6), Y(21.5), 4.6 * s, 'inst', ['AC', 'BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'], true);
+  rotary(X(6.8), Y(23.9), 4.6 * s, 'mode', ['P.CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY', 'COMPOSE'], false);
+  rotary(X(16.6), Y(23.9), 4.6 * s, 'inst', ['AC', 'BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'], true);
   T(X(6.8), Y(29), 'PATTERN CLEAR', 1.8, W);
   p(`<g data-trb="stepno" style="cursor:pointer">`); circle(X(6.8), Y(32), 2.2 * s, '#0b0b0c'); circle(X(6.8), Y(32), 1.7 * s, '#d0352b'); circle(X(6.8), Y(32), 5 * s, 'transparent'); p('</g>');
   T(X(3.2), Y(31.4), 'STEP', 1.6, W); T(X(3.2), Y(33.6), 'NUMBER', 1.6, W); T(X(11), Y(31.4), 'TRACK', 1.6, O); T(X(11), Y(33.6), 'CLEAR', 1.6, O);
@@ -1655,8 +1655,8 @@ function tr808Body(bw, bh) {
   T(X(7.3), Y(40.6), 'TEMPO', 2.6, W);
   circle(X(7.3), Y(52), 13 * s, '#a3a19b'); circle(X(7.3), Y(52), 11.4 * s, '#c4c2bc'); for (let i = 0; i <= 10; i++) { const a = (-150 + i * 30) * Math.PI / 180; T(X(7.3) + Math.sin(a) * 12.2 * s, Y(52) - Math.cos(a) * 12.2 * s + 0.7 * s, String(i), 1.9, '#2a2a2a', 'middle', 900); }
   knob(X(7.3), Y(52), 8.6 * s, 'tempo', false);
-  T(X(16.2), Y(48.5), 'FINE', 2.2, W); knob(X(16.2), Y(54), 2.9 * s, 'fine', false); T(X(13.4), Y(59), 'SLOW', 1.6); T(X(19), Y(59), 'FAST', 1.6);
-  knob(X(92.7), Y(53.4), 3.6 * s, 'master', false); T(X(92.7), Y(60.4), 'MASTER VOLUME', 1.9, W); T(X(89.4), Y(58), 'MIN', 1.5); T(X(96), Y(58), 'MAX', 1.5);
+  T(X(17.2), Y(51.5), 'FINE', 2.2, W); knob(X(17.2), Y(57), 2.9 * s, 'fine', false); T(X(14.4), Y(61.6), 'SLOW', 1.6); T(X(20), Y(61.6), 'FAST', 1.6);
+  knob(X(93.2), Y(57.6), 3.6 * s, 'master', false); T(X(93.2), Y(62.6), 'MASTER VOLUME', 1.9, W); T(X(90), Y(61.4), 'MIN', 1.5); T(X(96.4), Y(61.4), 'MAX', 1.5);
   // lower section: BASIC-VARIATION + LEDs, START/STOP, PRE-SCALE, the note bars, I/F-VARIATION, TAP
   rect(X(2.2), Y(65), X(12.6) - X(2.2), Y(76.5) - Y(65), 'none', `stroke="#6c6b68" stroke-width="${0.4 * s}" rx="${0.6 * s}"`);
   T(X(7.4), Y(67.5), 'BASIC - VARIATION', 1.9, '#232323', 'middle', 900);
