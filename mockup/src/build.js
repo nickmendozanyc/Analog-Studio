@@ -1314,7 +1314,7 @@ function panelBase(n, fill, h) {
 // the whole panel as SVG markup, for a pop-up: 19 in shown 19 in wide on a 60-inch 4K screen (73.4 px per inch)
 const PX_PER_IN = 3840 / (60 * 16 / Math.hypot(16, 9));
 function panelSVG(n, fill, draw, o = {}) {
-  const h = n * PNL.U - PNL.GAP, nh = n * 60 - 4, k = h / nh, ox = (PNL.PW - PNL.UW * k) / 2, wpx = Math.round(19 * PX_PER_IN);
+  const h = n * PNL.U - PNL.GAP, nh = n * 60 - 4, k = h / nh, ox = (PNL.PW - PNL.UW * k) / 2, wpx = Math.round(19 * PX_PER_IN * 1.5);   // 1.5 x the real 19 inches on a 60-inch screen: easier to work
   const art = capture(() => { if (o.native) { draw(PNL.PW, h); return; } panelBase(n, fill, h); p(`<g transform="translate(${ox.toFixed(2)} 0) scale(${k.toFixed(4)})">`); draw(PNL.UW, nh); p('</g>'); });
   return `<svg width="${wpx}" height="${Math.round(wpx * h / PNL.PW)}" viewBox="0 0 ${PNL.PW} ${h.toFixed(3)}" style="display:block;margin:0 auto">${art}</svg>`;
 }
@@ -1511,6 +1511,66 @@ function rmxFace(w, h) {
   circle(X(1057), Y(528), 1.5, '#3a0a10'); p(`<circle class="${id('pw')}" cx="${X(1057)}" cy="${Y(528)}" r="1.5" fill="#ff2a5a" opacity="1" filter="url(#glowSm)"/>`); T(1057, 557, 'power', 2.6, W);
   frame(168, 570, 1080, 589); T(624, 584, 'model rmx16 : digital reverberation system : advanced axis systems : burnley, england', 3.6, W, 'middle', 700, 'letter-spacing="0.2"');
   p(`<text class="${id('route')}" x="${X(624)}" y="${Y(600)}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+}
+function junoBody(w, h) {
+  // Rowan JUNO-1060 (after the Roland Juno-106), seen from above: black top panel with the slider sections, the left-hand
+  // module (volume, tune, transpose, the bender with its DCO / VCF sliders), the patch programmer at the right, wooden-free
+  // black end cheeks and the 61-note keyboard. Units are millimetres of the real one (988 x 352), scaled.
+  const s = w / 988, X = (mm) => mm * s, Y = (mm) => mm * h / 352, W = '#ece8dc', G = '#9b978c', K = '#121213';
+  const T = (x, y, t, sz, col = W, a = 'middle', wt = 800, ex = '') => text(X(x), Y(y), t, sz * s, col, a, wt, ex);
+  rect(0, 0, w, h, '#0d0d0e', `rx="${6 * s}"`); rect(X(6), Y(4), X(976), Y(150), '#1b1b1d', `rx="${3 * s}"`);
+  rect(X(6), Y(4), X(976), Y(2), '#fff', 'opacity="0.06"');
+  // name strip
+  T(12, 12.5, 'Rowan', 6.5, W, 'start', 700); T(36, 12.5, 'JUNO-1060', 7.5, W, 'start', 900, 'letter-spacing="0.6"'); T(86, 12.5, 'PROGRAMMABLE POLYPHONIC SYNTHESIZER', 3, G, 'start', 700, 'letter-spacing="0.6"');
+  // a slider: slot, cap (class ju-s-KEY moves), scale 0-10
+  const slider = (x, k, lab, y0 = 40, len = 72) => {
+    T(x, y0 - 8, lab, 2.8, W, 'middle', 800);
+    for (let i = 0; i <= 10; i++) p(`<line x1="${X(x - 3.2)}" y1="${Y(y0 + len - i * len / 10)}" x2="${X(x - 2)}" y2="${Y(y0 + len - i * len / 10)}" stroke="${G}" stroke-width="${0.25 * s}"/>`);
+    rect(X(x - 0.6), Y(y0), X(1.2), Y(len), '#000', `rx="${0.6 * s}"`);
+    p(`<g data-jk="${k}" style="cursor:ns-resize"><rect x="${X(x - 6)}" y="${Y(y0 - 4)}" width="${X(12)}" height="${Y(len + 8)}" fill="transparent"/>`);
+    p(`<g class="ju-s-${k}" data-y0="${Y(y0)}" data-len="${Y(len)}" transform="translate(0 0)"><rect x="${X(x - 3.6)}" y="${Y(y0) - 2.8 * s}" width="${X(7.2)}" height="${5.6 * s}" rx="${0.6 * s}" fill="#2c2c2f" stroke="#000" stroke-width="${0.4 * s}"/><rect x="${X(x - 3.6)}" y="${Y(y0) - 0.35 * s}" width="${X(7.2)}" height="${0.7 * s}" fill="#f2efe6"/></g></g>`);
+  };
+  // a button with a red LED above it (class ju-l-KEY)
+  const btn = (x, y, k, lab, col = '#c9c5b8', bw = 7, led = true) => {
+    if (led) { circle(X(x), Y(y - 6), 0.9 * s, '#3a1412'); p(`<circle class="ju-l-${k}" cx="${X(x)}" cy="${Y(y - 6)}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
+    p(`<g data-jb="${k}" style="cursor:pointer">`); rect(X(x - bw / 2), Y(y - 2.6), X(bw), Y(5.2), '#000', `rx="${0.6 * s}"`); rect(X(x - bw / 2 + 0.4), Y(y - 2.4), X(bw - 0.8), Y(4.6), col, `rx="${0.5 * s}"`); p('</g>');
+    if (lab) T(x, y + 7, lab, 2.4, W, 'middle', 800);
+  };
+  const sect = (x0, x1, name) => { rect(X(x0), Y(22), X(x1 - x0), Y(1), '#5b5a55'); T((x0 + x1) / 2, 20.5, name, 3, W, 'middle', 900, 'letter-spacing="0.8"'); p(`<line x1="${X(x1 + 2)}" y1="${Y(24)}" x2="${X(x1 + 2)}" y2="${Y(140)}" stroke="#3a3a3c" stroke-width="${0.5 * s}"/>`); };
+  // left module: VOLUME, TUNE, KEY TRANSPOSE; bender with DCO / VCF and LFO TRIG
+  sect(10, 74, 'MASTER'); slider(20, 'vol', 'VOLUME'); slider(36, 'tune', 'TUNE'); btn(58, 66, 'transpose', 'KEY TRANS', '#c9c5b8', 9);
+  T(58, 92, 'BENDER', 2.6); slider(50, 'bendDco', 'DCO', 100, 30); slider(66, 'bendVcf', 'VCF', 100, 30);
+  // main sections
+  sect(84, 118, 'LFO'); slider(92, 'lfoRate', 'RATE'); slider(110, 'lfoDelay', 'DELAY');
+  sect(124, 262, 'DCO'); slider(132, 'dcoLfo', 'LFO'); slider(150, 'pwm', 'PWM'); btn(168, 50, 'pwmLfo', 'LFO / MAN', '#c9c5b8', 8);
+  T(196, 36, 'RANGE', 2.6); btn(186, 50, 'r16', "16'"); btn(198, 50, 'r8', "8'"); btn(210, 50, 'r4', "4'");
+  btn(186, 82, 'pulse', 'PULSE'); btn(200, 82, 'saw', 'SAW'); slider(230, 'sub', 'SUB OSC'); slider(250, 'noise', 'NOISE');
+  sect(268, 290, 'HPF'); slider(279, 'hpf', 'FREQ');
+  sect(296, 412, 'VCF'); slider(306, 'cutoff', 'FREQ'); slider(324, 'res', 'RES'); btn(343, 50, 'envPol', 'ENV ±', '#c9c5b8', 8); slider(362, 'env', 'ENV'); slider(380, 'vcfLfo', 'LFO'); slider(398, 'kybd', 'KYBD');
+  sect(418, 458, 'VCA'); btn(428, 50, 'vcaGate', 'ENV / GATE', '#c9c5b8', 8); slider(448, 'vcaLevel', 'LEVEL');
+  sect(464, 540, 'ENV'); slider(472, 'a', 'A'); slider(490, 'd', 'D'); slider(508, 's', 'S'); slider(526, 'r', 'R');
+  sect(546, 586, 'CHORUS'); btn(556, 50, 'ch1', 'I', '#c9c5b8', 8); btn(576, 50, 'ch2', 'II', '#c9c5b8', 8); T(566, 88, 'OFF = both up', 2.2, G);
+  // programmer: LED display, BANK 1-8, PATCH 1-8, MANUAL, WRITE
+  sect(594, 976, 'PROGRAMMER');
+  rect(X(604), Y(34), X(38), Y(22), '#160302', `rx="${1 * s}"`);
+  p(`<text x="${X(623)}" y="${Y(51)}" font-family="${MONO2}" font-size="${13 * s}" font-weight="700" fill="#ff2a14" opacity="0.08" text-anchor="middle">88</text>`);
+  p(`<text class="ju-disp" x="${X(623)}" y="${Y(51)}" font-family="${MONO2}" font-size="${13 * s}" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">11</text>`);
+  T(623, 64, 'BANK · NUMBER', 2.2, G);
+  T(700, 34, 'BANK', 2.8); for (let i = 0; i < 8; i++) btn(660 + i * 13, 50, 'b' + i, String(i + 1), '#c9c5b8', 9);
+  T(700, 74, 'PATCH', 2.8); for (let i = 0; i < 8; i++) btn(660 + i * 13, 90, 'p' + i, String(i + 1), '#e8e0c8', 9);
+  btn(780, 50, 'manual', 'MANUAL', '#c9c5b8', 12); btn(780, 90, 'write', 'WRITE', '#c9352b', 12);
+  T(890, 46, 'Bank 1 holds the factory sounds,', 2.6, G); T(890, 53, 'banks 2-8 your own (WRITE).', 2.6, G);
+  p(`<text class="ju-name" x="${X(890)}" y="${Y(78)}" font-family="${MONO2}" font-size="${7 * s}" font-weight="700" fill="#ffb02e" text-anchor="middle">STRINGS</text>`);
+  // bender lever
+  rect(X(14), Y(166), X(56), Y(26), '#202022', `rx="${2 * s}"`); p(`<g data-jb="bend" style="cursor:ew-resize"><rect x="${X(18)}" y="${Y(172)}" width="${X(48)}" height="${Y(14)}" fill="#0b0b0c" rx="${1.5 * s}"/><rect class="ju-bend" x="${X(39)}" y="${Y(168)}" width="${X(6)}" height="${Y(22)}" fill="#4a4a4e" rx="${1 * s}"/></g>`);
+  btn(42, 205, 'lfotrig', 'LFO TRIG', '#c9c5b8', 14, false);
+  // the keyboard: 61 notes, C to C (36 .. 96)
+  const kx0 = 84, kx1 = 976, ky0 = 160, ky1 = 346, whites = []; for (let n = 36; n <= 96; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
+  const ww = (kx1 - kx0) / whites.length;
+  rect(X(kx0 - 2), Y(ky0 - 3), X(kx1 - kx0 + 4), Y(ky1 - ky0 + 5), '#000');
+  whites.forEach((n, i) => { p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + i * ww + 0.2)}" y="${Y(ky0)}" width="${X(ww - 0.4)}" height="${Y(ky1 - ky0)}" rx="${0.8 * s}" fill="#f1ede3" stroke="#8d8a82" stroke-width="${0.3 * s}" style="cursor:pointer"/>`); });
+  for (let n = 36; n <= 96; n++) if ([1, 3, 6, 8, 10].includes(n % 12)) { const i = whites.indexOf(n - 1); p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + (i + 1) * ww - ww * 0.3)}" y="${Y(ky0)}" width="${X(ww * 0.6)}" height="${Y((ky1 - ky0) * 0.62)}" rx="${0.6 * s}" fill="#111" style="cursor:pointer"/>`); }
+  rect(X(kx0 - 2), Y(ky0 - 3), X(kx1 - kx0 + 4), Y(4), '#7a1a14');   // the red felt strip
 }
 function tr909Body(bw, bh) {
   // Rowan TR-9090 (after the Roland TR-909), drawn from the user's straight-on photo: the off-white panel with grey end
@@ -2063,7 +2123,9 @@ const PX_PER_IN19 = 1395 / 19;   // the pop-ups' 19-inch scale (a 60-inch 4K scr
     + unitBox(deskL, deskY + Math.max(0, (d9H - d8H) / 2), d8W, d8H, '0 0 528 300', () => tr808Body(528, 300), 'tr808', 'Open the Rowan TR-8080')
     + unitBox(deskL + d8W + gap, deskY, d9W, d9H, `0 0 484 ${t8H9}`, () => tr909Body(484, t8H9), 'tr909', 'Open the Rowan TR-9090')
     + `<div class="rr-909cap" style="left:${deskL}px;top:${deskY + Math.max(d8H, d9H) + 28}px;width:${deskR - deskL}px">ROWAN TR-8080 · ROWAN TR-9090 · click one to play it</div>`;
-  scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div>${desk}<div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}${[1, 2, 3].map((k) => lightHtml(4 - k, RX - k * (RW + 40), false)).join('')}<div class="hot" data-open="s900" style="left:${globalThis.S9_HOT.x}px;top:${Math.round(globalThis.S9_HOT.y)}px;width:${globalThis.S9_HOT.w}px;height:${Math.round(globalThis.S9_HOT.h)}px" title="Open the Akita S900 sampler"><span>Open the Akita S900 sampler</span></div>${[1, 2, 3].map((k) => `<div class="fm-hot" data-fm="${4 - k}" style="left:${RX - k * (RW + 40) + 26}px;top:${RY + fmTop}px;width:${RW - 52}px;height:${Math.round(fmH)}px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>`).join('')}</div>`);
+  const juW = deskR - deskL, juH = Math.round(juW * 352 / 988), juY = deskY + Math.max(d8H, d9H) + 110;
+  const juDesk = unitBox(deskL, juY, juW, juH, '0 0 988 352', () => junoBody(988, 352), 'juno', 'Open the Rowan JUNO-1060') + `<div class="rr-909cap" style="left:${deskL}px;top:${juY + juH + 24}px;width:${juW}px">ROWAN JUNO-1060 · click it to play</div>`;
+  scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div>${desk}${juDesk}<div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}${[1, 2, 3].map((k) => lightHtml(4 - k, RX - k * (RW + 40), false)).join('')}<div class="hot" data-open="s900" style="left:${globalThis.S9_HOT.x}px;top:${Math.round(globalThis.S9_HOT.y)}px;width:${globalThis.S9_HOT.w}px;height:${Math.round(globalThis.S9_HOT.h)}px" title="Open the Akita S900 sampler"><span>Open the Akita S900 sampler</span></div>${[1, 2, 3].map((k) => `<div class="fm-hot" data-fm="${4 - k}" style="left:${RX - k * (RW + 40) + 26}px;top:${RY + fmTop}px;width:${RW - 52}px;height:${Math.round(fmH)}px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>`).join('')}</div>`);
 }
 
 // rack edge shadow over console + room lighting
@@ -2366,9 +2428,9 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .rr-unit{position:absolute;filter:drop-shadow(0 18px 22px rgba(0,0,0,.65)) drop-shadow(0 3px 4px rgba(0,0,0,.5))}
   .rr-open{border-radius:6px}
   .rr-909cap{position:absolute;text-align:center;font:700 20px 'JetBrains Mono',monospace;color:#e7d6b8;letter-spacing:1px}
-  .s9kb{position:relative;height:150px;margin:10px auto 4px;width:1395px;user-select:none;touch-action:none}
-  .s9kb i{position:absolute;top:0;height:150px;background:linear-gradient(#f4f1ea,#ddd8cc);border:1px solid #444;border-radius:0 0 5px 5px;box-sizing:border-box;cursor:pointer}
-  .s9kb i.b{height:92px;background:linear-gradient(#2a2a2c,#0d0d0e);border-color:#000;z-index:2}
+  .s9kb{position:relative;height:200px;margin:10px auto 4px;width:2093px;user-select:none;touch-action:none}
+  .s9kb i{position:absolute;top:0;height:200px;background:linear-gradient(#f4f1ea,#ddd8cc);border:1px solid #444;border-radius:0 0 5px 5px;box-sizing:border-box;cursor:pointer}
+  .s9kb i.b{height:124px;background:linear-gradient(#2a2a2c,#0d0d0e);border-color:#000;z-index:2}
   .s9kb i.on{background:linear-gradient(#ffd59a,#e0a95a)}
   .s9kb i.b.on{background:linear-gradient(#a8692a,#6a3c12)}
   .s9kb i span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font:700 11px Archivo,Arial;color:#777}
@@ -2485,6 +2547,9 @@ ${overlay('rmx', 'AXS RMX16 DIGITAL REVERBERATION SYSTEM', `<div class="ovsync">
 ${overlay('pcm', 'LEXIMAN PCM41 × 2 · PCM42 × 2 DIGITAL DELAY PROCESSORS', `<div class="ovsync">${['41A', '41B', '42A', '42B'].map((u) => panelSVG(1, '#111112', (w, h) => pcmFace(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
   <div class="sk">${['41A', '41B', '42A', '42B'].map((u) => `<button type="button" data-pf="${u}:byp" title="The bypass footswitch (rear jack)">PCM${u.slice(0, 2)} ${u[2]} · BYPASS</button>${u[1] === '1' ? `<button type="button" data-pf="${u}:rpt" title="The repeat footswitch (rear jack)">REPEAT</button>` : ''}<span class="gap"></span>`).join('')}</div>
   <p class="note">Drag the knobs (Shift for fine; double-click resets), click the buttons. PCM41: ◀ ▶ DELAY SELECT steps the eleven taps (0 to 200 ms; DLY X2 doubles them at 6 kHz bandwidth), DELAY MULTIPLY stretches any tap from half to double. The sweep (DEPTH, WAVEFORM: sine, ENV follower, square; RATE) changes the sample clock itself, so the pitch bends, and at slow clock settings the PCM41 aliases. FILTER INV / LO / HI shape the repeats; INV by the mix inverts the delay. Bypass and repeat are footswitches on the real PCM41: use the buttons under the panels. PCM42: SET-MODE on DLY, UP / DOWN step 256 taps up to 800 ms (hold to repeat, hold both to slew fast), and the display shows the real delay as it sweeps; on CLK, DOWN sets the beat's numerator and UP its denominator. ∞ RPT holds the whole memory, starting and stopping on the clock's beat. Each unit replaces its channel on the insert it is patched to (PCM41 A on the hats, B on ch 9, PCM42 A on ch 10, B on ch 11 to start).</p></div>`, '<span class="ov-msg" id="pcm-msg"></span>', true)}
+${overlay('juno', 'ROWAN JUNO-1060 PROGRAMMABLE POLYPHONIC SYNTHESIZER', `<div class="ovsync"><svg width="3000" height="${Math.round(3000 * 352 / 988)}" viewBox="0 0 988 352" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => junoBody(988, 352))}</svg>
+  <div class="sk"><select id="ju-midi" class="ov-pick"><option value="">MIDI IN · computer keys</option></select><span class="gap"></span><span class="v" style="font:700 14px JetBrains Mono,monospace;color:#c9c2b0">OUT: STEREO MIX</span></div>
+  <p class="note">Play it on the keys (click or drag), on your computer keyboard (A W S E D F T G Y H U J K: one octave, Z / X shift it) or from a MIDI keyboard. Drag the sliders (double-click resets one). PATCH 1-8 calls a sound from the bank shown (bank 1: STRINGS, BRASS, BASS, PAD, PIANO, LEAD, HOOVER, SWEEP); BANK picks the bank, MANUAL plays what the sliders show, WRITE then a PATCH key stores the panel there (banks 2-8). Chorus I and II as on the original: both off, either, or both together. Drag the bender left / right (its DCO and VCF sliders set how far it bends).</p></div>`, '<span class="ov-msg" id="ju-msg"></span>', true)}
 ${overlay('tr909', 'ROWAN TR-9090 RHYTHM COMPOSER', `<div class="ovsync"><svg width="2600" height="${Math.round(2600 * 453 / 758)}" viewBox="0 0 484 ${Math.round(484 * 453 / 758)}" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => tr909Body(484, Math.round(484 * 453 / 758)))}</svg>
   <p class="note">PATTERN PLAY I / II / III pick the group, the step keys the pattern; SHIFT + a group key = PATTERN WRITE: INSTRUMENT SELECT then a step key picks the voice (the two keys under a drum: normal / accented; CARTRIDGE/ENTER = total accent), the step keys enter it, BACK/TAP enters it in time, SHUFFLE/FLAM marks flams, LAST STEP sets the length, CLEAR empties the voice (SHIFT + CLEAR the pattern). TRACK PLAY 1-4 play a track; SHIFT + one writes it (a step key picks the pattern, CARTRIDGE/ENTER adds the measure). SCALE: step length. TAPE SYNC: follow the SBX-80. Drag the knobs (double-click resets).</p></div>`, '<span class="ov-msg" id="t9-msg"></span>', true)}
 ${overlay('tr808', 'ROWAN TR-8080 RHYTHM COMPOSER', `<div class="ovsync"><svg width="2600" height="${Math.round(2600 * 300 / 528)}" viewBox="0 0 528 300" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => tr808Body(528, 300))}</svg>
@@ -2514,16 +2579,16 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + ['h949.js', 'rmx16.js', 'pcm4x.js', 's900.js', 'tr808.js', 'tr909.js', '../console/jhmix.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '').replace(/\bclass Line\b/g, 'class RmxLine').replace(/new Line\(/g, 'new RmxLine(').replace(/\bTAU\b/g, f === 'h949.js' ? 'H_TAU' : 'R_TAU')).join('\n') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + ['h949.js', 'rmx16.js', 'pcm4x.js', 's900.js', 'tr808.js', 'tr909.js', '../console/jhmix.js', '../synth/juno.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '').replace(/\bclass Line\b/g, 'class RmxLine').replace(/new Line\(/g, 'new RmxLine(').replace(/\bTAU\b/g, f === 'h949.js' ? 'H_TAU' : 'R_TAU')).join('\n') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90presets.js'), 'utf8').replace(/^export /gm, '')}</script>
-<script>${['s900.js', 's900factory.js', 'tr808.js', 'tr909.js', '../console/jhmix.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')).join('\n')}</script>
+<script>${['s900.js', 's900factory.js', 'tr808.js', 'tr909.js', '../console/jhmix.js', '../synth/juno.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')).join('\n')}</script>
 <script>const RMX_PROGRAMS_UI = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'rmx16.js'), 'utf8').replace(/^export /gm, '')}; return RMX_PROGRAMS; })(); const h949Ratio = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'h949.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')}; return h949Ratio; })();</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'furman.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 's900.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr808.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr909.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'console.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'patchgate.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'furman.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 's900.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr808.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'tr909.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'console.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'patchgate.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'juno.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 <script>(() => {   // the OldTools splash: names what is coming up, then fades
   const el = document.getElementById('splash'); if (!el) return;
-  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Pulling out the rack lights', 'Booting the Akita S900', 'Tuning the Rowan TR-8080', 'Setting the TR-9090 on the desk', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
+  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Pulling out the rack lights', 'Booting the Akita S900', 'Tuning the Rowan TR-8080', 'Setting the TR-9090 on the desk', 'Tuning the JUNO-1060', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
   const st = document.getElementById('spl-status'), bar = document.getElementById('spl-bar'); let i = 0, done = false;
   const close = () => { if (done) return; done = true; el.classList.add('gone'); setTimeout(() => el.remove(), 1000); };
   const tick = () => { if (done) return; st.textContent = steps[i] + (i < steps.length - 1 ? '…' : ''); bar.style.width = Math.round((i + 1) / steps.length * 100) + '%'; if (++i < steps.length) setTimeout(tick, 260 + Math.random() * 180); else setTimeout(close, 700); };

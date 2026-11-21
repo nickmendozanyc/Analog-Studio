@@ -242,7 +242,7 @@
   const s9kbEl = document.getElementById('s9kb');
   if (s9kbEl) {
     const lo = 36, hi = 84, whites = []; for (let n = lo; n <= hi; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
-    const ww = 1395 / whites.length;
+    const ww = 2093 / whites.length;
     whites.forEach((n, i) => { const e = document.createElement('i'); e.dataset.n = n; e.style.left = (i * ww) + 'px'; e.style.width = ww + 'px'; if (n % 12 === 0) e.innerHTML = `<span>${s9Note(n)}</span>`; s9kbEl.appendChild(e); });
     for (let n = lo; n <= hi; n++) if ([1, 3, 6, 8, 10].includes(n % 12)) { const i = whites.indexOf(n - 1), e = document.createElement('i'); e.className = 'b'; e.dataset.n = n; e.style.left = ((i + 1) * ww - ww * 0.32) + 'px'; e.style.width = (ww * 0.64) + 'px'; s9kbEl.appendChild(e); }
     let down = null;
