@@ -22,6 +22,7 @@
   .ov-bar button.ov-close{margin-left:auto}
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
+  body.fullview #stage>:not(.overlay){visibility:hidden}
   .overlay.float{background:rgba(8,6,5,.5)}
   .overlay.float .ov-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:12px;overflow:hidden;border:2px solid #000;background:#141210;box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
   .overlay.float .ov-bar{height:auto;min-height:52px;flex-wrap:wrap;gap:14px 18px;padding:6px 16px;font-size:17px;letter-spacing:2px}
@@ -105635,13 +105636,15 @@ class Chaser {
     if (open) hide();
     const o = views[v]; if (!o) return;
     o.hidden = false; open = o;
+    // a full-screen view covers the studio: hide it, so the browser stops painting the 4K room underneath
+    document.body.classList.toggle('fullview', !o.classList.contains('float'));
     if (v === 'tape') o.querySelectorAll('.tpv').forEach((d) => { d.hidden = d.dataset.skin !== (document.body.dataset.studio === 'sls' ? 'sls' : 'cmi'); });
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
     if (v === 'elec') { elShowTrims(); startMeters('#ov-elec'); }
   }
-  function hide() { if (!open) return; open.hidden = true; open = null; stopMeters(); stopAL(); }
+  function hide() { if (!open) return; open.hidden = true; open = null; document.body.classList.remove('fullview'); stopMeters(); stopAL(); }
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
   document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', hide));
   // floating windows close when you click the dimmed studio around them
@@ -105857,7 +105860,7 @@ class Chaser {
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
   // both machines follow the same transport: the JH-Tape (JH room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE], ['jhp', window.JH_LIVE], ['a8p', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
-    k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
+    pre, k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
   })));
   // A827 front panel: live tape timer and key lamps
@@ -105924,8 +105927,16 @@ class Chaser {
     }
     return `conic-gradient(${hole.join(',')}), conic-gradient(${lab.join(',')}), ${d.avg}`;
   }
+  // only the reels on screen are drawn: the studio deck of the room you're in, or the tape view's copy while it's open
+  function reelVisible(pre) {
+    const sls = document.body.dataset.studio === 'sls', tapeOpen = open && open.dataset.view === 'tape';
+    if (pre === 'jhp' || pre === 'a8p') return tapeOpen && (pre === 'a8p') === sls;
+    return !document.body.classList.contains('fullview') && (pre === 'a8') === sls;
+  }
   function drawConsoleReels() {
+    const vis = {}; for (const p of ['jh', 'a8', 'jhp', 'a8p']) vis[p] = reelVisible(p);
     for (const rl of reels) {
+      if (!vis[rl.pre]) { rl.lastR = -1; rl.smKey = rl.smOp = null; continue; }   // redrawn in full when it comes back on screen
       const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
       // motion blur, modelled as a camera exposure of ~1/30 s: in that time the reel turns S degrees, so each slot and the
@@ -105969,11 +105980,16 @@ class Chaser {
   const fmt = (t) => { const a = Math.abs(t); const m = Math.min(99, Math.floor(a / 60)), sec = Math.floor(a % 60); return `${String(m).padStart(2, '0')}${String(sec).padStart(2, '0')}`; };
   const segLast = {};
   // dec: the colon shows as a decimal point (its lower dot only), for TVI's 30.00 ips and 1.25 semitones
+  // the autolocator's 7-segment displays (pop-up + studio-view mirror): elements looked up once; only segments
+  // that change are touched (the glow filter is costly to re-rasterize while the counter races in a fast wind)
+  const segEls = {};
   function setSeg(id, digits, dec = false) {
     if (segLast[id] === digits + dec) return; segLast[id] = digits + dec;
-    for (const g of [alSvg.querySelector(`#al-${id}`), ...document.querySelectorAll(`.alm-${id}`)]) { if (!g) continue; const cs = g.querySelectorAll('circle'); if (cs[0]) cs[0].setAttribute('opacity', dec ? 0.09 : 1); }
-    for (const rs of [alSvg.querySelectorAll(`#al-${id} rect`), ...[...document.querySelectorAll(`.alm-${id}`)].map((g) => g.querySelectorAll('rect'))])
-    [...digits].forEach((ch, d) => { const on = SEG[ch] || ''; 'abcdefg'.split('').forEach((k, i) => { const r = rs[d * 7 + i]; if (!r) return; if (on.includes(k)) { r.setAttribute('opacity', '1'); r.setAttribute('filter', 'url(#glowSm)'); } else { r.setAttribute('opacity', '0.09'); r.removeAttribute('filter'); } }); });
+    const E = segEls[id] || (segEls[id] = (() => { const gs = [alSvg.querySelector(`#al-${id}`), ...document.querySelectorAll(`.alm-${id}`)].filter(Boolean);
+      return { dots: gs.map((g) => g.querySelector('circle')).filter(Boolean), rects: gs.map((g) => [...g.querySelectorAll('rect')]) }; })());
+    for (const c of E.dots) if (c._dec !== dec) { c._dec = dec; c.setAttribute('opacity', dec ? 0.09 : 1); }
+    for (const rs of E.rects)
+      [...digits].forEach((ch, d) => { const on = SEG[ch] || ''; 'abcdefg'.split('').forEach((k, i) => { const r = rs[d * 7 + i]; if (!r) return; const v = on.includes(k); if (r._on === v) return; r._on = v; if (v) { r.setAttribute('opacity', '1'); r.setAttribute('filter', 'url(#glowSm)'); } else { r.setAttribute('opacity', '0.09'); r.removeAttribute('filter'); } }); });
   }
   const lampEls = {}, ledEls = {};   // the pop-up's element and the studio-view face's mirror of it
   const lamp = (n, on) => { const els = lampEls[n] || (lampEls[n] = [alSvg && alSvg.querySelector(`[data-lamp="${n}"]`), ...document.querySelectorAll(`[data-mlamp="${n}"]`)].filter(Boolean)); for (const g of els) if (g._on !== on) { g._on = on; g.setAttribute('opacity', on ? 1 : 0); } };
@@ -107252,7 +107268,9 @@ class Chaser {
     dzDraw(m);
   }
   // ---- displays and lamps (rack units and their pop-ups share classes)
-  const sgAll = (sel, f) => document.querySelectorAll(sel).forEach(f);
+  // the page is huge: look each selector up once (the rack faces and pop-ups never change) instead of every frame
+  const sgCache = new Map();
+  const sgAll = (sel, f) => { let l = sgCache.get(sel); if (!l) { l = [...document.querySelectorAll(sel)]; sgCache.set(sel, l); } l.forEach(f); };
   const sgLamp = (cls, on) => sgAll(cls, (e) => { const v = on ? 1 : 0; if (e._v !== v) { e._v = v; e.setAttribute('opacity', v); } });
   const sgTxt = (cls, s) => sgAll(cls, (e) => { if (e.textContent !== s) e.textContent = s; });
   const sgSay = (s) => { DZ.msg = s; const el = document.getElementById('sg-msg'); if (el) el.textContent = s; const z = document.getElementById('dz-msg'); if (z) z.textContent = s; };
@@ -107359,18 +107377,19 @@ class Chaser {
   function studio(now) {
     const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
     sgTick(dt, now); syncAdvance(dt, now);   // the synchronizer's servo steps the transport at 100 Hz while it chases
-    drawConsoleReels();
+    const full = document.body.classList.contains('fullview');   // the studio is hidden behind a full-screen view: skip its drawing
+    drawConsoleReels();   // draws only the reels on screen (the tape view's own copy while it is open)
     sbxTick(dt, now);
     dzTick(dt);
-    if (document.body.dataset.studio === 'sls') drawA827();
+    if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it
       if (tr.mode === 'play' && tr.counter >= AL.mem[9]) tr.locateTo(counterTake(AL.mem[8]), 'play');
       else if (tr.mode !== 'play' && tr.mode !== 'locate') AL.rep = false;
     }
-    if ((open && open.dataset.view === 'al') || document.body.dataset.studio !== 'sls') alRender(now);   // the studio-view face mirrors it too
+    if ((open && open.dataset.view === 'al') || (!full && document.body.dataset.studio !== 'sls')) alRender(now);   // the studio-view face mirrors it too
     elecTick();
-    roomMeters(now);
+    if (!full) roomMeters(now);
     requestAnimationFrame(studio);
   }
   window.AS_PRESS = press;   // for tests

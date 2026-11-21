@@ -92,7 +92,9 @@
     dzDraw(m);
   }
   // ---- displays and lamps (rack units and their pop-ups share classes)
-  const sgAll = (sel, f) => document.querySelectorAll(sel).forEach(f);
+  // the page is huge: look each selector up once (the rack faces and pop-ups never change) instead of every frame
+  const sgCache = new Map();
+  const sgAll = (sel, f) => { let l = sgCache.get(sel); if (!l) { l = [...document.querySelectorAll(sel)]; sgCache.set(sel, l); } l.forEach(f); };
   const sgLamp = (cls, on) => sgAll(cls, (e) => { const v = on ? 1 : 0; if (e._v !== v) { e._v = v; e.setAttribute('opacity', v); } });
   const sgTxt = (cls, s) => sgAll(cls, (e) => { if (e.textContent !== s) e.textContent = s; });
   const sgSay = (s) => { DZ.msg = s; const el = document.getElementById('sg-msg'); if (el) el.textContent = s; const z = document.getElementById('dz-msg'); if (z) z.textContent = s; };
