@@ -27,7 +27,6 @@
   }
   function t9Knobs() {
     document.querySelectorAll('[data-t9k]').forEach((g) => { const k = g.dataset.t9k, [lo, hi] = T9_KN[k] || [0, 1], v = (t9Get(k) - lo) / (hi - lo), r = g.querySelector('[class^="t9-k-"]'); if (r) { const m = /rotate\([^ ]+ ([^ ]+) ([^)]+)\)/.exec(r.getAttribute('transform') || ''); if (m) r.setAttribute('transform', `rotate(${(-135 + v * 270).toFixed(1)} ${m[1]} ${m[2]})`); } });
-    for (const [cls, on] of [['t9-mode', !T9.write], ['t9-sync', T9.p.sync === 'din']]) for (const e of document.querySelectorAll('.' + cls)) { const x0 = +(e.dataset.x0 || (e.dataset.x0 = e.getAttribute('x'))), w = +e.getAttribute('width'); e.setAttribute('x', on ? x0 + w * 1.05 : x0); }
   }
   document.querySelectorAll('[data-t9k]').forEach((g) => {
     const k = g.dataset.t9k, [lo, hi] = T9_KN[k] || [0, 1], span = hi - lo;
@@ -67,7 +66,7 @@
       else on = run ? M.step === i || (M.next === i && blink) : i === T9.pat;
       c1Lamp(`t9-l${i}`, on);
     }
-    c1Lamp('t9-start', !!run); for (const k of ['inst', 'last', 'shuf']) c1Lamp(`t9-${k}`, T9.fn === k && blink);
+    c1Lamp('t9-start', !!run); c1Lamp('t9-modeL', T9.write); c1Lamp('t9-syncL', T9.p.sync === 'din'); for (const k of ['inst', 'last', 'shuf']) c1Lamp(`t9-${k}`, T9.fn === k && blink);
     sgTxt('.t9-disp', T9.show && T9.show.until > now ? T9.show.t : String(Math.round(run && M ? M.tempo : T9.p.tempo)).padStart(3, ' '));
   }
   function tr909Tick() {
