@@ -27,12 +27,14 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
 
   // ---------- 3D primitives (children of the deck) ----------
   const box = (style) => `position:absolute;transform-style:preserve-3d;${style}`;
+  const ZQ = 2.6;
   function disc(cx, cy, r, z, bg, extra = '', cls = '') {
     add(`<div${cls ? ` class="${cls}" data-z="${f(z)}"` : ''} style="${box(`left:${f(cx - r)}px;top:${f(cy - r)}px;width:${f(2 * r)}px;height:${f(2 * r)}px;border-radius:50%;background:${bg};transform:translateZ(${f(z)}px);${extra}`)}"></div>`);
   }
   // solid cylinder from z0 to z1; side shading comes from a left-to-right gradient on each layer
+  // ZQ thins out the stacked layers (each one is a 3D plane the browser composites every frame): fewer, slightly coarser
   function cylinder(cx, cy, r, z0, z1, side, top, step = 2.2) {
-    for (let z = z0; z < z1; z += step) disc(cx, cy, r, z, side);
+    step *= ZQ; for (let z = z0; z < z1; z += step) disc(cx, cy, r, z, side);
     disc(cx, cy, r, z1, top);
   }
   function ring(cx, cy, r, w, z, color) {
@@ -258,18 +260,18 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     // back flange (3 layers)
     rotor();
     const flange = (z, layer) => add(`<div class="jh-fl" data-reel="${key}" data-layer="${layer}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;transform:translateZ(${f(z)}px);background:${sk[layer]};clip-path:path(evenodd,'${d}')`)}"></div>`);
-    flange(20, 'edge'); flange(21.5, 'edge'); flange(23, 'back');
-    add(`<div class="jh-smear jh-smearback" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;transform:translateZ(23.3px);background:${sk.backBg}`)}"></div>`);   // back flange smears too
+    flange(21, 'edge'); flange(23, 'back');   // one rim layer under each flange: fewer composited planes
+    add(`<div class="jh-smear jh-smearback" data-reel="${key}" style="${box(`left:${f(cx - R)}px;top:${f(cy - R)}px;width:${2 * R}px;height:${2 * R}px;border-radius:50%;opacity:0;visibility:hidden;transform:translateZ(23.3px);background:${sk.backBg}`)}"></div>`);   // back flange smears too
     add('</div>');
     // hub ring (black plastic) between the flanges
-    for (let z = 23; z <= 100; z += 2.5) ring(cx, cy, hubR, hubR - holeR, z, z > 98 ? '#141416' : '#0b0b0c');
+    for (let z = 23; z <= 100; z += 7) ring(cx, cy, hubR, hubR - holeR, z, z > 92 ? '#141416' : '#0b0b0c');
     // tape pack: outer wraps are matte black back-coating; top edge shows the wound edges
     const packMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px);mask-image:radial-gradient(circle, transparent ${f(hubR - 1)}px, #000 ${f(hubR)}px)`;
-    for (let z = TAPE_Z0; z < TAPE_Z1; z += 2.4) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#0b0705,#24160e 35%,#110b07 70%,#080504)', packMask, `jh-pack jh-pack-${key}`);
+    for (let z = TAPE_Z0; z < TAPE_Z1; z += 8) disc(cx, cy, rl.pack, z, 'linear-gradient(90deg,#0b0705,#24160e 35%,#110b07 70%,#080504)', packMask, `jh-pack jh-pack-${key}`);
     disc(cx, cy, rl.pack, TAPE_Z1, `radial-gradient(circle, transparent ${f(hubR - 1)}px, #1a110b ${f(hubR)}px, #2a1b11 ${f(hubR + 8)}px, #21150d ${f(rl.pack * 0.7)}px, #332216 ${f(rl.pack - 3)}px, #110b07 ${f(rl.pack)}px), repeating-radial-gradient(circle, rgba(0,0,0,0.18) 0 1px, transparent 1px 6px)`, '', `jh-pack jh-pack-${key} jh-packtop`);
     rotor();
     // front flange (3 layers, the top one with the finish)
-    flange(100, 'edge'); flange(101.5, 'edge'); flange(103, 'face');
+    flange(101, 'edge'); flange(103, 'face');
     // exposure smear (rotates with the reel): each window and the label drag an arc behind them whose length is the
     // angle the reel turns during one exposure; the client writes the conic gradients from the reel speed
     const bandMask = `-webkit-mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px);mask-image:radial-gradient(circle, transparent ${f(R * 0.375)}px, #000 ${f(R * 0.385)}px, #000 ${f(R * 0.93)}px, transparent ${f(R * 0.96)}px)`;
@@ -480,7 +482,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const BLK = A8 ? 'linear-gradient(90deg,#4a4e54,#c9ccd1 32%,#80858b 62%,#3a3d42)' : 'linear-gradient(90deg,#060606,#3a3a3d 30%,#141416 62%,#040404)';
   const BLK_TOP = A8 ? 'radial-gradient(circle at 40% 35%, #eceef0, #8a8f95 70%)' : 'radial-gradient(circle at 40% 35%, #3a3a3d, #0d0d0e 70%)';
   // ribbed black cylinder: alternating light/dark layers read as grooves
-  const ribbed = (c, z0, z1, rr) => { for (let z = z0; z < z1; z += 2) disc(c.cx, c.cy, rr + ((Math.floor(z / 6) % 2) ? 0 : -1.2), z, (Math.floor(z / 6) % 2) ? BLK : 'linear-gradient(90deg,#030303,#26262a 30%,#0a0a0b 62%,#020202)'); disc(c.cx, c.cy, rr, z1, BLK_TOP); };
+  const ribbed = (c, z0, z1, rr) => { for (let z = z0; z < z1; z += 3) disc(c.cx, c.cy, rr + ((Math.floor(z / 6) % 2) ? 0 : -1.2), z, (Math.floor(z / 6) % 2) ? BLK : 'linear-gradient(90deg,#030303,#26262a 30%,#0a0a0b 62%,#020202)'); disc(c.cx, c.cy, rr, z1, BLK_TOP); };
   // left supply guide: flanged base, tall black roller (tape wraps its back side)
   cylinder(guideL.cx, guideL.cy, guideL.r + 12, 0, 8, BLK, '#1a1a1c', 2);
   cylinder(guideL.cx, guideL.cy, guideL.r + 6, 8, 18, BLK, '#161618', 2);

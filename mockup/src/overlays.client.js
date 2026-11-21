@@ -388,10 +388,13 @@
     if (pre === 'jhp' || pre === 'a8p') return tapeOpen && (pre === 'a8p') === sls;
     return !document.body.classList.contains('fullview') && !document.body.classList.contains('racksview') && (pre === 'a8') === sls;
   }
+  let reelFrame = 0;
   function drawConsoleReels() {
     const vis = {}; for (const p of ['jh', 'a8', 'jhp', 'a8p']) vis[p] = reelVisible(p);
+    // the studio's small reels update at 30 fps (every second frame): half the 3D compositing; the large tape view keeps 60
+    if (++reelFrame % 2) { vis.jh = vis.a8 = false; }
     for (const rl of reels) {
-      if (!vis[rl.pre]) { rl.lastR = -1; rl.smKey = rl.smOp = null; continue; }   // redrawn in full when it comes back on screen
+      if (!vis[rl.pre]) { if (!reelVisible(rl.pre)) { rl.lastR = -1; rl.smKey = rl.smOp = null; } continue; }   // redrawn in full when it comes back on screen
       const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
       // the smeared image turns with the reel, so each streak trails its own slot (moved by the GPU, never repainted)
@@ -412,12 +415,13 @@
       const opKey = `${ease(o1).toFixed(2)}|${ease(o2).toFixed(2)}`;
       if (opKey !== rl.smOp) {
         rl.smOp = opKey;
-        for (const el of rl.smears) el.style.opacity = ease(o1).toFixed(3);
-        for (const el of rl.lights) el.style.opacity = ease(o1).toFixed(3);
-        for (const b of rl.blurs) b.style.opacity = ease(o2).toFixed(3);
+        const v1 = ease(o1), v2 = ease(o2), vis = (el, v) => { el.style.opacity = v.toFixed(3); el.style.visibility = v > 0.002 ? 'visible' : 'hidden'; };   // hidden layers cost nothing to composite
+        for (const el of rl.smears) vis(el, v1);
+        for (const el of rl.lights) vis(el, v1);
+        for (const b of rl.blurs) vis(b, v2);
       }
       const r = packPx(rl.k === 's' ? tr.rS : tr.rT);
-      if (Math.abs(r - rl.lastR) < 0.25) continue;
+      if (Math.abs(r - rl.lastR) < 1) continue;   // the packs (and the tape strand) are redrawn once their radius moves a whole pixel
       rl.lastR = r;
       const { cx, cy } = rl.d;
       for (const el of rl.packs) {
