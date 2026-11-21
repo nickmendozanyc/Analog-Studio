@@ -1292,29 +1292,41 @@ function c160Face(w, h, u) {
   p(`<text class="${id('route')}" x="${X(735)}" y="${Y(123)}" font-family="'JetBrains Mono', monospace" font-size="3.2" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
   text(w - 21, Y(123), u, 4, '#8e8c92', 'end', 900);
 }
+// A 19-inch panel: 498 x (46n - 2) units, ears with slotted holes and rack screws at the EIA positions. Faces drawn for
+// the old 450 x (60n - 4) size are scaled evenly and centred between the ears; native faces are drawn at full size.
+// exact EIA-310 proportions: 1U = 1.75 in on a 19 in panel; a panel is 1/32 in shorter than its rack space
+const PNL = { U: 498 * 1.75 / 19, GAP: 498 * (1 / 32) / 19, PW: 498, UW: 450, EAR: 22 };
+function panelBase(n, fill, h) {
+  const { PW, EAR, U } = PNL;
+  rect(0, 0, PW, h, fill, 'rx="1.5"');
+  rect(0, 0, PW, 1.5, '#fff', 'opacity="0.14"'); rect(0, h - 1.5, PW, 1.5, '#000', 'opacity="0.55"');
+  for (const ex of [0, PW - EAR]) {
+    rect(ex, 0, EAR, h, '#000', 'opacity="0.18"'); rect(ex + (ex ? 0 : EAR - 0.8), 0, 0.8, h, '#000', 'opacity="0.45"');
+    for (let u = 0; u < n; u++) for (const hy of [6.6, U - 8.6]) { const cy = u * U + hy; rect(ex + 4, cy - 3, EAR - 8, 6, '#070707', 'rx="3"'); screw(ex + EAR / 2, cy, 3.6); }
+  }
+}
+// the whole panel as SVG markup, for a pop-up: 19 in shown 19 in wide on a 60-inch 4K screen (73.4 px per inch)
+const PX_PER_IN = 3840 / (60 * 16 / Math.hypot(16, 9));
+function panelSVG(n, fill, draw, o = {}) {
+  const h = n * PNL.U - PNL.GAP, nh = n * 60 - 4, k = h / nh, ox = (PNL.PW - PNL.UW * k) / 2, wpx = Math.round(19 * PX_PER_IN);
+  const art = capture(() => { if (o.native) { draw(PNL.PW, h); return; } panelBase(n, fill, h); p(`<g transform="translate(${ox.toFixed(2)} 0) scale(${k.toFixed(4)})">`); draw(PNL.UW, nh); p('</g>'); });
+  return `<svg width="${wpx}" height="${Math.round(wpx * h / PNL.PW)}" viewBox="0 0 ${PNL.PW} ${h.toFixed(3)}" style="display:block;margin:0 auto">${art}</svg>`;
+}
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
   // Real 19-inch proportions: every panel spans the rails (its ears, with their rack screws, cover them) and one rack
   // unit is 1.75 in tall: 498 px wide x 46 px per U (10.9 : 1). Faces drawn for the old 450 x (60n - 4) size are
   // scaled evenly (never stretched) and centred between the ears; a face marked native is drawn at the panel's size.
-  const U = 46, UX = 50, UW = RW - 100, PX = 26, PW = RW - 52, EAR = 22, DEPTH = 70;
+  const U = PNL.U, UX = 50, UW = RW - 100, PX = 26, PW = RW - 52, EAR = 22, DEPTH = 70;
   const units = [];      // { y, h, html }
   let uy = 70;
   const rackKnobs = [];
   const RK = (x, y, r, cap, ang, o = {}) => rackKnobs.push(knob3d(x, y, r, cap, ang, o));
   const LW = '#e6e2d8';
   function unit(n, fill, draw, o = {}) {
-    const h = n * U - 2, y0 = uy, kStart = rackKnobs.length, nh = n * 60 - 4, k = h / nh, ox = (PW - UW * k) / 2;
+    const h = n * U - PNL.GAP, y0 = uy, kStart = rackKnobs.length, nh = n * 60 - 4, k = h / nh, ox = (PW - UW * k) / 2;
     // the panel: full width, ears with slotted holes and rack screws over the rails (EIA hole positions)
-    const base = capture(() => {
-      if (o.native) { draw(PW, h); return; }
-      rect(0, 0, PW, h, fill, 'rx="1.5"');
-      rect(0, 0, PW, 1.5, '#fff', 'opacity="0.14"'); rect(0, h - 1.5, PW, 1.5, '#000', 'opacity="0.55"');
-      for (const ex of [0, PW - EAR]) {
-        rect(ex, 0, EAR, h, '#000', 'opacity="0.18"'); rect(ex + (ex ? 0 : EAR - 0.8), 0, 0.8, h, '#000', 'opacity="0.45"');
-        for (let u = 0; u < n; u++) for (const hy of [6.6, U - 8.6]) { const cy = u * U + hy; rect(ex + 4, cy - 3, EAR - 8, 6, '#070707', 'rx="3"'); screw(ex + EAR / 2, cy, 3.6); }
-      }
-    });
+    const base = capture(() => { if (o.native) draw(PW, h); else panelBase(n, fill, h); });
     const face = o.native ? '' : capture(() => draw(UW, nh));
     const kn = rackKnobs.splice(kStart).join('');
     const inner = o.native ? '' : `<div style="${B3(`left:${ox.toFixed(2)}px;top:0;width:${UW}px;height:${nh}px;transform-origin:0 0;transform:scale(${k.toFixed(4)})`)}">${svgWrap(UW, nh, face)}${kn}</div>`;
@@ -1822,12 +1834,12 @@ ${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id
 ${overlay('elec', 'JH-TAPE · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
-${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
+${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync">${panelSVG(1, '#0d0d0e', (w, h) => sgFace(w, h))}
   <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the JH-Tape's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → JH-Tape</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
   <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the JH-Tape's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
-${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => `<svg width="1500" height="133" viewBox="0 0 498 44" style="display:block">${capture(() => c160Face(498, 44, u))}</svg>`).join('<div style="height:10px"></div>')}
+${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => panelSVG(1, '#232127', (w, h) => c160Face(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
   <p class="note">Drag a knob up or down (double-click resets it); click the buttons. Each unit works on the channel it is patched into at the patchbay (INSERT SEND → 160X IN, 160X OUT → INSERT RETURN): A is on the kick and B on the bass to start with. SLAVE on one unit links it to the other as a stereo pair: the louder channel drives both, with the other unit's controls. You hear it once the tape machine's electronics are on.</p></div>`, '<span class="ov-msg" id="c160-msg"></span>', true)}
-${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
+${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync">${panelSVG(1, '#cfcdc7', (w, h) => dzFace(w, h))}
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
   <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
   <p class="note">The front panel works: click its keys. MASTER and SLAVE enable the chase · RUN starts the generator · STOP·CONT holds the system · SELECT steps the display (G_TC, M_TC, S_TC, S_OFS, S_ERR, S_SPD; the last two letters show the chase: PK park, CU cue, WT wait, PL pull-in, LK lock, TL tight lock, HD held) · ◀ ▶ trim the offset a quarter frame · CLEAR zeroes it · INDEX switches the LOCK lamp between the wide (0.05 frame) and tight (0.003 frame) windows. A red SHIFT reaches the red legends on its half: CAPTURE takes the offset, GOTO parks the slave on the master, LEARN relearns the slave's start-up, COPY resets the generator. MIDI (MTC IN) is an extension: the original read master LTC and only sent MTC.</p></div>`, '<span class="ov-msg" id="dz-msg"></span>', true)}
