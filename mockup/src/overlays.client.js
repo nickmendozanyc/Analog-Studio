@@ -13,25 +13,57 @@
   // ---------------- pop-up views ----------------
   const views = {};
   document.querySelectorAll('.overlay').forEach((o) => { views[o.dataset.view] = o; });
-  let open = null;
+  // Several floating windows can be open together (dragged by their title bars, clicked to the front, closed with ✕;
+  // Esc closes the one on top). A full-screen view stands alone: opening one closes the rest.
+  let open = null;   // the window on top (keyboard shortcuts go to it)
+  let zTop = 100;
+  const isOpen = (v) => !!views[v] && !views[v].hidden;
+  const isFloat = (o) => o.classList.contains('float');
+  const raise = (o) => { o.style.zIndex = String(++zTop); open = o; };
   function show(v) {
-    if (open) hide();
     const o = views[v]; if (!o) return;
-    o.hidden = false; open = o;
-    // a full-screen view covers the studio: hide it, so the browser stops painting the 4K room underneath
-    document.body.classList.toggle('fullview', !o.classList.contains('float'));
+    for (const x of Object.values(views)) if (!x.hidden && (!isFloat(x) || !isFloat(o)) && x !== o) hide(x);
+    if (!o.hidden) { raise(o); return; }
+    o.hidden = false; raise(o);
+    if (isFloat(o)) {   // a new window steps down-right from the others so it does not hide them exactly
+      const n = Object.values(views).filter((x) => !x.hidden && isFloat(x) && x !== o).length, w = o.querySelector('.ov-win');
+      if (w && !w.dataset.moved) w.style.transform = `translate(calc(-50% + ${n * 48}px), calc(-50% + ${n * 48}px))`;
+    }
+    document.body.classList.toggle('fullview', !isFloat(o));   // a full-screen view hides the 4K room behind it
     if (v === 'tape') o.querySelectorAll('.tpv').forEach((d) => { d.hidden = d.dataset.skin !== (document.body.dataset.studio === 'sls' ? 'sls' : 'cmi'); });
     if (v === 'meters') startMeters();
     if (v === 'patchbay') drawPatchbay();
     if (v === 'al') startAL();
     if (v === 'elec') { elShowTrims(); startMeters('#ov-elec'); }
   }
-  function hide() { if (!open) return; open.hidden = true; open = null; document.body.classList.remove('fullview'); stopMeters(); stopAL(); }
+  function hide(o = open) {
+    if (!o || o.hidden) return;
+    o.hidden = true; const v = o.dataset.view;
+    if (!isFloat(o)) document.body.classList.remove('fullview');
+    if (v === 'meters' || v === 'elec') stopMeters();
+    if (v === 'al') stopAL();
+    const rest = Object.values(views).filter((x) => !x.hidden).sort((a, b) => (+b.style.zIndex || 0) - (+a.style.zIndex || 0));
+    open = rest[0] || null;
+  }
+  const hideAll = () => { for (const x of Object.values(views)) if (!x.hidden) hide(x); };
   document.querySelectorAll('[data-open]').forEach((h) => h.addEventListener('click', () => show(h.dataset.open)));
-  document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', hide));
-  // floating windows close when you click the dimmed studio around them
-  document.querySelectorAll('.overlay.float').forEach((o) => o.addEventListener('pointerdown', (e) => { if (e.target === o) hide(); }));
+  document.querySelectorAll('.ov-close').forEach((b) => b.addEventListener('click', () => hide(b.closest('.overlay'))));
   addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+  // floating windows: click to the front, drag by the title bar (in stage pixels, whatever the window's scale)
+  document.querySelectorAll('.overlay.float').forEach((o) => {
+    const w = o.querySelector('.ov-win'), bar = o.querySelector('.ov-bar'); if (!w || !bar) return;
+    w.addEventListener('pointerdown', () => raise(o), true);
+    bar.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button, input, select, label, a')) return;
+      e.preventDefault(); bar.setPointerCapture(e.pointerId);
+      const st = document.getElementById('stage').getBoundingClientRect(), k = st.width / 3840, r = w.getBoundingClientRect();
+      let x = (r.left - st.left) / k, y = (r.top - st.top) / k; const x0 = e.clientX, y0 = e.clientY, bx = x, by = y;
+      Object.assign(w.style, { left: `${x}px`, top: `${y}px`, transform: 'none' }); w.dataset.moved = '1';
+      const mv = (ev) => { x = bx + (ev.clientX - x0) / k; y = by + (ev.clientY - y0) / k; w.style.left = `${Math.max(-w.offsetWidth + 120, Math.min(3840 - 120, x))}px`; w.style.top = `${Math.max(0, Math.min(2160 - 60, y))}px`; };
+      const up = () => { bar.removeEventListener('pointermove', mv); bar.removeEventListener('pointerup', up); };
+      bar.addEventListener('pointermove', mv); bar.addEventListener('pointerup', up);
+    });
+  });
   const svgPt = (svg, e, ref = svg) => { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(ref.getScreenCTM().inverse()); };
 
   // ---------------- live tape meters (VU ballistics) ----------------
@@ -342,7 +374,7 @@
   }
   // only the reels on screen are drawn: the studio deck of the room you're in, or the tape view's copy while it's open
   function reelVisible(pre) {
-    const sls = document.body.dataset.studio === 'sls', tapeOpen = open && open.dataset.view === 'tape';
+    const sls = document.body.dataset.studio === 'sls', tapeOpen = isOpen('tape');
     if (pre === 'jhp' || pre === 'a8p') return tapeOpen && (pre === 'a8p') === sls;
     return !document.body.classList.contains('fullview') && (pre === 'a8') === sls;
   }
@@ -803,7 +835,7 @@
     if (d && d.as === 'cmd' && Object.prototype.hasOwnProperty.call(CMDS, d.fn)) CMDS[d.fn](...(d.args || []));
   });
   function postState() {
-    if (!tapeFrame || !open || open.dataset.view !== 'tape' || !tapeFrame.contentWindow) return;
+    if (!tapeFrame || !isOpen('tape') || !tapeFrame.contentWindow) return;
     const st = {}; for (const k of STATE_KEYS) st[k] = tr[k];
     tapeFrame.contentWindow.postMessage({ as: 'state', s: st }, '*');
   }
@@ -818,7 +850,7 @@
     document.body.dataset.studio = mode;
     try { localStorage.setItem('as-studio', mode); } catch (e) {}
   }
-  modeKeys.forEach((b) => b.addEventListener('click', () => { if (open) hide(); setStudio(b.dataset.mode); }));
+  modeKeys.forEach((b) => b.addEventListener('click', () => { hideAll(); setStudio(b.dataset.mode); }));
   let savedMode = 'cmi'; try { savedMode = localStorage.getItem('as-studio') || 'cmi'; } catch (e) {}
   setStudio(savedMode);
   window.AS_SET_STUDIO = setStudio;
@@ -840,7 +872,7 @@
       if (tr.mode === 'play' && tr.counter >= AL.mem[9]) tr.locateTo(counterTake(AL.mem[8]), 'play');
       else if (tr.mode !== 'play' && tr.mode !== 'locate') AL.rep = false;
     }
-    if ((open && open.dataset.view === 'al') || (!full && document.body.dataset.studio !== 'sls')) alRender(now);   // the studio-view face mirrors it too
+    if (isOpen('al') || (!full && document.body.dataset.studio !== 'sls')) alRender(now);   // the studio-view face mirrors it too
     elecTick();
     if (!full) roomMeters(now);
     requestAnimationFrame(studio);

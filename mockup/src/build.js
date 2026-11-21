@@ -1805,7 +1805,9 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .ov-body{position:absolute;left:0;top:56px;width:3840px;height:2104px}
   .ov-body iframe{width:100%;height:100%;border:0;display:block}
   body.fullview #stage>:not(.overlay){visibility:hidden}
-  .overlay.float{background:transparent}   /* the studio stays as it is behind a floating window (clicking it still closes the window) */
+  .overlay.float{background:transparent;pointer-events:none}   /* the studio stays usable around floating windows */
+  .overlay.float .ov-win{pointer-events:auto}
+  .overlay.float .ov-bar{cursor:move;user-select:none}   /* the studio stays as it is behind a floating window (clicking it still closes the window) */
   .overlay.float .ov-win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:12px;overflow:hidden;border:2px solid #000;background:#141210;box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.06)}
   .overlay.float .ov-bar{height:auto;min-height:52px;flex-wrap:wrap;gap:14px 18px;padding:6px 16px;font-size:17px;letter-spacing:2px}
   .overlay.float .ov-bar button.ov-close{padding:6px 12px}
