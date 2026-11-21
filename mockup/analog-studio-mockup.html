@@ -76,6 +76,19 @@
   #racks-room .rr-title{position:absolute;left:90px;top:80px;font:900 64px Archivo,Arial;letter-spacing:14px;color:#efe6d2}
   #racks-room .rr-sub{position:absolute;left:94px;top:170px;width:1200px;font:600 24px Archivo,Arial;color:#a9a294;line-height:1.5}
   #racks-room .rr-back{position:absolute;left:94px;top:260px;font:900 20px Archivo,Arial;letter-spacing:3px;padding:16px 30px;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  .fm-hot{position:absolute;cursor:pointer;z-index:5}
+  .fm-lamp{transition:transform .5s ease,opacity .5s ease}
+  .fm-lamp i{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:4px 4px 2px 2px;background:linear-gradient(#8a8c92,#4a4c52 45%,#26272b);border:1px solid #111;box-shadow:0 4px 8px rgba(0,0,0,.8)}
+  .fm-lamp i::before{content:'';position:absolute;left:50%;top:100%;width:6px;height:12px;margin-left:-3px;background:linear-gradient(90deg,#2a2b2e,#6a6c71,#2a2b2e)}
+  .fm-lamp i::after{content:'';position:absolute;left:5px;right:5px;bottom:-3px;height:4px;border-radius:2px;background:#fff6e0;box-shadow:0 2px calc(26px * var(--dim)) calc(9px * var(--dim)) rgba(255,214,150,calc(0.95 * var(--dim))),0 0 4px #fff}
+  .fm-light{position:absolute;pointer-events:none;z-index:4}
+  .fm-light .fm-glow,.fm-light .fm-dark{position:absolute;left:0;top:0;width:100%;height:100%;transition:opacity .6s ease}
+  .fm-light .fm-glow{background:radial-gradient(ellipse 120% 70% at 50% 0%,rgba(255,214,150,calc(0.3 * var(--dim))),rgba(255,206,140,calc(0.1 * var(--dim))) 45%,rgba(255,200,130,0) 85%)}
+  .fm-light .fm-dark{background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.62));opacity:0}
+  .fm-beam{position:absolute;top:0;width:180px;height:640px;margin-left:-90px;background:radial-gradient(ellipse 50% 100% at 50% 0%,rgba(255,230,180,calc(0.22 * var(--dim))),rgba(255,220,160,0) 72%);transition:opacity .6s ease}
+  .fm-light[data-on="0"] .fm-glow,.fm-light[data-on="0"] .fm-beam{opacity:0}
+  .fm-light[data-on="0"] .fm-dark{opacity:1}
+  .fm-lamps[data-on="0"] .fm-lamp{opacity:0}
   .rk-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:2px dashed rgba(233,227,208,0.16);border-radius:6px;color:rgba(233,227,208,0.32);font:900 30px Archivo,Arial;letter-spacing:10px}
   .rk-empty small{font:700 16px Archivo,Arial;letter-spacing:3px}
   #files-bar .fbtns button{font:900 16px Archivo,Arial;letter-spacing:2px;padding:14px 0;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
@@ -32250,7 +32263,80 @@
       <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:8px;height:2100px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14"></div>
       <div style="position:absolute;left:0;top:14px;width:550px;text-align:center;font:800 18px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:4px;color:#e9e3d0">RACK 1</div>
       <div style="position:absolute;left:0;top:40px;width:550px;text-align:center;font:600 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;color:#bdb8aa">audio &amp; MIDI gear · to come</div>
-      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:70px;width:450px;height:1990px;transform:translateZ(1px)"><span>EMPTY</span><small>43 U · 19-inch rails</small></div>
+      <div style="position:absolute;transform-style:preserve-3d;left:26px;top:70px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121213" />
+<rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
+<rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="11.638738686701267" y1="3.791724214021859" x2="10.361261313298733" y2="9.408275785978141" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="13.854910763192418" y1="38.070020956092584" x2="8.145089236807582" y2="38.82866325443375" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="488.4904903082839" y1="9.06431301601721" x2="485.5095096917161" y2="4.135686983982792" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="488.00820092154515" y1="41.14710616125388" x2="485.99179907845485" y2="35.75157804927245" stroke="#333" stroke-width="1.08"/>
+<rect x="25.896" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="27.896" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="37.824" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="43.824" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="436.24799999999993" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="438.24799999999993" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="448.17599999999993" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="454.17599999999993" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="68.7" y="13.524671052631582" width="12" height="18" fill="#060606" rx="1.5"/>
+<rect class="fm1-pw" x="69.7" y="14.524671052631582" width="10" height="16" rx="1" fill="#c8261c"/>
+<rect x="69.7" y="14.524671052631582" width="10" height="6" fill="#fff" opacity="0.18" rx="1"/>
+<text x="74.7" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">POWER</text>
+<text x="134.46" y="24.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#e8e6e0" text-anchor="middle" font-weight="800" font-style="italic" letter-spacing="-0.2">Fermann</text>
+<text x="134.46" y="31.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.5" fill="#a9a69c" text-anchor="middle" font-weight="800" letter-spacing="0.5">POWER CONDITIONER · PL-8 C</text>
+<rect x="200.16" y="11.524671052631582" width="18" height="22" fill="#d8d4c8" rx="3"/>
+<rect x="204.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<rect x="211.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<circle cx="209.16" cy="27.524671052631582" r="1.6" fill="#222" />
+<text x="209.16" y="41.549342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#9b988f" text-anchor="middle" font-weight="800" >15A 125V</text>
+<rect x="258.96000000000004" y="7" width="64.74000000000001" height="31.049342105263165" fill="#160302" rx="1.5"/>
+<text x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" opacity="0.07" text-anchor="middle">888</text>
+<text class="fm1-v" x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">120</text>
+<text x="276.88800000000003" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >VOLTS</text>
+<circle cx="296.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a0" cx="296.808" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="300.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a1" cx="300.408" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="304.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a2" cx="304.008" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="307.608" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a3" cx="307.608" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a4" cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="314.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a5" cx="314.808" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="318.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a6" cx="318.408" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="322.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm1-a7" cx="322.008" cy="21.524671052631582" r="1.1" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="309.408" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >AMPS</text>
+<rect x="347.58" y="16.524671052631582" width="12" height="12" fill="#050505" rx="1"/>
+<rect x="348.38" y="17.324671052631583" width="10.4" height="10.4" fill="#2b2b2e" rx="1"/>
+<circle class="fm1-lt" cx="353.58" cy="13.024671052631582" r="1" fill="#ffd27a" opacity="1" filter="url(#glowSm)"/>
+<text x="353.58" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">LIGHTS</text>
+<circle cx="393.82" cy="22.324671052631583" r="6.4" fill="#000" opacity="0.6"/>
+<circle cx="393.42" cy="21.524671052631582" r="6.2" fill="#2e2f33" />
+<circle cx="393.42" cy="21.524671052631582" r="4.6" fill="#3c3d42" />
+<g class="fm1-dim" transform="rotate(60 393.42 21.524671052631582)"><rect x="392.97" y="15.724671052631582" width="0.9" height="3.6" fill="#e8e6e0"/></g>
+<text x="393.42" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">DIMMER</text></svg></div>
+      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:121.86842105263159px;width:450px;height:1938.1315789473683px;transform:translateZ(1px)"><span>EMPTY</span><small>42 U · 19-inch rails</small></div>
+      <div class="fm-lamps" data-fm="1" data-on="1" style="--dim:0.85;position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;pointer-events:none"><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:43.9px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:454.2px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div></div>
     </div>
   </div><div class="rk-cab" data-rack="2" style="position:absolute;left:2110px;top:60px;width:550px;height:2100px;perspective:2200px;perspective-origin:-60% 40%;">
     <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px">
@@ -32540,7 +32626,80 @@
       <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:8px;height:2100px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14"></div>
       <div style="position:absolute;left:0;top:14px;width:550px;text-align:center;font:800 18px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:4px;color:#e9e3d0">RACK 2</div>
       <div style="position:absolute;left:0;top:40px;width:550px;text-align:center;font:600 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;color:#bdb8aa">audio &amp; MIDI gear · to come</div>
-      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:70px;width:450px;height:1990px;transform:translateZ(1px)"><span>EMPTY</span><small>43 U · 19-inch rails</small></div>
+      <div style="position:absolute;transform-style:preserve-3d;left:26px;top:70px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121213" />
+<rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
+<rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="11.22658468278785" y1="3.728927137544933" x2="10.773415317212152" y2="9.471072862455067" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="13.501270962867181" y1="37.021741471221034" x2="8.49872903713282" y2="39.87694273930529" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="487.96354881248675" y1="9.314032734871748" x2="486.03645118751325" y2="3.8859672651282513" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="487.58269566741143" y1="41.26977926272297" x2="486.41730433258857" y2="35.628904947803356" stroke="#333" stroke-width="1.08"/>
+<rect x="25.896" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="27.896" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="37.824" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="43.824" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="436.24799999999993" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="438.24799999999993" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="448.17599999999993" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="454.17599999999993" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="68.7" y="13.524671052631582" width="12" height="18" fill="#060606" rx="1.5"/>
+<rect class="fm2-pw" x="69.7" y="14.524671052631582" width="10" height="16" rx="1" fill="#c8261c"/>
+<rect x="69.7" y="14.524671052631582" width="10" height="6" fill="#fff" opacity="0.18" rx="1"/>
+<text x="74.7" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">POWER</text>
+<text x="134.46" y="24.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#e8e6e0" text-anchor="middle" font-weight="800" font-style="italic" letter-spacing="-0.2">Fermann</text>
+<text x="134.46" y="31.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.5" fill="#a9a69c" text-anchor="middle" font-weight="800" letter-spacing="0.5">POWER CONDITIONER · PL-8 C</text>
+<rect x="200.16" y="11.524671052631582" width="18" height="22" fill="#d8d4c8" rx="3"/>
+<rect x="204.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<rect x="211.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<circle cx="209.16" cy="27.524671052631582" r="1.6" fill="#222" />
+<text x="209.16" y="41.549342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#9b988f" text-anchor="middle" font-weight="800" >15A 125V</text>
+<rect x="258.96000000000004" y="7" width="64.74000000000001" height="31.049342105263165" fill="#160302" rx="1.5"/>
+<text x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" opacity="0.07" text-anchor="middle">888</text>
+<text class="fm2-v" x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">120</text>
+<text x="276.88800000000003" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >VOLTS</text>
+<circle cx="296.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a0" cx="296.808" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="300.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a1" cx="300.408" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="304.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a2" cx="304.008" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="307.608" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a3" cx="307.608" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a4" cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="314.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a5" cx="314.808" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="318.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a6" cx="318.408" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="322.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm2-a7" cx="322.008" cy="21.524671052631582" r="1.1" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="309.408" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >AMPS</text>
+<rect x="347.58" y="16.524671052631582" width="12" height="12" fill="#050505" rx="1"/>
+<rect x="348.38" y="17.324671052631583" width="10.4" height="10.4" fill="#2b2b2e" rx="1"/>
+<circle class="fm2-lt" cx="353.58" cy="13.024671052631582" r="1" fill="#ffd27a" opacity="1" filter="url(#glowSm)"/>
+<text x="353.58" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">LIGHTS</text>
+<circle cx="393.82" cy="22.324671052631583" r="6.4" fill="#000" opacity="0.6"/>
+<circle cx="393.42" cy="21.524671052631582" r="6.2" fill="#2e2f33" />
+<circle cx="393.42" cy="21.524671052631582" r="4.6" fill="#3c3d42" />
+<g class="fm2-dim" transform="rotate(60 393.42 21.524671052631582)"><rect x="392.97" y="15.724671052631582" width="0.9" height="3.6" fill="#e8e6e0"/></g>
+<text x="393.42" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">DIMMER</text></svg></div>
+      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:121.86842105263159px;width:450px;height:1938.1315789473683px;transform:translateZ(1px)"><span>EMPTY</span><small>42 U · 19-inch rails</small></div>
+      <div class="fm-lamps" data-fm="2" data-on="1" style="--dim:0.85;position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;pointer-events:none"><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:43.9px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:454.2px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div></div>
     </div>
   </div><div class="rk-cab" data-rack="3" style="position:absolute;left:2700px;top:60px;width:550px;height:2100px;perspective:2200px;perspective-origin:-60% 40%;">
     <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px">
@@ -32830,9 +32989,82 @@
       <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:8px;height:2100px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14"></div>
       <div style="position:absolute;left:0;top:14px;width:550px;text-align:center;font:800 18px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:4px;color:#e9e3d0">RACK 3</div>
       <div style="position:absolute;left:0;top:40px;width:550px;text-align:center;font:600 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;color:#bdb8aa">audio &amp; MIDI gear · to come</div>
-      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:70px;width:450px;height:1990px;transform:translateZ(1px)"><span>EMPTY</span><small>43 U · 19-inch rails</small></div>
+      <div style="position:absolute;transform-style:preserve-3d;left:26px;top:70px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121213" />
+<rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
+<rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="13.747806849580755" y1="5.737470280281842" x2="8.252193150419245" y2="7.462529719718157" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="13.369742994996322" y1="36.81266310873823" x2="8.630257005003678" y2="40.0860211017881" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="487.7891899546957" y1="9.369761580968191" x2="486.2108100453043" y2="3.830238419031809" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="487.17808849989694" y1="35.57485354445718" x2="486.82191150010306" y2="41.32383066606915" stroke="#333" stroke-width="1.08"/>
+<rect x="25.896" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="27.896" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="37.824" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="43.824" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="436.24799999999993" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="438.24799999999993" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="448.17599999999993" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="454.17599999999993" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="68.7" y="13.524671052631582" width="12" height="18" fill="#060606" rx="1.5"/>
+<rect class="fm3-pw" x="69.7" y="14.524671052631582" width="10" height="16" rx="1" fill="#c8261c"/>
+<rect x="69.7" y="14.524671052631582" width="10" height="6" fill="#fff" opacity="0.18" rx="1"/>
+<text x="74.7" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">POWER</text>
+<text x="134.46" y="24.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#e8e6e0" text-anchor="middle" font-weight="800" font-style="italic" letter-spacing="-0.2">Fermann</text>
+<text x="134.46" y="31.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.5" fill="#a9a69c" text-anchor="middle" font-weight="800" letter-spacing="0.5">POWER CONDITIONER · PL-8 C</text>
+<rect x="200.16" y="11.524671052631582" width="18" height="22" fill="#d8d4c8" rx="3"/>
+<rect x="204.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<rect x="211.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<circle cx="209.16" cy="27.524671052631582" r="1.6" fill="#222" />
+<text x="209.16" y="41.549342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#9b988f" text-anchor="middle" font-weight="800" >15A 125V</text>
+<rect x="258.96000000000004" y="7" width="64.74000000000001" height="31.049342105263165" fill="#160302" rx="1.5"/>
+<text x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" opacity="0.07" text-anchor="middle">888</text>
+<text class="fm3-v" x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">120</text>
+<text x="276.88800000000003" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >VOLTS</text>
+<circle cx="296.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a0" cx="296.808" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="300.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a1" cx="300.408" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="304.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a2" cx="304.008" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="307.608" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a3" cx="307.608" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a4" cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="314.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a5" cx="314.808" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="318.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a6" cx="318.408" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="322.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm3-a7" cx="322.008" cy="21.524671052631582" r="1.1" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="309.408" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >AMPS</text>
+<rect x="347.58" y="16.524671052631582" width="12" height="12" fill="#050505" rx="1"/>
+<rect x="348.38" y="17.324671052631583" width="10.4" height="10.4" fill="#2b2b2e" rx="1"/>
+<circle class="fm3-lt" cx="353.58" cy="13.024671052631582" r="1" fill="#ffd27a" opacity="1" filter="url(#glowSm)"/>
+<text x="353.58" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">LIGHTS</text>
+<circle cx="393.82" cy="22.324671052631583" r="6.4" fill="#000" opacity="0.6"/>
+<circle cx="393.42" cy="21.524671052631582" r="6.2" fill="#2e2f33" />
+<circle cx="393.42" cy="21.524671052631582" r="4.6" fill="#3c3d42" />
+<g class="fm3-dim" transform="rotate(60 393.42 21.524671052631582)"><rect x="392.97" y="15.724671052631582" width="0.9" height="3.6" fill="#e8e6e0"/></g>
+<text x="393.42" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">DIMMER</text></svg></div>
+      <div class="rk-empty" style="position:absolute;transform-style:preserve-3d;left:50px;top:121.86842105263159px;width:450px;height:1938.1315789473683px;transform:translateZ(1px)"><span>EMPTY</span><small>42 U · 19-inch rails</small></div>
+      <div class="fm-lamps" data-fm="3" data-on="1" style="--dim:0.85;position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;pointer-events:none"><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:43.9px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:454.2px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div></div>
     </div>
-  </div></div>
+  </div><div class="fm-light" data-fm="3" data-on="1" style="--dim:0.85;left:2726px;top:126px;width:498px;height:2014px"><b class="fm-beam" style="left:43.8px"></b><b class="fm-beam" style="left:454.2px"></b><i class="fm-glow"></i><i class="fm-dark"></i></div><div class="fm-light" data-fm="2" data-on="1" style="--dim:0.85;left:2136px;top:126px;width:498px;height:2014px"><b class="fm-beam" style="left:43.8px"></b><b class="fm-beam" style="left:454.2px"></b><i class="fm-glow"></i><i class="fm-dark"></i></div><div class="fm-light" data-fm="1" data-on="1" style="--dim:0.85;left:1546px;top:126px;width:498px;height:2014px"><b class="fm-beam" style="left:43.8px"></b><b class="fm-beam" style="left:454.2px"></b><i class="fm-glow"></i><i class="fm-dark"></i></div><div class="fm-hot" data-fm="3" style="left:2726px;top:130px;width:498px;height:45px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div><div class="fm-hot" data-fm="2" style="left:2136px;top:130px;width:498px;height:45px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div><div class="fm-hot" data-fm="1" style="left:1546px;top:130px;width:498px;height:45px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div></div>
 <div style="position:absolute;left:1342px;top:116px;width:400px;height:630px;transform:scale(0.8727810650887574);transform-origin:0 0;perspective:2600px;perspective-origin:50% 30%;">
     <svg width="400" height="630" style="position:absolute;left:0;top:0;overflow:visible">
     <defs><linearGradient id="cab" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6d7078"/><stop offset="0.4" stop-color="#b9bcc2"/><stop offset="1" stop-color="#55585e"/></linearGradient>
@@ -35952,7 +36184,79 @@
       <div style="position:absolute;transform-style:preserve-3d;left:524px;top:0;width:26px;height:2100px;transform:translateZ(8px);background:linear-gradient(90deg,#6e4420,#b37a3e 40%,#8a5a2c 70%,#4a2c14)"></div>
       <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:8px;height:2100px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14"></div>
       <div style="position:absolute;left:0;top:14px;width:550px;text-align:center;font:800 18px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:4px;color:#e9e3d0">OUTBOARD RACK</div><div style="position:absolute;left:0;top:40px;width:550px;text-align:center;font:600 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;color:#bdb8aa">drag a unit to an insert or aux send</div>
-      <div style="position:absolute;transform-style:preserve-3d;left:26px;top:70px;width:498px;height:182.65460526315792px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="182.65460526315792" viewBox="0 0 498 182.65460526315792" style="position:absolute;left:0;top:0;overflow:visible"><g transform="scale(0.28295 0.28187)">
+      <div style="position:absolute;transform-style:preserve-3d;left:26px;top:70px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121213" />
+<rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
+<rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="13.280724684448222" y1="8.358605957498312" x2="8.719275315551778" y2="4.841394042501686" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="13.844088009788802" y1="38.90273309830953" x2="8.155911990211198" y2="37.995951112216794" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#0d0d0e" />
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="488.8966778294723" y1="4.432740622078617" x2="485.1033221705277" y2="8.767259377921384" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
+<circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
+<line x1="487.6892513641158" y1="35.653035155541" x2="486.3107486358842" y2="41.24564905498533" stroke="#333" stroke-width="1.08"/>
+<rect x="25.896" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="27.896" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="37.824" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="43.824" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="436.24799999999993" y="0" width="35.856" height="6" fill="#050505" rx="1"/>
+<rect x="438.24799999999993" y="1.5" width="31.856" height="2.4" fill="#2a2a2c" rx="1"/>
+<rect x="448.17599999999993" y="6.5" width="12" height="3" fill="#2b2b2e" rx="1.5"/>
+<text x="454.17599999999993" y="18" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#9b988f" text-anchor="middle" font-weight="800" letter-spacing="0.6">LAMP</text>
+<rect x="68.7" y="13.524671052631582" width="12" height="18" fill="#060606" rx="1.5"/>
+<rect class="fm0-pw" x="69.7" y="14.524671052631582" width="10" height="16" rx="1" fill="#c8261c"/>
+<rect x="69.7" y="14.524671052631582" width="10" height="6" fill="#fff" opacity="0.18" rx="1"/>
+<text x="74.7" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">POWER</text>
+<text x="134.46" y="24.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#e8e6e0" text-anchor="middle" font-weight="800" font-style="italic" letter-spacing="-0.2">Fermann</text>
+<text x="134.46" y="31.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.5" fill="#a9a69c" text-anchor="middle" font-weight="800" letter-spacing="0.5">POWER CONDITIONER · PL-8 C</text>
+<rect x="200.16" y="11.524671052631582" width="18" height="22" fill="#d8d4c8" rx="3"/>
+<rect x="204.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<rect x="211.85999999999999" y="15.524671052631582" width="1.6" height="6" fill="#222" rx="0.5"/>
+<circle cx="209.16" cy="27.524671052631582" r="1.6" fill="#222" />
+<text x="209.16" y="41.549342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#9b988f" text-anchor="middle" font-weight="800" >15A 125V</text>
+<rect x="258.96000000000004" y="7" width="64.74000000000001" height="31.049342105263165" fill="#160302" rx="1.5"/>
+<text x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" opacity="0.07" text-anchor="middle">888</text>
+<text class="fm0-v" x="276.88800000000003" y="27.024671052631582" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">120</text>
+<text x="276.88800000000003" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >VOLTS</text>
+<circle cx="296.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a0" cx="296.808" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="300.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a1" cx="300.408" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="304.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a2" cx="304.008" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="307.608" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a3" cx="307.608" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a4" cx="311.20799999999997" cy="21.524671052631582" r="1.1" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<circle cx="314.808" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a5" cx="314.808" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="318.408" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a6" cx="318.408" cy="21.524671052631582" r="1.1" fill="#ffc928" opacity="0" filter="url(#glowSm)"/>
+<circle cx="322.008" cy="21.524671052631582" r="1.1" fill="#1c0e0b" />
+<circle class="fm0-a7" cx="322.008" cy="21.524671052631582" r="1.1" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>
+<text x="309.408" y="36.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.2" fill="#c9563f" text-anchor="middle" font-weight="800" >AMPS</text>
+<rect x="347.58" y="16.524671052631582" width="12" height="12" fill="#050505" rx="1"/>
+<rect x="348.38" y="17.324671052631583" width="10.4" height="10.4" fill="#2b2b2e" rx="1"/>
+<circle class="fm0-lt" cx="353.58" cy="13.024671052631582" r="1" fill="#ffd27a" opacity="1" filter="url(#glowSm)"/>
+<text x="353.58" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">LIGHTS</text>
+<circle cx="393.82" cy="22.324671052631583" r="6.4" fill="#000" opacity="0.6"/>
+<circle cx="393.42" cy="21.524671052631582" r="6.2" fill="#2e2f33" />
+<circle cx="393.42" cy="21.524671052631582" r="4.6" fill="#3c3d42" />
+<g class="fm0-dim" transform="rotate(60 393.42 21.524671052631582)"><rect x="392.97" y="15.724671052631582" width="0.9" height="3.6" fill="#e8e6e0"/></g>
+<text x="393.42" y="40.049342105263165" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.6" fill="#e8e6e0" text-anchor="middle" font-weight="800" letter-spacing="0.6">DIMMER</text></svg></div>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:115.86842105263159px;width:498px;height:182.65460526315792px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="182.65460526315792" viewBox="0 0 498 182.65460526315792" style="position:absolute;left:0;top:0;overflow:visible"><g transform="scale(0.28295 0.28187)">
 <rect x="0" y="0" width="1760" height="648" fill="#161718" rx="6"/>
 <rect x="0" y="0" width="1760" height="6" fill="#fff" opacity="0.1"/>
 <rect x="380" y="40" width="40" height="14" fill="#0b0b0c" rx="3"/>
@@ -35969,22 +36273,22 @@
 <rect x="1350" y="40" width="40" height="14" fill="#0b0b0c" rx="3"/>
 <circle cx="40" cy="51" r="13" fill="#000" opacity="0.5"/>
 <circle cx="40" cy="50" r="12" fill="url(#chrome)" />
-<line x1="47.60241561482741" y1="55.86201985832771" x2="32.39758438517259" y2="44.13798014167229" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="43.28786475514718" y1="59.01942045543177" x2="36.71213524485281" y2="40.980579544568236" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="1720" cy="51" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1720" cy="50" r="12" fill="url(#chrome)" />
-<line x1="1729.4802933659628" y1="51.51130331015457" x2="1710.5197066340372" y2="48.48869668984543" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1722.86269353148" y1="59.16324100658837" x2="1717.13730646852" y2="40.83675899341163" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="40" cy="599" r="13" fill="#000" opacity="0.5"/>
 <circle cx="40" cy="598" r="12" fill="url(#chrome)" />
-<line x1="46.322259431574395" y1="590.7758020735954" x2="33.67774056842561" y2="605.2241979264046" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="41.55948915868272" y1="588.5275138657292" x2="38.44051084131728" y2="607.4724861342708" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="1720" cy="599" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1720" cy="598" r="12" fill="url(#chrome)" />
-<line x1="1722.2975045470528" y1="588.6789768342594" x2="1717.7024954529472" y2="607.3210231657406" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1722.0414345734332" y1="607.380434152127" x2="1717.9585654265668" y2="588.619565847873" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="880" cy="35" r="13" fill="#000" opacity="0.5"/>
 <circle cx="880" cy="34" r="12" fill="url(#chrome)" />
-<line x1="883.2878647551472" y1="43.01942045543177" x2="876.7121352448528" y2="24.980579544568236" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="889.057846291895" y1="37.18047489416365" x2="870.942153708105" y2="30.819525105836348" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="880" cy="615" r="13" fill="#000" opacity="0.5"/>
 <circle cx="880" cy="614" r="12" fill="url(#chrome)" />
-<line x1="882.86269353148" y1="623.1632410065884" x2="877.13730646852" y2="604.8367589934116" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="881.0431520271114" y1="604.4568436118686" x2="878.9568479728886" y2="623.5431563881314" stroke="#333" stroke-width="3.5999999999999996"/>
 <rect x="220" y="259.2" width="1320" height="110.16000000000001" fill="#2f6db3" />
 <rect x="260" y="279.2" width="220" height="70.16000000000001" fill="none" stroke="#f2f4f8" stroke-width="4"/>
 <text x="370" y="336.28" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="60" fill="#f2f4f8" text-anchor="middle" font-weight="900" >leximan</text>
@@ -36004,7 +36308,7 @@
 <circle cx="1320" cy="518.4" r="10" fill="#ff3b2f" filter="url(#glow)"/>
 <circle cx="1440" cy="518.4" r="10" fill="#2a2b2e" />
 </g></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:253.47368421052633px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#232127" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:299.3421052631579px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#232127" />
 <rect x="0" y="1" width="498" height="0.35" fill="#fff" opacity="0.021"/>
 <rect x="0" y="2.3" width="498" height="0.35" fill="#fff" opacity="0.031"/>
 <rect x="0" y="3.5999999999999996" width="498" height="0.35" fill="#fff" opacity="0.021"/>
@@ -36046,21 +36350,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.467846747604817" y1="3.7582541597187835" x2="10.532153252395181" y2="9.441745840281216" stroke="#333" stroke-width="1.08"/>
+<line x1="13.868888782122255" y1="6.347260695947211" x2="8.131111217877745" y2="6.852739304052787" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.61243037202999" y1="41.263472350901274" x2="10.387569627970011" y2="35.63521185962505" stroke="#333" stroke-width="1.08"/>
+<line x1="13.769376842186682" y1="37.65880310814783" x2="8.230623157813318" y2="39.2398811023785" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#1b1a1e" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.5"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.7173538875685" y1="7.554142468249096" x2="484.2826461124315" y2="5.645857531750904" stroke="#333" stroke-width="1.08"/>
+<line x1="487.7702136085558" y1="9.375098376129289" x2="486.2297863914442" y2="3.8249016238707094" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.3129456081334" y1="35.586395188823744" x2="486.6870543918666" y2="41.31228902170258" stroke="#333" stroke-width="1.08"/>
+<line x1="489.61598251013646" y1="39.653931457142114" x2="484.38401748986354" y2="37.24475275338421" stroke="#333" stroke-width="1.08"/>
 <text x="60.6031746031746" y="21.71052631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#cfcfd4" text-anchor="middle" font-weight="700" letter-spacing="0.5" font-stretch="125%">dbk</text>
 <text x="60.6031746031746" y="30.937500000000007" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8.5" fill="#cfcfd4" text-anchor="middle" font-weight="900" letter-spacing="0.4">160X</text>
 <circle cx="105.39682539682539" cy="13.569078947368425" r="1.45" fill="#3a1412" />
@@ -36265,7 +36569,7 @@
 <text x="366.25396825396825" y="34.194078947368425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.8" fill="#e4e3e6" text-anchor="middle" font-weight="900" letter-spacing="0.4">COMPRESSOR/LIMITER</text>
 <text class="c160-A-route" x="366.25396825396825" y="42.33552631578948" font-family="'JetBrains Mono', monospace" font-size="3.2" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>
 <text x="477" y="42.33552631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4" fill="#8e8c92" text-anchor="end" font-weight="900" >A</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:299.3421052631579px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#232127" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:345.2105263157895px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#232127" />
 <rect x="0" y="1" width="498" height="0.35" fill="#fff" opacity="0.021"/>
 <rect x="0" y="2.3" width="498" height="0.35" fill="#fff" opacity="0.031"/>
 <rect x="0" y="3.5999999999999996" width="498" height="0.35" fill="#fff" opacity="0.021"/>
@@ -36307,21 +36611,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.868888782122255" y1="6.347260695947211" x2="8.131111217877745" y2="6.852739304052787" stroke="#333" stroke-width="1.08"/>
+<line x1="11.96732699445713" y1="3.8873115759832393" x2="10.032673005542868" y2="9.31268842401676" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.769376842186682" y1="37.65880310814783" x2="8.230623157813318" y2="39.2398811023785" stroke="#333" stroke-width="1.08"/>
+<line x1="13.877150783685819" y1="38.57741773891797" x2="8.122849216314181" y2="38.321266471608354" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#1b1a1e" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.5"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.7702136085558" y1="9.375098376129289" x2="486.2297863914442" y2="3.8249016238707094" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8784026380028" y1="6.504092474025578" x2="484.1215973619972" y2="6.695907525974421" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.61598251013646" y1="39.653931457142114" x2="484.38401748986354" y2="37.24475275338421" stroke="#333" stroke-width="1.08"/>
+<line x1="489.38721106804815" y1="36.83824827913498" x2="484.61278893195185" y2="40.060435931391346" stroke="#333" stroke-width="1.08"/>
 <text x="60.6031746031746" y="21.71052631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#cfcfd4" text-anchor="middle" font-weight="700" letter-spacing="0.5" font-stretch="125%">dbk</text>
 <text x="60.6031746031746" y="30.937500000000007" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8.5" fill="#cfcfd4" text-anchor="middle" font-weight="900" letter-spacing="0.4">160X</text>
 <circle cx="105.39682539682539" cy="13.569078947368425" r="1.45" fill="#3a1412" />
@@ -36526,7 +36830,7 @@
 <text x="366.25396825396825" y="34.194078947368425" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.8" fill="#e4e3e6" text-anchor="middle" font-weight="900" letter-spacing="0.4">COMPRESSOR/LIMITER</text>
 <text class="c160-B-route" x="366.25396825396825" y="42.33552631578948" font-family="'JetBrains Mono', monospace" font-size="3.2" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>
 <text x="477" y="42.33552631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4" fill="#8e8c92" text-anchor="end" font-weight="900" >B</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:345.2105263157895px;width:498px;height:136.78618421052633px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="136.78618421052633" viewBox="0 0 498 136.78618421052633" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="136.78618421052633" fill="#16161a" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:391.07894736842104px;width:498px;height:136.78618421052633px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="136.78618421052633" viewBox="0 0 498 136.78618421052633" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="136.78618421052633" fill="#16161a" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
 <rect x="0" y="135.38618421052632" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="136.78618421052633" fill="#0d0d10" />
@@ -36534,53 +36838,53 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.96732699445713" y1="3.8873115759832393" x2="10.032673005542868" y2="9.31268842401676" stroke="#333" stroke-width="1.08"/>
+<line x1="13.85616149238478" y1="6.230214211443504" x2="8.14383850761522" y2="6.969785788556496" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="13.877150783685819" y1="37.39649668628639" x2="8.122849216314181" y2="37.14034541897677" stroke="#333" stroke-width="1.08"/>
+<line x1="13.375410797937562" y1="38.896863112098735" x2="8.624589202062438" y2="35.639978993164426" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="49.468421052631584" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="13.878402638002798" y1="52.372513526657166" x2="8.121597361997202" y2="52.56432857860601" stroke="#333" stroke-width="1.08"/>
+<line x1="13.876707385675765" y1="52.6060968210097" x2="8.123292614324235" y2="52.33074528425347" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="80.13684210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="84.13684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="83.13684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.387211068048162" y1="81.52574827913497" x2="8.612788931951838" y2="84.74793593139134" stroke="#333" stroke-width="1.08"/>
+<line x1="13.530048455690856" y1="81.76088614235725" x2="8.469951544309144" y2="84.51279806816906" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="95.33684210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="99.33684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="98.33684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.85616149238478" y1="97.96705631670666" x2="8.14383850761522" y2="98.70662789381966" stroke="#333" stroke-width="1.08"/>
+<line x1="13.243251600664582" y1="100.14300440586513" x2="8.756748399335418" y2="96.53067980466119" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="126.00526315789475" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="130.00526315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="129.00526315789475" r="3.6" fill="url(#chrome)" />
-<line x1="13.375410797937562" y1="130.6337052173619" x2="8.624589202062438" y2="127.37682109842758" stroke="#333" stroke-width="1.08"/>
+<line x1="11.197201484817173" y1="126.132022552866" x2="10.802798515182825" y2="131.8785037629235" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="136.78618421052633" fill="#0d0d10" />
 <rect x="476" y="0" width="0.8" height="136.78618421052633" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.8767073856758" y1="6.737675768378114" x2="484.1232926143242" y2="6.462324231621887" stroke="#333" stroke-width="1.08"/>
+<line x1="489.72572262197644" y1="7.5299656918648825" x2="484.27427737802356" y2="5.670034308135117" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.53004845569086" y1="35.892465089725675" x2="484.46995154430914" y2="38.644377015537486" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8786536073351" y1="37.356474496497114" x2="484.1213463926649" y2="37.18036760876605" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="49.468421052631584" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="489.24325160066456" y1="54.27458335323355" x2="484.75674839933544" y2="50.662258752029615" stroke="#333" stroke-width="1.08"/>
+<line x1="487.82026356422637" y1="49.70770236265199" x2="486.17973643577363" y2="55.229139742611174" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="80.13684210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="84.13684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="83.13684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.1972014848172" y1="80.26360150023442" x2="486.8027985151828" y2="86.0100827102919" stroke="#333" stroke-width="1.08"/>
+<line x1="487.86359482179597" y1="80.38936981536337" x2="486.13640517820403" y2="85.88431439516295" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="95.33684210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="99.33684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="98.33684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.72572262197644" y1="99.26680779712804" x2="484.27427737802356" y2="97.40687641339828" stroke="#333" stroke-width="1.08"/>
+<line x1="489.13761490535063" y1="96.4068155467871" x2="484.86238509464937" y2="100.26686866373922" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="126.00526315789475" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="130.00526315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="129.00526315789475" r="3.6" fill="url(#chrome)" />
-<line x1="489.8786536073351" y1="129.09331660176028" x2="484.1213463926649" y2="128.9172097140292" stroke="#333" stroke-width="1.08"/>
+<line x1="489.86032754562893" y1="129.34130829134608" x2="484.13967245437107" y2="128.6692180244434" stroke="#333" stroke-width="1.08"/>
 <text x="79.68518518518519" y="13.678618421052631" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="7.4" fill="#ece6d6" text-anchor="middle" font-weight="700" font-family="'Times New Roman', Georgia, serif" letter-spacing="0.9">PUBLIZON</text>
 <text x="205.63888888888889" y="13.678618421052631" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="7.4" fill="#ece6d6" text-anchor="middle" font-weight="700" font-family="'Times New Roman', Georgia, serif" letter-spacing="0.9">INFERNAL MACHINE 90</text>
 <text x="372.8888888888889" y="13.678618421052631" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="7.4" fill="#ece6d6" text-anchor="middle" font-weight="700" font-family="'Times New Roman', Georgia, serif" letter-spacing="0.9">STEREO AUDIO COMPUTER</text>
@@ -36810,7 +37114,7 @@
 <text x="405.1" y="127.52002334465196" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.2" fill="#ece6d6" text-anchor="middle" font-weight="800" >ON</text>
 <g data-ik="power" style="cursor:pointer"><ellipse cx="423.27037037037036" cy="126.45504032258067" rx="6.607407407407436" ry="3.9712117996604377" fill="#000" opacity="0.5"/><ellipse cx="423.27037037037036" cy="125.75504032258067" rx="6.607407407407436" ry="3.9712117996604377" fill="#f07040"/><ellipse cx="421.94888888888886" cy="124.36511619269952" rx="3.9644444444444615" ry="1.5884847198641752" fill="#fff" opacity="0.22"/></g>
 <text x="441.02777777777777" y="127.52002334465196" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.2" fill="#ece6d6" text-anchor="middle" font-weight="800" >OFF</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:482.8157894736842px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#141416" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:528.6842105263158px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#141416" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#101012" />
@@ -36818,21 +37122,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.82026356422639" y1="3.83928131002041" x2="10.17973643577361" y2="9.360718689979588" stroke="#333" stroke-width="1.08"/>
+<line x1="12.358677637420737" y1="4.0606309686119255" x2="9.641322362579263" y2="9.139369031388075" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.863594821795983" y1="35.70186981536338" x2="10.136405178204017" y2="41.196814395162946" stroke="#333" stroke-width="1.08"/>
+<line x1="13.413133844469133" y1="36.877341771714335" x2="8.586866155530867" y2="40.02134243881199" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#101012" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.13761490535063" y1="4.669973441523947" x2="484.86238509464937" y2="8.530026558476054" stroke="#333" stroke-width="1.08"/>
+<line x1="489.7552264578408" y1="7.438526783122645" x2="484.2447735421592" y2="5.761473216877354" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.86032754562893" y1="38.78538723871449" x2="484.13967245437107" y2="38.113296971811835" stroke="#333" stroke-width="1.08"/>
+<line x1="487.2102857280792" y1="35.577029463407094" x2="486.7897142719208" y2="41.32165474711923" stroke="#333" stroke-width="1.08"/>
 <text x="27.887999999999998" y="11.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="middle" font-weight="800" >POWER</text>
 <g data-sk="A:power" style="cursor:pointer">
 <rect x="24.387999999999998" y="17.5" width="7" height="9" fill="#000" rx="0.8"/>
@@ -36959,7 +37263,7 @@
 <text x="414.336" y="29.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="start" font-weight="800" >BYPASS</text>
 <text x="460.15200000000004" y="41.84934210526316" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3" fill="#8e8c92" text-anchor="middle" font-weight="900" >A</text>
 <text class="spx-A-route" x="131.97" y="43.44934210526316" font-family="'JetBrains Mono', monospace" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:528.6842105263158px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#141416" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:574.5526315789474px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#141416" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.12"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#101012" />
@@ -36967,21 +37271,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.358677637420737" y1="4.0606309686119255" x2="9.641322362579263" y2="9.139369031388075" stroke="#333" stroke-width="1.08"/>
+<line x1="11.264036563843687" y1="9.467871108148625" x2="10.735963436156313" y2="3.732128891851375" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.413133844469133" y1="36.877341771714335" x2="8.586866155530867" y2="40.02134243881199" stroke="#333" stroke-width="1.08"/>
+<line x1="12.380150039312312" y1="40.97710512204029" x2="9.619849960687686" y2="35.921579088486034" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#101012" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.7552264578408" y1="7.438526783122645" x2="484.2447735421592" y2="5.761473216877354" stroke="#333" stroke-width="1.08"/>
+<line x1="489.53806762812314" y1="5.238892834831416" x2="484.46193237187686" y2="7.961107165168583" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.2102857280792" y1="35.577029463407094" x2="486.7897142719208" y2="41.32165474711923" stroke="#333" stroke-width="1.08"/>
+<line x1="487.5757123090997" y1="35.62747121219397" x2="486.4242876909003" y2="41.27121299833236" stroke="#333" stroke-width="1.08"/>
 <text x="27.887999999999998" y="11.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="middle" font-weight="800" >POWER</text>
 <g data-sk="B:power" style="cursor:pointer">
 <rect x="24.387999999999998" y="17.5" width="7" height="9" fill="#000" rx="0.8"/>
@@ -37108,43 +37412,43 @@
 <text x="414.336" y="29.6" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="start" font-weight="800" >BYPASS</text>
 <text x="460.15200000000004" y="41.84934210526316" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3" fill="#8e8c92" text-anchor="middle" font-weight="900" >B</text>
 <text class="spx-B-route" x="131.97" y="43.44934210526316" font-family="'JetBrains Mono', monospace" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:574.5526315789474px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="#151517" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:620.421052631579px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="#151517" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="89.41776315789474" width="498" height="1.5" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="90.91776315789474" fill="#111113" />
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.264036563843687" y1="9.467871108148625" x2="10.735963436156313" y2="3.732128891851375" stroke="#333" stroke-width="1.08"/>
+<line x1="13.401714436709884" y1="8.189392262627234" x2="8.598285563290114" y2="5.010607737372766" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="12.380150039312312" y1="39.79618406940871" x2="9.619849960687686" y2="34.74065803585445" stroke="#333" stroke-width="1.08"/>
+<line x1="11.491161302482313" y1="34.430611937320286" x2="10.508838697517687" y2="40.106230167942876" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="49.468421052631584" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="13.538067628123164" y1="51.107313887463" x2="8.461932371876836" y2="53.82952821780017" stroke="#333" stroke-width="1.08"/>
+<line x1="12.277990639067129" y1="55.04933947955964" x2="9.722009360932873" y2="49.887502625703526" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="81.31776315789475" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="85.31776315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="84.31776315789475" r="3.6" fill="url(#chrome)" />
-<line x1="11.575712309099664" y1="81.49589226482556" x2="10.424287690900336" y2="87.13963405096393" stroke="#333" stroke-width="1.08"/>
+<line x1="13.20964304067054" y1="82.47063629900924" x2="8.79035695932946" y2="86.16489001678025" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="90.91776315789474" fill="#111113" />
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.4017144367099" y1="8.189392262627234" x2="484.5982855632901" y2="5.010607737372766" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8459419398625" y1="7.04160443264517" x2="484.1540580601375" y2="6.158395567354828" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="487.49116130248234" y1="34.430611937320286" x2="486.50883869751766" y2="40.106230167942876" stroke="#333" stroke-width="1.08"/>
+<line x1="487.58526072248765" y1="34.44851504591554" x2="486.41473927751235" y2="40.08832705934762" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="49.468421052631584" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="488.2779906390671" y1="55.04933947955964" x2="485.7220093609329" y2="49.887502625703526" stroke="#333" stroke-width="1.08"/>
+<line x1="488.73137658012956" y1="54.76988474727872" x2="485.26862341987044" y2="50.16695735798445" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="81.31776315789475" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="85.31776315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="84.31776315789475" r="3.6" fill="url(#chrome)" />
-<line x1="489.2096430406705" y1="82.47063629900924" x2="484.7903569593295" y2="86.16489001678025" stroke="#333" stroke-width="1.08"/>
+<line x1="489.86629241179463" y1="84.5984191930848" x2="484.13370758820537" y2="84.0371071227047" stroke="#333" stroke-width="1.08"/>
 <text x="252.27631578947367" y="10.519410613310134" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ece8de" text-anchor="middle" font-weight="900" xml:space="preserve">E V E R T I D E   H A R M O N I Z E R ™</text>
 <text x="394.4684210526316" y="11.27079708568943" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.8" fill="#ece8de" text-anchor="middle" font-weight="800" >MODEL H949</text>
 <rect x="31.45263157894737" y="13.524956502827317" width="78.63157894736841" height="46.58596128751631" rx="1.4" fill="none" stroke="#d8d4ca" stroke-width="0.55"/>
@@ -37290,25 +37594,25 @@
 <g data-hk="power" style="cursor:pointer"><rect x="407.2289473684211" y="68.37616898651588" width="2" height="6" rx="1" fill="#c9ccd0"/><circle class="h949-pw" cx="408.2289473684211" cy="68.37616898651588" r="1.4" fill="#e9eaec"/><circle cx="408.2289473684211" cy="71.38171487603306" r="5" fill="transparent"/></g>
 <text x="408.2289473684211" y="81.9011254893432" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="1.8" fill="#ece8de" text-anchor="middle" font-weight="700" xml:space="preserve">OFF   ON</text>
 <text class="h949-route" x="252.27631578947367" y="89.31776315789475" font-family="'JetBrains Mono', monospace" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:666.2894736842105px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="#18191b" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:712.1578947368421px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="#18191b" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="89.41776315789474" width="498" height="1.5" fill="#000" opacity="0.5"/>
 <rect x="0.6273764258555135" y="1.3066308864265936" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="6.6273764258555135" cy="5.306630886426594" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="6.6273764258555135" cy="4.306630886426594" r="3.4" fill="url(#chrome)" />
-<line x1="9.315210480170066" y1="4.723701739480366" x2="3.9395423715409623" y2="3.88956003337282" stroke="#333" stroke-width="1.02"/>
+<line x1="8.96808463082283" y1="5.6920857212006055" x2="4.286668220888195" y2="2.9211760516525835" stroke="#333" stroke-width="1.02"/>
 <rect x="0.6273764258555135" y="83.61113227146814" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="6.6273764258555135" cy="87.61113227146814" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="6.6273764258555135" cy="86.61113227146814" r="3.4" fill="url(#chrome)" />
-<line x1="7.180122663760533" y1="83.94788770956966" x2="6.074630187950494" y2="89.27437683336662" stroke="#333" stroke-width="1.02"/>
+<line x1="9.009435157604347" y1="87.92421878746742" x2="4.24531769410668" y2="85.29804575546885" stroke="#333" stroke-width="1.02"/>
 <rect x="484.89923954372625" y="1.3066308864265936" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="490.89923954372625" cy="5.306630886426594" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="490.89923954372625" cy="4.306630886426594" r="3.4" fill="url(#chrome)" />
-<line x1="492.53442853607083" y1="6.480235486926666" x2="489.2640505513817" y2="2.133026285926522" stroke="#333" stroke-width="1.02"/>
+<line x1="492.99998686415495" y1="6.03442158431555" x2="488.79849222329756" y2="2.578840188537637" stroke="#333" stroke-width="1.02"/>
 <rect x="484.89923954372625" y="83.61113227146814" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="490.89923954372625" cy="87.61113227146814" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="490.89923954372625" cy="86.61113227146814" r="3.4" fill="url(#chrome)" />
-<line x1="493.60629348819896" y1="86.87619630470319" x2="488.19218559925355" y2="86.34606823823309" stroke="#333" stroke-width="1.02"/>
+<line x1="492.9071830444056" y1="88.44595185335609" x2="488.8912960430469" y2="84.77631268958018" stroke="#333" stroke-width="1.02"/>
 <circle cx="24.61596958174905" cy="8.613261772853187" r="2" fill="#55575c" />
 <circle cx="24.61596958174905" cy="82.78301592797784" r="2" fill="#55575c" />
 <circle cx="471.9638783269962" cy="8.613261772853187" r="2" fill="#55575c" />
@@ -37457,7 +37761,7 @@
 <rect x="33.136882129277566" y="80.39044321329641" width="431.72623574144484" height="9.091776315789474" fill="none" stroke="#cfcbc2" stroke-width="0.55"/>
 <text x="249" y="87.08964681440445" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="3.6" fill="#e6e3dc" text-anchor="middle" font-weight="700" letter-spacing="0.2">model rmx16 : digital reverberation system : advanced axis systems : burnley, england</text>
 <text class="rmx-route" x="249" y="94.74587950138505" font-family="'JetBrains Mono', monospace" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:758.0263157894736px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#111112" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:803.8947368421052px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#111112" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
@@ -37465,21 +37769,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.47839692290657" y1="8.066952177996011" x2="8.521603077093427" y2="5.133047822003989" stroke="#333" stroke-width="1.08"/>
+<line x1="13.717238525906236" y1="5.645529050556851" x2="8.282761474093764" y2="7.55447094944315" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.522179833616413" y1="39.83966900455653" x2="8.477820166383587" y2="37.0590152059698" stroke="#333" stroke-width="1.08"/>
+<line x1="13.425024216217789" y1="36.895747064476375" x2="8.574975783782211" y2="40.00293714604995" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.2243206922186" y1="8.4294254448236" x2="484.7756793077814" y2="4.770574555176399" stroke="#333" stroke-width="1.08"/>
+<line x1="489.31638656839016" y1="4.888639936839209" x2="484.68361343160984" y2="8.311360063160791" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.12605782424873" y1="40.392092250791585" x2="484.87394217575127" y2="36.50659195973474" stroke="#333" stroke-width="1.08"/>
+<line x1="489.76444700641156" y1="37.64173282551082" x2="484.23555299358844" y2="39.25695138501551" stroke="#333" stroke-width="1.08"/>
 <rect x="53.784000000000006" y="4.5" width="155.87400000000002" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="212.148" y="4.5" width="114.53999999999994" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="330.672" y="4.5" width="107.56799999999998" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
@@ -37795,7 +38099,7 @@
 <text x="464.63399999999996" y="21.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ecebe6" text-anchor="middle" font-weight="800" font-style="italic">leximan</text>
 <text x="464.63399999999996" y="27.024671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="1.8" fill="#8fa58a" text-anchor="middle" font-weight="900" letter-spacing="0.4">UNIT A</text>
 <text class="pcm41A-route" x="464.63399999999996" y="41.049342105263165" font-family="'JetBrains Mono', monospace" font-size="1.7" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:803.8947368421052px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#111112" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:849.7631578947368px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#111112" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
@@ -37803,21 +38107,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.717238525906236" y1="5.645529050556851" x2="8.282761474093764" y2="7.55447094944315" stroke="#333" stroke-width="1.08"/>
+<line x1="11.816734633898111" y1="9.361764750624374" x2="10.183265366101887" y2="3.838235249375624" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.425024216217789" y1="36.895747064476375" x2="8.574975783782211" y2="40.00293714604995" stroke="#333" stroke-width="1.08"/>
+<line x1="13.097705859429215" y1="40.42267181094246" x2="8.902294140570785" y2="36.476012399583865" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.31638656839016" y1="4.888639936839209" x2="484.68361343160984" y2="8.311360063160791" stroke="#333" stroke-width="1.08"/>
+<line x1="488.26310260915284" y1="9.188237199089619" x2="485.73689739084716" y2="4.011762800910382" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.76444700641156" y1="37.64173282551082" x2="484.23555299358844" y2="39.25695138501551" stroke="#333" stroke-width="1.08"/>
+<line x1="487.84781180413785" y1="35.696958566443676" x2="486.15218819586215" y2="41.20172564408265" stroke="#333" stroke-width="1.08"/>
 <rect x="53.784000000000006" y="4.5" width="155.87400000000002" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="212.148" y="4.5" width="114.53999999999994" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="330.672" y="4.5" width="107.56799999999998" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
@@ -38133,7 +38437,7 @@
 <text x="464.63399999999996" y="21.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ecebe6" text-anchor="middle" font-weight="800" font-style="italic">leximan</text>
 <text x="464.63399999999996" y="27.024671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="1.8" fill="#8fa58a" text-anchor="middle" font-weight="900" letter-spacing="0.4">UNIT B</text>
 <text class="pcm41B-route" x="464.63399999999996" y="41.049342105263165" font-family="'JetBrains Mono', monospace" font-size="1.7" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:849.7631578947368px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0f16" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:895.6315789473683px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0f16" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
@@ -38141,21 +38445,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.816734633898111" y1="9.361764750624374" x2="10.183265366101887" y2="3.838235249375624" stroke="#333" stroke-width="1.08"/>
+<line x1="13.826728854929113" y1="7.151365559961036" x2="8.173271145070888" y2="6.048634440038962" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.097705859429215" y1="40.42267181094246" x2="8.902294140570785" y2="36.476012399583865" stroke="#333" stroke-width="1.08"/>
+<line x1="11.613800631400895" y1="35.63551041433141" x2="10.386199368599105" y2="41.26317379619492" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.26310260915284" y1="9.188237199089619" x2="485.73689739084716" y2="4.011762800910382" stroke="#333" stroke-width="1.08"/>
+<line x1="487.02165965886087" y1="9.479918550788899" x2="486.97834034113913" y2="3.7200814492111007" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.84781180413785" y1="35.696958566443676" x2="486.15218819586215" y2="41.20172564408265" stroke="#333" stroke-width="1.08"/>
+<line x1="488.937990885188" y1="40.57973909383788" x2="485.062009114812" y2="36.31894511668845" stroke="#333" stroke-width="1.08"/>
 <rect x="51.792" y="4.5" width="153.38400000000001" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="207.168" y="4.5" width="124.49999999999994" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="333.66" y="4.5" width="102.58799999999991" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
@@ -38431,7 +38735,7 @@
 <text x="464.63399999999996" y="21.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ecebe6" text-anchor="middle" font-weight="800" font-style="italic">leximan</text>
 <text x="464.63399999999996" y="27.024671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="1.8" fill="#7fa6e0" text-anchor="middle" font-weight="900" letter-spacing="0.4">UNIT A</text>
 <text class="pcm42A-route" x="464.63399999999996" y="41.049342105263165" font-family="'JetBrains Mono', monospace" font-size="1.7" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:895.6315789473683px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0f16" />
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:941.4999999999999px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0f16" />
 <rect x="0" y="0" width="498" height="1.2" fill="#fff" opacity="0.1"/>
 <rect x="0" y="43.649342105263166" width="498" height="1.4" fill="#000" opacity="0.5"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
@@ -38439,21 +38743,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.826728854929113" y1="7.151365559961036" x2="8.173271145070888" y2="6.048634440038962" stroke="#333" stroke-width="1.08"/>
+<line x1="11.6381466163263" y1="3.791589614021608" x2="10.361853383673703" y2="9.408410385978392" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.613800631400895" y1="35.63551041433141" x2="10.386199368599105" y2="41.26317379619492" stroke="#333" stroke-width="1.08"/>
+<line x1="13.479268989811327" y1="36.98386427323706" x2="8.520731010188673" y2="39.914819937289266" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.02165965886087" y1="9.479918550788899" x2="486.97834034113913" y2="3.7200814492111007" stroke="#333" stroke-width="1.08"/>
+<line x1="489.873378796245" y1="6.795177594230935" x2="484.126621203755" y2="6.404822405769065" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.937990885188" y1="40.57973909383788" x2="485.062009114812" y2="36.31894511668845" stroke="#333" stroke-width="1.08"/>
+<line x1="489.5077342281663" y1="37.033125652568465" x2="484.4922657718337" y2="39.86555855795786" stroke="#333" stroke-width="1.08"/>
 <rect x="51.792" y="4.5" width="153.38400000000001" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="207.168" y="4.5" width="124.49999999999994" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="333.66" y="4.5" width="102.58799999999991" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
@@ -38729,46 +39033,7 @@
 <text x="464.63399999999996" y="21.524671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ecebe6" text-anchor="middle" font-weight="800" font-style="italic">leximan</text>
 <text x="464.63399999999996" y="27.024671052631582" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="1.8" fill="#7fa6e0" text-anchor="middle" font-weight="900" letter-spacing="0.4">UNIT B</text>
 <text class="pcm42B-route" x="464.63399999999996" y="41.049342105263165" font-family="'JetBrains Mono', monospace" font-size="1.7" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text></svg></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:941.4999999999999px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#ebe8de" rx="1.5"/>
-<rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
-<rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
-<rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
-<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
-<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.6381466163263" y1="3.791589614021608" x2="10.361853383673703" y2="9.408410385978392" stroke="#333" stroke-width="1.08"/>
-<rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="13.479268989811327" y1="35.80294322060548" x2="8.520731010188673" y2="38.733898884657684" stroke="#333" stroke-width="1.08"/>
-<rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
-<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
-<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.873378796245" y1="6.795177594230935" x2="484.126621203755" y2="6.404822405769065" stroke="#333" stroke-width="1.08"/>
-<rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.5077342281663" y1="35.85220459993688" x2="484.4922657718337" y2="38.68463750532628" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="10" height="56" fill="#8c8768" />
-<rect x="440" y="0" width="10" height="56" fill="#8c8768" />
-<rect x="128" y="4" width="230" height="48" fill="#556986" rx="3"/>
-<rect x="20" y="9" width="13" height="10" fill="none" stroke="#d23b2c" stroke-width="2" rx="2"/>
-<text x="37" y="19" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#d23b2c" text-anchor="start" font-weight="800" >Rowan</text>
-<text x="20" y="44" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="22" fill="#3f5477" text-anchor="start" font-weight="900" font-style="italic">SBX-80</text>
-<rect x="136" y="9" width="214" height="30" fill="#061412" rx="2"/>
-<text id="rk-sbx-l" x="144" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" filter="url(#glowSm)">01 001 1</text>
-<text id="rk-sbx-r" x="342" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" text-anchor="end" filter="url(#glowSm)">96.0</text>
-<text x="243" y="50" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#eef1f5" text-anchor="middle" font-weight="800" letter-spacing="1">SONG · MEASURE · BEAT · TEMPO</text>
-<circle cx="378" cy="18" r="4" fill="#2a1c1a" />
-<circle id="rk-sbx-lock" cx="378" cy="18" r="4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
-<text x="378" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#3f5477" text-anchor="middle" font-weight="800" >LOCK</text>
-<circle cx="408" cy="18" r="4" fill="#2a1c1a" />
-<circle id="rk-sbx-beat" cx="408" cy="18" r="4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
-<text x="408" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#3f5477" text-anchor="middle" font-weight="800" >BEAT</text>
-<text x="430" y="50" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="10" fill="#3f5477" text-anchor="end" font-weight="900" font-style="italic" letter-spacing="1">SYNC BOX</text></svg></div></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:987.3684210526314px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0d0e" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:987.3684210526314px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#ebe8de" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
 <rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
@@ -38790,7 +39055,46 @@
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.8799855858218" y1="37.27753288331874" x2="484.1200144141782" y2="37.25930922194442" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="url(#rackBlack)" />
+<line x1="489.8799855858218" y1="37.27753288331874" x2="484.1200144141782" y2="37.25930922194442" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="10" height="56" fill="#8c8768" />
+<rect x="440" y="0" width="10" height="56" fill="#8c8768" />
+<rect x="128" y="4" width="230" height="48" fill="#556986" rx="3"/>
+<rect x="20" y="9" width="13" height="10" fill="none" stroke="#d23b2c" stroke-width="2" rx="2"/>
+<text x="37" y="19" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#d23b2c" text-anchor="start" font-weight="800" >Rowan</text>
+<text x="20" y="44" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="22" fill="#3f5477" text-anchor="start" font-weight="900" font-style="italic">SBX-80</text>
+<rect x="136" y="9" width="214" height="30" fill="#061412" rx="2"/>
+<text id="rk-sbx-l" x="144" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" filter="url(#glowSm)">01 001 1</text>
+<text id="rk-sbx-r" x="342" y="31" font-family="'JetBrains Mono', monospace" font-size="17" font-weight="700" fill="#7dffd6" text-anchor="end" filter="url(#glowSm)">96.0</text>
+<text x="243" y="50" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#eef1f5" text-anchor="middle" font-weight="800" letter-spacing="1">SONG · MEASURE · BEAT · TEMPO</text>
+<circle cx="378" cy="18" r="4" fill="#2a1c1a" />
+<circle id="rk-sbx-lock" cx="378" cy="18" r="4" fill="#4fe07a" opacity="0" filter="url(#glowSm)"/>
+<text x="378" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#3f5477" text-anchor="middle" font-weight="800" >LOCK</text>
+<circle cx="408" cy="18" r="4" fill="#2a1c1a" />
+<circle id="rk-sbx-beat" cx="408" cy="18" r="4" fill="#ff6a3c" opacity="0" filter="url(#glowSm)"/>
+<text x="408" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8" fill="#3f5477" text-anchor="middle" font-weight="800" >BEAT</text>
+<text x="430" y="50" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="10" fill="#3f5477" text-anchor="end" font-weight="900" font-style="italic" letter-spacing="1">SYNC BOX</text></svg></div></div>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1033.2368421052631px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#0d0d0e" rx="1.5"/>
+<rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
+<rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="13.802521197362985" y1="5.936467831728452" x2="8.197478802637015" y2="7.263532168271547" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
+<line x1="12.960038651357007" y1="39.3785510214218" x2="9.039961348642993" y2="35.15829108384136" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="489.8304182602594" y1="6.067898062407221" x2="484.1695817397406" y2="7.132101937592777" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
+<line x1="489.6279388590081" y1="36.09014377061558" x2="484.3720611409919" y2="38.44669833464758" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="url(#rackBlack)" />
 <text x="24" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#e9e4d6" text-anchor="start" font-weight="900" letter-spacing="2">HOLLIS</text>
 <text x="24" y="36" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="12" fill="#e8a33a" text-anchor="start" font-weight="900" >SG-24</text>
 <text x="24" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="6.5" fill="#a9a594" text-anchor="start" font-weight="800" letter-spacing="1">MASTER SYNC</text>
@@ -38828,7 +39132,7 @@
 <circle cx="340" cy="45" r="4.2" fill="#0b0b0c" />
 <circle cx="340" cy="45" r="2.4" fill="#8d8f94" />
 <text x="364" y="47" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="5.5" fill="#77746a" text-anchor="start" font-weight="700" >WORD · BB · TRI</text></svg></div></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1033.2368421052631px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#cfcdc7" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1079.1052631578948px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#cfcdc7" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
 <rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
@@ -38836,21 +39140,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.802521197362985" y1="5.936467831728452" x2="8.197478802637015" y2="7.263532168271547" stroke="#333" stroke-width="1.08"/>
+<line x1="13.794997411058606" y1="7.294542635246889" x2="8.205002588941394" y2="5.905457364753111" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="12.960038651357007" y1="39.3785510214218" x2="9.039961348642993" y2="35.15829108384136" stroke="#333" stroke-width="1.08"/>
+<line x1="13.877118106258061" y1="37.397228671358235" x2="8.122881893741939" y2="37.13961343390493" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.8304182602594" y1="6.067898062407221" x2="484.1695817397406" y2="7.132101937592777" stroke="#333" stroke-width="1.08"/>
+<line x1="488.30367011532684" y1="9.16804287939352" x2="485.69632988467316" y2="4.03195712060648" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.6279388590081" y1="36.09014377061558" x2="484.3720611409919" y2="38.44669833464758" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#cfcdc7" />
+<line x1="487.7492417416903" y1="40.04925488666569" x2="486.2507582583097" y2="34.48758721859747" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="56" fill="#cfcdc7" />
 <rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.5"/>
 <rect x="0" y="54" width="450" height="2" fill="#000" opacity="0.25"/>
 <circle cx="18" cy="11" r="2.2" fill="#5a5652" />
@@ -38995,33 +39299,7 @@
 <circle cx="7" cy="48" r="2.4" fill="#8a8780" />
 <circle cx="443" cy="8" r="2.4" fill="#8a8780" />
 <circle cx="443" cy="48" r="2.4" fill="#8a8780" /></svg></div></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1113.1052631578948px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#1a1b1e" rx="1.5"/>
-<rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
-<rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
-<rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
-<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
-<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.794997411058606" y1="7.294542635246889" x2="8.205002588941394" y2="5.905457364753111" stroke="#333" stroke-width="1.08"/>
-<rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="13.877118106258061" y1="37.397228671358235" x2="8.122881893741939" y2="37.13961343390493" stroke="#333" stroke-width="1.08"/>
-<rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
-<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
-<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.30367011532684" y1="9.16804287939352" x2="485.69632988467316" y2="4.03195712060648" stroke="#333" stroke-width="1.08"/>
-<rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
-<circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
-<circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="487.7492417416903" y1="40.04925488666569" x2="486.2507582583097" y2="34.48758721859747" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="30" y="6" width="390" height="44" fill="#26292e" rx="3"/>
-<text x="44" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="start" font-weight="800" >VST3</text>
-<text x="96" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="16" fill="#e8e4d8" text-anchor="start" font-weight="600" >Plate Reverb</text>
-<text x="406" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="end" font-weight="800" >AUX 2 ▸</text></svg></div></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1158.9736842105265px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121315" rx="1.5"/>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1158.9736842105265px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#1a1b1e" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
 <rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
 <rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
@@ -39043,13 +39321,15 @@
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.40505214191074" y1="35.68408390584415" x2="484.59494785808926" y2="38.852758199419014" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="30" y="6" width="390" height="44" fill="none" rx="3" stroke="#5a5c60" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="225" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#8a877c" text-anchor="middle" font-weight="700" >+ drop a VST3 / AU plugin</text></svg></div></div>
-<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1214.8421052631581px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="url(#rackBlack)" rx="1.5"/>
+<line x1="489.40505214191074" y1="35.68408390584415" x2="484.59494785808926" y2="38.852758199419014" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="30" y="6" width="390" height="44" fill="#26292e" rx="3"/>
+<text x="44" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="start" font-weight="800" >VST3</text>
+<text x="96" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="16" fill="#e8e4d8" text-anchor="start" font-weight="600" >Plate Reverb</text>
+<text x="406" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="end" font-weight="800" >AUX 2 ▸</text></svg></div></div>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1204.8421052631581px;width:498px;height:45.049342105263165px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="45.049342105263165" viewBox="0 0 498 45.049342105263165" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="45.049342105263165" fill="#121315" rx="1.5"/>
 <rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
-<rect x="0" y="89.41776315789474" width="498" height="1.5" fill="#000" opacity="0.55"/>
-<rect x="0" y="0" width="22" height="90.91776315789474" fill="#000" opacity="0.18"/>
-<rect x="21.2" y="0" width="0.8" height="90.91776315789474" fill="#000" opacity="0.45"/>
+<rect x="0" y="43.549342105263165" width="498" height="1.5" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
+<rect x="21.2" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
@@ -39058,32 +39338,56 @@
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
 <line x1="13.298419831883708" y1="39.00383635635679" x2="8.701580168116292" y2="35.53300574890637" stroke="#333" stroke-width="1.08"/>
+<rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
+<rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
+<rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="489.6184819343222" y1="5.400853487004891" x2="484.3815180656778" y2="7.799146512995109" stroke="#333" stroke-width="1.08"/>
+<rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
+<line x1="487.1498878493" y1="34.39232410839757" x2="486.8501121507" y2="40.144517996865595" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:68.00px;top:0;width:450px;height:56px;transform-origin:0 0;transform:scale(0.8045)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="56" viewBox="0 0 450 56" style="position:absolute;left:0;top:0;overflow:visible"><rect x="30" y="6" width="390" height="44" fill="none" rx="3" stroke="#5a5c60" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="225" y="35" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#8a877c" text-anchor="middle" font-weight="700" >+ drop a VST3 / AU plugin</text></svg></div></div>
+<div style="position:absolute;transform-style:preserve-3d;left:26px;top:1260.7105263157898px;width:498px;height:90.91776315789474px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)"><svg xmlns="http://www.w3.org/2000/svg" width="498" height="90.91776315789474" viewBox="0 0 498 90.91776315789474" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="498" height="90.91776315789474" fill="url(#rackBlack)" rx="1.5"/>
+<rect x="0" y="0" width="498" height="1.5" fill="#fff" opacity="0.14"/>
+<rect x="0" y="89.41776315789474" width="498" height="1.5" fill="#000" opacity="0.55"/>
+<rect x="0" y="0" width="22" height="90.91776315789474" fill="#000" opacity="0.18"/>
+<rect x="21.2" y="0" width="0.8" height="90.91776315789474" fill="#000" opacity="0.45"/>
+<rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
+<line x1="13.837540137415129" y1="7.092712866239691" x2="8.162459862584871" y2="6.107287133760309" stroke="#333" stroke-width="1.08"/>
+<rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
+<circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
+<circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
+<line x1="13.212082019859555" y1="35.42421576649501" x2="8.787917980140445" y2="39.11262633876815" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="49.468421052631584" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="13.61848193432219" y1="51.26927453963648" x2="8.381518065677811" y2="53.66756756562669" stroke="#333" stroke-width="1.08"/>
+<line x1="13.682368239229863" y1="53.51689643582896" x2="8.317631760770137" y2="51.419945669434206" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="80.13684210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="84.13684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="83.13684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.149887849299988" y1="80.26074516102915" x2="10.850112150700014" y2="86.01293904949716" stroke="#333" stroke-width="1.08"/>
+<line x1="11.553909877069957" y1="85.96307349141757" x2="10.446090122930043" y2="80.31061071910874" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="90.91776315789474" fill="#000" opacity="0.18"/>
 <rect x="476" y="0" width="0.8" height="90.91776315789474" fill="#000" opacity="0.45"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.83754013741515" y1="7.092712866239691" x2="484.16245986258485" y2="6.107287133760309" stroke="#333" stroke-width="1.08"/>
+<line x1="489.69128250438393" y1="7.625377238677047" x2="484.30871749561607" y2="5.574622761322953" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.21208201985957" y1="35.42421576649501" x2="484.78791798014043" y2="39.11262633876815" stroke="#333" stroke-width="1.08"/>
+<line x1="487.47610782412687" y1="40.10879450339561" x2="486.52389217587313" y2="34.428047601867554" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="49.468421052631584" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="489.68236823922985" y1="53.51689643582896" x2="484.31763176077015" y2="51.419945669434206" stroke="#333" stroke-width="1.08"/>
+<line x1="489.87785880378493" y1="52.579455756565324" x2="484.12214119621507" y2="52.35738634869785" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="80.13684210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="84.13684210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="83.13684210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.55390987706994" y1="85.96307349141757" x2="486.44609012293006" y2="80.31061071910874" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:72.65px;top:0;width:450px;height:116px;transform-origin:0 0;transform:scale(0.7838)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="116" viewBox="0 0 450 116" style="position:absolute;left:0;top:0;overflow:visible"><text x="225" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#cfcfcf" text-anchor="middle" font-weight="800" letter-spacing="2">PATCHBAY · INSERTS</text>
+<line x1="488.64022455844986" y1="85.50413241231425" x2="485.35977544155014" y2="80.76955179821206" stroke="#333" stroke-width="1.08"/></svg><div style="position:absolute;transform-style:preserve-3d;left:72.65px;top:0;width:450px;height:116px;transform-origin:0 0;transform:scale(0.7838)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="116" viewBox="0 0 450 116" style="position:absolute;left:0;top:0;overflow:visible"><text x="225" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#cfcfcf" text-anchor="middle" font-weight="800" letter-spacing="2">PATCHBAY · INSERTS</text>
 <circle cx="34" cy="46" r="5.6" fill="#5d6066" />
 <circle cx="34" cy="46" r="3.4" fill="#050505" />
 <circle cx="50.5" cy="46" r="5.6" fill="#5d6066" />
@@ -39182,10 +39486,11 @@
 <circle cx="413.5" cy="86" r="5.6" fill="#5d6066" />
 <circle cx="413.5" cy="86" r="3.4" fill="#050505" />
 <text x="18" y="90" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#e8c34a" text-anchor="middle" font-weight="800" >R</text></svg></div></div>
-      <div style="position:absolute;transform-style:preserve-3d;left:0;top:1087.1052631578948px;width:550px;transform:translateZ(2px);text-align:center;font:800 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:3px;color:#d9d3c7">PLUGIN SLOTS</div>
-      <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;transform:translateZ(12px)"><svg width="550" height="2100" style="position:absolute;left:0;top:0;overflow:visible"><path d="M280.4864167422868 1250.8957009981855 C280.4864167422868 1313.8957009981855 125.29920031760436 1345.2466538112526 125.29920031760436 1282.2466538112526" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M280.4864167422868 1250.8957009981855 C280.4864167422868 1313.8957009981855 125.29920031760436 1345.2466538112526 125.29920031760436 1282.2466538112526" fill="none" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/><path d="M280.4864167422868 1250.8957009981855 C280.4864167422868 1313.8957009981855 125.29920031760436 1345.2466538112526 125.29920031760436 1282.2466538112526" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="280.4864167422868" cy="1250.8957009981855" r="7" fill="#c9ccd0"/><circle cx="125.29920031760436" cy="1282.2466538112526" r="7" fill="#c9ccd0"/><path d="M371.0122929900182 1250.8957009981855 C371.0122929900182 1329.8957009981855 138.23146835299457 1361.2466538112526 138.23146835299457 1282.2466538112526" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M371.0122929900182 1250.8957009981855 C371.0122929900182 1329.8957009981855 138.23146835299457 1361.2466538112526 138.23146835299457 1282.2466538112526" fill="none" stroke="#2f6fb3" stroke-width="7" stroke-linecap="round"/><path d="M371.0122929900182 1250.8957009981855 C371.0122929900182 1329.8957009981855 138.23146835299457 1361.2466538112526 138.23146835299457 1282.2466538112526" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="371.0122929900182" cy="1250.8957009981855" r="7" fill="#c9ccd0"/><circle cx="138.23146835299457" cy="1282.2466538112526" r="7" fill="#c9ccd0"/><path d="M202.89280852994557 1250.8957009981855 C202.89280852994557 1305.8957009981855 383.94456102540835 1337.2466538112526 383.94456102540835 1282.2466538112526" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M202.89280852994557 1250.8957009981855 C202.89280852994557 1305.8957009981855 383.94456102540835 1337.2466538112526 383.94456102540835 1282.2466538112526" fill="none" stroke="#e8c34a" stroke-width="7" stroke-linecap="round"/><path d="M202.89280852994557 1250.8957009981855 C202.89280852994557 1305.8957009981855 383.94456102540835 1337.2466538112526 383.94456102540835 1282.2466538112526" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="202.89280852994557" cy="1250.8957009981855" r="7" fill="#c9ccd0"/><circle cx="383.94456102540835" cy="1282.2466538112526" r="7" fill="#c9ccd0"/></svg></div>
-      <div style="position:absolute;transform-style:preserve-3d;left:50px;top:1330.5789473684213px;width:450px;height:647.4210526315787px;transform:translateZ(2px)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="647.4210526315787" viewBox="0 0 450 647.4210526315787" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="647.4210526315787" fill="#141517" rx="6"/>
-<rect x="0" y="0" width="450" height="647.4210526315787" fill="none" rx="6" stroke="#2c2e32" stroke-width="1.5"/>
+      <div style="position:absolute;transform-style:preserve-3d;left:0;top:1132.9736842105265px;width:550px;transform:translateZ(2px);text-align:center;font:800 14px 'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif;letter-spacing:3px;color:#d9d3c7">PLUGIN SLOTS</div>
+      <div style="position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;transform:translateZ(12px)"><svg width="550" height="2100" style="position:absolute;left:0;top:0;overflow:visible"><path d="M280.4864167422868 1296.7641220508172 C280.4864167422868 1359.7641220508172 125.29920031760436 1391.1150748638843 125.29920031760436 1328.1150748638843" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M280.4864167422868 1296.7641220508172 C280.4864167422868 1359.7641220508172 125.29920031760436 1391.1150748638843 125.29920031760436 1328.1150748638843" fill="none" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/><path d="M280.4864167422868 1296.7641220508172 C280.4864167422868 1359.7641220508172 125.29920031760436 1391.1150748638843 125.29920031760436 1328.1150748638843" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="280.4864167422868" cy="1296.7641220508172" r="7" fill="#c9ccd0"/><circle cx="125.29920031760436" cy="1328.1150748638843" r="7" fill="#c9ccd0"/><path d="M371.0122929900182 1296.7641220508172 C371.0122929900182 1375.7641220508172 138.23146835299457 1407.1150748638843 138.23146835299457 1328.1150748638843" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M371.0122929900182 1296.7641220508172 C371.0122929900182 1375.7641220508172 138.23146835299457 1407.1150748638843 138.23146835299457 1328.1150748638843" fill="none" stroke="#2f6fb3" stroke-width="7" stroke-linecap="round"/><path d="M371.0122929900182 1296.7641220508172 C371.0122929900182 1375.7641220508172 138.23146835299457 1407.1150748638843 138.23146835299457 1328.1150748638843" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="371.0122929900182" cy="1296.7641220508172" r="7" fill="#c9ccd0"/><circle cx="138.23146835299457" cy="1328.1150748638843" r="7" fill="#c9ccd0"/><path d="M202.89280852994557 1296.7641220508172 C202.89280852994557 1351.7641220508172 383.94456102540835 1383.1150748638843 383.94456102540835 1328.1150748638843" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M202.89280852994557 1296.7641220508172 C202.89280852994557 1351.7641220508172 383.94456102540835 1383.1150748638843 383.94456102540835 1328.1150748638843" fill="none" stroke="#e8c34a" stroke-width="7" stroke-linecap="round"/><path d="M202.89280852994557 1296.7641220508172 C202.89280852994557 1351.7641220508172 383.94456102540835 1383.1150748638843 383.94456102540835 1328.1150748638843" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="202.89280852994557" cy="1296.7641220508172" r="7" fill="#c9ccd0"/><circle cx="383.94456102540835" cy="1328.1150748638843" r="7" fill="#c9ccd0"/></svg></div>
+      <div class="fm-lamps" data-fm="0" data-on="1" style="--dim:0.85;position:absolute;transform-style:preserve-3d;left:0;top:0;width:550px;height:2100px;pointer-events:none"><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:43.9px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div><div class="fm-lamp" style="position:absolute;transform-style:preserve-3d;left:454.2px;top:56px;width:51.9px;height:16px;transform:translateZ(30px)"><i></i></div></div>
+      <div style="position:absolute;transform-style:preserve-3d;left:50px;top:1376.447368421053px;width:450px;height:601.5526315789471px;transform:translateZ(2px)"><svg xmlns="http://www.w3.org/2000/svg" width="450" height="601.5526315789471" viewBox="0 0 450 601.5526315789471" style="position:absolute;left:0;top:0;overflow:visible"><rect x="0" y="0" width="450" height="601.5526315789471" fill="#141517" rx="6"/>
+<rect x="0" y="0" width="450" height="601.5526315789471" fill="none" rx="6" stroke="#2c2e32" stroke-width="1.5"/>
 <text x="20" y="38" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="18" fill="#e9e3d0" text-anchor="start" font-weight="800" letter-spacing="3">PLUGINS</text>
 <rect x="337" y="15" width="94" height="35" fill="#000" rx="2.5" opacity="0.55"/>
 <rect x="338" y="16" width="92" height="32" fill="#4d3510" rx="2"/>
@@ -39223,12 +39528,7 @@
 <text x="53" y="514" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#c49bff" text-anchor="middle" font-weight="800" >AU</text>
 <text x="88" y="515" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="600" >Tape Echo</text>
 <text x="416" y="515" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="end" font-weight="600" >⠿ drag</text>
-<rect x="20" y="534" width="410" height="38" fill="#1c1d20" rx="3"/>
-<rect x="30" y="543" width="46" height="20" fill="#1c2a44" rx="2"/>
-<text x="53" y="558" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#7fb0ff" text-anchor="middle" font-weight="800" >VST3</text>
-<text x="88" y="559" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="600" >Bus Compressor</text>
-<text x="416" y="559" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="end" font-weight="600" >⠿ drag</text>
-<text x="225" y="623.4210526315787" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="middle" font-weight="600" >Scan · list · drag into a rack slot</text></svg></div>
+<text x="225" y="577.5526315789471" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="14" fill="#77746a" text-anchor="middle" font-weight="600" >Scan · list · drag into a rack slot</text></svg></div>
     </div>
   </div>
 <svg class="smpte-clock" width="330" height="118" viewBox="0 0 330 118" style="position:absolute;left:1351.5562130177514px;top:66px;overflow:visible" aria-label="SMPTE time code wall clock">
@@ -99719,23 +100019,25 @@
 <div class="hot" data-open="tape" style="left:24px;top:76px;width:1296px;height:590px" title="Open the JH-Tape"><span>Open the JH-Tape</span></div>
 <div class="hot" data-open="al" style="left:1342px;top:176px;width:349px;height:490px" title="Open the AutoLocator III"><span>Open the AutoLocator III</span></div>
 <div class="hot" data-open="meters" style="left:1704px;top:60px;width:1578px;height:606px" title="Open the meter bridge"><span>Open the meter bridge</span></div>
-<div class="hot rk-keep" data-open="224" style="left:3316px;top:130px;width:498px;height:183px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
+<div class="hot rk-keep" data-open="224" style="left:3316px;top:176px;width:498px;height:183px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
 <div class="hot" data-open="224" style="left:2857px;top:1280px;width:296px;height:462px" title="Open the Leximan 224X"><span>Open the Leximan 224X</span></div>
-<div class="hot rk-keep" data-open="patchbay" style="left:3316px;top:1275px;width:498px;height:91px" title="Open the patchbay"><span>Open the patchbay</span></div>
-<div class="hot rk-keep" data-open="sbx" style="left:3316px;top:1001px;width:498px;height:45px" title="Open the SBX-80 sync box"><span>Open the SBX-80 sync box</span></div>
-<div class="hot rk-keep" data-open="sg" style="left:3316px;top:1047px;width:498px;height:45px" title="Open the SG-24 master sync generator"><span>Open the SG-24 master sync generator</span></div>
-<div class="hot rk-keep" data-open="dz" style="left:3316px;top:1093px;width:498px;height:45px" title="Open the Delta-Three synchronizer"><span>Open the Delta-Three synchronizer</span></div>
-<div class="hot rk-keep" data-open="c160" style="left:3316px;top:313px;width:498px;height:45px" title="Open the dbk 160X compressors"><span>Open the dbk 160X compressors</span></div>
+<div class="hot rk-keep" data-open="patchbay" style="left:3316px;top:1321px;width:498px;height:91px" title="Open the patchbay"><span>Open the patchbay</span></div>
+<div class="hot rk-keep" data-open="sbx" style="left:3316px;top:1047px;width:498px;height:45px" title="Open the SBX-80 sync box"><span>Open the SBX-80 sync box</span></div>
+<div class="hot rk-keep" data-open="sg" style="left:3316px;top:1093px;width:498px;height:45px" title="Open the SG-24 master sync generator"><span>Open the SG-24 master sync generator</span></div>
+<div class="hot rk-keep" data-open="dz" style="left:3316px;top:1139px;width:498px;height:45px" title="Open the Delta-Three synchronizer"><span>Open the Delta-Three synchronizer</span></div>
 <div class="hot rk-keep" data-open="c160" style="left:3316px;top:359px;width:498px;height:45px" title="Open the dbk 160X compressors"><span>Open the dbk 160X compressors</span></div>
-<div class="hot rk-keep" data-open="im90" style="left:3316px;top:405px;width:498px;height:137px" title="Open the Publizon IM90"><span>Open the Publizon IM90</span></div>
-<div class="hot rk-keep" data-open="spx" style="left:3316px;top:543px;width:498px;height:45px" title="Open the Yahaha SPX90II units"><span>Open the Yahaha SPX90II units</span></div>
+<div class="hot rk-keep" data-open="c160" style="left:3316px;top:405px;width:498px;height:45px" title="Open the dbk 160X compressors"><span>Open the dbk 160X compressors</span></div>
+<div class="hot rk-keep" data-open="im90" style="left:3316px;top:451px;width:498px;height:137px" title="Open the Publizon IM90"><span>Open the Publizon IM90</span></div>
 <div class="hot rk-keep" data-open="spx" style="left:3316px;top:589px;width:498px;height:45px" title="Open the Yahaha SPX90II units"><span>Open the Yahaha SPX90II units</span></div>
-<div class="hot rk-keep" data-open="h949" style="left:3316px;top:635px;width:498px;height:91px" title="Open the Evertide H949 Harmonizer"><span>Open the Evertide H949 Harmonizer</span></div>
-<div class="hot rk-keep" data-open="rmx" style="left:3316px;top:726px;width:498px;height:91px" title="Open the AXS RMX16"><span>Open the AXS RMX16</span></div>
-<div class="hot rk-keep" data-open="pcm" style="left:3316px;top:818px;width:498px;height:45px" title="Open the Leximan PCM41 / PCM42 delays"><span>Open the Leximan PCM41 / PCM42 delays</span></div>
+<div class="hot rk-keep" data-open="spx" style="left:3316px;top:635px;width:498px;height:45px" title="Open the Yahaha SPX90II units"><span>Open the Yahaha SPX90II units</span></div>
+<div class="hot rk-keep" data-open="h949" style="left:3316px;top:680px;width:498px;height:91px" title="Open the Evertide H949 Harmonizer"><span>Open the Evertide H949 Harmonizer</span></div>
+<div class="hot rk-keep" data-open="rmx" style="left:3316px;top:772px;width:498px;height:91px" title="Open the AXS RMX16"><span>Open the AXS RMX16</span></div>
+<div class="fm-light rk-keep" data-fm="0" data-on="1" style="--dim:0.85;left:3316px;top:126px;width:498px;height:2014px"><b class="fm-beam" style="left:43.8px"></b><b class="fm-beam" style="left:454.2px"></b><i class="fm-glow"></i><i class="fm-dark"></i></div>
+<div class="fm-hot rk-keep" data-fm="0" style="left:3316px;top:130px;width:498px;height:45px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>
 <div class="hot rk-keep" data-open="pcm" style="left:3316px;top:864px;width:498px;height:45px" title="Open the Leximan PCM41 / PCM42 delays"><span>Open the Leximan PCM41 / PCM42 delays</span></div>
 <div class="hot rk-keep" data-open="pcm" style="left:3316px;top:910px;width:498px;height:45px" title="Open the Leximan PCM41 / PCM42 delays"><span>Open the Leximan PCM41 / PCM42 delays</span></div>
 <div class="hot rk-keep" data-open="pcm" style="left:3316px;top:956px;width:498px;height:45px" title="Open the Leximan PCM41 / PCM42 delays"><span>Open the Leximan PCM41 / PCM42 delays</span></div>
+<div class="hot rk-keep" data-open="pcm" style="left:3316px;top:1001px;width:498px;height:45px" title="Open the Leximan PCM41 / PCM42 delays"><span>Open the Leximan PCM41 / PCM42 delays</span></div>
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:664px;top:624px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 <div class="hot" data-open="patchbay" style="left:3480px;top:8px;width:160px;height:40px" title="Open the patchbay"><span>Open the patchbay</span></div>
@@ -104387,21 +104689,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.789189954695694" y1="9.369761580968191" x2="10.210810045304306" y2="3.830238419031809" stroke="#333" stroke-width="1.08"/>
+<line x1="12.401994564116684" y1="9.115712869583346" x2="9.598005435883316" y2="4.084287130416655" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="11.178088499896937" y1="34.393932491825595" x2="10.821911500103063" y2="40.14290961343757" stroke="#333" stroke-width="1.08"/>
+<line x1="11.006583365782111" y1="34.38842857706936" x2="10.993416634217889" y2="40.1484135281938" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.22658468278786" y1="3.728927137544933" x2="486.77341531721214" y2="9.471072862455067" stroke="#333" stroke-width="1.08"/>
+<line x1="488.8988426852831" y1="4.434637107423599" x2="485.1011573147169" y2="8.765362892576402" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.5012709628672" y1="35.84082041858945" x2="484.4987290371328" y2="38.69602168667371" stroke="#333" stroke-width="1.08"/>
+<line x1="489.79650392330836" y1="36.579969306376995" x2="484.20349607669164" y2="37.95687279888617" stroke="#333" stroke-width="1.08"/>
 <g transform="translate(68.00 0) scale(0.8045)">
 <rect x="0" y="0" width="450" height="56" fill="url(#rackBlack)" />
 <text x="24" y="22" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="13" fill="#e9e4d6" text-anchor="start" font-weight="900" letter-spacing="2">HOLLIS</text>
@@ -104486,21 +104788,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.963548812486726" y1="9.314032734871748" x2="10.036451187513274" y2="3.8859672651282513" stroke="#333" stroke-width="1.08"/>
+<line x1="12.234739085819593" y1="3.998112341020581" x2="9.76526091418041" y2="9.20188765897942" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.582695667411414" y1="41.26977926272297" x2="10.417304332588586" y2="35.628904947803356" stroke="#333" stroke-width="1.08"/>
+<line x1="13.816129965298998" y1="37.84617378833574" x2="8.183870034701002" y2="39.052510422190586" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#1b1a1e" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.5"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.6387386867013" y1="3.791724214021859" x2="486.3612613132987" y2="9.408275785978141" stroke="#333" stroke-width="1.08"/>
+<line x1="489.2814220684976" y1="8.357701153601518" x2="484.7185779315024" y2="4.842298846398483" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.85491076319244" y1="38.070020956092584" x2="484.14508923680756" y2="38.82866325443375" stroke="#333" stroke-width="1.08"/>
+<line x1="489.80718516104156" y1="37.8058271702166" x2="484.19281483895844" y2="39.092857040309724" stroke="#333" stroke-width="1.08"/>
 <text x="60.6031746031746" y="21.71052631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#cfcfd4" text-anchor="middle" font-weight="700" letter-spacing="0.5" font-stretch="125%">dbk</text>
 <text x="60.6031746031746" y="30.937500000000007" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8.5" fill="#cfcfd4" text-anchor="middle" font-weight="900" letter-spacing="0.4">160X</text>
 <circle cx="105.39682539682539" cy="13.569078947368425" r="1.45" fill="#3a1412" />
@@ -104746,21 +105048,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.490490308283878" y1="9.06431301601721" x2="9.50950969171612" y2="4.135686983982792" stroke="#333" stroke-width="1.08"/>
+<line x1="11.527006998534878" y1="9.431371332675257" x2="10.47299300146512" y2="3.7686286673247427" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="12.008200921545171" y1="41.14710616125388" x2="9.991799078454829" y2="35.75157804927245" stroke="#333" stroke-width="1.08"/>
+<line x1="13.879531807072857" y1="38.39741357692147" x2="8.120468192927143" y2="38.501270633604854" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#1b1a1e" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.5"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.5434355149639" y1="7.951049881100015" x2="484.4565644850361" y2="5.248950118899985" stroke="#333" stroke-width="1.08"/>
+<line x1="487.30084321413045" y1="3.7357560577856397" x2="486.69915678586955" y2="9.46424394221436" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.976459557915" y1="40.54409927876238" x2="485.023540442085" y2="36.354584931763945" stroke="#333" stroke-width="1.08"/>
+<line x1="488.20906265614695" y1="41.06326014022732" x2="485.79093734385305" y2="35.835424070299005" stroke="#333" stroke-width="1.08"/>
 <text x="60.6031746031746" y="21.71052631578948" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#cfcfd4" text-anchor="middle" font-weight="700" letter-spacing="0.5" font-stretch="125%">dbk</text>
 <text x="60.6031746031746" y="30.937500000000007" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="8.5" fill="#cfcfd4" text-anchor="middle" font-weight="900" letter-spacing="0.4">160X</text>
 <circle cx="105.39682539682539" cy="13.569078947368425" r="1.45" fill="#3a1412" />
@@ -105189,21 +105491,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.537735320761954" y1="7.961726639879395" x2="8.462264679238046" y2="5.238273360120605" stroke="#333" stroke-width="1.08"/>
+<line x1="12.96620242058549" y1="4.495612193229642" x2="9.033797579414507" y2="8.704387806770356" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="12.983228469676048" y1="36.36099231725676" x2="9.016771530323952" y2="40.53769189326957" stroke="#333" stroke-width="1.08"/>
+<line x1="12.747286589107368" y1="36.15993397748744" x2="9.252713410892632" y2="40.738750233038886" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#101012" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="489.53698077043975" y1="7.963131897660325" x2="484.46301922956025" y2="5.236868102339676" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8455393670513" y1="7.044191074382672" x2="484.1544606329487" y2="6.155808925617327" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.7267998743359" y1="36.144442499207905" x2="485.2732001256641" y2="40.75424171131842" stroke="#333" stroke-width="1.08"/>
+<line x1="487.64694398920625" y1="41.25573899003015" x2="486.35305601079375" y2="35.64294522049617" stroke="#333" stroke-width="1.08"/>
 <text x="27.887999999999998" y="11.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="middle" font-weight="800" >POWER</text>
 <g data-sk="A:power" style="cursor:pointer">
 <rect x="24.387999999999998" y="17.5" width="7" height="9" fill="#000" rx="0.8"/>
@@ -105337,21 +105639,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.401994564116684" y1="9.115712869583346" x2="9.598005435883316" y2="4.084287130416655" stroke="#333" stroke-width="1.08"/>
+<line x1="11.84223515811614" y1="9.354095121529589" x2="10.15776484188386" y2="3.84590487847041" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.006583365782111" y1="35.569349629700945" x2="10.993416634217889" y2="41.32933458082538" stroke="#333" stroke-width="1.08"/>
+<line x1="13.188190120723215" y1="36.57685071794804" x2="8.811809879276785" y2="40.32183349257829" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#101012" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.8988426852831" y1="4.434637107423599" x2="485.1011573147169" y2="8.765362892576402" stroke="#333" stroke-width="1.08"/>
+<line x1="488.39311630867917" y1="9.120640186637534" x2="485.60688369132083" y2="4.079359813362466" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="489.79650392330836" y1="37.76089035900858" x2="484.20349607669164" y2="39.13779385151775" stroke="#333" stroke-width="1.08"/>
+<line x1="488.2061531800872" y1="41.06460394801725" x2="485.7938468199128" y2="35.834080262509076" stroke="#333" stroke-width="1.08"/>
 <text x="27.887999999999998" y="11.5" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.3" fill="#e8e6e0" text-anchor="middle" font-weight="800" >POWER</text>
 <g data-sk="B:power" style="cursor:pointer">
 <rect x="24.387999999999998" y="17.5" width="7" height="9" fill="#000" rx="0.8"/>
@@ -105486,36 +105788,36 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.234739085819593" y1="3.998112341020581" x2="9.76526091418041" y2="9.20188765897942" stroke="#333" stroke-width="1.08"/>
+<line x1="12.636805062204374" y1="4.230344078069109" x2="9.363194937795626" y2="8.96965592193089" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="13.816129965298998" y1="36.66525273570416" x2="8.183870034701002" y2="37.871589369559004" stroke="#333" stroke-width="1.08"/>
+<line x1="12.119053585296053" y1="39.92212018275844" x2="9.880946414703946" y2="34.61472192250472" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="49.468421052631584" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="13.281422068497607" y1="54.2261222062331" x2="8.718577931502393" y2="50.71071989903007" stroke="#333" stroke-width="1.08"/>
+<line x1="11.444067672188938" y1="49.62286242513562" x2="10.555932327811062" y2="55.313979680127545" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="81.31776315789475" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="11" cy="85.31776315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="84.31776315789475" r="3.6" fill="url(#chrome)" />
-<line x1="13.807185161041577" y1="83.67424822284819" x2="8.192814838958423" y2="84.9612780929413" stroke="#333" stroke-width="1.08"/>
+<line x1="12.662527310704512" y1="81.96608228218868" x2="9.337472689295488" y2="86.66944403360081" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="90.91776315789474" fill="#111113" />
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.5270069985349" y1="9.431371332675257" x2="486.4729930014651" y2="3.7686286673247427" stroke="#333" stroke-width="1.08"/>
+<line x1="488.42777816896375" y1="4.098830373559112" x2="485.57222183103625" y2="9.101169626440887" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="489.87953180707285" y1="37.21649252428989" x2="484.12046819292715" y2="37.32034958097327" stroke="#333" stroke-width="1.08"/>
+<line x1="487.1055738170138" y1="40.14648536205226" x2="486.8944261829862" y2="34.3903567432109" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="49.468421052631584" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="53.468421052631584" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="52.468421052631584" r="3.6" fill="url(#chrome)" />
-<line x1="487.30084321413045" y1="49.604177110417226" x2="486.69915678586955" y2="55.33266499484594" stroke="#333" stroke-width="1.08"/>
+<line x1="488.3548346105361" y1="55.00984254032178" x2="485.6451653894639" y2="49.92699956494139" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="81.31776315789475" width="14" height="6" fill="#060606" rx="3"/>
 <circle cx="487" cy="85.31776315789475" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="84.31776315789475" r="3.6" fill="url(#chrome)" />
-<line x1="488.20906265614695" y1="86.9316811928589" x2="485.79093734385305" y2="81.70384512293059" stroke="#333" stroke-width="1.08"/>
+<line x1="488.8576682289911" y1="86.51855136919478" x2="485.1423317710089" y2="82.11697494659472" stroke="#333" stroke-width="1.08"/>
 <text x="252.27631578947367" y="10.519410613310134" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="4.2" fill="#ece8de" text-anchor="middle" font-weight="900" xml:space="preserve">E V E R T I D E   H A R M O N I Z E R ™</text>
 <text x="394.4684210526316" y="11.27079708568943" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="2.8" fill="#ece8de" text-anchor="middle" font-weight="800" >MODEL H949</text>
 <rect x="31.45263157894737" y="13.524956502827317" width="78.63157894736841" height="46.58596128751631" rx="1.4" fill="none" stroke="#d8d4ca" stroke-width="0.55"/>
@@ -105668,19 +105970,19 @@
 <rect x="0.6273764258555135" y="1.3066308864265936" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="6.6273764258555135" cy="5.306630886426594" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="6.6273764258555135" cy="4.306630886426594" r="3.4" fill="url(#chrome)" />
-<line x1="8.4843453786307" y1="2.3191535133657" x2="4.7704074730803265" y2="6.294108259487486" stroke="#333" stroke-width="1.02"/>
+<line x1="9.339501407795042" y1="4.099802256059535" x2="3.915251443915985" y2="4.513459516793652" stroke="#333" stroke-width="1.02"/>
 <rect x="0.6273764258555135" y="83.61113227146814" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="6.6273764258555135" cy="87.61113227146814" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="6.6273764258555135" cy="86.61113227146814" r="3.4" fill="url(#chrome)" />
-<line x1="8.277591537790249" y1="84.4489134841244" x2="4.977161313920777" y2="88.77335105881187" stroke="#333" stroke-width="1.02"/>
+<line x1="8.8571166434342" y1="85.05335868005244" x2="4.397636208276827" y2="88.16890586288383" stroke="#333" stroke-width="1.02"/>
 <rect x="484.89923954372625" y="1.3066308864265936" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="490.89923954372625" cy="5.306630886426594" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="490.89923954372625" cy="4.306630886426594" r="3.4" fill="url(#chrome)" />
-<line x1="493.58669339038585" y1="4.726144678899118" x2="488.21178569706666" y2="3.88711709395407" stroke="#333" stroke-width="1.02"/>
+<line x1="491.9246639286846" y1="1.7873244678397646" x2="489.8738151587679" y2="6.825937305013423" stroke="#333" stroke-width="1.02"/>
 <rect x="484.89923954372625" y="83.61113227146814" width="12" height="6" fill="#060606" rx="3"/>
 <circle cx="490.89923954372625" cy="87.61113227146814" r="4.4" fill="#000" opacity="0.5"/>
 <circle cx="490.89923954372625" cy="86.61113227146814" r="3.4" fill="url(#chrome)" />
-<line x1="491.51024220019883" y1="89.26161821819251" x2="490.2882368872537" y2="83.96064632474376" stroke="#333" stroke-width="1.02"/>
+<line x1="491.13075285316916" y1="89.32126171257437" x2="490.66772623428335" y2="83.9010028303619" stroke="#333" stroke-width="1.02"/>
 <circle cx="24.61596958174905" cy="8.613261772853187" r="2" fill="#55575c" />
 <circle cx="24.61596958174905" cy="82.78301592797784" r="2" fill="#55575c" />
 <circle cx="471.9638783269962" cy="8.613261772853187" r="2" fill="#55575c" />
@@ -105838,21 +106140,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.84223515811614" y1="9.354095121529589" x2="10.15776484188386" y2="3.84590487847041" stroke="#333" stroke-width="1.08"/>
+<line x1="11.857624305399439" y1="3.850658160434004" x2="10.142375694600561" y2="9.349341839565994" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.188190120723215" y1="36.57685071794804" x2="8.811809879276785" y2="40.32183349257829" stroke="#333" stroke-width="1.08"/>
+<line x1="13.588326915096182" y1="39.71226085981101" x2="8.411673084903818" y2="37.186423350715316" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.39311630867917" y1="9.120640186637534" x2="485.60688369132083" y2="4.079359813362466" stroke="#333" stroke-width="1.08"/>
+<line x1="487.22482475042494" y1="3.72878878666226" x2="486.77517524957506" y2="9.471211213337739" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.2061531800872" y1="41.06460394801725" x2="485.7938468199128" y2="35.834080262509076" stroke="#333" stroke-width="1.08"/>
+<line x1="487.5005919347484" y1="35.61318137024392" x2="486.4994080652516" y2="41.285502840282405" stroke="#333" stroke-width="1.08"/>
 <rect x="53.784000000000006" y="4.5" width="155.87400000000002" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="212.148" y="4.5" width="114.53999999999994" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="330.672" y="4.5" width="107.56799999999998" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
@@ -106175,21 +106477,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.636805062204374" y1="4.230344078069109" x2="9.363194937795626" y2="8.96965592193089" stroke="#333" stroke-width="1.08"/>
+<line x1="13.61577827582559" y1="7.805032784499618" x2="8.38422172417441" y2="5.394967215500382" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="12.119053585296053" y1="41.10304123539002" x2="9.880946414703946" y2="35.7956429751363" stroke="#333" stroke-width="1.08"/>
+<line x1="11.143920458477844" y1="35.57294037712582" x2="10.856079541522156" y2="41.32574383340051" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0c0c0d" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.44406767218896" y1="3.754441372504038" x2="486.55593232781104" y2="9.445558627495961" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8517268033828" y1="6.197440390913344" x2="484.1482731966172" y2="7.0025596090866555" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.6625273107045" y1="36.097661229557104" x2="485.3374726892955" y2="40.80102298096922" stroke="#333" stroke-width="1.08"/>
+<line x1="489.07516316773825" y1="36.45231986521109" x2="484.92483683226175" y2="40.44636434531524" stroke="#333" stroke-width="1.08"/>
 <rect x="53.784000000000006" y="4.5" width="155.87400000000002" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="212.148" y="4.5" width="114.53999999999994" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
 <rect x="330.672" y="4.5" width="107.56799999999998" height="36.049342105263165" fill="#7f957a" rx="3.5" opacity="0.9"/>
@@ -106512,21 +106814,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="12.427778168963776" y1="4.098830373559112" x2="9.572221831036224" y2="9.101169626440887" stroke="#333" stroke-width="1.08"/>
+<line x1="13.724917179247948" y1="5.667676898152035" x2="8.275082820752052" y2="7.532323101847965" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="11.105573817013806" y1="41.32740641468384" x2="10.894426182986193" y2="35.571277795842484" stroke="#333" stroke-width="1.08"/>
+<line x1="12.204493493172972" y1="41.06536875361825" x2="9.795506506827028" y2="35.83331545690807" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.3548346105361" y1="9.141421487690193" x2="485.6451653894639" y2="4.058578512309808" stroke="#333" stroke-width="1.08"/>
+<line x1="489.773080933648" y1="7.377445905152291" x2="484.226919066352" y2="5.8225540948477095" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="488.8576682289911" y1="40.65013031656319" x2="485.1423317710089" y2="36.248553893963134" stroke="#333" stroke-width="1.08"/>
+<line x1="488.617855850982" y1="40.83197561578118" x2="485.382144149018" y2="36.066708594745144" stroke="#333" stroke-width="1.08"/>
 <rect x="51.792" y="4.5" width="153.38400000000001" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="207.168" y="4.5" width="124.49999999999994" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="333.66" y="4.5" width="102.58799999999991" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
@@ -106809,21 +107111,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="13.87166174558303" y1="6.381004979611349" x2="8.12833825441697" y2="6.81899502038865" stroke="#333" stroke-width="1.08"/>
+<line x1="12.761487682841453" y1="8.878499757120428" x2="9.238512317158547" y2="4.321500242879571" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="11" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="13.360901406848022" y1="36.799934773175956" x2="8.639098593151978" y2="40.09874943735037" stroke="#333" stroke-width="1.08"/>
+<line x1="12.59477839654782" y1="36.05120076958164" x2="9.40522160345218" y2="40.847483440944686" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#0a0b11" />
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.6"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="488.0857434664265" y1="3.9324990862021805" x2="485.9142565335735" y2="9.26750091379782" stroke="#333" stroke-width="1.08"/>
+<line x1="489.8270540871545" y1="7.149695541461775" x2="484.1729459128455" y2="6.050304458538225" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="35.44934210526316" width="14" height="6" fill="#050505" rx="3"/>
 <circle cx="487" cy="39.44934210526316" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="38.44934210526316" r="3.6" fill="url(#chrome)" />
-<line x1="487.2451317394101" y1="41.318890925258" x2="486.7548682605899" y2="35.57979328526832" stroke="#333" stroke-width="1.08"/>
+<line x1="487.8218224987842" y1="41.20959712617918" x2="486.1781775012158" y2="35.68908708434714" stroke="#333" stroke-width="1.08"/>
 <rect x="51.792" y="4.5" width="153.38400000000001" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="207.168" y="4.5" width="124.49999999999994" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
 <rect x="333.66" y="4.5" width="102.58799999999991" height="36.049342105263165" fill="#2f5d9e" rx="3.5" opacity="0.9"/>
@@ -107109,21 +107411,21 @@
 <rect x="4" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="11.857624305399439" y1="3.850658160434004" x2="10.142375694600561" y2="9.349341839565994" stroke="#333" stroke-width="1.08"/>
+<line x1="12.044643772757018" y1="9.283862773697638" x2="9.955356227242982" y2="3.916137226302361" stroke="#333" stroke-width="1.08"/>
 <rect x="4" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="11" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="11" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="13.588326915096182" y1="38.53133980717943" x2="8.411673084903818" y2="36.005502298083734" stroke="#333" stroke-width="1.08"/>
+<line x1="12.703144215390768" y1="34.945987031699886" x2="9.296855784609232" y2="39.590855073563276" stroke="#333" stroke-width="1.08"/>
 <rect x="476" y="0" width="22" height="45.049342105263165" fill="#000" opacity="0.18"/>
 <rect x="476" y="0" width="0.8" height="45.049342105263165" fill="#000" opacity="0.45"/>
 <rect x="480" y="3.5999999999999996" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="7.6" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="6.6" r="3.6" fill="url(#chrome)" />
-<line x1="487.22482475042494" y1="3.72878878666226" x2="486.77517524957506" y2="9.471211213337739" stroke="#333" stroke-width="1.08"/>
+<line x1="488.2282670043955" y1="3.9950508323744014" x2="485.7717329956045" y2="9.204949167625598" stroke="#333" stroke-width="1.08"/>
 <rect x="480" y="34.26842105263158" width="14" height="6" fill="#070707" rx="3"/>
 <circle cx="487" cy="38.26842105263158" r="4.6" fill="#000" opacity="0.5"/>
 <circle cx="487" cy="37.26842105263158" r="3.6" fill="url(#chrome)" />
-<line x1="487.5005919347484" y1="34.43226031761234" x2="486.4994080652516" y2="40.10458178765082" stroke="#333" stroke-width="1.08"/>
+<line x1="488.1702278935328" y1="34.636887910678446" x2="485.8297721064672" y2="39.899954194584716" stroke="#333" stroke-width="1.08"/>
 <g transform="translate(68.00 0) scale(0.8045)">
 <rect x="0" y="0" width="450" height="56" fill="#cfcdc7" />
 <rect x="0" y="0" width="450" height="2" fill="#fff" opacity="0.5"/>
@@ -109657,22 +109959,22 @@
 <rect x="3250" y="680" width="40" height="14" fill="#0b0b0c" rx="3"/>
 <circle cx="1940" cy="691" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1940" cy="690" r="12" fill="url(#chrome)" />
-<line x1="1948.9709416812798" y1="693.4179241289235" x2="1931.0290583187202" y2="686.5820758710765" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1948.4781183832129" y1="694.5034996036667" x2="1931.521881616787" y2="685.4965003963333" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="3620" cy="691" r="13" fill="#000" opacity="0.5"/>
 <circle cx="3620" cy="690" r="12" fill="url(#chrome)" />
-<line x1="3621.587026080423" y1="699.4679115025467" x2="3618.412973919577" y2="680.5320884974533" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="3626.588198526383" y1="696.9825239116641" x2="3613.411801473617" y2="683.0174760883359" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="1940" cy="1239" r="13" fill="#000" opacity="0.5"/>
 <circle cx="1940" cy="1238" r="12" fill="url(#chrome)" />
-<line x1="1949.5928626792831" y1="1238.370115679779" x2="1930.4071373207169" y2="1237.629884320221" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="1948.4591177358732" y1="1242.539088799598" x2="1931.5408822641268" y2="1233.460911200402" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="3620" cy="1239" r="13" fill="#000" opacity="0.5"/>
 <circle cx="3620" cy="1238" r="12" fill="url(#chrome)" />
-<line x1="3625.467415194833" y1="1245.8909676901703" x2="3614.532584805167" y2="1230.1090323098297" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="3626.610761565587" y1="1231.0388340399786" x2="3613.389238434413" y2="1244.9611659600214" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="2780" cy="675" r="13" fill="#000" opacity="0.5"/>
 <circle cx="2780" cy="674" r="12" fill="url(#chrome)" />
-<line x1="2789.1593561652694" y1="671.1249009342728" x2="2770.8406438347306" y2="676.8750990657272" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="2788.4566025681324" y1="678.5437729922011" x2="2771.5433974318676" y2="669.4562270077989" stroke="#333" stroke-width="3.5999999999999996"/>
 <circle cx="2780" cy="1255" r="13" fill="#000" opacity="0.5"/>
 <circle cx="2780" cy="1254" r="12" fill="url(#chrome)" />
-<line x1="2787.8991433166543" y1="1248.5444033449169" x2="2772.1008566833457" y2="1259.4555966550831" stroke="#333" stroke-width="3.5999999999999996"/>
+<line x1="2785.7559995811193" y1="1246.3170013131491" x2="2774.2440004188807" y2="1261.6829986868509" stroke="#333" stroke-width="3.5999999999999996"/>
 <rect x="2120" y="899.2" width="1320" height="110.16000000000001" fill="#2f6db3" />
 <rect x="2160" y="919.2" width="220" height="70.16000000000001" fill="none" stroke="#f2f4f8" stroke-width="4"/>
 <text x="2270" y="976.2800000000001" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="60" fill="#f2f4f8" text-anchor="middle" font-weight="900" >leximan</text>
@@ -115394,6 +115696,35 @@ class Chaser {
     pcmDraw();
   }
   PCMU.forEach((u, i) => pcmKnobs(i));
+  // ---------------- Fermann PL-8 C power conditioners: one on top of every rack, with pull-out rack lights ----------------
+  // Click a unit: its two lamps slide out of the top and light the rack below (or slide back in, and the rack goes dark).
+  // Drag up / down or scroll on it: the dimmer. The voltmeter reads the mains; the amp bar the load in that rack.
+  const FM = { st: [0, 1, 2, 3].map(() => ({ on: true, dim: 0.85 })), t: 0, v: [120, 120, 120, 120] };
+  try { const sv = JSON.parse(localStorage.getItem('as-furman') || 'null'); if (Array.isArray(sv)) sv.forEach((o, i) => { if (o && FM.st[i]) Object.assign(FM.st[i], o); }); } catch (e) { /* storage unavailable */ }
+  const fmSave = () => { try { localStorage.setItem('as-furman', JSON.stringify(FM.st)); } catch (e) { /* ignore */ } };
+  function fmApply(i) {
+    const S = FM.st[i];
+    for (const el of document.querySelectorAll(`.fm-lamps[data-fm="${i}"], .fm-light[data-fm="${i}"]`)) { el.dataset.on = S.on ? '1' : '0'; el.style.setProperty('--dim', S.dim.toFixed(2)); }
+    c1Lamp(`fm${i}-lt`, S.on);
+    for (const g of c1All(`fm${i}-dim`)) { const m = /rotate\([^ ]+ ([^ ]+) ([^)]+)\)/.exec(g.getAttribute('transform') || ''); if (m) g.setAttribute('transform', `rotate(${(-140 + S.dim * 280).toFixed(1)} ${m[1]} ${m[2]})`); }
+  }
+  document.querySelectorAll('.fm-hot').forEach((el) => {
+    const i = +el.dataset.fm; let y0 = null, d0 = 0, moved = false;
+    el.addEventListener('pointerdown', (e) => { e.stopPropagation(); el.setPointerCapture(e.pointerId); y0 = e.clientY; d0 = FM.st[i].dim; moved = false; });
+    el.addEventListener('pointermove', (e) => { if (y0 == null) return; const dy = y0 - e.clientY; if (Math.abs(dy) > 4) moved = true; if (moved) { FM.st[i].dim = Math.max(0.15, Math.min(1, d0 + dy / 200)); if (!FM.st[i].on) FM.st[i].on = true; fmApply(i); } });
+    el.addEventListener('pointerup', () => { if (y0 == null) return; y0 = null; if (!moved) FM.st[i].on = !FM.st[i].on; fmApply(i); fmSave(); });
+    el.addEventListener('wheel', (e) => { e.preventDefault(); FM.st[i].dim = Math.max(0.15, Math.min(1, FM.st[i].dim - Math.sign(e.deltaY) * 0.05)); FM.st[i].on = true; fmApply(i); fmSave(); }, { passive: false });
+  });
+  function fmTick() {
+    if (++FM.t % 30) return;   // twice a second
+    for (let i = 0; i < 4; i++) {
+      FM.v[i] += (119.5 + Math.random() * 2 - FM.v[i]) * 0.3;
+      sgTxt(`.fm${i}-v`, String(Math.round(FM.v[i])));
+      const amps = (i === 0 ? 3.1 + (EL.on ? 1.2 : 0) : 0.2) + (FM.st[i].on ? 0.15 * FM.st[i].dim : 0) + Math.random() * 0.2;   // the outboard rack draws the most
+      for (let k = 0; k < 8; k++) c1Lamp(`fm${i}-a${k}`, amps > k * 1.5 + 0.1);
+    }
+  }
+  [0, 1, 2, 3].forEach(fmApply);
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
@@ -115406,7 +115737,7 @@ class Chaser {
     c160Tick();
     im90Tick();
     spxTick();
-    h949Tick(); rmxTick(); pcmTick();
+    h949Tick(); rmxTick(); pcmTick(); fmTick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it
@@ -115429,7 +115760,7 @@ class Chaser {
 </script>
 <script>(() => {   // the OldTools splash: names what is coming up, then fades
   const el = document.getElementById('splash'); if (!el) return;
-  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
+  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Pulling out the rack lights', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
   const st = document.getElementById('spl-status'), bar = document.getElementById('spl-bar'); let i = 0, done = false;
   const close = () => { if (done) return; done = true; el.classList.add('gone'); setTimeout(() => el.remove(), 1000); };
   const tick = () => { if (done) return; st.textContent = steps[i] + (i < steps.length - 1 ? '…' : ''); bar.style.width = Math.round((i + 1) / steps.length * 100) + '%'; if (++i < steps.length) setTimeout(tick, 260 + Math.random() * 180); else setTimeout(close, 700); };

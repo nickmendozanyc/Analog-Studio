@@ -880,7 +880,7 @@
     c160Tick();
     im90Tick();
     spxTick();
-    h949Tick(); rmxTick(); pcmTick();
+    h949Tick(); rmxTick(); pcmTick(); fmTick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

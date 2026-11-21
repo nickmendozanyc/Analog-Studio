@@ -1506,6 +1506,37 @@ function rmxFace(w, h) {
   frame(168, 570, 1080, 589); T(624, 584, 'model rmx16 : digital reverberation system : advanced axis systems : burnley, england', 3.6, W, 'middle', 700, 'letter-spacing="0.2"');
   p(`<text class="${id('route')}" x="${X(624)}" y="${Y(600)}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
 }
+function furmanFace(w, h, i) {
+  // Fermann PL-8 C power conditioner (after the Furman PL-8 C): black 1U panel, the lamp drawers at both ends (the rack
+  // lights pull out of the top), a red rocker, a voltmeter and an 8-LED amp bar, a front outlet, LIGHTS and a dimmer
+  const W = '#e8e6e0', id = (k) => `fm${i}-${k}`, X = (pct) => pct / 100 * w;
+  rect(0, 0, w, h, '#121213'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.12"'); rect(0, h - 1.4, w, 1.4, '#000', 'opacity="0.55"');
+  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#0d0d0e'); rect(ex + (ex ? 0 : 21.2), 0, 0.8, h, '#000', 'opacity="0.6"'); for (const ey of [6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#050505', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
+  // the lamp drawers: a slot in the top edge with a finger pull at each end
+  for (const lx of [X(5.2), X(87.6)]) { rect(lx, 0, X(7.2), 6, '#050505', 'rx="1"'); rect(lx + 2, 1.5, X(7.2) - 4, 2.4, '#2a2a2c', 'rx="1"'); rect(lx + X(3.6) - 6, 6.5, 12, 3, '#2b2b2e', 'rx="1.5"'); text(lx + X(3.6), 18, 'LAMP', 2.6, '#9b988f', 'middle', 800, 'letter-spacing="0.6"'); }
+  // power rocker
+  rect(X(15) - 6, h / 2 - 9, 12, 18, '#060606', 'rx="1.5"'); p(`<rect class="${id('pw')}" x="${X(15) - 5}" y="${h / 2 - 8}" width="10" height="16" rx="1" fill="#c8261c"/>`); rect(X(15) - 5, h / 2 - 8, 10, 6, '#fff', 'opacity="0.18" rx="1"');
+  text(X(15), h - 5, 'POWER', 2.6, W, 'middle', 800, 'letter-spacing="0.6"');
+  // badge
+  text(X(27), h / 2 + 2, 'Fermann', 11, W, 'middle', 800, 'font-style="italic" letter-spacing="-0.2"');
+  text(X(27), h / 2 + 9, 'POWER CONDITIONER · PL-8 C', 2.5, '#a9a69c', 'middle', 800, 'letter-spacing="0.5"');
+  // front outlet
+  rect(X(42) - 9, h / 2 - 11, 18, 22, '#d8d4c8', 'rx="3"'); for (const sx of [-3.5, 3.5]) rect(X(42) + sx - 0.8, h / 2 - 7, 1.6, 6, '#222', 'rx="0.5"'); circle(X(42), h / 2 + 5, 1.6, '#222');
+  text(X(42), h - 3.5, '15A 125V', 2.3, '#9b988f', 'middle', 800);
+  // voltmeter + amp bar
+  rect(X(52), 7, X(13), h - 14, '#160302', 'rx="1.5"');
+  p(`<text x="${X(55.6)}" y="${h / 2 + 4.5}" font-family="${MONO2}" font-size="12" font-weight="700" fill="#ff2a14" opacity="0.07" text-anchor="middle">888</text>`);
+  p(`<text class="${id('v')}" x="${X(55.6)}" y="${h / 2 + 4.5}" font-family="${MONO2}" font-size="12" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">120</text>`);
+  text(X(55.6), h - 9, 'VOLTS', 2.2, '#c9563f', 'middle', 800);
+  for (let k = 0; k < 8; k++) { const ax = X(59.6) + k * 3.6, c = k < 5 ? '#4fe07a' : k < 7 ? '#ffc928' : '#ff3b2f'; circle(ax, h / 2 - 1, 1.1, '#1c0e0b'); p(`<circle class="${id('a' + k)}" cx="${ax}" cy="${h / 2 - 1}" r="1.1" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); }
+  text(X(59.6) + 12.6, h - 9, 'AMPS', 2.2, '#c9563f', 'middle', 800);
+  // LIGHTS button + dimmer
+  rect(X(71) - 6, h / 2 - 6, 12, 12, '#050505', 'rx="1"'); rect(X(71) - 5.2, h / 2 - 5.2, 10.4, 10.4, '#2b2b2e', 'rx="1"'); p(`<circle class="${id('lt')}" cx="${X(71)}" cy="${h / 2 - 9.5}" r="1" fill="#ffd27a" opacity="1" filter="url(#glowSm)"/>`);
+  text(X(71), h - 5, 'LIGHTS', 2.6, W, 'middle', 800, 'letter-spacing="0.6"');
+  const kx = X(79), ky = h / 2 - 1; circle(kx + 0.4, ky + 0.8, 6.4, '#000', 'opacity="0.6"'); circle(kx, ky, 6.2, '#2e2f33'); circle(kx, ky, 4.6, '#3c3d42');
+  p(`<g class="${id('dim')}" transform="rotate(60 ${kx} ${ky})"><rect x="${kx - 0.45}" y="${ky - 5.8}" width="0.9" height="3.6" fill="#e8e6e0"/></g>`);
+  text(kx, h - 5, 'DIMMER', 2.6, W, 'middle', 800, 'letter-spacing="0.6"');
+}
 function pcmFace(w, h, u) {
   // Leximan PCM41 / PCM42 (1U), laid out from photos of the real panels: positions are the centre of each control as a
   // percentage of the full 19-inch width (references/pcm41-42 README, sections 1.3 and 2.3)
@@ -1609,6 +1640,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     return { y: RY + y0, h, k, x: PX + ox, map: (fx, fy) => [PX + ox + fx * k, y0 + fy * k] };   // face coordinates -> rack coordinates
   }
   globalThis.RACK_HOT = {};
+  globalThis.RACK_HOT.fm0 = unit(1, '#121213', (w, h) => furmanFace(w, h, 0), { native: true });   // Fermann PL-8 C on top: the rack lights
   // Leximan 224X mainframe (4U): the same drawing as in its pop-up, scaled to the panel
   globalThis.RACK_HOT['224'] = unit(4, '#161718', (w, h) => { p(`<g transform="scale(${(w / 1760).toFixed(5)} ${(h / Math.round(1760 * 7 / 19)).toFixed(5)})">`); lex224Frame(0, 0, 1760, Math.round(1760 * 7 / 19)); p('</g>'); }, { native: true });
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
@@ -1700,6 +1732,14 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     }
   });
   const woodV = 'linear-gradient(90deg,#6e4420,#b37a3e 40%,#8a5a2c 70%,#4a2c14)';
+  // the Fermann's two lamps pulled out of its top edge, leaning over the rack, and the warm light they throw down it
+  const fmTop = 70, fmH = U - PNL.GAP;
+  const lampsHtml = (n) => `<div class="fm-lamps" data-fm="${n}" data-on="1" style="--dim:0.85;${B3(`left:0;top:0;width:${RW}px;height:${RH}px;pointer-events:none`)}">${[5.2, 87.6].map((pc) => { const lx = 26 + pc / 100 * PW; return `<div class="fm-lamp" style="${B3(`left:${(lx - 8).toFixed(1)}px;top:${fmTop - 14}px;width:${(7.2 / 100 * PW + 16).toFixed(1)}px;height:16px;transform:translateZ(30px)`)}"><i></i></div>`; }).join('')}</div>`;
+  globalThis.FM_LAMPS = lampsHtml;
+  // the light itself: a flat layer over each rack's face (2D: big translucent layers inside the 3D scene draw unreliably)
+  const lightHtml = (n, x, keep) => `<div class="fm-light${keep ? ' rk-keep' : ''}" data-fm="${n}" data-on="1" style="--dim:0.85;left:${x + 26}px;top:${RY + fmTop - 4}px;width:${RW - 52}px;height:${RH - fmTop - 16}px">${[5.2, 87.6].map((pc) => `<b class="fm-beam" style="left:${(pc / 100 * PW + 3.6 / 100 * PW).toFixed(1)}px"></b>`).join('')}<i class="fm-glow"></i><i class="fm-dark"></i></div>`;
+  globalThis.FM_LIGHT = lightHtml;
+  const fmPanel = (n) => `<div style="${B3(`left:${PX}px;top:${fmTop}px;width:${PW}px;height:${fmH}px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)`)}">${svgWrap(PW, fmH, capture(() => furmanFace(PW, fmH, n)))}</div>`;
   scenes3d.push(`<div id="rack-main" class="rk-keep" style="position:absolute;left:${RX}px;top:${RY}px;width:${RW}px;height:${RH}px;perspective:2200px;perspective-origin:-60% 40%;">
     <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px`)}">
       <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-${DEPTH}px);background:#0b0a09`)}"></div>
@@ -1713,6 +1753,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
       ${units.join('\n')}
       <div style="${B3(`left:0;top:${slotsY}px;width:${RW}px;transform:translateZ(2px);text-align:center;font:800 14px ${SANS};letter-spacing:3px;color:#d9d3c7`)}">PLUGIN SLOTS</div>
       <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(12px)`)}">${cables}</div>
+      ${lampsHtml(0)}
       <div style="${B3(`left:${UX}px;top:${by0}px;width:${bw}px;height:${bh}px;transform:translateZ(2px)`)}">${svgWrap(bw, bh, browser)}</div>
     </div>
   </div>`);
@@ -1729,11 +1770,13 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
       <div style="${B3(`left:0;top:0;width:8px;height:${RH}px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14`)}"></div>
       <div style="position:absolute;left:0;top:14px;width:${RW}px;text-align:center;font:800 18px ${SANS};letter-spacing:4px;color:#e9e3d0">${title}</div>
       <div style="position:absolute;left:0;top:40px;width:${RW}px;text-align:center;font:600 14px ${SANS};color:#bdb8aa">${sub}</div>
-      <div class="rk-empty" style="${B3(`left:${UX}px;top:70px;width:${UW}px;height:${RH - 110}px;transform:translateZ(1px)`)}"><span>EMPTY</span><small>${Math.floor((RH - 110) / U)} U · 19-inch rails</small></div>
+      ${fmPanel(n)}
+      <div class="rk-empty" style="${B3(`left:${UX}px;top:${fmTop + U + 6}px;width:${UW}px;height:${RH - 116 - U}px;transform:translateZ(1px)`)}"><span>EMPTY</span><small>${Math.floor((RH - 116 - U) / U)} U · 19-inch rails</small></div>
+      ${lampsHtml(n)}
     </div>
   </div>`;
   const ROOM_RACKS = [1, 2, 3].map((k) => rackCab(RX - k * (RW + 40), `RACK ${4 - k}`, 'audio &amp; MIDI gear · to come', 4 - k));
-  scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div><div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}</div>`);
+  scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div><div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}${[1, 2, 3].map((k) => lightHtml(4 - k, RX - k * (RW + 40), false)).join('')}${[1, 2, 3].map((k) => `<div class="fm-hot" data-fm="${4 - k}" style="left:${RX - k * (RW + 40) + 26}px;top:${RY + fmTop}px;width:${RW - 52}px;height:${Math.round(fmH)}px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>`).join('')}</div>`);
 }
 
 // rack edge shadow over console + room lighting
@@ -2026,6 +2069,19 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #racks-room .rr-title{position:absolute;left:90px;top:80px;font:900 64px Archivo,Arial;letter-spacing:14px;color:#efe6d2}
   #racks-room .rr-sub{position:absolute;left:94px;top:170px;width:1200px;font:600 24px Archivo,Arial;color:#a9a294;line-height:1.5}
   #racks-room .rr-back{position:absolute;left:94px;top:260px;font:900 20px Archivo,Arial;letter-spacing:3px;padding:16px 30px;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  .fm-hot{position:absolute;cursor:pointer;z-index:5}
+  .fm-lamp{transition:transform .5s ease,opacity .5s ease}
+  .fm-lamp i{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:4px 4px 2px 2px;background:linear-gradient(#8a8c92,#4a4c52 45%,#26272b);border:1px solid #111;box-shadow:0 4px 8px rgba(0,0,0,.8)}
+  .fm-lamp i::before{content:'';position:absolute;left:50%;top:100%;width:6px;height:12px;margin-left:-3px;background:linear-gradient(90deg,#2a2b2e,#6a6c71,#2a2b2e)}
+  .fm-lamp i::after{content:'';position:absolute;left:5px;right:5px;bottom:-3px;height:4px;border-radius:2px;background:#fff6e0;box-shadow:0 2px calc(26px * var(--dim)) calc(9px * var(--dim)) rgba(255,214,150,calc(0.95 * var(--dim))),0 0 4px #fff}
+  .fm-light{position:absolute;pointer-events:none;z-index:4}
+  .fm-light .fm-glow,.fm-light .fm-dark{position:absolute;left:0;top:0;width:100%;height:100%;transition:opacity .6s ease}
+  .fm-light .fm-glow{background:radial-gradient(ellipse 120% 70% at 50% 0%,rgba(255,214,150,calc(0.3 * var(--dim))),rgba(255,206,140,calc(0.1 * var(--dim))) 45%,rgba(255,200,130,0) 85%)}
+  .fm-light .fm-dark{background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.62));opacity:0}
+  .fm-beam{position:absolute;top:0;width:180px;height:640px;margin-left:-90px;background:radial-gradient(ellipse 50% 100% at 50% 0%,rgba(255,230,180,calc(0.22 * var(--dim))),rgba(255,220,160,0) 72%);transition:opacity .6s ease}
+  .fm-light[data-on="0"] .fm-glow,.fm-light[data-on="0"] .fm-beam{opacity:0}
+  .fm-light[data-on="0"] .fm-dark{opacity:1}
+  .fm-lamps[data-on="0"] .fm-lamp{opacity:0}
   .rk-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:2px dashed rgba(233,227,208,0.16);border-radius:6px;color:rgba(233,227,208,0.32);font:900 30px Archivo,Arial;letter-spacing:10px}
   .rk-empty small{font:700 16px Archivo,Arial;letter-spacing:3px}
   #files-bar .fbtns button{font:900 16px Archivo,Arial;letter-spacing:2px;padding:14px 0;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
@@ -2100,6 +2156,8 @@ ${rhot('spxA', 'spx', 'Open the Yahaha SPX90II units')}
 ${rhot('spxB', 'spx', 'Open the Yahaha SPX90II units')}
 ${rhot('h949', 'h949', 'Open the Evertide H949 Harmonizer')}
 ${rhot('rmx', 'rmx', 'Open the AXS RMX16')}
+${globalThis.FM_LIGHT(0, RX, true)}
+<div class="fm-hot rk-keep" data-fm="0" style="left:${RX + 26}px;top:${Math.round(globalThis.RACK_HOT.fm0.y)}px;width:${RW - 52}px;height:${Math.round(globalThis.RACK_HOT.fm0.h)}px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>
 ${['41A', '41B', '42A', '42B'].map((u) => rhot('pcm' + u, 'pcm', 'Open the Leximan PCM41 / PCM42 delays')).join('\n')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
@@ -2149,10 +2207,10 @@ return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90presets.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>const RMX_PROGRAMS_UI = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'rmx16.js'), 'utf8').replace(/^export /gm, '')}; return RMX_PROGRAMS; })(); const h949Ratio = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'h949.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')}; return h949Ratio; })();</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pcm.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'furman.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 <script>(() => {   // the OldTools splash: names what is coming up, then fades
   const el = document.getElementById('splash'); if (!el) return;
-  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
+  const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for 4M 996', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Racking the Leximan PCM41s and PCM42s', 'Pulling out the rack lights', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
   const st = document.getElementById('spl-status'), bar = document.getElementById('spl-bar'); let i = 0, done = false;
   const close = () => { if (done) return; done = true; el.classList.add('gone'); setTimeout(() => el.remove(), 1000); };
   const tick = () => { if (done) return; st.textContent = steps[i] + (i < steps.length - 1 ? '…' : ''); bar.style.width = Math.round((i + 1) / steps.length * 100) + '%'; if (++i < steps.length) setTimeout(tick, 260 + Math.random() * 180); else setTimeout(close, 700); };
