@@ -203,13 +203,13 @@
   ];
   const COLS = ['#c0392b', '#2f6fb3', '#e8c34a', '#3f8f3a', '#1b1b1b', '#e9e5da', '#e07b28', '#8e44ad'];
   const DEFAULT = [
-    ['isend:1', 'fxin:160X A'], ['fxout:160X A', 'iret:1'], ['isend:7', 'fxin:160X B'], ['fxout:160X B', 'iret:7'],
+    ['isend:7', 'fxin:160X B'], ['fxout:160X B', 'iret:7'],
     ['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8'],
     ['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5'],
     ['aux:SEND 1', 'fxin:224 L'], ['fxout:224 L', 'lin:LINE 25'], ['fxout:224 R', 'lin:LINE 26'],
     ['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'],
     ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11'],
-    ['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
+    ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
     ['dir:2', 'fxin:S900'], ['fxout:S900', 'lin:LINE 27'],
     ['aux:MIX L', 'ifout:1'], ['aux:MIX R', 'ifout:2'],
     ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
@@ -219,7 +219,8 @@
     const s = JSON.parse(localStorage.getItem('as-patches-v4') || 'null');
     if (Array.isArray(s)) { patches = s.filter((pc) => !/1176/.test(pc.a + pc.b));   // the 1176s left the rack: their cables go too
       // the SPX90IIs work on channel inserts now: their old aux-send / line-return cables give way to the new defaults
-      if (!patches.some((pc) => /^isend:/.test(pc.a) && /SPX/.test(pc.b))) { patches = patches.filter((pc) => !/SPX/.test(pc.a + pc.b)); for (const [a2, b2] of [['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }
+      if (!patches.some((pc) => /^isend:/.test(pc.a) && /SPX/.test(pc.b))) { patches = patches.filter((pc) => !/SPX/.test(pc.a + pc.b)); for (const [a2, b2] of [['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }
+      if (!localStorage.getItem('as-clean-ch12')) { localStorage.setItem('as-clean-ch12', '1'); patches = patches.filter((pc) => !['isend:1', 'iret:1', 'isend:2', 'iret:2'].includes(pc.a) && !['isend:1', 'iret:1', 'isend:2', 'iret:2'].includes(pc.b)); localStorage.setItem('as-patches-v4', JSON.stringify(patches)); }   // channels 1 and 2 dry (no inserts)
       if (!localStorage.getItem('as-units-s900')) { localStorage.setItem('as-units-s900', '1'); for (const [a2, b2] of [['dir:2', 'fxin:S900'], ['fxout:S900', 'lin:LINE 27']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the S900 joins a saved layout
       if (!localStorage.getItem('as-units-pcm')) { localStorage.setItem('as-units-pcm', '1'); patches = patches.filter((pc) => !(pc.a === 'aux:SEND 2' && pc.b === 'fxin:PCM42 A') && !(pc.a === 'fxout:PCM42 A' && pc.b === 'lin:LINE 29')); for (const [a2, b2] of [['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'], ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the PCMs now work on inserts
       if (!localStorage.getItem('as-units-h949rmx')) { localStorage.setItem('as-units-h949rmx', '1'); for (const [a2, b2] of [['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the new units join a saved layout, once
