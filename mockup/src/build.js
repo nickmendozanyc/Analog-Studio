@@ -1426,21 +1426,6 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
   for (const u of ['A', 'B']) globalThis.RACK_HOT['c160' + u] = unit(1, '#232127', (w, h) => c160Face(w, h, u), { native: true });
   globalThis.RACK_HOT.im90 = unit(3, '#16161a', (w, h) => im90Face(w, h), { native: true });   // Publizon IM90 (3U)
-  // Unified Audio 1176LN x2 (2U)
-  for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
-    text(26, 30, 'UNIFIED AUDIO', 14, '#cfcfcf', 'start', 800);
-    text(26, 64, '1176LN', 28, '#f2f2f2', 'start', 800);
-    text(26, 88, k ? 'INS · VOX' : 'INS · BASS', 14, '#e8c34a', 'start', 800);
-    for (const [kx, lab, a] of [[184, 'IN', k ? 10 : 40], [246, 'OUT', -10]]) {
-      ticks(kx, 48, 24, '#cfcfcf');
-      RK(kx, 48, 24, 'radial-gradient(circle, #1a1a1a, #050505)', a, { dark: true, h: 16 });
-      text(kx, 104, lab, 14, '#cfcfcf', 'middle', 800);
-    }
-    RK(298, 34, 10, '#cfd2d6', 60, { h: 9 }); text(314, 39, 'ATK', 14, '#cfcfcf', 'start', 800);
-    RK(298, 76, 10, '#cfd2d6', -40, { h: 9 }); text(314, 81, 'REL', 14, '#cfcfcf', 'start', 800);
-    vu(w - 98, 10, 76, 52, k ? -6 : -3.5, { fontScale: 0.14 });
-    ['20', '12', '8', '4'].forEach((r, i) => button(w - 100 + i * 20, 70, 18, 20, 'white', i === 3 - k, r, { size: 12 }));
-  });
   // Yahaha SPX90 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackSpx)', (w, h) => {
     text(26, 26, 'YAHAHA', 16, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
@@ -1526,13 +1511,13 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     button(bw - 112, 16, 92, 32, 'amber', false, 'SCAN', { size: 14 });
     rect(20, 62, bw - 40, 38, '#0b0b0c', 'rx="4"'); text(34, 87, 'Search plugins…', 15, '#77746a', 'start', 500);
     text(20, 132, 'BUILT-IN VINTAGE', 14, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
-    ['224 Digital Reverb', '1176LN Peak Limiter', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'].forEach((b, i) => {
+    ['224 Digital Reverb', '160X Compressor', 'IM90 Infernal Machine', 'SPX90 Multi-Effect', 'PCM41 Digital Delay', 'PCM42 Digital Delay'].forEach((b, i) => {
       const ry = 146 + i * 44;
       rect(20, ry, bw - 40, 38, i % 2 ? '#17181b' : '#1c1d20', 'rx="3"');
       text(34, ry + 25, b, 15, '#e8e4d8', 'start', 600);
-      text(bw - 34, ry + 25, i === 0 ? '1 in rack' : '2 in rack', 14, '#a9a594', 'end', 600);
+      text(bw - 34, ry + 25, i === 0 || i === 2 ? '1 in rack' : '2 in rack', 14, '#a9a594', 'end', 600);
     });
-    const tp = 390;
+    const tp = 146 + 6 * 44 + 22;   // below the built-in list
     text(20, tp, 'THIRD-PARTY · 14 FOUND', 14, '#d9d3c7', 'start', 800, 'letter-spacing="2"');
     [['Plate Reverb', 'VST3'], ['Tape Echo', 'AU'], ['Bus Compressor', 'VST3'], ['Vintage EQ', 'AU'], ['Spring Reverb', 'VST3'], ['De-Esser', 'VST3'], ['Chorus Ensemble', 'AU'], ['Room Reverb', 'VST3'], ['Opto Leveler', 'AU'], ['Saturator', 'VST3']].forEach(([n, f], i) => {
       const ry = tp + 14 + i * 44;
@@ -1914,7 +1899,7 @@ ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync">${pan
   <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the JH-Tape's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
 ${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => panelSVG(1, '#232127', (w, h) => c160Face(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
   <p class="note">Drag a knob up or down (double-click resets it); click the buttons. Each unit works on the channel it is patched into at the patchbay (INSERT SEND → 160X IN, 160X OUT → INSERT RETURN): A is on the kick and B on the bass to start with. SLAVE on one unit links it to the other as a stereo pair: the louder channel drives both, with the other unit's controls. You hear it once the tape machine's electronics are on.</p></div>`, '<span class="ov-msg" id="c160-msg"></span>', true)}
-${overlay('im90', 'PUBLIZON INFERNAL MACHINE 90 · STEREO AUDIO COMPUTER', `<div class="ovsync">${panelSVG(3, '#16161a', (w, h) => im90Face(w, h), { native: true })}<div style="height:16px"></div><svg width="1000" height="266" viewBox="0 0 500 133" style="display:block;margin:0 auto">${capture(() => im90Remote(500, 133))}</svg>
+${overlay('im90', 'PUBLIZON IM90 REMOTE CONTROL', `<div class="ovsync"><svg width="3000" height="798" viewBox="0 0 500 133" style="display:block;margin:0 auto">${capture(() => im90Remote(500, 133))}</svg>
   <p class="note">Like the original: choose the channel with SET A / SET B (or A, A&amp;B, B on the remote), call a function with FUNCTIONS, its number and PARAMETERS (01 DELAY, 02 ECHO, 04 PITCH-SHIFTING, 09 SAMPLER), step through its pages with + and −, type a value and ENTER, or press PARAMETERS for increment mode, where + / − step it and 1–9 ramp it (0 stops). Turn the wheel to change a value. Sampling: 09, PARAMETERS, 0 ENTER arms it to record on input A, then it records from the first sound; AUX stops, AUX again records the next, PARAMETERS plays. MEMORY SELECT + number, MEMORY IN stores, MEMORY OUT recalls. GAINS sets input, effect and direct levels. Patch it at the patchbay (IM90 A / B on a channel insert): A is on the guitar to start with.</p></div>`, '<span class="ov-msg" id="im90-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync">${panelSVG(1, '#cfcdc7', (w, h) => dzFace(w, h))}
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
