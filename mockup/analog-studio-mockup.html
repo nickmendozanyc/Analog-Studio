@@ -108658,7 +108658,7 @@ class Chaser {
       // disc look arrives last
       // the exposure image is right at every speed (short streaks look just like the reel), so it takes over as soon as
       // the reel turns faster than play speed; the blur itself grows with the streaks' length as the reels gather speed
-      const o1 = Math.min(1, Math.max(0, (S - 6) / 14)), o2 = Math.min(1, Math.max(0, (Sx - 200) / 260)), ease = (x) => x * x * (3 - 2 * x);
+      const o1 = Math.min(1, Math.max(0, (S - 19) / 14)),   /* above any reel in play: an empty take-up at 30 ips turns ~2 rev/s (15 deg) and still looks sharp */ o2 = Math.min(1, Math.max(0, (Sx - 200) / 260)), ease = (x) => x * x * (3 - 2 * x);
       const key = `${S < 60 ? Math.round(S) : Math.round(S / 3) * 3}|${dir}`;   // redraw the streaks as the speed changes (coarser when fast)
       if (o1 > 0 && key !== rl.smKey) { rl.smKey = key; for (const el of rl.smears) if (el.dataset.slots) el.style.background = smearBg(el, Math.max(1, Math.round(S)), dir); }
       const opKey = `${ease(o1).toFixed(2)}|${ease(o2).toFixed(2)}`;
