@@ -157,9 +157,9 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       // the hub with a shallow curved edge and narrow toward the rim; a solid grey logo between the top two, the number on
       // a small brass plate under it, a brass screw under the plate and two more either side of the hub, lower down
       name: 'Scotia 250', ...SILVER, face: silver('#cdd0d2', '#d1d3d5', '#c9ccce', '#d5d7d9'), edge: 'linear-gradient(90deg,#86898d,#d9dbdd 40%,#74777b)', back: '#8d9094',
-      win: { n: 3, rIn: 0.41, rOut: 0.87, wIn: 0.6, wOut: 0.5, c: 0.07, arc: 1.4, a0: 62 },
-      labels: [[0, () => `<g>${T(-3, -1, 'Scotia', 44, '#55585b', 'font-weight="700" letter-spacing="-1"')}${T(70, -26, '®', 8, '#55585b')}<rect x="-47" y="11" width="94" height="34" rx="1.5" fill="#8f8a68"/><rect x="-45.5" y="12.5" width="91" height="31" rx="1" fill="#c3bc93"/><rect x="-45.5" y="12.5" width="91" height="10" rx="1" fill="#fff" opacity="0.2"/>${T(0, 35, '250', 19, '#f6f3e6', 'font-weight="500" stroke="#8a8460" stroke-width="0.5"')}${BRASS_SCREW(57)}</g>`],
-        ...[-111, 111].map((a) => [a, () => `<g>${BRASS_SCREW(61)}</g>`])],
+      win: { n: 3, rIn: 0.47, rOut: 0.88, wIn: 0.49, wOut: 0.36, c: 0.045, hub: true, a0: 60 },
+      labels: [[0, () => `<g>${T(-3, 6, 'Scotia', 42, '#55585b', 'font-weight="700" letter-spacing="-1"')}${T(66, -18, '®', 8, '#55585b')}<rect x="-48" y="15" width="96" height="44" rx="1.5" fill="#8f8a68"/><rect x="-46.5" y="16.5" width="93" height="41" rx="1" fill="#c3bc93"/><rect x="-46.5" y="16.5" width="93" height="13" rx="1" fill="#fff" opacity="0.2"/>${T(0, 44, '250', 21, '#f6f3e6', 'font-weight="500" stroke="#8a8460" stroke-width="0.5"')}${BRASS_SCREW(66)}</g>`],
+        ...[-118, 118].map((a) => [a, () => `<g>${BRASS_SCREW(62)}</g>`])],
       labRGB: '85,88,91', labK: 0.35,
     },
     atx: {
@@ -178,14 +178,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
   // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
   const slot = (cx, cy, w, ang, R) => {
-    if (w.arc) {   // the 3M/Scotia-style window: inner edge a shallow arc just outside the hub, outer edge on a circle, narrowing outward
-      const t = ang * Math.PI / 180, X = ([x, d]) => [cx + x * Math.cos(t) + d * Math.sin(t), cy + x * Math.sin(t) - d * Math.cos(t)];
-      const rI = w.rIn * R, rO = w.rOut * R, hI = w.wIn * R / 2, hO = w.wOut * R / 2, c = w.c * R, dO = Math.sqrt(rO * rO - hO * hO);
-      const OL = [-hO, dO], OR = [hO, dO], IR = [hI, rI], IL = [-hI, rI];
+    if (w.hub) {   // the Scotia-style window, as photographed: the inner edge is an arc round the hub (the window wraps the
+      // hub), the outer edge a straight line short of the rim, straight sides, small rounded corners
+      const P = (r, a) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
+      const rI = w.rIn * R, rO = w.rOut * R, aI = Math.asin(w.wIn / 2 / w.rIn) * 180 / Math.PI, aO = Math.asin(w.wOut / 2 / w.rOut) * 180 / Math.PI, c = w.c * R, dI = c / rI * 180 / Math.PI;
+      const OL = P(rO, ang - aO), OR = P(rO, ang + aO), IR = P(rI, ang + aI), IL = P(rI, ang - aI);
       const tw = (p, q, d) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]); return [p[0] + (q[0] - p[0]) * d / L, p[1] + (q[1] - p[1]) * d / L]; };
-      const g = (pt) => { const [x, y] = X(pt); return `${f(x)} ${f(y)}`; }, rk = w.arc * R;
-      const s0 = tw(OL, OR, c), e0 = tw(OR, OL, c), a1 = tw(OR, IR, c), a2 = tw(IR, OR, c), i1 = tw(IR, IL, c), i2 = tw(IL, IR, c), b1 = tw(IL, OL, c), b2 = tw(OL, IL, c);
-      return `M${g(s0)} A${f(rO)} ${f(rO)} 0 0 1 ${g(e0)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(i1)} A${f(rk)} ${f(rk)} 0 0 1 ${g(i2)} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s0)} Z `;
+      const g = (pt) => `${f(pt[0])} ${f(pt[1])}`;
+      const s0 = tw(OL, OR, c), e0 = tw(OR, OL, c), a1 = tw(OR, IR, c), a2 = tw(IR, OR, c), i1 = P(rI, ang + aI - dI), i2 = P(rI, ang - aI + dI), b1 = tw(IL, OL, c), b2 = tw(OL, IL, c);
+      return `M${g(s0)} L${g(e0)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(i1)} A${f(rI)} ${f(rI)} 0 0 0 ${g(i2)} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s0)} Z `;
     }
     const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
     const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
