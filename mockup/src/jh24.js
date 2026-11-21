@@ -147,7 +147,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       // the 996 as photographed: gold anodised aluminium, three narrow tapered windows, a pale-yellow paper label at the
       // rim between the top two windows, six small screws round the hub
       name: '4M 996', ...SILVER, face: silver('#d7ad66', '#dbb26c', '#d2a860', '#dfb773'), edge: 'linear-gradient(90deg,#8d6a2e,#e6c181 40%,#7b5a24)', back: '#9a7638',
-      win: { n: 3, rIn: 0.47, rOut: 0.84, wIn: 0.2, wOut: 0.34, c: 0.07, a0: 60 },
+      win: { n: 3, rIn: 0.46, rOut: 0.89, wIn: 0.16, wOut: 0.27, c: 0.06, a0: 62 },
       labels: [[0, () => `<g><rect x="-40" y="-52" width="80" height="78" rx="2" fill="#f2d98f"/><rect x="-40" y="-52" width="80" height="78" rx="2" fill="none" stroke="#c9a856" stroke-width="0.8"/>${T(0, -27, '4M', 25, '#151515', 'letter-spacing="-1.5"')}<rect x="-30" y="-20" width="62" height="1.6" fill="#151515"/><text x="-28" y="-4" font-family="${SANS}" font-size="15" fill="#151515" font-weight="500">996</text><text x="-28" y="7" font-family="${SANS}" font-size="8" fill="#151515" font-weight="500">Audio</text><text x="-28" y="17" font-family="${SANS}" font-size="8" fill="#151515" font-weight="500">Mastering Tape</text></g>`],
         ...[22, 78, 148, 208, 262, 322].map((a) => [a, () => `<g><circle cx="0" cy="44" r="4.2" fill="#8f8a78"/><circle cx="0" cy="44" r="3.3" fill="#d8d3c0"/><path d="M-2 42 L2 46 M2 42 L-2 46" stroke="#6d6858" stroke-width="0.9"/></g>`])],
       labRGB: '242,217,143', labK: 0.45,
@@ -157,7 +157,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       // the hub with a shallow curved edge and narrow toward the rim; a solid grey logo between the top two, the number on
       // a small brass plate under it, a brass screw under the plate and two more either side of the hub, lower down
       name: 'Scotia 250', ...SILVER, face: silver('#cdd0d2', '#d1d3d5', '#c9ccce', '#d5d7d9'), edge: 'linear-gradient(90deg,#86898d,#d9dbdd 40%,#74777b)', back: '#8d9094',
-      win: { n: 3, rIn: 0.47, rOut: 0.88, wIn: 0.49, wOut: 0.36, c: 0.045, hub: true, a0: 60 },
+      win: { n: 3, rIn: 0.466, rOut: 0.87, wIn: 0.535, wOut: 0.385, c: 0.05, hub: 1.8, a0: 60 },
       labels: [[0, () => `<g>${T(-3, 6, 'Scotia', 42, '#55585b', 'font-weight="700" letter-spacing="-1"')}${T(66, -18, '®', 8, '#55585b')}<rect x="-48" y="15" width="96" height="44" rx="1.5" fill="#8f8a68"/><rect x="-46.5" y="16.5" width="93" height="41" rx="1" fill="#c3bc93"/><rect x="-46.5" y="16.5" width="93" height="13" rx="1" fill="#fff" opacity="0.2"/>${T(0, 44, '250', 21, '#f6f3e6', 'font-weight="500" stroke="#8a8460" stroke-width="0.5"')}${BRASS_SCREW(66)}</g>`],
         ...[-118, 118].map((a) => [a, () => `<g>${BRASS_SCREW(62)}</g>`])],
       labRGB: '85,88,91', labK: 0.35,
@@ -178,15 +178,16 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
   // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
   const slot = (cx, cy, w, ang, R) => {
-    if (w.hub) {   // the Scotia-style window, as photographed: the inner edge is an arc round the hub (the window wraps the
-      // hub), the outer edge a straight line short of the rim, straight sides, small rounded corners
+    if (w.hub) {   // the Scotia-style window, traced over the photo: a nearly straight inner edge that bows slightly toward
+      // the hub (w.hub = its radius), an outer edge on a circle near the rim, straight sides narrowing outward, rounded corners
       const P = (r, a) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
       const rI = w.rIn * R, rO = w.rOut * R, aI = Math.asin(w.wIn / 2 / w.rIn) * 180 / Math.PI, aO = Math.asin(w.wOut / 2 / w.rOut) * 180 / Math.PI, c = w.c * R, dI = c / rI * 180 / Math.PI;
       const OL = P(rO, ang - aO), OR = P(rO, ang + aO), IR = P(rI, ang + aI), IL = P(rI, ang - aI);
       const tw = (p, q, d) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]); return [p[0] + (q[0] - p[0]) * d / L, p[1] + (q[1] - p[1]) * d / L]; };
       const g = (pt) => `${f(pt[0])} ${f(pt[1])}`;
       const s0 = tw(OL, OR, c), e0 = tw(OR, OL, c), a1 = tw(OR, IR, c), a2 = tw(IR, OR, c), i1 = P(rI, ang + aI - dI), i2 = P(rI, ang - aI + dI), b1 = tw(IL, OL, c), b2 = tw(OL, IL, c);
-      return `M${g(s0)} L${g(e0)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(i1)} A${f(rI)} ${f(rI)} 0 0 0 ${g(i2)} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s0)} Z `;
+      const rk = w.hub * R, dO = c / rO * 180 / Math.PI, s1 = P(rO, ang - aO + dO), e1 = P(rO, ang + aO - dO);
+      return `M${g(s1)} A${f(rO)} ${f(rO)} 0 0 1 ${g(e1)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(tw(IR, IL, c))} A${f(rk)} ${f(rk)} 0 0 1 ${g(tw(IL, IR, c))} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s1)} Z `;
     }
     const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
     const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
