@@ -1382,6 +1382,46 @@ function im90Remote(w, h) {
   for (const [k, xx, col] of [['setA', 865, '#ff3b2f'], ['setB', 985, '#ffb02e']]) { rect(X(xx) - 3, Y(495), 6, 2.6, '#5a5a5a', 'rx="0.8"'); p(`<rect class="im90-kl-${k}" x="${X(xx) - 3}" y="${Y(495)}" width="6" height="2.6" rx="0.8" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); }
   key(X(865), Y(527), X(911) - X(865), Y(539) - Y(515), 'onlyA', '#d8342c', 'A', '#1a0c08', 6.4); key(X(925), Y(527), X(971) - X(925), Y(539) - Y(515), 'bothAB', '#d8342c', 'A&B', '#1a0c08', 5.4); key(X(985), Y(527), X(1031) - X(985), Y(539) - Y(515), 'onlyB', '#e6d23a', 'B', '#1a0c08', 6.4);
 }
+// Yahaha SPX90II (1U), after the operating manual's panel: POWER, INPUT, the smoked window (logo, 7-LED meter, 2-digit
+// memory number, 16 x 2 LCD), then PARAMETER, DATA, BALANCE, STORE, MEMORY, RECALL, UTILITY, FOOT TRIGGER / BYPASS
+function spxFace(w, h, u) {
+  const W = '#e8e6e0', T = '#3fb8a0', id = (k) => `spx-${u}-${k}`, X = (pct) => pct / 100 * w;
+  rect(0, 0, w, h, '#161618'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.12"'); rect(0, h - 1.4, w, 1.4, '#000', 'opacity="0.5"');
+  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#111113'); rect(ex + (ex ? 0 : 21.2), 0, 0.8, h, '#000', 'opacity="0.6"'); for (const ey of [6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#060606', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
+  const key = (cx, cy, k, label, ww = 9, hh = 7, labAbove = true) => {
+    p(`<g data-sk="${u}:${k}" style="cursor:pointer">`); rect(cx - ww / 2 - 0.6, cy - hh / 2 - 0.6, ww + 1.2, hh + 1.2, 'none', `stroke="${T}" stroke-width="0.5" rx="1"`);
+    rect(cx - ww / 2, cy - hh / 2 + 0.5, ww, hh, '#000', 'rx="0.8"'); rect(cx - ww / 2, cy - hh / 2, ww, hh, '#1d1d20', 'rx="0.8"'); rect(cx - ww / 2, cy - hh / 2, ww, hh * 0.35, '#fff', 'opacity="0.1" rx="0.8"'); p('</g>');
+    if (label) label.split('\n').forEach((t, j, a) => text(cx, labAbove ? cy - hh / 2 - 2 - (a.length - 1 - j) * 3.2 : cy + hh / 2 + 3.6 + j * 3.2, t, 2.7, W, 'middle', 800, 'letter-spacing="0.2"'));
+  };
+  const led = (x, y, cls, col = '#ff3b2f') => { circle(x, y, 1.1, '#3a1412'); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="1.1" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
+  // power, input
+  key(X(7.8), 24, 'power', 'POWER', 8, 6); text(X(7.8), 36, 'ON ⇵ OFF', 2.3, W, 'middle', 700);
+  p(`<g data-sk="${u}:input" style="cursor:ns-resize"><circle cx="${X(13)}" cy="22.5" r="6.6" fill="#0a0a0b"/><circle cx="${X(13)}" cy="22.5" r="5.6" fill="#232326"/><g class="${id('in')}" transform="rotate(60 ${X(13)} 22.5)"><rect x="${X(13) - 0.4}" y="17.4" width="0.8" height="3.6" fill="${W}"/></g><circle cx="${X(13)}" cy="22.5" r="9" fill="transparent"/></g>`);
+  text(X(13), 9.6, 'INPUT', 2.8, W, 'middle', 800); text(X(13) - 7, 34, 'MIN', 2.2, W, 'middle', 700); text(X(13) + 7, 34, 'MAX', 2.2, W, 'middle', 700);
+  // the smoked display window
+  rect(X(16.5), 4.5, X(48) - X(16.5), h - 9, '#0b0d0d', 'rx="1.5"'); rect(X(16.5), 4.5, X(48) - X(16.5), 2, '#fff', 'opacity="0.06" rx="1.5"');
+  text(X(17.6), 12, 'YAHAHA', 4.6, W, 'start', 900, 'letter-spacing="0.6"'); text(X(17.6), 19, 'SPX90', 5.4, W, 'start', 900); text(X(17.6) + 18.6, 19, 'II', 5.4, '#e8a33a', 'start', 900);
+  text(X(17.6), 24.5, 'DIGITAL MULTI-EFFECT', 2.1, '#b9b6ae', 'start', 700); text(X(17.6), 27.4, 'PROCESSOR', 2.1, '#b9b6ae', 'start', 700);
+  ['0', '-3', '-6', '-10', '-15', '-20', '-30'].forEach((l, i) => { const y = 9 + i * 3.8, col = i === 0 ? '#ff3b2f' : i < 2 ? '#ffd23a' : '#59e05a'; rect(X(26.6), y - 1, 3, 2, '#1a1d1a'); p(`<rect class="${id('m' + i)}" x="${X(26.6)}" y="${y - 1}" width="3" height="2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(X(26.6) + 4.2, y + 0.9, l, 2, '#b9b6ae', 'start', 700); });
+  text(X(31.4), 9.2, 'MEMORY', 2.2, '#b9b6ae', 'middle', 700);
+  p(`<text class="${id('mem')}" x="${X(31.4)}" y="21.5" font-family="${MONO2}" font-size="10" font-weight="700" fill="#ff3220" filter="url(#glowSm)" text-anchor="middle">01</text>`);
+  rect(X(34.6), 8, X(47.2) - X(34.6), 22, '#9db83a', 'rx="0.8"'); rect(X(34.6), 8, X(47.2) - X(34.6), 22, '#000', 'opacity="0.08" rx="0.8"');
+  for (const [k, y] of [['l1', 17], ['l2', 26.5]]) p(`<text class="${id(k)}" x="${X(35.1)}" y="${y}" font-family="${MONO2}" font-size="6" font-weight="700" fill="#1c2808" xml:space="preserve" textLength="${(X(46.7) - X(35.1)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
+  // keys
+  key(X(53), 24, 'param', 'PARAMETER'); led(X(53), 15.5, id('led-param'));
+  key(X(57.2), 18, 'dup', 'DATA', 7, 5.2); key(X(57.2), 27.6, 'ddn', '', 7, 5.2); text(X(57.2), 19.1, '▲', 3, W, 'middle', 900); text(X(57.2), 28.7, '▼', 3, W, 'middle', 900);
+  key(X(61.4), 24, 'bal', 'BALANCE');
+  key(X(66), 24, 'store', 'STORE');
+  key(X(70.2), 18, 'mup', 'MEMORY', 7, 5.2); key(X(70.2), 27.6, 'mdn', '', 7, 5.2); text(X(70.2), 19.1, '▲', 3, W, 'middle', 900); text(X(70.2), 28.7, '▼', 3, W, 'middle', 900);
+  key(X(74.4), 24, 'recall', 'RECALL');
+  key(X(79), 24, 'util', 'UTILITY'); led(X(79), 15.5, id('led-util'));
+  key(X(84), 15, 'ftrg', 'FOOT TRIGGER', 8, 5.6); led(X(86.6), 15, id('led-ftrg'), '#ffd23a');
+  key(X(84), 30, 'byp', 'BYPASS', 8, 5.6); led(X(86.6), 30, id('led-byp'));
+  // the footswitch jacks (click = a footswitch press)
+  for (const [k, y, l] of [['foot', 15, 'MEMORY/TRIGGER'], ['footb', 30, 'BYPASS']]) { p(`<g data-sk="${u}:${k}" style="cursor:pointer"><circle cx="${X(89.6)}" cy="${y}" r="2.6" fill="#7d8086"/><circle cx="${X(89.6)}" cy="${y}" r="1.4" fill="#050505"/><circle cx="${X(89.6)}" cy="${y}" r="4" fill="transparent"/></g>`); text(X(89.6), y + 5.4, l, 1.9, W, 'middle', 700); }
+  text(X(93.6), h - 4, u, 3.4, '#8e8c92', 'middle', 900);
+  p(`<text class="${id('route')}" x="${X(66)}" y="${h - 3}" font-family="${MONO2}" font-size="2.6" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+}
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
   // Real 19-inch proportions: every panel spans the rails (its ears, with their rack screws, cover them) and one rack
@@ -1410,17 +1450,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
   for (const u of ['A', 'B']) globalThis.RACK_HOT['c160' + u] = unit(1, '#232127', (w, h) => c160Face(w, h, u), { native: true });
   globalThis.RACK_HOT.im90 = unit(3, '#16161a', (w, h) => im90Face(w, h), { native: true });   // Publizon IM90 (3U)
-  // Yahaha SPX90 x2 (1U)
-  for (let k = 0; k < 2; k++) unit(1, 'url(#rackSpx)', (w, h) => {
-    text(26, 26, 'YAHAHA', 16, '#f0f0f0', 'start', 900, 'letter-spacing="1"');
-    text(26, 46, 'SPX90', 14, '#d0d0d0', 'start', 800);
-    RK(130, 22, 10, '#202124', -30, { dark: true }); text(130, 52, 'IN', 14, '#d0d0d0', 'middle', 800);
-    rect(156, 8, 46, 40, '#000', 'rx="2"'); seg7(162, 14, 26, k ? '12' : '03', '#ff3220');
-    rect(210, 8, 168, 40, 'url(#lcd)', 'rx="2"');
-    text(218, 25, k ? 'PITCH CHANGE A' : 'REV 1 HALL', 14, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
-    text(218, 42, k ? 'L -8  R +8' : 'RT = 2.6 s', 14, '#1f2a10', 'start', 700, `font-family="'JetBrains Mono', monospace"`);
-    RK(w - 48, 22, 10, '#202124', 10, { dark: true }); text(w - 48, 52, 'OUT', 14, '#d0d0d0', 'middle', 800);
-  });
+  // Yahaha SPX90II x2 (1U each): working multi-effects, each on its own patch point
+  for (const u of ['A', 'B']) globalThis.RACK_HOT['spx' + u] = unit(1, '#161618', (w, h) => spxFace(w, h, u), { native: true });
   // Leximan PCM41 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
     text(26, 26, 'leximan', 18, '#f0f0f0', 'start', 900);
@@ -1875,6 +1906,8 @@ ${rhot('dz', 'dz', 'Open the Delta-Three synchronizer')}
 ${rhot('c160A', 'c160', 'Open the dbk 160X compressors')}
 ${rhot('c160B', 'c160', 'Open the dbk 160X compressors')}
 ${rhot('im90', 'im90', 'Open the Publizon IM90')}
+${rhot('spxA', 'spx', 'Open the Yahaha SPX90II units')}
+${rhot('spxB', 'spx', 'Open the Yahaha SPX90II units')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
@@ -1889,6 +1922,8 @@ ${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync"
   <p class="note">Drag a knob up or down (double-click resets it); click the buttons. Each unit works on the channel it is patched into at the patchbay (INSERT SEND → 160X IN, 160X OUT → INSERT RETURN): A is on the kick and B on the bass to start with. SLAVE on one unit links it to the other as a stereo pair: the louder channel drives both, with the other unit's controls. You hear it once the tape machine's electronics are on.</p></div>`, '<span class="ov-msg" id="c160-msg"></span>', true)}
 ${overlay('im90', 'PUBLIZON IM90 REMOTE CONTROL', `<div class="ovsync"><svg width="3000" height="798" viewBox="0 0 500 133" style="display:block;margin:0 auto">${capture(() => im90Remote(500, 133))}</svg>
   <p class="note">Like the original: choose the channel with SET A / SET B (or A, A&amp;B, B on the remote), call a function with FUNCTIONS, its number and PARAMETERS (01 DELAY, 02 ECHO, 04 PITCH-SHIFTING, 09 SAMPLER), step through its pages with + and −, type a value and ENTER, or press PARAMETERS for increment mode, where + / − step it and 1–9 ramp it (0 stops). Turn the wheel to change a value. Sampling: 09, PARAMETERS, 0 ENTER arms it to record on input A, then it records from the first sound; AUX stops, AUX again records the next, PARAMETERS plays. MEMORY SELECT + number, MEMORY IN stores, MEMORY OUT recalls. GAINS sets input, effect and direct levels. Patch it at the patchbay (IM90 A / B on a channel insert): A is on the guitar to start with.</p></div>`, '<span class="ov-msg" id="im90-msg"></span>', true)}
+${overlay('spx', 'YAHAHA SPX90II DIGITAL MULTI-EFFECT PROCESSOR · A + B', `<div class="ovsync">${['A', 'B'].map((u) => panelSVG(1, '#161618', (w, h) => spxFace(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
+  <p class="note">Each unit runs on its own: MEMORY ▲▼ picks a program (the number flashes) and RECALL loads it (1–30 factory, 31–90 yours). PARAMETER steps through the program's parameters, DATA ▲▼ changes the one shown; BALANCE switches to BALANCE and OUTPUT LEVEL. STORE saves to 31–90. UTILITY shows title and MIDI pages. FOOT TRIGGER makes the footswitch jack (click it) fire the gate, pan, vibrato and freeze programs instead of stepping memories. On FREEZE, the RECORD and PLAY pages run with DATA ▲. BYPASS passes the dry signal. Drag INPUT to set the level. Patch each at the patchbay (SPX A / B on a channel insert; the stereo effect goes straight to the mix): A starts on the snare with GATE REVERB, B on the toms with REV 4 PLATE.</p></div>`, '<span class="ov-msg" id="spx-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync">${panelSVG(1, '#cfcdc7', (w, h) => dzFace(w, h))}
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
   <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
@@ -1909,12 +1944,21 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '')}</script>
+<script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90presets.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
+// the audio engine's code is several files joined into one AudioWorklet: make sure it loads (a clash of names there
+// would silently stop all the audio in the browser)
+{
+  const wsrc = /<script type="text\/plain" id="jh24-worklet-src">([\s\S]*?)<\/script>/.exec(html)[1];
+  const g = { AudioWorkletProcessor: class { constructor() { this.port = { postMessage() {}, onmessage: null }; } }, registerProcessor: (n, c) => { g.P = c; }, sampleRate: 48000 };
+  try { new Function('AudioWorkletProcessor', 'registerProcessor', 'sampleRate', wsrc)(g.AudioWorkletProcessor, g.registerProcessor, g.sampleRate); new g.P(); }
+  catch (e) { console.error('AUDIO ENGINE (worklet) FAILS TO LOAD: ' + e.message); process.exit(1); }
+}
 // artifact version: the same page without the document wrapper (the host adds it), title first
 {
   const head = html.slice(html.indexOf('<link href='), html.indexOf('</head>'));

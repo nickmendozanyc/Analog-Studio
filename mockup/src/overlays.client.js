@@ -206,7 +206,7 @@
     ['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8'],
     ['aux:SEND 1', 'fxin:224 L'], ['fxout:224 L', 'lin:LINE 25'], ['fxout:224 R', 'lin:LINE 26'],
     ['aux:SEND 2', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'lin:LINE 29'],
-    ['aux:SEND 3', 'fxin:SPX A L'], ['aux:SEND 4', 'fxin:SPX A R'], ['fxout:SPX A L', 'lin:LINE 27'], ['fxout:SPX A R', 'lin:LINE 28'],
+    ['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
     ['aux:MIX L', 'ifout:1'], ['aux:MIX R', 'ifout:2'],
     ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
   ];
@@ -214,6 +214,8 @@
   try {
     const s = JSON.parse(localStorage.getItem('as-patches-v4') || 'null');
     if (Array.isArray(s)) { patches = s.filter((pc) => !/1176/.test(pc.a + pc.b));   // the 1176s left the rack: their cables go too
+      // the SPX90IIs work on channel inserts now: their old aux-send / line-return cables give way to the new defaults
+      if (!patches.some((pc) => /^isend:/.test(pc.a) && /SPX/.test(pc.b))) { patches = patches.filter((pc) => !/SPX/.test(pc.a + pc.b)); for (const [a2, b2] of [['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }
       if (!patches.some((pc) => /IM90/.test(pc.a + pc.b))) for (const [a, b] of [['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8']]) if (!patches.some((pc) => pc.a === a || pc.b === b)) patches.push({ a, b, c: COLS[patches.length % COLS.length] }); }   // the IM90 joins an existing session
   } catch (e) { /* storage unavailable */ }
   const save = () => { try { localStorage.setItem('as-patches-v4', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
@@ -866,6 +868,7 @@
     dzTick(dt);
     c160Tick();
     im90Tick();
+    spxTick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

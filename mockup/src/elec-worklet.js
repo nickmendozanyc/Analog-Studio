@@ -20,6 +20,9 @@ class JH24Processor extends AudioWorkletProcessor {
     // the Publizon IM90's two channels, on inserts too (each can trigger from either channel's input)
     this.im = [new IM90Channel(sampleRate), new IM90Channel(sampleRate)]; this.imch = [null, null];
     this.imIn = [new Float32Array(128), new Float32Array(128)]; this.imOut = [new Float32Array(128), new Float32Array(128)];
+    // two SPX90IIs: mono in from a channel insert, stereo out straight to the mix (the channel itself is replaced)
+    this.spx = [new SPX90(sampleRate), new SPX90(sampleRate)]; this.spxch = [null, null];
+    this.spxIn = [new Float32Array(128), new Float32Array(128)]; this.spxL = [new Float32Array(128), new Float32Array(128)]; this.spxR = [new Float32Array(128), new Float32Array(128)]; this.silent = new Float32Array(128);
     this.port.onmessage = (e) => this.msg(e.data);
   }
   msg(d) {
@@ -41,6 +44,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.smp) { const o = { ...d.smp }; if (o.fromMs != null) { o.start = Math.min(c.N - 1, Math.max(0, o.fromMs * sampleRate / 1000)); delete o.fromMs; } if (o.toMs != null) { o.end = Math.min(c.N - 1, Math.max(0, o.toMs * sampleRate / 1000)); delete o.toMs; } c.setSample(o); }
       if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
     }
+    else if (d.type === 'spx') { const u = this.spx[d.unit]; if (!u) return; if (d.ch !== undefined) this.spxch[d.unit] = d.ch; if (d.set) u.set(d.set); if (d.cmd === 'trig') u.trigger(); }
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
     else if (d.type === 'mix') Object.assign(this.mix, d);
@@ -142,12 +146,20 @@ class JH24Processor extends AudioWorkletProcessor {
       c.process(this.imIn[u], this.imOut[u], n, this.imIn[by === 'B' ? 1 : 0]);
       const ch = this.imch[u]; if (ch != null) ins[ch] = this.imOut[u];
     }
+    // SPX90II (last on the insert): process the channel, silence it in the mix, add the unit's stereo output
+    for (let u = 0; u < 2; u++) {
+      if (this.spxIn[u].length !== n) { this.spxIn[u] = new Float32Array(n); this.spxL[u] = new Float32Array(n); this.spxR[u] = new Float32Array(n); this.silent = new Float32Array(n); }
+      const ch = this.spxch[u]; if (ch != null && this.out[ch]) this.spxIn[u].set(ins[ch] || this.out[ch]); else this.spxIn[u].fill(0);
+      this.spx[u].process(this.spxIn[u], this.spxL[u], this.spxR[u], n);
+      if (ch != null) ins[ch] = this.silent;
+    }
     if (!this.mix.mute) for (let i = 0; i < this.N; i++) {
       if (this.mix.solo >= 0 && this.mix.solo !== i) continue;
       const pan = this.mix.solo >= 0 ? 0.5 : 0.15 + 0.7 * (i % 8) / 7, gl = Math.cos(pan * Math.PI / 2) * this.mix.gain, gr = Math.sin(pan * Math.PI / 2) * this.mix.gain;
       const y = ins[i] || this.out[i];
       for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
     }
+    if (!this.mix.mute && this.mix.solo < 0) for (let u = 0; u < 2; u++) if (this.spxch[u] != null) { const g = this.mix.gain * 0.75, a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) { L[k] += a[k] * g; if (R !== L) R[k] += b[k] * g; } }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
     if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }
     // VU levels (average-responding, ~300 ms; 0 VU = 0 dB) and what each channel is monitoring, ~30 times a second
@@ -156,7 +168,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()) });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()) });
     }
     return true;
   }

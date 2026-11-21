@@ -27,7 +27,7 @@ const TAU = 2 * Math.PI;
 class Line { constructor(n) { this.b = new Float32Array(n); this.w = 0; this.n = n; }
   push(v) { this.b[this.w] = v; this.w = (this.w + 1) % this.n; }
   at(d) { let p = this.w - 1 - d; while (p < 0) p += this.n; const i = Math.floor(p), f = p - i; return this.b[i % this.n] * (1 - f) + this.b[(i + 1) % this.n] * f; } }
-class Biquad {   // RBJ cookbook
+class SpxBiquad {   // RBJ cookbook
   constructor() { this.b0 = 1; this.b1 = this.b2 = this.a1 = this.a2 = 0; this.x1 = this.x2 = this.y1 = this.y2 = 0; }
   set(type, fs, f, g = 0, q = 0.707) {
     const A = 10 ** (g / 40), w = TAU * Math.min(f, fs * 0.45) / fs, c = Math.cos(w), s = Math.sin(w), al = s / (2 * q);
@@ -63,8 +63,8 @@ export class SPX90 {
     this.env = 0; this.gainS = 1; this.hold = 0; this.gateT = 0;
     this.pitchL = new IM90Channel(fs).set({ mode: 'pitch' }); this.pitchR = new IM90Channel(fs).set({ mode: 'pitch' });
     this.frz = new IM90Channel(fs).set({ mode: 'sample' });
-    this.eq = [new Biquad(), new Biquad(), new Biquad()]; this.tone = new Biquad(); this.hdl = 0; this.hdr = 0;
-    this.hp = new Biquad(); this.lp = new Biquad(); this.adrG = 0; this.adrPh = 'idle'; this.adrT = 0; this.mask = 0; this.trigD = new Line(Math.round(2.1 * fs)); this.audD = new Line(Math.round(2.1 * fs)); this.panPos = 0; this.vibAmt = 0; this.erTaps = [];
+    this.eq = [new SpxBiquad(), new SpxBiquad(), new SpxBiquad()]; this.tone = new SpxBiquad(); this.hdl = 0; this.hdr = 0;
+    this.hp = new SpxBiquad(); this.lp = new SpxBiquad(); this.adrG = 0; this.adrPh = 'idle'; this.adrT = 0; this.mask = 0; this.trigD = new Line(Math.round(2.1 * fs)); this.audD = new Line(Math.round(2.1 * fs)); this.panPos = 0; this.vibAmt = 0; this.erTaps = [];
     this.tmpL = new Float32Array(128); this.tmpR = new Float32Array(128); this.one = new Float32Array(128);
     this.pin = 0; this.pout = 0; this.am = 1 - Math.exp(-1 / (0.05 * fs));
     this.set({});
@@ -96,7 +96,7 @@ export class SPX90 {
     if (p.algo === 'pitch') { this.pitchL.process(x, this.tmpL, n); this.pitchR.process(x, this.tmpR, n); }
     if (p.algo === 'freeze') { this.frz.process(x, this.tmpL, n); const s2 = this.frz.smp; if (s2.rec === 'rec' && s2.recN >= 2 * fs) this.frz.endRec(); }
     for (let k = 0; k < n; k++) {
-      let v = x[k]; let l = 0, r = 0;
+      let v = x[k] * (p.inGain ?? 1); let l = 0, r = 0;
       if (this.hpOn && (p.algo === 'reverb' || p.algo === 'peq' || p.rev)) v = this.hp.run(v);
       if (this.lpOn && (p.algo === 'reverb' || p.algo === 'er' || p.algo === 'peq' || p.rev)) v = this.lp.run(v);
       this.pin += this.am * (v * v - this.pin);
