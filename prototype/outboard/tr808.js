@@ -7,7 +7,7 @@
 export const TR_INST = ['BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'];
 const TR_TAU = 2 * Math.PI;
 const TR_METAL = [205.3, 304.4, 369.6, 522.7, 540, 800];   // the six square-wave oscillators (Hz)
-class TrBp {   // 2-pole band-pass / high-pass / low-pass (state-variable, stable form)
+export class TrBp {   // 2-pole band-pass / high-pass / low-pass (state-variable, stable form)
   constructor(fs, f, q) { this.fs = fs; this.s1 = 0; this.s2 = 0; this.set(f, q); }
   set(f, q) { const g = Math.tan(Math.PI * Math.min(f, this.fs * 0.45) / this.fs), k = 1 / q; this.a1 = 1 / (1 + g * (g + k)); this.a2 = g * this.a1; this.a3 = g * this.a2; this.k = k; }
   run(x) { const v3 = x - this.s2, v1 = this.a1 * this.s1 + this.a2 * v3, v2 = this.s2 + this.a2 * this.s1 + this.a3 * v3; this.s1 = 2 * v1 - this.s1; this.s2 = 2 * v2 - this.s2; this.lp = v2; this.bp = v1; this.hp = x - this.k * v1 - v2; return v1; }
