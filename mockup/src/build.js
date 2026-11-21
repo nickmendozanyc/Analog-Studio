@@ -1385,42 +1385,52 @@ function im90Remote(w, h) {
 // Yahaha SPX90II (1U), after the operating manual's panel: POWER, INPUT, the smoked window (logo, 7-LED meter, 2-digit
 // memory number, 16 x 2 LCD), then PARAMETER, DATA, BALANCE, STORE, MEMORY, RECALL, UTILITY, FOOT TRIGGER / BYPASS
 function spxFace(w, h, u) {
-  const W = '#e8e6e0', T = '#3fb8a0', id = (k) => `spx-${u}-${k}`, X = (pct) => pct / 100 * w;
-  rect(0, 0, w, h, '#161618'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.12"'); rect(0, h - 1.4, w, 1.4, '#000', 'opacity="0.5"');
-  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#111113'); rect(ex + (ex ? 0 : 21.2), 0, 0.8, h, '#000', 'opacity="0.6"'); for (const ey of [6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#060606', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
-  const key = (cx, cy, k, label, ww = 9, hh = 7, labAbove = true) => {
-    p(`<g data-sk="${u}:${k}" style="cursor:pointer">`); rect(cx - ww / 2 - 0.6, cy - hh / 2 - 0.6, ww + 1.2, hh + 1.2, 'none', `stroke="${T}" stroke-width="0.5" rx="1"`);
-    rect(cx - ww / 2, cy - hh / 2 + 0.5, ww, hh, '#000', 'rx="0.8"'); rect(cx - ww / 2, cy - hh / 2, ww, hh, '#1d1d20', 'rx="0.8"'); rect(cx - ww / 2, cy - hh / 2, ww, hh * 0.35, '#fff', 'opacity="0.1" rx="0.8"'); p('</g>');
-    if (label) label.split('\n').forEach((t, j, a) => text(cx, labAbove ? cy - hh / 2 - 2 - (a.length - 1 - j) * 3.2 : cy + hh / 2 + 3.6 + j * 3.2, t, 2.7, W, 'middle', 800, 'letter-spacing="0.2"'));
+  // drawn from photos of the real unit: the teal-outlined display window (logo, green LED meter, big red memory number,
+  // dark LCD with amber characters), and keys in teal-outlined groups with their legends printed on them
+  const W = '#e8e6e0', T = '#3cc98a', id = (k) => `spx-${u}-${k}`, X = (pct) => pct / 100 * w;
+  rect(0, 0, w, h, '#141416'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.12"'); rect(0, h - 1.4, w, 1.4, '#000', 'opacity="0.5"');
+  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#101012'); rect(ex + (ex ? 0 : 21.2), 0, 0.8, h, '#000', 'opacity="0.6"'); for (const ey of [6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#060606', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
+  const box = (x0, y0, x1, y1) => p(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" rx="1.2" fill="none" stroke="${T}" stroke-width="0.6"/>`);
+  const key = (cx, cy, k, label, ww = 11, hh = 9, arrow = 0) => {
+    p(`<g data-sk="${u}:${k}" style="cursor:pointer">`); rect(cx - ww / 2, cy - hh / 2 + 0.5, ww, hh, '#000', 'rx="0.8"'); rect(cx - ww / 2, cy - hh / 2, ww, hh, '#1b1b1e', `rx="0.8" stroke="${T}" stroke-width="0.45"`); rect(cx - ww / 2, cy - hh / 2, ww, hh * 0.3, '#fff', 'opacity="0.07" rx="0.8"');
+    if (arrow) p(`<path d="M${cx - 4} ${cy + arrow * 2.6} L${cx} ${cy - arrow * 3} L${cx + 4} ${cy + arrow * 2.6} Z" fill="none" stroke="${W}" stroke-width="0.5"/>`);
+    p('</g>');
+    if (label) label.split('\n').forEach((t, j, a) => text(cx, cy + 1 + (j - (a.length - 1) / 2) * 2.9, t, 2.35, W, 'middle', 800, 'letter-spacing="0.15"'));
   };
-  const led = (x, y, cls, col = '#ff3b2f') => { circle(x, y, 1.1, '#3a1412'); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="1.1" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
-  // power, input
-  key(X(7.8), 24, 'power', 'POWER', 8, 6); text(X(7.8), 36, 'ON ⇵ OFF', 2.3, W, 'middle', 700);
-  p(`<g data-sk="${u}:input" style="cursor:ns-resize"><circle cx="${X(13)}" cy="22.5" r="6.6" fill="#0a0a0b"/><circle cx="${X(13)}" cy="22.5" r="5.6" fill="#232326"/><g class="${id('in')}" transform="rotate(60 ${X(13)} 22.5)"><rect x="${X(13) - 0.4}" y="17.4" width="0.8" height="3.6" fill="${W}"/></g><circle cx="${X(13)}" cy="22.5" r="9" fill="transparent"/></g>`);
-  text(X(13), 9.6, 'INPUT', 2.8, W, 'middle', 800); text(X(13) - 7, 34, 'MIN', 2.2, W, 'middle', 700); text(X(13) + 7, 34, 'MAX', 2.2, W, 'middle', 700);
-  // the smoked display window
-  rect(X(16.5), 4.5, X(48) - X(16.5), h - 9, '#0b0d0d', 'rx="1.5"'); rect(X(16.5), 4.5, X(48) - X(16.5), 2, '#fff', 'opacity="0.06" rx="1.5"');
-  text(X(17.6), 12, 'YAHAHA', 4.6, W, 'start', 900, 'letter-spacing="0.6"'); text(X(17.6), 19, 'SPX90', 5.4, W, 'start', 900); text(X(17.6) + 18.6, 19, 'II', 5.4, '#e8a33a', 'start', 900);
-  text(X(17.6), 24.5, 'DIGITAL MULTI-EFFECT', 2.1, '#b9b6ae', 'start', 700); text(X(17.6), 27.4, 'PROCESSOR', 2.1, '#b9b6ae', 'start', 700);
-  ['0', '-3', '-6', '-10', '-15', '-20', '-30'].forEach((l, i) => { const y = 9 + i * 3.8, col = i === 0 ? '#ff3b2f' : i < 2 ? '#ffd23a' : '#59e05a'; rect(X(26.6), y - 1, 3, 2, '#1a1d1a'); p(`<rect class="${id('m' + i)}" x="${X(26.6)}" y="${y - 1}" width="3" height="2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(X(26.6) + 4.2, y + 0.9, l, 2, '#b9b6ae', 'start', 700); });
-  text(X(31.4), 9.2, 'MEMORY', 2.2, '#b9b6ae', 'middle', 700);
-  p(`<text class="${id('mem')}" x="${X(31.4)}" y="21.5" font-family="${MONO2}" font-size="10" font-weight="700" fill="#ff3220" filter="url(#glowSm)" text-anchor="middle">01</text>`);
-  rect(X(34.6), 8, X(47.2) - X(34.6), 22, '#9db83a', 'rx="0.8"'); rect(X(34.6), 8, X(47.2) - X(34.6), 22, '#000', 'opacity="0.08" rx="0.8"');
-  for (const [k, y] of [['l1', 17], ['l2', 26.5]]) p(`<text class="${id(k)}" x="${X(35.1)}" y="${y}" font-family="${MONO2}" font-size="6" font-weight="700" fill="#1c2808" xml:space="preserve" textLength="${(X(46.7) - X(35.1)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
-  // keys
-  key(X(53), 24, 'param', 'PARAMETER'); led(X(53), 15.5, id('led-param'));
-  key(X(57.2), 18, 'dup', 'DATA', 7, 5.2); key(X(57.2), 27.6, 'ddn', '', 7, 5.2); text(X(57.2), 19.1, '▲', 3, W, 'middle', 900); text(X(57.2), 28.7, '▼', 3, W, 'middle', 900);
-  key(X(61.4), 24, 'bal', 'BALANCE');
-  key(X(66), 24, 'store', 'STORE');
-  key(X(70.2), 18, 'mup', 'MEMORY', 7, 5.2); key(X(70.2), 27.6, 'mdn', '', 7, 5.2); text(X(70.2), 19.1, '▲', 3, W, 'middle', 900); text(X(70.2), 28.7, '▼', 3, W, 'middle', 900);
-  key(X(74.4), 24, 'recall', 'RECALL');
-  key(X(79), 24, 'util', 'UTILITY'); led(X(79), 15.5, id('led-util'));
-  key(X(84), 15, 'ftrg', 'FOOT TRIGGER', 8, 5.6); led(X(86.6), 15, id('led-ftrg'), '#ffd23a');
-  key(X(84), 30, 'byp', 'BYPASS', 8, 5.6); led(X(86.6), 30, id('led-byp'));
-  // the footswitch jacks (click = a footswitch press)
-  for (const [k, y, l] of [['foot', 15, 'MEMORY/TRIGGER'], ['footb', 30, 'BYPASS']]) { p(`<g data-sk="${u}:${k}" style="cursor:pointer"><circle cx="${X(89.6)}" cy="${y}" r="2.6" fill="#7d8086"/><circle cx="${X(89.6)}" cy="${y}" r="1.4" fill="#050505"/><circle cx="${X(89.6)}" cy="${y}" r="4" fill="transparent"/></g>`); text(X(89.6), y + 5.4, l, 1.9, W, 'middle', 700); }
-  text(X(93.6), h - 4, u, 3.4, '#8e8c92', 'middle', 900);
-  p(`<text class="${id('route')}" x="${X(66)}" y="${h - 3}" font-family="${MONO2}" font-size="2.6" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+  const led = (x, y, cls, col = '#ff3b2f') => { circle(x, y, 0.95, '#3a1412'); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="0.95" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
+  // positions measured across the photographed panel (ears included)
+  text(X(5.6), 11.5, 'POWER', 2.3, W, 'middle', 800); key(X(5.6), 21.5, 'power', '', 7, 9); text(X(5.6), 30.5, 'ON ⇵ OFF', 2, W, 'middle', 700);
+  p(`<g data-sk="${u}:input" style="cursor:ns-resize"><circle cx="${X(9.2)}" cy="21" r="3.8" fill="#0a0a0b"/><circle cx="${X(9.2)}" cy="21" r="3.1" fill="#2a2a2e"/><g class="${id('in')}" transform="rotate(60 ${X(9.2)} 21)"><rect x="${X(9.2) - 0.35}" y="18" width="0.7" height="2.2" fill="${W}"/></g><circle cx="${X(9.2)}" cy="21" r="6.5" fill="transparent"/></g>`);
+  text(X(9.2), 11.5, 'INPUT', 2.3, W, 'middle', 800); text(X(9.2) - 3.6, 28.5, '0', 1.9, W, 'middle', 700); text(X(9.2) + 3.6, 28.5, '10', 1.9, W, 'middle', 700);
+  // the display window: logo, LED meter, memory number, LCD
+  const wx0 = X(12), wx1 = X(41);
+  rect(wx0, 6.5, wx1 - wx0, h - 13, '#08090a', 'rx="1"'); box(wx0, 6.5, wx1, h - 6.5);
+  text(X(13.4), 18.5, 'YAHAHA', 3.3, W, 'start', 900, 'letter-spacing="0.6"');
+  text(X(13.4), 26.5, 'SPX90II', 5.4, 'none', 'start', 900, `stroke="${T}" stroke-width="0.45" letter-spacing="0.3"`);
+  const MV = [[0, '#ff4a2e'], [-3, '#ffd23a'], [-6, '#59e05a'], [-10, '#59e05a'], [-15, '#59e05a'], [-20, '#59e05a'], [-30, '#59e05a']];
+  MV.forEach(([l, col], i) => { const y = 10.6 + i * 3.25; rect(X(20.6), y - 1.1, 2.6, 2.2, '#2a2d2a'); p(`<rect class="${id('m' + i)}" x="${X(20.6)}" y="${y - 1.1}" width="2.6" height="2.2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(X(20.6) + 3.6, y + 0.8, String(l), 1.8, W, 'start', 800); });
+  p(`<text class="${id('mem')}" x="${X(25.6)}" y="25.5" font-family="${MONO2}" font-size="12" font-weight="700" fill="#ff2a1a" filter="url(#glowSm)" text-anchor="middle" letter-spacing="0.6">01</text>`);
+  text(X(25.6), 32.5, 'MEMORY', 2.2, W, 'middle', 800);
+  rect(X(29.2), 11, X(40.2) - X(29.2), 21, '#1f2418', 'rx="0.6"');
+  for (const [k2, y] of [['l1', 19.8], ['l2', 28.4]]) p(`<text class="${id(k2)}" x="${X(29.6)}" y="${y}" font-family="${MONO2}" font-size="6.6" font-weight="700" fill="#e6c43a" filter="url(#glowSm)" xml:space="preserve" textLength="${(X(39.8) - X(29.6)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
+  // the keys: black squares outlined in green, arrows stacked
+  const K = 12.6, A2 = 13.6;
+  key(X(44), 22, 'param', 'PARAM-\nETER', K, K); led(X(44), 17.2, id('led-param'));
+  key(X(47.7), 22 - A2 / 2, 'dup', '', A2, A2, 1); key(X(47.7), 22 + A2 / 2, 'ddn', '', A2, A2, -1);
+  key(X(51.4), 22, 'bal', 'BALANCE', K, K);
+  key(X(56), 22, 'store', 'STORE', K, K);
+  key(X(60.2), 22 - A2 / 2, 'mup', '', A2, A2, 1); key(X(60.2), 22 + A2 / 2, 'mdn', '', A2, A2, -1);
+  key(X(64.5), 22, 'recall', 'RECALL', K, K);
+  key(X(69.8), 22, 'util', 'UTILITY', K, K); led(X(69.8), 17.2, id('led-util'));
+  key(X(74.3), 22 - A2 / 2, 'ftrg', 'FOOT\nTRIGGER', A2, A2); led(X(74.3), 22 - A2 / 2 - 4.6, id('led-ftrg'));
+  key(X(74.3), 22 + A2 / 2, 'byp', 'BYPASS', A2, A2); led(X(74.3) + 5, 22 + A2 / 2 - 4.6, id('led-byp'));
+  for (const [k2, y, l] of [['foot', 22 - A2 / 2, 'MEMORY\nTRIGGER'], ['footb', 22 + A2 / 2, 'BYPASS']]) {
+    p(`<line x1="${X(74.3) + A2 / 2}" y1="${y}" x2="${X(80.8) - 3}" y2="${y}" stroke="${W}" stroke-width="0.35"/>`);
+    p(`<g data-sk="${u}:${k2}" style="cursor:pointer"><circle cx="${X(80.8)}" cy="${y}" r="2.9" fill="#9a9da3"/><circle cx="${X(80.8)}" cy="${y}" r="1.6" fill="#050505"/><circle cx="${X(80.8)}" cy="${y}" r="4.4" fill="transparent"/></g>`);
+    l.split('\n').forEach((t, j, a3) => text(X(83.2), y + 0.8 + (j - (a3.length - 1) / 2) * 2.7, t, 2.3, W, 'start', 800));
+  }
+  text(X(92.4), h - 3.2, u, 3, '#8e8c92', 'middle', 900);
+  p(`<text class="${id('route')}" x="${X(26.5)}" y="${h - 1.6}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
 }
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {

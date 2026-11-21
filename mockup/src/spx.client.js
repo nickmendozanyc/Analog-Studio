@@ -99,7 +99,7 @@
     const now = performance.now(), blink = Math.floor(now / 350) % 2 === 0, M = window.SPX_M;
     SPXU.forEach((u, i) => {
       const U = SPX.u[i], [l1, l2] = spxLines(U);
-      sgTxt(`.spx-${u}-l1`, (l1 || '').padEnd(16).slice(0, 16)); sgTxt(`.spx-${u}-l2`, (l2 || '').padEnd(16).slice(0, 16));
+      sgTxt(`.spx-${u}-l1`, (l1 || '').trim().padStart(16).slice(-16));   // the title sits right-aligned, as on the unit sgTxt(`.spx-${u}-l2`, (l2 || '').padEnd(16).slice(0, 16));
       sgTxt(`.spx-${u}-mem`, !U.on ? '' : U.sel !== U.mem && !blink ? '' : String(U.sel).padStart(2, '0'));
       c1Lamp(`spx-${u}-led-param`, U.on && U.page >= 0); c1Lamp(`spx-${u}-led-util`, U.on && U.util >= 0); c1Lamp(`spx-${u}-led-ftrg`, U.on && U.ftrg); c1Lamp(`spx-${u}-led-byp`, U.on && U.byp);
       const db = M && M[i] && U.ch != null && U.on ? M[i].inDb + 12 : -99;   // 0 on the meter ~ -12 dBFS
