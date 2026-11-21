@@ -69,8 +69,8 @@
     if (!ST[key]) {
       const s = {};
       for (const sec of ORDER[con]) for (const row of SPEC[con][sec].rows) for (const c of row) if (c.id && c.t !== 'bus24') s[c.id] = c.def;
-      // bus defaults match the console drawing: SLS track n -> group n; CMI drums 1-2, bass 3-4, guitars 5-6, keys 7-8
-      s.bus = con === 'sls' ? (ch < 24 ? [ch + 1] : []) : (ch < 11 ? [1, 2] : ch < 13 ? [3, 4] : ch < 19 ? [5, 6] : ch < 23 ? [7, 8] : []);
+      // bus defaults match the console drawing: channel n -> bus / group n (tracks 1-24), on both consoles
+      s.bus = ch < 24 ? [ch + 1] : [];
       ST[key] = s;
     }
     return ST[key];

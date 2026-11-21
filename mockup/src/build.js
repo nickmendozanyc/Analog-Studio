@@ -842,7 +842,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
   const STRIP = 85, NCH = 32, MXL = NCH * STRIP, MWD = PW - MXL;   // master section x / width
   const UD = 964, FD = 370, YF = 1146;   // knob-panel depth, fader-panel depth, screen y of the fader front edge
   const consoleNames = [...tapeNames, '224 L', '224 R', 'SPX L', 'SPX R', 'PCM42 A', 'PCM42 B', 'LIVE 1', 'TALK'];
-  const busLit = (i) => (i < 11 ? [0, 1] : i < 13 ? [2, 3] : i < 19 ? [4, 5] : i < 23 ? [6, 7] : []);
+  const busLit = (i) => (i < 24 ? [i] : []);   // channel n -> bus n (tracks 1-24); 25-32 unassigned
   const muted = new Set([2, 22, 31]), soloed = new Set([19]);
   const faderPos = consoleNames.map((n, i) => (i === 19 ? 0.2 : i === 31 ? 0.98 : 0.24 + rnd() * 0.2));
   const L = '#ece7dc';
