@@ -72,14 +72,16 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.sound) { u.sounds[d.sound.i] = d.sound.data ? spSound(d.sound.data, d.sound.name) : null; if (u.sounds[d.sound.i] && d.sound.o) Object.assign(u.sounds[d.sound.i], d.sound.o); }
       if (d.soundSet) Object.assign(u.sounds[d.soundSet.i] || {}, d.soundSet.set);
       if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) u.patterns[d.patIx] = d.pattern;
-      for (const k of ['pat', 'tempo', 'swing', 'quant', 'rec', 'metro', 'repeat']) if (d[k] !== undefined) u[k] = d[k];
+      for (const k of ['pat', 'tempo', 'swing', 'quant', 'rec', 'metro', 'repeat', 'vol', 'mvol']) if (d[k] !== undefined) u[k] = d[k];
       if (d.erase) u.erase = new Set(d.erase);
       if (d.hitWith) u.hitWith(d.hitWith.s, d.hitWith.ch, d.hitWith.tune, d.hitWith.v ?? 1);
       if (d.hit != null) u.press(d.hit, d.v ?? 1); if (d.up != null) u.release(d.up);
       if (d.play === true) u.start(); else if (d.play === false) u.stop();
       if (d.sync !== undefined) u.sync = d.sync;
       if (d.sampleCh !== undefined) this.spInCh = d.sampleCh;
-      if (d.sample) { this.spRec = { pad: d.sample.pad, len: Math.round(d.sample.sec * SP_FS), buf: [], ph: 0, armed: d.sample.thresh || 0 }; }
+      if (d.sample) { this.spRec = { pad: d.sample.pad, len: Math.round(d.sample.sec * SP_FS), buf: [], ph: 0, armed: d.sample.thresh || 0, gain: d.sample.gain ?? 1 }; }
+      if (d.copy) { u.patterns[d.copy.to] = JSON.parse(JSON.stringify(u.patterns[d.copy.from])); }
+      if (d.segLen) { const P = u.patterns[u.pat], len = d.segLen * 4 * SP_PPQ; P.bars = d.segLen; P.events = P.events.filter((e) => e.t < len); }
       if (d.getPat) this.port.postMessage({ type: 'sp1200', patterns: u.patterns });
     }
     else if (d.type === 'juno') { const u = this.ju; if (d.set) u.set(d.set); if (d.note != null) { if (d.vel > 0) u.noteOn(d.note, d.vel); else u.noteOff(d.note); } if (d.allOff) u.allOff(); if (d.vol != null) this.juVol = d.vol; }
@@ -261,7 +263,7 @@ class JH24Processor extends AudioWorkletProcessor {
     }
     // the SP-1200: its sampling input is the channel patched to SP-1200 IN (sampled at 26.04 kHz, 12 bits); output into the mix
     if (this.spRec) { const r = this.spRec, ch = this.spInCh, x = ch != null && this.out[ch] ? this.out[ch] : null, step = SP_FS / sampleRate;
-      if (x) for (let k = 0; k < n; k++) { if (r.armed > 0) { if (Math.abs(x[k]) < r.armed) continue; r.armed = 0; } r.ph += step; while (r.ph >= 1) { r.ph -= 1; r.buf.push(x[k]); } if (r.buf.length >= r.len) break; }
+      if (x) for (let k = 0; k < n; k++) { if (r.armed > 0) { if (Math.abs(x[k]) < r.armed) continue; r.armed = 0; } r.ph += step; while (r.ph >= 1) { r.ph -= 1; r.buf.push(Math.max(-1, Math.min(1, x[k] * r.gain))); } if (r.buf.length >= r.len) break; }
       if (r.buf.length >= r.len || !x) { const d2 = Float32Array.from(r.buf); this.sp.sounds[r.pad] = spSound(d2, 'SAMPLE ' + (r.pad + 1)); this.port.postMessage({ type: 'sp1200', sampled: r.pad, data: this.sp.sounds[r.pad].data, empty: !x }); this.spRec = null; } }
     if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
     this.sp.process(this.spL, this.spR, n); for (let k = 0; k < n; k++) { BL[k] += this.spL[k]; BR[k] += this.spR[k]; }

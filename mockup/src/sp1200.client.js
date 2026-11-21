@@ -1,18 +1,18 @@
   // ---------------- E-mew SPU-1200: the front panel's working (the sound and the sequencer run in the audio engine) ----------
   const SP_QL = ['1/8', '1/8T', '1/16', '1/16T', '1/32', '1/32T', 'OFF'];
   const SPU = { sounds: spFactory().concat(Array(24).fill(null)), patterns: Array.from({ length: 100 }, () => spPattern(2)), pat: 0, bank: 0, sel: 0, mode: 'mix', entry: null, typed: '',
-    tempo: 90, swing: 50, quant: '1/16', rec: false, metro: true, sync: false, multi: false, multiTune: [-12, -7, -5, -2, 0, 3, 5, 7], msg: null, node: null, held: new Set() };
+    tempo: 90, swing: 50, quant: '1/16', rec: false, metro: true, sync: false, multi: false, multiTune: [-12, -7, -5, -2, 0, 3, 5, 7], gain: 0.6, vol: 0.8, mvol: 0.6, msg: null, node: null, held: new Set() };
   // a demo beat on pattern 1 (written here): kick, snare, hats
   { const ev = SPU.patterns[0].events, at = (b, s16) => (b * 4 * 96) + s16 * 24; for (let b = 0; b < 2; b++) { for (const k of [0, 7, 10]) ev.push({ t: at(b, k), pad: 0, v: 1 }); for (const k of [4, 12]) ev.push({ t: at(b, k), pad: 1, v: 1 }); for (let k = 0; k < 16; k += 2) ev.push({ t: at(b, k), pad: 2, v: k % 4 ? 0.6 : 0.85 }); } ev.push({ t: at(1, 14), pad: 3, v: 0.8 }); }
-  try { const sv = JSON.parse(localStorage.getItem('as-sp1200') || 'null'); if (sv) { if (sv.patterns) SPU.patterns = sv.patterns; for (const k of ['pat', 'tempo', 'swing', 'quant', 'metro', 'mode']) if (sv[k] != null) SPU[k] = sv[k]; if (sv.sets) sv.sets.forEach((o, i) => { if (o && SPU.sounds[i]) Object.assign(SPU.sounds[i], o); }); } } catch (e) { /* storage unavailable */ }
-  let spSaveT = 0; const spSave = () => { clearTimeout(spSaveT); spSaveT = setTimeout(() => { try { localStorage.setItem('as-sp1200', JSON.stringify({ patterns: SPU.patterns, pat: SPU.pat, tempo: SPU.tempo, swing: SPU.swing, quant: SPU.quant, metro: SPU.metro, mode: SPU.mode, sets: SPU.sounds.map((x) => x && { tune: x.tune, decay: x.decay, level: x.level }) })); } catch (e) { /* ignore */ } }, 500); };
+  try { const sv = JSON.parse(localStorage.getItem('as-sp1200') || 'null'); if (sv) { if (sv.patterns) SPU.patterns = sv.patterns; for (const k of ['pat', 'tempo', 'swing', 'quant', 'metro', 'mode', 'gain', 'vol', 'mvol']) if (sv[k] != null) SPU[k] = sv[k]; if (sv.sets) sv.sets.forEach((o, i) => { if (o && SPU.sounds[i]) Object.assign(SPU.sounds[i], o); }); } } catch (e) { /* storage unavailable */ }
+  let spSaveT = 0; const spSave = () => { clearTimeout(spSaveT); spSaveT = setTimeout(() => { try { localStorage.setItem('as-sp1200', JSON.stringify({ patterns: SPU.patterns, pat: SPU.pat, tempo: SPU.tempo, swing: SPU.swing, quant: SPU.quant, metro: SPU.metro, mode: SPU.mode, gain: SPU.gain, vol: SPU.vol, mvol: SPU.mvol, sets: SPU.sounds.map((x) => x && { tune: x.tune, decay: x.decay, level: x.level }) })); } catch (e) { /* ignore */ } }, 500); };
   const spPost = (o) => elPost({ type: 'sp1200', ...o });
   const spSay = (l1, l2 = '', ms = 1500) => { SPU.msg = { l: [l1, l2], until: performance.now() + ms }; };
   const spName = (i) => (SPU.sounds[i] ? SPU.sounds[i].name : '-empty-');
   const spPad = (p) => SPU.bank * 8 + p;
   function spSendAll() {
     SPU.sounds.forEach((x, i) => { if (x) spPost({ sound: { i, data: x.data, name: x.name, o: { tune: x.tune, decay: x.decay, level: x.level } } }); });
-    spPost({ patterns: SPU.patterns, pat: SPU.pat, tempo: SPU.tempo, swing: SPU.swing, quant: SPU.quant, metro: SPU.metro, rec: SPU.rec });
+    spPost({ vol: SPU.vol * 1.25, mvol: SPU.mvol, patterns: SPU.patterns, pat: SPU.pat, tempo: SPU.tempo, swing: SPU.swing, quant: SPU.quant, metro: SPU.metro, rec: SPU.rec });
   }
   window.SP_RECV = (d) => {
     if (d.sampled != null) { if (d.empty) return spSay('SAMPLE: NOTHING', 'PATCHED TO SPU-IN'); SPU.sounds[d.sampled] = Object.assign(spSound(d.data, 'SAMPLE ' + (d.sampled + 1)), { data: d.data }); spSay(`SAMPLED ${'ABCD'[Math.floor(d.sampled / 8)]}${d.sampled % 8 + 1}`, `${(d.data.length / SP_FS).toFixed(2)} SEC`); }
@@ -33,6 +33,15 @@
       const mv = (ev) => spSetSl(i, v0 + (y0 - ev.clientY) / len); const up = () => { g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); };
       g.addEventListener('pointermove', mv); g.addEventListener('pointerup', up); });
     g.addEventListener('wheel', (e) => { e.preventDefault(); spSetSl(i, spSl(i) - Math.sign(e.deltaY) * 0.02); }, { passive: false });
+  });
+  // ---- knobs: GAIN (sampling input), MIX VOLUME, METRONOME VOLUME ----
+  const spKnob = (k, v) => { SPU[k] = Math.max(0, Math.min(1, v)); if (k === 'vol') spPost({ vol: SPU.vol * 1.25 }); if (k === 'mvol') spPost({ mvol: SPU.mvol }); spSay(k === 'gain' ? 'SAMPLE GAIN' : k === 'vol' ? 'MIX VOLUME' : 'METRONOME VOLUME', `${Math.round(SPU[k] * 100)}`); spSave(); spDraw(); };
+  document.querySelectorAll('[data-spv]').forEach((g) => {
+    const k = g.dataset.spv;
+    g.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); g.setPointerCapture(e.pointerId); const y0 = e.clientY, v0 = SPU[k];
+      const mv = (ev) => spKnob(k, v0 + (y0 - ev.clientY) / 200); const up = () => { g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); };
+      g.addEventListener('pointermove', mv); g.addEventListener('pointerup', up); });
+    g.addEventListener('wheel', (e) => { e.preventDefault(); spKnob(k, SPU[k] - Math.sign(e.deltaY) * 0.03); }, { passive: false });
   });
   // ---- pads: velocity from where you hit (lower = harder) ----
   function spHit(i, v = 1) {
@@ -55,7 +64,23 @@
     if (SPU.entry === 'tempo' && SPU.typed) { SPU.tempo = Math.max(30, Math.min(250, v)); spPost({ tempo: SPU.tempo }); }
     if (SPU.entry === 'swing' && SPU.typed) { SPU.swing = Math.max(50, Math.min(75, v)); spPost({ swing: SPU.swing }); }
     if (SPU.entry === 'pattern' && SPU.typed) { SPU.pat = Math.max(1, Math.min(99, v)) - 1; spPost({ pat: SPU.pat }); }
-    SPU.typed = ''; spSave();
+    if (SPU.entry === 'copy' && SPU.typed) { const to = Math.max(1, Math.min(99, v)) - 1; spPost({ copy: { from: SPU.pat, to }, getPat: true }); spSay(`COPY SEG ${String(SPU.pat + 1).padStart(2, '0')}`, `TO SEG ${String(to + 1).padStart(2, '0')}`); }
+    if (SPU.entry === 'seglen' && SPU.typed) { const b = Math.max(1, Math.min(99, v)); spPost({ segLen: b, getPat: true }); spSay('SEGMENT LENGTH', `${b} BARS`); }
+    if (SPU.entry === 'setup' && SPU.typed) spSetup(v);
+    if (SPU.entry === 'disk' && SPU.typed) spDisk(v);
+    const done = ['copy', 'seglen', 'setup', 'disk'].includes(SPU.entry); SPU.typed = ''; if (done) SPU.entry = null; spSave();
+  }
+  function spSetup(v) {
+    if (v === 11) { SPU.multi = true; SPU.multiSound = SPU.sel; spSay('MULTI PITCH', spName(SPU.sel).slice(0, 16)); }
+    else if (v === 13) { SPU.multi = false; spSay('EXIT MULTI MODE', ''); }
+    else if (v === 18) { SPU.mode = SPU.mode === 'decay' ? 'tune' : 'decay'; SPU.multi = false; spSay('DECAY/TUNE SELECT', SPU.mode === 'decay' ? 'SLIDERS: DECAY' : 'SLIDERS: TUNE'); }
+    else if (v === 20) { if (!SPU.sounds[SPU.sel]) return spSay('DELETE SOUND', 'PAD IS EMPTY'); SPU.sounds[SPU.sel] = null; spPost({ sound: { i: SPU.sel, data: null } }); spSay('DELETE SOUND', `${'ABCD'[Math.floor(SPU.sel / 8)]}${SPU.sel % 8 + 1} DELETED`); }
+    else spSay(`SET-UP ${v}`, 'NOT ON THIS ONE');
+  }
+  function spDisk(v) {
+    if (v === 5 || v === 6) document.getElementById('sp-file').click();
+    else if (v === 1 || v === 2 || v === 3 || v === 0) spSay('DISK: PATTERNS', 'KEPT AUTOMATICALLY');
+    else spSay(`DISK ${v}`, 'NOT ON THIS ONE');
   }
   document.querySelectorAll('[data-spb]').forEach((g) => g.addEventListener('pointerdown', (e) => {
     e.stopPropagation(); const k = g.dataset.spb, M = window.SP_M;
@@ -64,7 +89,10 @@
     else if (k === 'rec') { SPU.rec = !SPU.rec; spPost({ rec: SPU.rec }); spSay(SPU.rec ? 'RECORD READY' : 'RECORD OFF', SPU.rec ? `AUTOCORRECT ${SPU.quant}` : ''); }
     else if (k === 'tap') { SPU.repeat = true; spPost({ repeat: true }); }
     else if (k === 'erase') { SPU.erasing = true; spSay('ERASE: HOLD A PAD', 'WHILE RECORDING'); }
-    else if (k === 'tempo' || k === 'swing' || k === 'pattern') { spEntry(k); }
+    else if (['tempo', 'swing', 'pattern', 'copy', 'seglen', 'setup', 'disk'].includes(k)) { spEntry(k); }
+    else if (k === 'timesig') spSay('TIME SIGNATURE', '4/4');
+    else if (k === 'step') spSay('STEP PROGRAM', 'USE RECORD + PADS');
+    else if (k === 'sliders') { const order = ['mix', 'tune', 'decay', 'multi'], cur = SPU.multi ? 'multi' : SPU.mode, nx = order[(order.indexOf(cur) + 1) % 4]; if (nx === 'multi') { SPU.multi = true; SPU.multiSound = SPU.sel; spSay('MULTI MODE', spName(SPU.sel).slice(0, 16)); } else { SPU.multi = false; SPU.mode = nx; spSay(`SLIDERS: ${nx.toUpperCase()}`, `BANK ${'ABCD'[SPU.bank]}`); } spSave(); }
     else if (k === 'quant') { SPU.quant = SP_QL[(SP_QL.indexOf(SPU.quant) + 1) % SP_QL.length]; spPost({ quant: SPU.quant }); spSay('AUTO CORRECT', SPU.quant === 'OFF' ? 'OFF (96 PPQ)' : `${SPU.quant} NOTE`); spSave(); }
     else if (k === 'metro') { SPU.metro = !SPU.metro; spPost({ metro: SPU.metro }); spSay('METRONOME', SPU.metro ? 'ON (RECORDING)' : 'OFF'); spSave(); }
     else if (k === 'bank') { SPU.bank = (SPU.bank + 1) % 4; SPU.sel = spPad(SPU.sel % 8); spSay(`BANK ${'ABCD'[SPU.bank]}`, ''); }
@@ -74,7 +102,7 @@
       const ch = SPU.inCh; if (ch == null) return spSay('SAMPLE: PATCH A', 'CHANNEL TO SPU-IN');
       const sec = Math.min(2.5, SP_WORDS / SP_FS - (SPU.sounds.reduce((a, x, i) => a + (x && i !== SPU.sel ? x.data.length : 0), 0) / SP_FS));
       if (sec < 0.1) return spSay('MEMORY FULL', '');
-      spPost({ sample: { pad: SPU.sel, sec, thresh: 0.02 } }); spSay(`SAMPLING ${'ABCD'[Math.floor(SPU.sel / 8)]}${SPU.sel % 8 + 1}`, `WAITING FOR SOUND`, 4000);
+      spPost({ sample: { pad: SPU.sel, sec, thresh: 0.02, gain: 4 * SPU.gain * SPU.gain } }); spSay(`SAMPLING ${'ABCD'[Math.floor(SPU.sel / 8)]}${SPU.sel % 8 + 1}`, `WAITING FOR SOUND`, 4000);
     }
     else if (k === 'sync') { SPU.sync = !SPU.sync; spPost({ sync: null, play: false }); spSay('SYNC', SPU.sync ? 'SBX-80 (DIN)' : 'INTERNAL'); }
     else if (k === 'load' || k === 'save') { if (k === 'load') document.getElementById('sp-file').click(); else spSay('SAVE: PATTERNS', 'KEPT AUTOMATICALLY'); }
@@ -82,8 +110,13 @@
     else if (k === 'yes' || k === 'no') {
       const d = k === 'yes' ? 1 : -1;
       if (SPU.entry === 'tempo') { SPU.tempo = Math.max(30, Math.min(250, SPU.tempo + d)); spPost({ tempo: SPU.tempo }); }
-      else if (SPU.entry === 'swing') { SPU.swing = Math.max(50, Math.min(75, SPU.swing + (d > 0 ? 4 : -4) - (SPU.swing === 50 && d > 0 ? 0 : 0))); spPost({ swing: SPU.swing }); }
-      else if (SPU.entry === 'pattern') { SPU.pat = (SPU.pat + d + 99) % 99; spPost({ pat: SPU.pat }); }
+      else if (SPU.entry === 'swing') { SPU.swing = Math.max(50, Math.min(75, SPU.swing + d)); spPost({ swing: SPU.swing }); }
+      else if (SPU.entry === 'setup') { l1 = 'SET-UP: ENTER #'; l2 = SPU.typed ? `${SPU.typed}_  (ENTER)` : '11-23'; }
+    else if (SPU.entry === 'disk') { l1 = 'DISK: ENTER #'; l2 = SPU.typed ? `${SPU.typed}_  (ENTER)` : '5 = LOAD SOUND'; }
+    else if (SPU.entry === 'copy') { l1 = `COPY SEG ${String(SPU.pat + 1).padStart(2, '0')} TO`; l2 = SPU.typed ? `${SPU.typed}_  (ENTER)` : 'SEGMENT # ?'; }
+    else if (SPU.entry === 'seglen') { l1 = 'SEGMENT LENGTH'; l2 = SPU.typed ? `${SPU.typed}_  (ENTER)` : `${(SPU.patterns[SPU.pat] || { bars: 2 }).bars} BARS`; }
+    else if (SPU.entry === 'pattern') { SPU.pat = (SPU.pat + d + 99) % 99; spPost({ pat: SPU.pat }); }
+      else if (!SPU.entry) { SPU.bank = (SPU.bank + d + 4) % 4; spSay(`BANK ${'ABCD'[SPU.bank]}`, ''); }
       spSave();
     }
     else if (k === 'enter') spEnter();
@@ -123,18 +156,19 @@
     else if (SPU.entry === 'pattern') { l1 = 'SELECT PATTERN'; l2 = SPU.typed ? `${SPU.typed}_  (ENTER)` : `PATTERN ${String(SPU.pat + 1).padStart(2, '0')}`; }
     else { l1 = `P${String(SPU.pat + 1).padStart(2, '0')} ${run ? `BAR ${M.bar} BEAT ${M.beat}` : `${SPU.tempo.toFixed(0)} BPM`}`; l2 = `${SPU.rec ? 'REC ' : ''}${'ABCD'[SPU.bank]}${SPU.sel % 8 + 1} ${spName(SPU.sel)}`; }
     sgTxt('.sp-l1', (l1 || '').padEnd(16).slice(0, 16)); sgTxt('.sp-l2', (l2 || '').padEnd(16).slice(0, 16));
-    for (const [k, on] of [['tempo', SPU.entry === 'tempo'], ['swing', SPU.entry === 'swing' || SPU.swing > 50], ['quant', SPU.quant !== 'OFF'], ['metro', SPU.metro], ['pattern', SPU.entry === 'pattern'], ['bank', SPU.bank > 0], ['mix', !SPU.multi && SPU.mode === 'mix'], ['tune', !SPU.multi && SPU.mode === 'tune'], ['decay', !SPU.multi && SPU.mode === 'decay'], ['multi', SPU.multi], ['run', !!run], ['rec', SPU.rec], ['tap', !!SPU.repeat], ['erase', !!SPU.erasing], ['sync', SPU.sync], ['sample', false]]) c1Lamp(`sp-l-${k}`, on);
+    for (const [k, on] of [['tempo', SPU.entry === 'tempo'], ['swing', SPU.entry === 'swing' || SPU.swing > 50], ['quant', SPU.quant !== 'OFF'], ['metro', SPU.metro], ['seg', true], ['song', false], ['setup', SPU.entry === 'setup'], ['disk', SPU.entry === 'disk'], ['bA', SPU.bank === 0], ['bB', SPU.bank === 1], ['bC', SPU.bank === 2], ['bD', SPU.bank === 3], ['mix', !SPU.multi && SPU.mode === 'mix'], ['tunedecay', !SPU.multi && SPU.mode !== 'mix'], ['multi', SPU.multi], ['run', !!run], ['rec', SPU.rec], ['tap', !!SPU.repeat], ['erase', !!SPU.erasing], ['sync', SPU.sync], ['sample', SPU.msg && /^SAMPLING/.test(SPU.msg.l[0]) && SPU.msg.until > now]]) c1Lamp(`sp-l-${k}`, on);
     for (let i = 0; i < 8; i++) {
       for (const g of c1All(`sp-s${i}`)) { const v = spSl(i), y = (1 - v) * +g.dataset.len; if (g._y !== y) { g._y = y; g.setAttribute('transform', `translate(0 ${y.toFixed(2)})`); } }
-      const lit = M && M.on && M.on[i], col = lit ? '#8f959b' : SPU.held.has(i) ? '#7a8086' : '#5d6064';
+      const lit = M && M.on && M.on[i], col = lit ? '#4c5157' : SPU.held.has(i) ? '#2c2f32' : '#141516';
       for (const e of c1All(`sp-pad${i}`)) if (e._c !== col) { e._c = col; e.setAttribute('fill', col); }
       sgTxt(`.sp-pn${i}`, (SPU.multi ? `${SPU.multiTune[i] > 0 ? '+' : ''}${SPU.multiTune[i]}` : spName(spPad(i))).slice(0, 8));
     }
   }
+  function spKnobs() { for (const k of ['gain', 'vol', 'mvol']) for (const g of c1All(`sp-v-${k}`)) { const a = -135 + 270 * SPU[k]; if (g._a !== a) { g._a = a; g.setAttribute('transform', g.getAttribute('transform').replace(/rotate\([^ ]+/, `rotate(${a.toFixed(1)}`)); } } }
   function spTick() {
     if (EL.node !== SPU.node) { SPU.node = EL.node; if (EL.node) spSendAll(); }
     if (SPU.sync && EL.node) { const cur = SBX.cur, on = running() && tr.playingMode && cur && cur.beats >= 0; spPost({ sync: { run: !!on, beats: cur ? cur.beats : 0, bpm: cur ? cur.bpm : SPU.tempo } }); }
     const pc = patches.find((q) => q.b === 'fxin:SP1200' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1], ch = n && n <= 24 ? n - 1 : null;
     if (ch !== SPU.inCh) { SPU.inCh = ch; spPost({ sampleCh: ch }); }
-    if (isOpen('sp1200') || document.body.classList.contains('racksview')) spDraw();
+    if (isOpen('sp1200') || document.body.classList.contains('racksview')) { spDraw(); spKnobs(); }
   }

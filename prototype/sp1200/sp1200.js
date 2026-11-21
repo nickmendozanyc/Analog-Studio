@@ -13,7 +13,7 @@ export const SP_QUANT = { '1/8': 48, '1/8T': 32, '1/16': 24, '1/16T': 16, '1/32'
 export class SP1200 {
   constructor(fs) {
     this.fs = fs; this.sounds = Array(32).fill(null); this.patterns = Array.from({ length: 100 }, () => spPattern(2)); this.pat = 0;
-    this.tempo = 90; this.swing = 50; this.quant = '1/16'; this.run = false; this.rec = false; this.tick = 0; this.ph = 0; this.metro = true;
+    this.tempo = 90; this.swing = 50; this.quant = '1/16'; this.run = false; this.rec = false; this.tick = 0; this.ph = 0; this.metro = true; this.vol = 1; this.mvol = 0.7;
     this.ch = Array.from({ length: 8 }, () => ({ on: false, S: null, pos: 0, step: 1, env: 1, dec: 0, g: 0, lp: [0, 0], cut: 1 }));
     this.held = new Set(); this.repeat = false; this.erase = new Set(); this.sync = null; this.peak = 0; this.clickT = 0;
   }
@@ -78,8 +78,8 @@ export class SP1200 {
         if (k < 6) { const fc = k < 2 ? 1200 + 11000 * c.env * c.env : 11500, a = 1 - Math.exp(-2 * Math.PI * fc / fs); c.lp[0] += a * (x - c.lp[0]); c.lp[1] += a * (c.lp[0] - c.lp[1]); x = c.lp[1]; }
         const y = x * c.env * c.g; l += y * (1 - PAN[k]); r += y * (1 + PAN[k]);
       }
-      if (this.clickT > 0) { const c = (this.clickT-- % 20 < 10 ? 0.15 : -0.15); l += c; r += c; }
-      L[i] = l; if (R !== L) R[i] = r; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > pk) pk = a;
+      if (this.clickT > 0) { const c = (this.clickT-- % 20 < 10 ? 0.15 : -0.15) * this.mvol / this.vol; l += c; r += c; }
+      l *= this.vol; r *= this.vol; L[i] = l; if (R !== L) R[i] = r; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > pk) pk = a;
     }
     this.peak = pk;
   }
