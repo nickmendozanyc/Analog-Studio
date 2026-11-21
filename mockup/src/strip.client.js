@@ -233,7 +233,7 @@
     for (const el of E.k) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'knob', id: el.dataset.kid, el, cx: b.x + b.w / 2, cy: b.y + b.h / 2, r: Math.max(b.w, b.h) / 2 }); }
     for (const el of E.b) { const b = stageBox(el); if (inP(b)) CTRLS.push({ t: 'key', id: el.dataset.bid, el, ...b }); }
     STRIP_SVG.innerHTML = o;
-    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `CH ${ch + 1} · ${NAMES[ch]} · ${ss.title.split(' · ')[0]}`;
+    const tt = document.getElementById('strip-title'); if (tt) tt.textContent = `CH ${ch + 1}`;   // channel number only: nothing in the title bar changes size
     const ow = document.querySelector('#ov-strip .ov-win'); if (ow) ow.style.minWidth = '0';
     showVal(null);
   }
