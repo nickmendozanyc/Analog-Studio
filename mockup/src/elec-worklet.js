@@ -22,6 +22,9 @@ class JH24Processor extends AudioWorkletProcessor {
     this.imIn = [new Float32Array(128), new Float32Array(128)]; this.imOut = [new Float32Array(128), new Float32Array(128)];
     // two SPX90IIs: mono in from a channel insert, stereo out straight to the mix (the channel itself is replaced)
     this.spx = [new SPX90(sampleRate), new SPX90(sampleRate)]; this.spxch = [null, null];
+    // two PCM41s and two PCM42s: mono delays on channel inserts (their output replaces the channel)
+    this.pcm = [new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 42), new PCM4x(sampleRate, 42)]; this.pcmch = [null, null, null, null];
+    this.pcmOut = this.pcm.map(() => new Float32Array(128));
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
     this.h949 = new H949Unit(sampleRate); this.rmx = new RMX16(sampleRate); this.par = { h949: null, rmx: null };
     this.parIn = new Float32Array(128); this.parL = new Float32Array(128); this.parR = new Float32Array(128);
@@ -48,6 +51,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
     }
     else if (d.type === 'h949' || d.type === 'rmx') { const u = d.type === 'h949' ? this.h949 : this.rmx; if (d.ch !== undefined) this.par[d.type] = d.ch; if (d.set) u.set(d.set); }
+    else if (d.type === 'pcm') { const u = this.pcm[d.unit]; if (!u) return; if (d.ch !== undefined) this.pcmch[d.unit] = d.ch; if (d.set) u.set(d.set); }
     else if (d.type === 'spx') { const u = this.spx[d.unit]; if (!u) return; if (d.ch !== undefined) this.spxch[d.unit] = d.ch; if (d.set) u.set(d.set); if (d.cmd === 'trig') u.trigger(); }
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
@@ -150,6 +154,12 @@ class JH24Processor extends AudioWorkletProcessor {
       c.process(this.imIn[u], this.imOut[u], n, this.imIn[by === 'B' ? 1 : 0]);
       const ch = this.imch[u]; if (ch != null) ins[ch] = this.imOut[u];
     }
+    // PCM41 / PCM42 (after the IM90): each delay replaces its channel with its own output (the dry is in its mix)
+    for (let u = 0; u < 4; u++) {
+      if (this.pcmOut[u].length !== n) this.pcmOut[u] = new Float32Array(n);
+      const ch = this.pcmch[u]; if (ch == null || !this.out[ch]) continue;
+      this.pcm[u].process(ins[ch] || this.out[ch], this.pcmOut[u], n); ins[ch] = this.pcmOut[u];
+    }
     // SPX90II (last on the insert): process the channel, silence it in the mix, add the unit's stereo output
     for (let u = 0; u < 2; u++) {
       if (this.spxIn[u].length !== n) { this.spxIn[u] = new Float32Array(n); this.spxL[u] = new Float32Array(n); this.spxR[u] = new Float32Array(n); this.silent = new Float32Array(n); }
@@ -181,7 +191,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters() });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()) });
     }
     return true;
   }
