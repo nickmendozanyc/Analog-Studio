@@ -1245,12 +1245,12 @@ const C160_KNOBS = { threshold: { min: -40, max: 20, sweep: 300, ticks: [[-40, '
   outGain: { min: -20, max: 20, sweep: 300, ticks: [[-20, '-20 dB'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20 dB']] } };
 globalThis.C160_KNOBS = C160_KNOBS;
 function c160Face(w, h, u) {
-  // laid out from a photo of the real 160X (positions measured across the panel; this 1U drawing is less wide, so
-  // the knobs keep their round shape while the spacing follows the photo)
-  const W = '#e4e3e6', id = (k) => `c160-${u}-${k}`, X = (px) => (px - 40) * 0.476, Y = (py) => (py - 45) * 0.675;
+  // laid out from a photo of the real 160X: positions measured across the photographed panel (ear to ear, 945 x 83 px)
+  // and mapped onto this one, which has the same 19 x 1.75 in proportions
+  const W = '#e4e3e6', id = (k) => `c160-${u}-${k}`, X = (px) => (px - 40) * w / 945, Y = (py) => (py - 45) * h / 83;
   rect(0, 0, w, h, '#232127'); for (let yy = 1; yy < h; yy += 1.3) rect(0, yy, w, 0.35, '#fff', `opacity="${(0.015 + 0.02 * ((yy * 7.3) % 1)).toFixed(3)}"`);   // brushed
   rect(0, 0, w, 1.2, '#fff', 'opacity="0.1"'); rect(0, h - 1.5, w, 1.5, '#000', 'opacity="0.5"');
-  for (const ex of [0, w - 17]) { rect(ex, 0, 17, h, '#1b1a1e'); rect(ex + (ex ? 0 : 16), 0, 1, h, '#000', 'opacity="0.5"'); for (const ey of [10, h - 10]) rect(ex + 3.5, ey - 4, 10, 8, '#0a0a0b', 'rx="4"'); }
+  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#1b1a1e'); rect(ex + (ex ? 0 : 21.2), 0, 0.8, h, '#000', 'opacity="0.5"'); for (const ey of [6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#070707', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
   text(X(155), Y(85), 'dbk', 17, '#cfcfd4', 'middle', 700, 'letter-spacing="0.5" font-stretch="125%"'); text(X(155), Y(102), '160X', 8.5, '#cfcfd4', 'middle', 900, 'letter-spacing="0.4"');
   const led = (x, y, col, dim, cls, r = 1.45) => { circle(x, y, r, dim); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
   const btn = (x, k, label) => { const y = Y(88); p(`<g data-cb="${u}:${k}" style="cursor:pointer">`); rect(x - 7.5, y, 15, 7, '#000', 'rx="0.8"'); rect(x - 6.9, y + 0.4, 13.8, 5.9, '#1c1c1e', 'rx="0.6"'); rect(x - 6.9, y + 0.4, 13.8, 1.4, '#fff', 'opacity="0.13" rx="0.6"'); p('</g>'); text(x, Y(116), label, 3.6, W, 'middle', 900, 'letter-spacing="0.3"'); };
@@ -1258,19 +1258,19 @@ function c160Face(w, h, u) {
   led(X(287), Y(70), '#ffd23a', '#33301a', id('slave')); btn(X(287), 'slave', 'SLAVE');
   const COL = { threshold: '#d93a2e', ratio: '#2381da', outGain: '#33894f' };
   const knob = (cx, k, l1, l2) => {
-    const K = C160_KNOBS[k], cy = Y(86), r = 7.6, ang = (v) => -K.sweep / 2 + (v - K.min) / (K.max - K.min) * K.sweep;
+    const K = C160_KNOBS[k], cy = Y(81), r = 6.3, ang = (v) => -K.sweep / 2 + (v - K.min) / (K.max - K.min) * K.sweep;
     const P = (a, rr) => [cx + rr * Math.sin(a * Math.PI / 180), cy - rr * Math.cos(a * Math.PI / 180)];
     if (k === 'ratio') { const [x0, y0] = P(ang(0.7), r + 2.1), [x1, y1] = P(ang(1), r + 2.1); p(`<path d="M${x0} ${y0} A${r + 2.1} ${r + 2.1} 0 0 1 ${x1} ${y1}" fill="none" stroke="#b9b8bd" stroke-width="2.2"/>`); }
     for (const [v, lab] of K.ticks) {
-      const a = ang(v); const [x1, y1] = P(a, r + 1), [x2, y2] = P(a, r + 3.2), [tx, ty] = P(a, r + (k === 'ratio' ? 7.2 : 6.6));
+      const a = ang(v); const [x1, y1] = P(a, r + 1), [x2, y2] = P(a, r + 3.2), [tx, ty] = P(a, r + (k === 'ratio' ? 6.4 : 5.6));
       p(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${W}" stroke-width="0.55"/>`);
-      text(tx, ty + 1.1, lab, 3.1, W, 'middle', 700);
+      text(tx, ty + 0.9, lab, 2.6, W, 'middle', 700);
     }
     p(`<g data-ck="${u}:${k}" style="cursor:ns-resize">`);
     circle(cx + 0.5, cy + 0.9, r + 0.3, '#000', 'opacity="0.55"'); circle(cx, cy, r, COL[k]); circle(cx - r * 0.28, cy - r * 0.32, r * 0.62, '#fff', 'opacity="0.16"'); circle(cx, cy, r, 'none', 'stroke="#000" stroke-opacity="0.35" stroke-width="0.5"');
     p(`<g class="${id('k-' + k)}" transform="rotate(${ang(k === 'ratio' ? 0.38 : k === 'threshold' ? -10 : 0)} ${cx} ${cy})"><rect x="${cx - 0.45}" y="${cy - r + 0.5}" width="0.9" height="${r * 0.9}" rx="0.45" fill="#f4f4f4"/></g>`);
     p(`<circle cx="${cx}" cy="${cy}" r="${r + 6}" fill="transparent"/></g>`);
-    text(cx, Y(116), l1, 3.6, W, 'middle', 900, 'letter-spacing="0.3"'); if (l2) text(cx, Y(123), l2, 3.6, W, 'middle', 900, 'letter-spacing="0.3"');
+    text(cx, l2 ? Y(115) : Y(119), l1, 3.3, W, 'middle', 900, 'letter-spacing="0.3"'); if (l2) text(cx, Y(123), l2, 3.3, W, 'middle', 900, 'letter-spacing="0.3"');
   };
   knob(X(345), 'threshold', 'THRESHOLD');
   const tx = X(410); text(tx, Y(62), 'THRESHOLD', 3.4, W, 'middle', 900);
@@ -1280,7 +1280,7 @@ function c160Face(w, h, u) {
   knob(X(485), 'ratio', 'COMPRESSION', 'RATIO');
   knob(X(568), 'outGain', 'OUTPUT', 'GAIN');
   const dx = X(622); text(dx, Y(61), 'INPUT', 2.7, W, 'middle', 800); led(dx, Y(67), '#ff3b2f', '#3a1412', id('d-in'), 1.15); led(dx, Y(75), '#ff3b2f', '#3a1412', id('d-out'), 1.15); text(dx, Y(83), 'OUTPUT', 2.7, W, 'middle', 800);
-  const lx = (i) => X(655) + i * 3.85, ly = Y(73), gy = Y(90);
+  const lx = (i) => X(655) + i * (X(800) - X(655)) / 18, ly = Y(73), gy = Y(90);
   p(`<path d="M${dx + 2} ${Y(67)} H${dx + 6} V${ly} H${lx(0) - 2} M${dx + 2} ${Y(75)} H${dx + 6} V${ly}" fill="none" stroke="${W}" stroke-width="0.4"/>`);
   btn(dx, 'display', 'DISPLAY');
   // meters: 19 round LEDs (12 yellow, 7 red), the scale under them, then 12 red gain-reduction LEDs under the left 12
@@ -1294,26 +1294,37 @@ function c160Face(w, h, u) {
 }
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
-  const U = 60, UX = 50, UW = RW - 100, DEPTH = 70;
+  // Real 19-inch proportions: every panel spans the rails (its ears, with their rack screws, cover them) and one rack
+  // unit is 1.75 in tall: 498 px wide x 46 px per U (10.9 : 1). Faces drawn for the old 450 x (60n - 4) size are
+  // scaled evenly (never stretched) and centred between the ears; a face marked native is drawn at the panel's size.
+  const U = 46, UX = 50, UW = RW - 100, PX = 26, PW = RW - 52, EAR = 22, DEPTH = 70;
   const units = [];      // { y, h, html }
   let uy = 70;
   const rackKnobs = [];
   const RK = (x, y, r, cap, ang, o = {}) => rackKnobs.push(knob3d(x, y, r, cap, ang, o));
   const LW = '#e6e2d8';
-  function unit(n, fill, draw) {
-    const h = n * U - 4, y0 = uy, kStart = rackKnobs.length;
-    const face = capture(() => {
-      rect(0, 0, UW, h, fill, 'rx="2"');
-      rect(0, 0, UW, 2, '#fff', 'opacity="0.14"'); rect(0, h - 2, UW, 2, '#000', 'opacity="0.55"');
-      for (const ex of [14, UW - 14]) { screw(ex, 15, 5); if (n > 1) screw(ex, h - 15, 5); }
-      draw(UW, h);
+  function unit(n, fill, draw, o = {}) {
+    const h = n * U - 2, y0 = uy, kStart = rackKnobs.length, nh = n * 60 - 4, k = h / nh, ox = (PW - UW * k) / 2;
+    // the panel: full width, ears with slotted holes and rack screws over the rails (EIA hole positions)
+    const base = capture(() => {
+      if (o.native) { draw(PW, h); return; }
+      rect(0, 0, PW, h, fill, 'rx="1.5"');
+      rect(0, 0, PW, 1.5, '#fff', 'opacity="0.14"'); rect(0, h - 1.5, PW, 1.5, '#000', 'opacity="0.55"');
+      for (const ex of [0, PW - EAR]) {
+        rect(ex, 0, EAR, h, '#000', 'opacity="0.18"'); rect(ex + (ex ? 0 : EAR - 0.8), 0, 0.8, h, '#000', 'opacity="0.45"');
+        for (let u = 0; u < n; u++) for (const hy of [6.6, U - 8.6]) { const cy = u * U + hy; rect(ex + 4, cy - 3, EAR - 8, 6, '#070707', 'rx="3"'); screw(ex + EAR / 2, cy, 3.6); }
+      }
     });
+    const face = o.native ? '' : capture(() => draw(UW, nh));
     const kn = rackKnobs.splice(kStart).join('');
-    units.push(`<div style="${B3(`left:${UX}px;top:${y0}px;width:${UW}px;height:${h}px;transform:translateZ(2px);box-shadow:0 8px 14px rgba(0,0,0,0.6)`)}">${svgWrap(UW, h, face)}${kn}</div>`);
+    const inner = o.native ? '' : `<div style="${B3(`left:${ox.toFixed(2)}px;top:0;width:${UW}px;height:${nh}px;transform-origin:0 0;transform:scale(${k.toFixed(4)})`)}">${svgWrap(UW, nh, face)}${kn}</div>`;
+    units.push(`<div style="${B3(`left:${PX}px;top:${y0}px;width:${PW}px;height:${h}px;transform:translateZ(2px);box-shadow:0 6px 12px rgba(0,0,0,0.6)`)}">${svgWrap(PW, h, base)}${inner}</div>`);
     uy += n * U;
+    return { y: RY + y0, h, k, x: PX + ox, map: (fx, fy) => [PX + ox + fx * k, y0 + fy * k] };   // face coordinates -> rack coordinates
   }
+  globalThis.RACK_HOT = {};
   // Leximan 224 (3U)
-  unit(3, 'url(#rack224)', (w, h) => {
+  globalThis.RACK_HOT['224'] = unit(3, 'url(#rack224)', (w, h) => {
     text(26, 42, 'leximan', 30, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
     text(26, 64, '224 DIGITAL REVERB', 14, '#d6cfbe', 'start', 800, 'letter-spacing="1"');
     rect(26, 80, 150, 56, '#000', 'rx="3"'); rect(30, 84, 142, 48, 'url(#displayBg)', 'rx="2"');
@@ -1331,7 +1342,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
   });
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
-  for (const u of ['A', 'B']) { globalThis['RACK_C160_' + u] = RY + uy; unit(1, '#232127', (w, h) => c160Face(w, h, u)); }
+  for (const u of ['A', 'B']) globalThis.RACK_HOT['c160' + u] = unit(1, '#232127', (w, h) => c160Face(w, h, u), { native: true });
   // Unified Audio 1176LN x2 (2U)
   for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
     text(26, 30, 'UNIFIED AUDIO', 14, '#cfcfcf', 'start', 800);
@@ -1381,8 +1392,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     });
   });
   // Rowan SBX-80 sync box (1U): two-tone grey, orange legends, green VFD readouts that follow the sync engine
-  globalThis.RACK_SBX_Y = RY + uy;
-  unit(1, '#ebe8de', (w, h) => {
+  globalThis.RACK_HOT.sbx = unit(1, '#ebe8de', (w, h) => {
     rect(0, 0, 10, h, '#8c8768'); rect(w - 10, 0, 10, h, '#8c8768');
     rect(128, 4, 230, h - 8, '#556986', 'rx="3"');
     rect(20, 9, 13, 10, 'none', 'stroke="#d23b2c" stroke-width="2" rx="2"');
@@ -1395,8 +1405,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     [['LOCK', 'rk-sbx-lock', '#4fe07a'], ['BEAT', 'rk-sbx-beat', '#ff6a3c']].forEach(([l, id, c], k) => { circle(378 + k * 30, 18, 4, '#2a1c1a'); p(`<circle id="${id}" cx="${378 + k * 30}" cy="18" r="4" fill="${c}" opacity="0" filter="url(#glowSm)"/>`); text(378 + k * 30, 34, l, 8, '#3f5477', 'middle', 800); });
     text(w - 20, 50, 'SYNC BOX', 10, '#3f5477', 'end', 900, 'font-style="italic" letter-spacing="1"');
   });
-  globalThis.RACK_SG_Y = RY + uy; unit(1, '#000', (w, h) => sgFace(w, h));
-  globalThis.RACK_DZ_Y = RY + uy; unit(1, '#000', (w, h) => dzFace(w, h));
+  globalThis.RACK_HOT.sg = unit(1, '#0d0d0e', (w, h) => sgFace(w, h));
+  globalThis.RACK_HOT.dz = unit(1, '#cfcdc7', (w, h) => dzFace(w, h));
   const slotsY = uy + 8; uy += 34;
   unit(1, '#1a1b1e', (w, h) => {
     rect(30, 6, w - 60, h - 12, '#26292e', 'rx="3"');
@@ -1409,8 +1419,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w / 2, 35, '+ drop a VST3 / AU plugin', 14, '#8a877c', 'middle', 700);
   });
   uy += 10;
-  const pbY = uy; globalThis.RACK_PB_Y = RY + pbY;
-  unit(2, 'url(#rackBlack)', (w, h) => {
+  const PB = globalThis.RACK_HOT.patchbay = unit(2, 'url(#rackBlack)', (w, h) => {
     text(w / 2, 22, 'PATCHBAY · INSERTS', 14, '#cfcfcf', 'middle', 800, 'letter-spacing="2"');
     for (let row = 0; row < 2; row++) {
       for (let j = 0; j < 24; j++) {
@@ -1422,8 +1431,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   });
   // patch cables in front of the patchbay
   const cab = (x1, y1, x2, y2, sag, col) => `<path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="8" transform="translate(3 7)"/><path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round"/><path d="M${x1} ${y1} C${x1} ${y1 + sag} ${x2} ${y2 + sag} ${x2} ${y2}" fill="none" stroke="#fff" stroke-opacity="0.25" stroke-width="2" transform="translate(-1 -1)"/><circle cx="${x1}" cy="${y1}" r="7" fill="#c9ccd0"/><circle cx="${x2}" cy="${y2}" r="7" fill="#c9ccd0"/>`;
-  const jx = (j) => UX + 34 + j * 16.5;
-  const cables = `<svg width="${RW}" height="${RH}" style="position:absolute;left:0;top:0;overflow:visible">${cab(jx(12), pbY + 46, jx(0), pbY + 86, 80, '#c0392b')}${cab(jx(19), pbY + 46, jx(1), pbY + 86, 100, '#2f6fb3')}${cab(jx(6), pbY + 46, jx(20), pbY + 86, 70, '#e8c34a')}</svg>`;
+  const PJ = (j, row) => PB.map(34 + j * 16.5, 46 + row * 40);   // a jack on the patchbay face, in rack coordinates
+  const cables = `<svg width="${RW}" height="${RH}" style="position:absolute;left:0;top:0;overflow:visible">${cab(...PJ(12, 0), ...PJ(0, 1), 63, '#c0392b')}${cab(...PJ(19, 0), ...PJ(1, 1), 79, '#2f6fb3')}${cab(...PJ(6, 0), ...PJ(20, 1), 55, '#e8c34a')}</svg>`;
   // plugin browser drawer
   uy += 24;
   const by0 = uy, bh = RH - 30 - uy - 92, bw = UW;
@@ -1686,6 +1695,8 @@ const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" s
 const overlay = (view, title, body, extra = '', float = false) => float
   ? `<div class="overlay float" id="ov-${view}" data-view="${view}" hidden><div class="ov-win"><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕</button></div><div class="ov-body">${body}</div></div></div>`
   : `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
+// a rack unit's hot area, from where unit() put it (full panel width, over the rails)
+const rhot = (key, view, title) => { const H = globalThis.RACK_HOT[key]; return hot(RX + 26, Math.round(H.y), RW - 52, Math.round(H.h), view, title); };
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JH-Studio by NMAudiowerks · 4K mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
 <style>
@@ -1796,14 +1807,14 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
 ${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the JH-Tape')}
 ${hot(AX, AY + 60, Math.round(AW * ALK), 590 - 60 - ALDROP, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
-${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
+${rhot('224', '224', 'Open the Leximan 224X')}
 ${hot(2857, 1280, 296, 462, '224', 'Open the Leximan 224X')}
-${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Open the patchbay')}
-${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
-${hot(3340, Math.round(globalThis.RACK_SG_Y), 450, 56, 'sg', 'Open the SG-24 master sync generator')}
-${hot(3340, Math.round(globalThis.RACK_DZ_Y), 450, 56, 'dz', 'Open the Delta-Three synchronizer')}
-${hot(3340, Math.round(globalThis.RACK_C160_A), 450, 56, 'c160', 'Open the dbk 160X compressors')}
-${hot(3340, Math.round(globalThis.RACK_C160_B), 450, 56, 'c160', 'Open the dbk 160X compressors')}
+${rhot('patchbay', 'patchbay', 'Open the patchbay')}
+${rhot('sbx', 'sbx', 'Open the SBX-80 sync box')}
+${rhot('sg', 'sg', 'Open the SG-24 master sync generator')}
+${rhot('dz', 'dz', 'Open the Delta-Three synchronizer')}
+${rhot('c160A', 'c160', 'Open the dbk 160X compressors')}
+${rhot('c160B', 'c160', 'Open the dbk 160X compressors')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
@@ -1814,7 +1825,7 @@ ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(
 ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the JH-Tape's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → JH-Tape</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
   <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the JH-Tape's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
-${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => `<svg width="1500" height="187" viewBox="0 0 450 56" style="display:block">${capture(() => c160Face(450, 56, u))}</svg>`).join('<div style="height:10px"></div>')}
+${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => `<svg width="1500" height="133" viewBox="0 0 498 44" style="display:block">${capture(() => c160Face(498, 44, u))}</svg>`).join('<div style="height:10px"></div>')}
   <p class="note">Drag a knob up or down (double-click resets it); click the buttons. Each unit works on the channel it is patched into at the patchbay (INSERT SEND → 160X IN, 160X OUT → INSERT RETURN): A is on the kick and B on the bass to start with. SLAVE on one unit links it to the other as a stereo pair: the louder channel drives both, with the other unit's controls. You hear it once the tape machine's electronics are on.</p></div>`, '<span class="ov-msg" id="c160-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
