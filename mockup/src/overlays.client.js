@@ -1,4 +1,4 @@
-// Analog Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
+// JH-Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
 (() => {
   const SVGNS = 'http://www.w3.org/2000/svg';
   const stage = document.getElementById('stage');

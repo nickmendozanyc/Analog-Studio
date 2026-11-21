@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JH-Studio by NMAudiowerks · 4K mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
 <style>
   html,body{margin:0;background:#000;overflow:hidden;height:100%}
@@ -329,7 +329,8 @@
 <rect x="0" y="0" width="3840" height="1" fill="#3a3b3f" />
 <rect x="24" y="12" width="300" height="32" fill="#0b0b0c" rx="3"/>
 <rect x="24" y="12" width="300" height="32" fill="url(#bezelHi)" rx="3"/>
-<text x="42" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#e9dcc0" text-anchor="start" font-weight="800" letter-spacing="5">ANALOG STUDIO</text>
+<text x="40" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="17" fill="#e9dcc0" text-anchor="start" font-weight="800" letter-spacing="4">JH-STUDIO</text>
+<text x="176" y="33" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="10.5" fill="#a9a594" text-anchor="start" font-weight="700" letter-spacing="1.2">by NMAudiowerks</text>
 <circle cx="304" cy="28" r="5" fill="#ff3b2f" filter="url(#glow)"/>
 <text x="420" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="11" fill="#8b8778" text-anchor="start" font-weight="700" letter-spacing="2">SESSION</text>
 <text x="500" y="34" font-family="'Helvetica Neue', Helvetica, Arial, 'FreeSans', 'Inter', sans-serif" font-size="15" fill="#e8e4d8" text-anchor="start" font-weight="500" >Midnight Tapes</text>
@@ -104645,7 +104646,7 @@ function demoTape(fs, encodeLTC) {
 }
 
 return demoTape; })();
-window.ASF = (() => { // Audio and session file writers for Analog Studio. Plain JS, no dependencies: runs in the page, in Node tests, and
+window.ASF = (() => { // Audio and session file writers for JH-Studio. Plain JS, no dependencies: runs in the page, in Node tests, and
 // ports to the native app. Input samples are Float32Array, full scale ±1.
 
 const clampI = (x, max) => Math.max(-max - 1, Math.min(max, Math.round(x * max)));
@@ -104763,7 +104764,7 @@ function writeTap(meta, tracks) {   // tracks[i] = [{ ...piece fields, data: Flo
 }
 function readTap(u8) {
   const v = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
-  if (String.fromCharCode(...u8.subarray(0, 6)) !== 'ASTAP1') throw new Error('not an Analog Studio .TAP file');
+  if (String.fromCharCode(...u8.subarray(0, 6)) !== 'ASTAP1') throw new Error('not a JH-Studio .TAP file');
   const L = v.getUint32(6, true), meta = JSON.parse(new TextDecoder().decode(u8.subarray(10, 10 + L)));
   let off = 10 + L; off += (4 - (off % 4)) % 4;
   meta.tracks = meta.tracks.map((t) => t.map((p) => { const data = new Float32Array(u8.buffer.slice(u8.byteOffset + off, u8.byteOffset + off + p.n * 4)); off += p.n * 4; return { ...p, lo: p.lo ?? -Infinity, hi: p.hi ?? Infinity, data }; }));
@@ -105674,7 +105675,7 @@ class Chaser {
   }
 }
 </script>
-<script>// Analog Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
+<script>// JH-Studio mockup: fit-to-window scaling, pop-up views, live meters, 224X remote, patchbay.
 (() => {
   const SVGNS = 'http://www.w3.org/2000/svg';
   const stage = document.getElementById('stage');
@@ -107083,7 +107084,7 @@ class Chaser {
     fsay('Reading the tape…');
     const r = await reelData(TP.key);
     const meta = {
-      format: 'analog-studio-tap', version: 1, tape: TP.key, takeup: document.getElementById('takeup-sel').value,
+      format: 'jh-studio-tap', version: 1, tape: TP.key, takeup: document.getElementById('takeup-sel').value,
       total: tr.total, take: tr.take, zero: tr.zero, ips: tr.speedIPS,
       smpte: SBX.stripes, tempo: { bars: SBX.bars, offset: SBX.offset, tempo: SBX.tempo, manual: SBX.manual }, locate: { loc: AL.loc, mem: AL.mem },
       machine: r ? { trims: r.trims, opLevel: r.opLevel, opts: r.opts } : null,
@@ -107114,13 +107115,13 @@ class Chaser {
 
   // ---- .MIX: both consoles' channel settings and the patchbay
   async function saveMix() {
-    const json = { format: 'analog-studio-mix', version: 1, consoles: ST, patches, studio: document.body.dataset.studio };
+    const json = { format: 'jh-studio-mix', version: 1, consoles: ST, patches, studio: document.body.dataset.studio };
     const res = await offer(`${SESSION}.MIX`, new TextEncoder().encode(JSON.stringify(json, null, 1)));
     fsay(res === 'declined' ? 'Save cancelled.' : `Mix saved: ${Object.keys(ST).length} channel settings, ${patches.length} patch cables${res === 'zipped' ? ' (inside a .zip)' : ''}.`);
   }
   function loadMix(u8, name) {
     const m = JSON.parse(new TextDecoder().decode(u8));
-    if (m.format !== 'analog-studio-mix') throw new Error('not an Analog Studio .MIX file');
+    if (!/^(jh|analog)-studio-mix$/.test(m.format)) throw new Error('not a JH-Studio .MIX file');   // older sessions saved as analog-studio-mix still load
     ST = m.consoles || {}; saveST2();
     for (const key of Object.keys(ST)) { const k = /^(cmi|sls)(\d+)$/.exec(key); if (k) applyCh(k[1], +k[2]); }
     if (Array.isArray(m.patches)) { patches = m.patches; save(); renderCables(); }
@@ -107138,7 +107139,7 @@ class Chaser {
         const head = String.fromCharCode(...it.data.subarray(0, 6));
         try {
           if (head === 'ASTAP1' || /\.tap$/i.test(it.name)) await loadTap(it.data, it.name);
-          else if (/\.mix$/i.test(it.name) || (head.startsWith('{') && /analog-studio-mix/.test(new TextDecoder().decode(it.data.subarray(0, 200))))) loadMix(it.data, it.name);
+          else if (/\.mix$/i.test(it.name) || (head.startsWith('{') && /(jh|analog)-studio-mix/.test(new TextDecoder().decode(it.data.subarray(0, 200))))) loadMix(it.data, it.name);
           else if (mode === 'import') audio.push(new File([it.data], it.name.split('/').pop()));
           else fsay(`${it.name}: LOAD opens .TAP tapes and .MIX mixes. Use IMPORT for audio.`);
         } catch (e) { fsay(`${it.name}: ${e.message}`); }

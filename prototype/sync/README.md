@@ -1,7 +1,7 @@
 # SBX-80 sync engine: SMPTE on track 24 → stable MIDI clock
 
 Use case: tape transfers. A conversion lab digitises a client's 2" reels; track 24 often carries SMPTE (LTC) printed in
-the 80s by a sync box. Analog Studio loads the transfer, reads that code and, like the original SBX-80, turns it into a
+the 80s by a sync box. JH-Studio loads the transfer, reads that code and, like the original SBX-80, turns it into a
 steady MIDI clock (plus song position, DIN sync and time base) so period MIDI gear plays along in time with the tape.
 
 ## Pieces (all tested here, all port 1:1 to the C++ engine)

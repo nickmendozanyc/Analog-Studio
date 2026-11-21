@@ -1,4 +1,4 @@
-// Phase 0 static UI mockup generator for Analog Studio.
+// Phase 0 static UI mockup generator for JH-Studio by NMAudiowerks.
 // Produces a single 3840x2160 SVG (wrapped in HTML) of the tape machine,
 // autolocator, tape meter bridge, 32-channel console and outboard rack.
 // Run: node mockup/src/build.js && node mockup/src/render.js
@@ -417,7 +417,7 @@ rect(0, 55, W, 1, '#000');
 rect(0, 0, W, 1, '#3a3b3f');
 rect(24, 12, 300, 32, '#0b0b0c', 'rx="3"');
 rect(24, 12, 300, 32, 'url(#bezelHi)', 'rx="3"');
-text(42, 34, 'ANALOG STUDIO', 17, '#e9dcc0', 'start', 800, 'letter-spacing="5"');
+text(40, 34, 'JH-STUDIO', 17, '#e9dcc0', 'start', 800, 'letter-spacing="4"'); text(176, 33, 'by NMAudiowerks', 10.5, '#a9a594', 'start', 700, 'letter-spacing="1.2"');
 circle(304, 28, 5, '#ff3b2f', 'filter="url(#glow)"');
 text(420, 34, 'SESSION', 11, '#8b8778', 'start', 700, 'letter-spacing="2"');
 text(500, 34, 'Midnight Tapes', 15, '#e8e4d8', 'start', 500);   // the tape menus sit beside it
@@ -1633,7 +1633,7 @@ const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" s
 const overlay = (view, title, body, extra = '', float = false) => float
   ? `<div class="overlay float" id="ov-${view}" data-view="${view}" hidden><div class="ov-win"><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕</button></div><div class="ov-body">${body}</div></div></div>`
   : `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
-const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Analog Studio · 4K mockup</title>
+const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JH-Studio by NMAudiowerks · 4K mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
 <style>
   html,body{margin:0;background:#000;overflow:hidden;height:100%}
@@ -1788,7 +1788,7 @@ fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
   const head = html.slice(html.indexOf('<link href='), html.indexOf('</head>'));
   const body = html.slice(html.indexOf('<body>') + 6, html.lastIndexOf('</body>'));
   fs.mkdirSync(path.join(dir, 'artifact'), { recursive: true });
-  fs.writeFileSync(path.join(dir, 'artifact', 'index.html'), `<title>Analog Studio Console</title>\n<meta name="viewport" content="width=device-width, initial-scale=1">\n${head}\n${body}`);
+  fs.writeFileSync(path.join(dir, 'artifact', 'index.html'), `<title>JH-Studio Console</title>\n<meta name="viewport" content="width=device-width, initial-scale=1">\n${head}\n${body}`);
   if (fs.existsSync(path.join(dir, 'tape-machine.html'))) fs.copyFileSync(path.join(dir, 'tape-machine.html'), path.join(dir, 'artifact', 'tape-machine.html'));
 }
 console.log('wrote', svg.length, 'bytes');

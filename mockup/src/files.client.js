@@ -43,7 +43,7 @@
     fsay('Reading the tape…');
     const r = await reelData(TP.key);
     const meta = {
-      format: 'analog-studio-tap', version: 1, tape: TP.key, takeup: document.getElementById('takeup-sel').value,
+      format: 'jh-studio-tap', version: 1, tape: TP.key, takeup: document.getElementById('takeup-sel').value,
       total: tr.total, take: tr.take, zero: tr.zero, ips: tr.speedIPS,
       smpte: SBX.stripes, tempo: { bars: SBX.bars, offset: SBX.offset, tempo: SBX.tempo, manual: SBX.manual }, locate: { loc: AL.loc, mem: AL.mem },
       machine: r ? { trims: r.trims, opLevel: r.opLevel, opts: r.opts } : null,
@@ -74,13 +74,13 @@
 
   // ---- .MIX: both consoles' channel settings and the patchbay
   async function saveMix() {
-    const json = { format: 'analog-studio-mix', version: 1, consoles: ST, patches, studio: document.body.dataset.studio };
+    const json = { format: 'jh-studio-mix', version: 1, consoles: ST, patches, studio: document.body.dataset.studio };
     const res = await offer(`${SESSION}.MIX`, new TextEncoder().encode(JSON.stringify(json, null, 1)));
     fsay(res === 'declined' ? 'Save cancelled.' : `Mix saved: ${Object.keys(ST).length} channel settings, ${patches.length} patch cables${res === 'zipped' ? ' (inside a .zip)' : ''}.`);
   }
   function loadMix(u8, name) {
     const m = JSON.parse(new TextDecoder().decode(u8));
-    if (m.format !== 'analog-studio-mix') throw new Error('not an Analog Studio .MIX file');
+    if (!/^(jh|analog)-studio-mix$/.test(m.format)) throw new Error('not a JH-Studio .MIX file');   // older sessions saved as analog-studio-mix still load
     ST = m.consoles || {}; saveST2();
     for (const key of Object.keys(ST)) { const k = /^(cmi|sls)(\d+)$/.exec(key); if (k) applyCh(k[1], +k[2]); }
     if (Array.isArray(m.patches)) { patches = m.patches; save(); renderCables(); }
@@ -98,7 +98,7 @@
         const head = String.fromCharCode(...it.data.subarray(0, 6));
         try {
           if (head === 'ASTAP1' || /\.tap$/i.test(it.name)) await loadTap(it.data, it.name);
-          else if (/\.mix$/i.test(it.name) || (head.startsWith('{') && /analog-studio-mix/.test(new TextDecoder().decode(it.data.subarray(0, 200))))) loadMix(it.data, it.name);
+          else if (/\.mix$/i.test(it.name) || (head.startsWith('{') && /(jh|analog)-studio-mix/.test(new TextDecoder().decode(it.data.subarray(0, 200))))) loadMix(it.data, it.name);
           else if (mode === 'import') audio.push(new File([it.data], it.name.split('/').pop()));
           else fsay(`${it.name}: LOAD opens .TAP tapes and .MIX mixes. Use IMPORT for audio.`);
         } catch (e) { fsay(`${it.name}: ${e.message}`); }

@@ -1,4 +1,4 @@
-// Audio and session file writers for Analog Studio. Plain JS, no dependencies: runs in the page, in Node tests, and
+// Audio and session file writers for JH-Studio. Plain JS, no dependencies: runs in the page, in Node tests, and
 // ports to the native app. Input samples are Float32Array, full scale ±1.
 
 const clampI = (x, max) => Math.max(-max - 1, Math.min(max, Math.round(x * max)));
@@ -116,7 +116,7 @@ export function writeTap(meta, tracks) {   // tracks[i] = [{ ...piece fields, da
 }
 export function readTap(u8) {
   const v = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
-  if (String.fromCharCode(...u8.subarray(0, 6)) !== 'ASTAP1') throw new Error('not an Analog Studio .TAP file');
+  if (String.fromCharCode(...u8.subarray(0, 6)) !== 'ASTAP1') throw new Error('not a JH-Studio .TAP file');
   const L = v.getUint32(6, true), meta = JSON.parse(new TextDecoder().decode(u8.subarray(10, 10 + L)));
   let off = 10 + L; off += (4 - (off % 4)) % 4;
   meta.tracks = meta.tracks.map((t) => t.map((p) => { const data = new Float32Array(u8.buffer.slice(u8.byteOffset + off, u8.byteOffset + off + p.n * 4)); off += p.n * 4; return { ...p, lo: p.lo ?? -Infinity, hi: p.hi ?? Infinity, data }; }));

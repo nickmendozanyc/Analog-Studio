@@ -34,7 +34,7 @@ test('ZIP: stored entries with good CRCs', () => {
 });
 test('.TAP round trip', () => {
   const tr = [[{ u0: 1.5, du: 0.0001, post: false, lo: -Infinity, hi: 3, fadeLo: 0, fadeHi: 0.01, data: x.slice(0, 1000) }], [], [{ u0: 0, du: 1, post: true, lo: -Infinity, hi: Infinity, fadeLo: 0, fadeHi: 0, data: x.slice(5, 9) }]];
-  const m = readTap(writeTap({ format: 'analog-studio-tap', tape: 'gp9' }, tr));
+  const m = readTap(writeTap({ format: 'jh-studio-tap', tape: 'gp9' }, tr));
   assert.equal(m.tape, 'gp9'); assert.equal(m.tracks.length, 3); assert.equal(m.tracks[0][0].hi, 3); assert.equal(m.tracks[0][0].lo, -Infinity);
   assert.deepEqual([...m.tracks[0][0].data], [...x.slice(0, 1000)]); assert.deepEqual([...m.tracks[2][0].data], [...x.slice(5, 9)]);
 });
