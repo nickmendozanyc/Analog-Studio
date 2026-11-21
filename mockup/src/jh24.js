@@ -143,10 +143,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       labRGB: '30,30,30', labK: 0.35,
     },
     scotia: {
-      name: 'Scotia', ...SILVER, face: silver('#dcdfe2', '#e1e3e6', '#d5d8dc', '#e8eaed'),
-      win: { n: 3, rIn: 0.44, rOut: 0.87, wIn: 0.28, wOut: 0.56, c: 0.07, a0: 60 },
-      labels: [[0, () => `<g>${T(0, 16, 'Scotia', 50, 'rgba(255,255,255,0.45)', 'font-style="italic" stroke="#8a8e93" stroke-width="1.6" letter-spacing="1"')}${T(78, -6, '®', 12, '#8a8e93')}</g>`]],
-      labRGB: '150,154,160', labK: 0.25,
+      // the 250 as photographed: matte aluminium, three wide windows, a solid dark-grey logo between the top two, the
+      // number on a small brass plate under it, and three brass screws round the hub (one under the plate, two lower)
+      name: 'Scotia 250', ...SILVER, face: silver('#cdd0d2', '#d1d3d5', '#c9ccce', '#d5d7d9'), edge: 'linear-gradient(90deg,#86898d,#d9dbdd 40%,#74777b)', back: '#8d9094',
+      win: { n: 3, rIn: 0.46, rOut: 0.89, wIn: 0.4, wOut: 0.66, c: 0.1, a0: 60 },
+      labels: [[0, () => {
+        const scr = (y) => `<circle cx="0" cy="${y}" r="4.6" fill="#8a6a2c"/><circle cx="0" cy="${y}" r="3.6" fill="#c9a24e"/><circle cx="-1" cy="${y - 1}" r="1.6" fill="#f1dc9c" opacity="0.8"/><line x1="-2.6" y1="${y}" x2="2.6" y2="${y}" stroke="#6b501f" stroke-width="1"/>`;
+        return `<g>${T(-4, 2, 'Scotia', 46, '#4c4f53', 'letter-spacing="-0.5"')}${T(70, -22, '®', 9, '#4c4f53')}<rect x="-42" y="13" width="84" height="28" rx="1.5" fill="#a88b4a"/><rect x="-40.5" y="14.5" width="81" height="25" rx="1" fill="#cdb376"/><rect x="-40.5" y="14.5" width="81" height="8" rx="1" fill="#fff" opacity="0.18"/>${T(0, 34.5, '250', 19, '#eae2c8', 'stroke="#8f7638" stroke-width="0.6"')}${scr(56)}</g>`;
+      }], ...[128, 232].map((a) => [a, () => `<g><circle cx="0" cy="58" r="4.6" fill="#8a6a2c"/><circle cx="0" cy="58" r="3.6" fill="#c9a24e"/><circle cx="-1" cy="57" r="1.6" fill="#f1dc9c" opacity="0.8"/><line x1="-2.6" y1="58" x2="2.6" y2="58" stroke="#6b501f" stroke-width="1"/></g>`])],
+      labRGB: '76,79,83', labK: 0.35,
     },
     atx: {
       name: 'ATX Magnetics', ...SILVER, face: silver('#e1e3e5', '#e6e7e9', '#dadcdf', '#edeef0'),
