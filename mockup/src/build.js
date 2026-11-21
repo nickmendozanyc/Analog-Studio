@@ -1513,64 +1513,89 @@ function rmxFace(w, h) {
   p(`<text class="${id('route')}" x="${X(624)}" y="${Y(600)}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
 }
 function junoBody(w, h) {
-  // Rowan JUNO-1060 (after the Roland Juno-106), seen from above: black top panel with the slider sections, the left-hand
-  // module (volume, tune, transpose, the bender with its DCO / VCF sliders), the patch programmer at the right, wooden-free
-  // black end cheeks and the 61-note keyboard. Units are millimetres of the real one (988 x 352), scaled.
-  const s = w / 988, X = (mm) => mm * s, Y = (mm) => mm * h / 352, W = '#ece8dc', G = '#9b978c', K = '#121213';
+  // Rowan JUNO-1060, drawn from the user's photo of a real Juno-106 (straight down): positions are the photo's pixels
+  // (the instrument spans x 28-1160, y 370-726 there), mapped onto the body
+  const X = (px) => (px - 28) * w / 1132, Y = (py) => (py - 370) * h / 356, s = w / 1132, W = '#e9e6dc', G = '#a9a59a', RED = '#b72a26', BLUE = '#2f7fd0';
   const T = (x, y, t, sz, col = W, a = 'middle', wt = 800, ex = '') => text(X(x), Y(y), t, sz * s, col, a, wt, ex);
-  rect(0, 0, w, h, '#0d0d0e', `rx="${6 * s}"`); rect(X(6), Y(4), X(976), Y(150), '#1b1b1d', `rx="${3 * s}"`);
-  rect(X(6), Y(4), X(976), Y(2), '#fff', 'opacity="0.06"');
-  // name strip
-  T(12, 12.5, 'Rowan', 6.5, W, 'start', 700); T(36, 12.5, 'JUNO-1060', 7.5, W, 'start', 900, 'letter-spacing="0.6"'); T(86, 12.5, 'PROGRAMMABLE POLYPHONIC SYNTHESIZER', 3, G, 'start', 700, 'letter-spacing="0.6"');
-  // a slider: slot, cap (class ju-s-KEY moves), scale 0-10
-  const slider = (x, k, lab, y0 = 40, len = 72) => {
-    T(x, y0 - 8, lab, 2.8, W, 'middle', 800);
-    for (let i = 0; i <= 10; i++) p(`<line x1="${X(x - 3.2)}" y1="${Y(y0 + len - i * len / 10)}" x2="${X(x - 2)}" y2="${Y(y0 + len - i * len / 10)}" stroke="${G}" stroke-width="${0.25 * s}"/>`);
-    rect(X(x - 0.6), Y(y0), X(1.2), Y(len), '#000', `rx="${0.6 * s}"`);
-    p(`<g data-jk="${k}" style="cursor:ns-resize"><rect x="${X(x - 6)}" y="${Y(y0 - 4)}" width="${X(12)}" height="${Y(len + 8)}" fill="transparent"/>`);
-    p(`<g class="ju-s-${k}" data-y0="${Y(y0)}" data-len="${Y(len)}" transform="translate(0 0)"><rect x="${X(x - 3.6)}" y="${Y(y0) - 2.8 * s}" width="${X(7.2)}" height="${5.6 * s}" rx="${0.6 * s}" fill="#2c2c2f" stroke="#000" stroke-width="${0.4 * s}"/><rect x="${X(x - 3.6)}" y="${Y(y0) - 0.35 * s}" width="${X(7.2)}" height="${0.7 * s}" fill="#f2efe6"/></g></g>`);
+  rect(0, 0, w, h, '#0b0b0c', `rx="${4 * s}"`);
+  for (const [x0, x1] of [[28, 68], [1120, 1160]]) { rect(X(x0), 0, X(x1) - X(x0), h, '#141415', `rx="${4 * s}"`); rect(X(x0) + 2 * s, 0, 3 * s, h, '#fff', 'opacity="0.05"'); }
+  rect(X(68), Y(372), X(1120) - X(68), Y(565) - Y(372), '#26272a');
+  // rear-panel label strip along the top
+  rect(X(68), Y(372), X(1120) - X(68), Y(388) - Y(372), '#1c1c1e');
+  [['LEVEL', 92], ['MONO · STEREO', 128], ['PHONES', 176], ['PEDAL HOLD', 196], ['PITCH SHIFT', 216], ['SAVE  LOAD', 245], ['TUNE', 285]].forEach(([t, x]) => T(x, 380, t, 1.8, G));
+  T(160, 386, 'OUTPUT', 1.8, G); T(245, 386, 'TAPE', 1.8, G);
+  [['FUNCTION', 905], ['IN', 958], ['OUT', 985], ['THRU', 1010], ['MEMORY PROTECT', 1040], ['POWER', 1080]].forEach(([t, x]) => T(x, 380, t, 1.8, G)); T(985, 386, 'MIDI', 1.8, G);
+  // left panel: cream stripe, logo, rule
+  rect(X(70), Y(394), X(305) - X(70), Y(404) - Y(394), '#e4e0d4');
+  rect(X(92), Y(406), 9 * s, 7 * s, 'none', `stroke="${W}" stroke-width="${1.2 * s}"`); T(104, 418, 'Rowan', 11.5, W, 'start', 600);
+  rect(X(70), Y(470), X(305) - X(70), 0.8 * s, '#e4e0d4');
+  // section headers (red) and the blue line
+  [['LFO', 308, 352], ['DCO', 355, 557], ['HPF', 560, 585], ['VCF', 588, 696], ['VCA', 699, 738], ['ENV', 741, 816], ['CHORUS', 819, 880]].forEach(([n, a, b]) => { rect(X(a), Y(390), X(b) - X(a), Y(404) - Y(390), RED); T((a + b) / 2, 401, n, 5.2, '#fff2ea', 'middle', 900); });
+  rect(X(882), Y(397), X(1110) - X(882), 2.6 * s, BLUE);
+  rect(X(308), Y(470), X(880) - X(308), 1.6 * s, RED);
+  const slider = (x, k, lab, y0 = 425, len = 38) => {
+    if (lab) T(x, y0 - 8, lab, 2.1, W);
+    for (let i = 0; i <= 10; i++) p(`<line x1="${X(x - 3.8)}" y1="${Y(y0 + len - i * len / 10)}" x2="${X(x - 2.4)}" y2="${Y(y0 + len - i * len / 10)}" stroke="${G}" stroke-width="${0.25 * s}"/>`);
+    rect(X(x) - 0.7 * s, Y(y0), 1.4 * s, Y(y0 + len) - Y(y0), '#000', `rx="${0.6 * s}"`);
+    p(`<g data-jk="${k}" style="cursor:ns-resize"><rect x="${X(x - 7)}" y="${Y(y0 - 5)}" width="${X(x + 7) - X(x - 7)}" height="${Y(y0 + len + 5) - Y(y0 - 5)}" fill="transparent"/>`);
+    p(`<g class="ju-s-${k}" data-len="${(Y(y0 + len) - Y(y0)).toFixed(2)}" transform="translate(0 0)"><rect x="${X(x) - 4.2 * s}" y="${Y(y0) - 3 * s}" width="${8.4 * s}" height="${6 * s}" rx="${0.6 * s}" fill="#18181a" stroke="#000" stroke-width="${0.4 * s}"/><rect x="${X(x) - 4.2 * s}" y="${Y(y0) - 0.4 * s}" width="${8.4 * s}" height="${0.8 * s}" fill="#f2efe6"/></g></g>`);
   };
-  // a button with a red LED above it (class ju-l-KEY)
-  const btn = (x, y, k, lab, col = '#c9c5b8', bw = 7, led = true) => {
-    if (led) { circle(X(x), Y(y - 6), 0.9 * s, '#3a1412'); p(`<circle class="ju-l-${k}" cx="${X(x)}" cy="${Y(y - 6)}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
-    p(`<g data-jb="${k}" style="cursor:pointer">`); rect(X(x - bw / 2), Y(y - 2.6), X(bw), Y(5.2), '#000', `rx="${0.6 * s}"`); rect(X(x - bw / 2 + 0.4), Y(y - 2.4), X(bw - 0.8), Y(4.6), col, `rx="${0.5 * s}"`); p('</g>');
-    if (lab) T(x, y + 7, lab, 2.4, W, 'middle', 800);
+  const btn = (x, y, k, col, lab, led = true, bw = 14) => {
+    if (led) { circle(X(x), Y(y - 10), 1.2 * s, '#3a1412'); p(`<circle class="ju-l-${k}" cx="${X(x)}" cy="${Y(y - 10)}" r="${1.2 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
+    p(`<g data-jb="${k}" style="cursor:pointer">`); rect(X(x) - bw / 2 * s, Y(y) - 4.2 * s, bw * s, 8.4 * s, '#000', `rx="${0.6 * s}"`); rect(X(x) - (bw / 2 - 0.6) * s, Y(y) - 3.6 * s, (bw - 1.2) * s, 7.2 * s, col, `rx="${0.5 * s}"`); rect(X(x) - (bw / 2 - 0.6) * s, Y(y) - 3.6 * s, (bw - 1.2) * s, 2 * s, '#fff', `opacity="0.25" rx="${0.5 * s}"`); p('</g>');
+    if (lab) T(x, y - 14, lab, 1.9, W);
   };
-  const sect = (x0, x1, name) => { rect(X(x0), Y(22), X(x1 - x0), Y(1), '#5b5a55'); T((x0 + x1) / 2, 20.5, name, 3, W, 'middle', 900, 'letter-spacing="0.8"'); p(`<line x1="${X(x1 + 2)}" y1="${Y(24)}" x2="${X(x1 + 2)}" y2="${Y(140)}" stroke="#3a3a3c" stroke-width="${0.5 * s}"/>`); };
-  // left module: VOLUME, TUNE, KEY TRANSPOSE; bender with DCO / VCF and LFO TRIG
-  sect(10, 74, 'MASTER'); slider(20, 'vol', 'VOLUME'); slider(36, 'tune', 'TUNE'); btn(58, 66, 'transpose', 'KEY TRANS', '#c9c5b8', 9);
-  T(58, 92, 'BENDER', 2.6); slider(50, 'bendDco', 'DCO', 100, 30); slider(66, 'bendVcf', 'VCF', 100, 30);
-  // main sections
-  sect(84, 118, 'LFO'); slider(92, 'lfoRate', 'RATE'); slider(110, 'lfoDelay', 'DELAY');
-  sect(124, 262, 'DCO'); slider(132, 'dcoLfo', 'LFO'); slider(150, 'pwm', 'PWM'); btn(168, 50, 'pwmLfo', 'LFO / MAN', '#c9c5b8', 8);
-  T(196, 36, 'RANGE', 2.6); btn(186, 50, 'r16', "16'"); btn(198, 50, 'r8', "8'"); btn(210, 50, 'r4', "4'");
-  btn(186, 82, 'pulse', 'PULSE'); btn(200, 82, 'saw', 'SAW'); slider(230, 'sub', 'SUB OSC'); slider(250, 'noise', 'NOISE');
-  sect(268, 290, 'HPF'); slider(279, 'hpf', 'FREQ');
-  sect(296, 412, 'VCF'); slider(306, 'cutoff', 'FREQ'); slider(324, 'res', 'RES'); btn(343, 50, 'envPol', 'ENV ±', '#c9c5b8', 8); slider(362, 'env', 'ENV'); slider(380, 'vcfLfo', 'LFO'); slider(398, 'kybd', 'KYBD');
-  sect(418, 458, 'VCA'); btn(428, 50, 'vcaGate', 'ENV / GATE', '#c9c5b8', 8); slider(448, 'vcaLevel', 'LEVEL');
-  sect(464, 540, 'ENV'); slider(472, 'a', 'A'); slider(490, 'd', 'D'); slider(508, 's', 'S'); slider(526, 'r', 'R');
-  sect(546, 586, 'CHORUS'); btn(556, 50, 'ch1', 'I', '#c9c5b8', 8); btn(576, 50, 'ch2', 'II', '#c9c5b8', 8); T(566, 88, 'OFF = both up', 2.2, G);
-  // programmer: LED display, BANK 1-8, PATCH 1-8, MANUAL, WRITE
-  sect(594, 976, 'PROGRAMMER');
-  rect(X(604), Y(34), X(38), Y(22), '#160302', `rx="${1 * s}"`);
-  p(`<text x="${X(623)}" y="${Y(51)}" font-family="${MONO2}" font-size="${13 * s}" font-weight="700" fill="#ff2a14" opacity="0.08" text-anchor="middle">88</text>`);
-  p(`<text class="ju-disp" x="${X(623)}" y="${Y(51)}" font-family="${MONO2}" font-size="${13 * s}" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">11</text>`);
-  T(623, 64, 'BANK · NUMBER', 2.2, G);
-  T(700, 34, 'BANK', 2.8); for (let i = 0; i < 8; i++) btn(660 + i * 13, 50, 'b' + i, String(i + 1), '#c9c5b8', 9);
-  T(700, 74, 'PATCH', 2.8); for (let i = 0; i < 8; i++) btn(660 + i * 13, 90, 'p' + i, String(i + 1), '#e8e0c8', 9);
-  btn(780, 50, 'manual', 'MANUAL', '#c9c5b8', 12); btn(780, 90, 'write', 'WRITE', '#c9352b', 12);
-  T(890, 46, 'Bank 1 holds the factory sounds,', 2.6, G); T(890, 53, 'banks 2-8 your own (WRITE).', 2.6, G);
-  p(`<text class="ju-name" x="${X(890)}" y="${Y(78)}" font-family="${MONO2}" font-size="${7 * s}" font-weight="700" fill="#ffb02e" text-anchor="middle">STRINGS</text>`);
-  // bender lever
-  rect(X(14), Y(166), X(56), Y(26), '#202022', `rx="${2 * s}"`); p(`<g data-jb="bend" style="cursor:ew-resize"><rect x="${X(18)}" y="${Y(172)}" width="${X(48)}" height="${Y(14)}" fill="#0b0b0c" rx="${1.5 * s}"/><rect class="ju-bend" x="${X(39)}" y="${Y(168)}" width="${X(6)}" height="${Y(22)}" fill="#4a4a4e" rx="${1 * s}"/></g>`);
-  btn(42, 205, 'lfotrig', 'LFO TRIG', '#c9c5b8', 14, false);
-  // the keyboard: 61 notes, C to C (36 .. 96)
-  const kx0 = 84, kx1 = 976, ky0 = 160, ky1 = 346, whites = []; for (let n = 36; n <= 96; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
+  const sw = (x, y, k, a, b) => { p(`<g data-jb="${k}" style="cursor:pointer">`); rect(X(x) - 2.4 * s, Y(y) - 7 * s, 4.8 * s, 14 * s, '#000', `rx="${0.8 * s}"`); p(`<rect class="ju-w-${k}" x="${X(x) - 1.8 * s}" y="${Y(y) - 6.2 * s}" width="${3.6 * s}" height="${5.6 * s}" rx="${0.5 * s}" fill="#c9c5b8"/>`); p('</g>'); T(x + 7, y - 4, a, 1.7, W, 'start'); T(x + 7, y + 7, b, 1.7, W, 'start'); };
+  const CREAM = '#e6dcc0', ORANGE = '#f09a2a', TEAL = '#6fb3a8';
+  // LFO
+  slider(325, 'lfoRate', 'RATE'); slider(344, 'lfoDelay', 'DELAY TIME');
+  // DCO
+  T(387, 416, 'RANGE', 2.1); btn(370, 440, 'r16', CREAM, ''); btn(387, 440, 'r8', CREAM, ''); btn(404, 440, 'r4', CREAM, '');
+  T(370, 427, "16'", 1.7, G); T(387, 427, "8'", 1.7, G); T(404, 427, "4'", 1.7, G);
+  slider(430, 'dcoLfo', 'LFO'); slider(447, 'pwm', 'PWM'); sw(465, 446, 'pwmLfo', 'LFO', 'MAN');
+  btn(486, 440, 'pulse', CREAM, '⊓'); btn(502, 440, 'saw', CREAM, '◿');
+  slider(528, 'sub', 'SUB'); slider(546, 'noise', 'NOISE');
+  // HPF
+  slider(572, 'hpf', 'FREQ');
+  // VCF
+  slider(598, 'cutoff', 'FREQ'); slider(615, 'res', 'RES'); sw(632, 446, 'envPol', '+', '−'); slider(652, 'env', 'ENV'); slider(669, 'vcfLfo', 'LFO'); slider(687, 'kybd', 'KYBD');
+  // VCA
+  sw(708, 446, 'vcaGate', 'ENV', 'GATE'); slider(727, 'vcaLevel', 'LEVEL');
+  // ENV
+  slider(751, 'a', 'A'); slider(768, 'd', 'D'); slider(785, 's', 'S'); slider(802, 'r', 'R');
+  // CHORUS
+  btn(832, 440, 'choff', CREAM, 'OFF'); btn(849, 440, 'ch1', ORANGE, 'I'); btn(866, 440, 'ch2', ORANGE, 'II');
+  // programmer row
+  T(325, 494, 'KEY', 1.9); T(325, 500, 'TRANSPOSE', 1.9); btn(325, 520, 'transpose', ORANGE, '', false);
+  T(350, 494, 'POLY', 1.9); btn(342, 520, 'poly1', CREAM, '', false); btn(358, 520, 'poly2', CREAM, '', false);
+  T(386, 500, 'MIDI CH', 1.9, '#7fb6e0'); btn(386, 520, 'midich', TEAL, '', false);
+  T(410, 490, 'SELECT', 1.9); T(410, 496, 'GROUP A', 1.9); T(410, 502, 'GROUP B', 1.9); btn(410, 520, 'group', TEAL, '', false);
+  rect(X(430), Y(490), X(565) - X(430), 4.4 * s, BLUE); T(497, 493.6, 'BANK', 2, '#fff');
+  rect(X(628), Y(490), X(763) - X(628), 4.4 * s, BLUE); T(696, 493.6, 'PATCH NUMBER', 2, '#fff'); T(602, 496, 'PATCH', 1.8); T(602, 501, 'BANK  NUMBER', 1.6);
+  for (let i = 0; i < 8; i++) { T(437 + i * 17, 508, String(i + 1), 1.9); btn(437 + i * 17, 520, 'b' + i, TEAL, '', false); T(640 + i * 17, 508, String(i + 1), 1.9); btn(640 + i * 17, 520, 'p' + i, TEAL, '', false); }
+  for (let i = 0; i < 8; i++) { T(437 + i * 17, 536, String(i + 1), 1.6, G); T(640 + i * 17, 536, String(i + 9), 1.6, G); }
+  rect(X(590), Y(506), X(615) - X(590), Y(530) - Y(506), '#180303', `rx="${0.8 * s}"`);
+  p(`<text x="${X(602.5)}" y="${Y(524)}" font-family="${MONO2}" font-size="${12 * s}" font-weight="700" fill="#ff2a14" opacity="0.08" text-anchor="middle">88</text>`);
+  p(`<text class="ju-disp" x="${X(602.5)}" y="${Y(524)}" font-family="${MONO2}" font-size="${12 * s}" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">11</text>`);
+  T(780, 500, 'MANUAL', 1.9); btn(780, 520, 'manual', ORANGE, '', true); T(806, 500, 'WRITE', 1.9); btn(806, 520, 'write', ORANGE, '', true);
+  T(830, 500, 'SAVE', 1.9); btn(830, 520, 'save', CREAM, '', false); T(848, 500, 'VERIFY', 1.9); btn(848, 520, 'verify', ORANGE, '', false); T(866, 500, 'LOAD', 1.9); btn(866, 520, 'load', ORANGE, '', false);
+  // the name
+  T(1008, 466, 'JUNO-1060', 22, W, 'middle', 900, 'font-stretch="125%" letter-spacing="0.5"'); T(1008, 481, 'PROGRAMMABLE POLYPHONIC SYNTHESIZER', 3.4, W, 'middle', 900);
+  p(`<text class="ju-name" x="${X(1008)}" y="${Y(520)}" font-family="${MONO2}" font-size="${7 * s}" font-weight="700" fill="#ffb02e" text-anchor="middle">STRINGS</text>`);
+  // front-left module: VOLUME, PORTAMENTO, bender sliders, switch, lever
+  rect(X(68), Y(566), X(160) - X(68), Y(726) - Y(566), '#26272a');
+  const knob = (x, y, k, lab) => { T(x, y - 12, lab, 2, W); for (let i = 0; i <= 10; i++) { const a = (-135 + i * 27) * Math.PI / 180; circle(X(x) + Math.sin(a) * 10 * s, Y(y) - Math.cos(a) * 10 * s, 0.4 * s, G); }
+    p(`<g data-jk="${k}" style="cursor:ns-resize"><circle cx="${X(x)}" cy="${Y(y)}" r="${12 * s}" fill="transparent"/><circle cx="${X(x)}" cy="${Y(y)}" r="${7.5 * s}" fill="#101011"/><g class="ju-s-${k}" data-len="${30 * s}" data-knob="1" transform="rotate(0 ${X(x)} ${Y(y)})"><rect x="${X(x) - 0.5 * s}" y="${Y(y) - 7.5 * s}" width="${1 * s}" height="${4 * s}" fill="#f2efe6"/></g></g>`); };
+  knob(95, 596, 'vol', 'VOLUME'); knob(136, 596, 'porta', 'PORTAMENTO');
+  slider(92, 'bendDco', 'DCO', 627, 30); slider(110, 'bendVcf', 'VCF', 627, 30); slider(128, 'bendLfo', 'LFO', 627, 30); sw(146, 642, 'bendSw', 'OFF', 'ON');
+  T(110, 676, 'LFO TRIG', 1.9); T(110, 712, 'BENDER', 2);
+  p(`<g data-jb="bend" style="cursor:ew-resize"><rect x="${X(90)}" y="${Y(684)}" width="${X(132) - X(90)}" height="${Y(702) - Y(684)}" fill="#000" rx="${1.5 * s}"/><rect class="ju-bend" x="${X(108)}" y="${Y(680)}" width="${X(112) - X(108)}" height="${Y(706) - Y(680)}" fill="#4a4a4e" rx="${0.8 * s}"/></g>`);
+  // the keyboard: 61 notes (36 .. 96), from x 160 to 1118
+  const kx0 = 160, kx1 = 1118, ky0 = 568, ky1 = 724, whites = []; for (let n = 36; n <= 96; n++) if (![1, 3, 6, 8, 10].includes(n % 12)) whites.push(n);
   const ww = (kx1 - kx0) / whites.length;
-  rect(X(kx0 - 2), Y(ky0 - 3), X(kx1 - kx0 + 4), Y(ky1 - ky0 + 5), '#000');
-  whites.forEach((n, i) => { p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + i * ww + 0.2)}" y="${Y(ky0)}" width="${X(ww - 0.4)}" height="${Y(ky1 - ky0)}" rx="${0.8 * s}" fill="#f1ede3" stroke="#8d8a82" stroke-width="${0.3 * s}" style="cursor:pointer"/>`); });
-  for (let n = 36; n <= 96; n++) if ([1, 3, 6, 8, 10].includes(n % 12)) { const i = whites.indexOf(n - 1); p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + (i + 1) * ww - ww * 0.3)}" y="${Y(ky0)}" width="${X(ww * 0.6)}" height="${Y((ky1 - ky0) * 0.62)}" rx="${0.6 * s}" fill="#111" style="cursor:pointer"/>`); }
-  rect(X(kx0 - 2), Y(ky0 - 3), X(kx1 - kx0 + 4), Y(4), '#7a1a14');   // the red felt strip
+  rect(X(kx0 - 2), Y(ky0 - 2), X(kx1 + 2) - X(kx0 - 2), Y(ky1 + 2) - Y(ky0 - 2), '#000');
+  whites.forEach((n, i) => p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + i * ww) + 0.3 * s}" y="${Y(ky0)}" width="${X(kx0 + ww) - X(kx0) - 0.6 * s}" height="${Y(ky1) - Y(ky0)}" rx="${0.8 * s}" fill="#f1ede3" stroke="#8d8a82" stroke-width="${0.3 * s}" style="cursor:pointer"/>`));
+  for (let n = 36; n <= 96; n++) if ([1, 3, 6, 8, 10].includes(n % 12)) { const i = whites.indexOf(n - 1); p(`<rect class="ju-k" data-jn="${n}" x="${X(kx0 + (i + 1) * ww - ww * 0.3)}" y="${Y(ky0)}" width="${X(kx0 + ww * 0.6) - X(kx0)}" height="${(Y(ky1) - Y(ky0)) * 0.63}" rx="${0.6 * s}" fill="#111" style="cursor:pointer"/>`); }
 }
 function tr909Body(bw, bh) {
   // Rowan TR-9090 (after the Roland TR-909), drawn from the user's straight-on photo: the off-white panel with grey end
@@ -2123,8 +2148,8 @@ const PX_PER_IN19 = 1395 / 19;   // the pop-ups' 19-inch scale (a 60-inch 4K scr
     + unitBox(deskL, deskY + Math.max(0, (d9H - d8H) / 2), d8W, d8H, '0 0 528 300', () => tr808Body(528, 300), 'tr808', 'Open the Rowan TR-8080')
     + unitBox(deskL + d8W + gap, deskY, d9W, d9H, `0 0 484 ${t8H9}`, () => tr909Body(484, t8H9), 'tr909', 'Open the Rowan TR-9090')
     + `<div class="rr-909cap" style="left:${deskL}px;top:${deskY + Math.max(d8H, d9H) + 28}px;width:${deskR - deskL}px">ROWAN TR-8080 · ROWAN TR-9090 · click one to play it</div>`;
-  const juW = deskR - deskL, juH = Math.round(juW * 352 / 988), juY = deskY + Math.max(d8H, d9H) + 110;
-  const juDesk = unitBox(deskL, juY, juW, juH, '0 0 988 352', () => junoBody(988, 352), 'juno', 'Open the Rowan JUNO-1060') + `<div class="rr-909cap" style="left:${deskL}px;top:${juY + juH + 24}px;width:${juW}px">ROWAN JUNO-1060 · click it to play</div>`;
+  const juW = deskR - deskL, juH = Math.round(juW * 356 / 1132), juY = deskY + Math.max(d8H, d9H) + 110;
+  const juDesk = unitBox(deskL, juY, juW, juH, '0 0 1132 356', () => junoBody(1132, 356), 'juno', 'Open the Rowan JUNO-1060') + `<div class="rr-909cap" style="left:${deskL}px;top:${juY + juH + 24}px;width:${juW}px">ROWAN JUNO-1060 · click it to play</div>`;
   scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div>${desk}${juDesk}<div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}${[1, 2, 3].map((k) => lightHtml(4 - k, RX - k * (RW + 40), false)).join('')}<div class="hot" data-open="s900" style="left:${globalThis.S9_HOT.x}px;top:${Math.round(globalThis.S9_HOT.y)}px;width:${globalThis.S9_HOT.w}px;height:${Math.round(globalThis.S9_HOT.h)}px" title="Open the Akita S900 sampler"><span>Open the Akita S900 sampler</span></div>${[1, 2, 3].map((k) => `<div class="fm-hot" data-fm="${4 - k}" style="left:${RX - k * (RW + 40) + 26}px;top:${RY + fmTop}px;width:${RW - 52}px;height:${Math.round(fmH)}px" title="Fermann PL-8 C: click to pull the rack lights out or push them in; drag up / down or scroll for the dimmer"></div>`).join('')}</div>`);
 }
 
@@ -2547,7 +2572,7 @@ ${overlay('rmx', 'AXS RMX16 DIGITAL REVERBERATION SYSTEM', `<div class="ovsync">
 ${overlay('pcm', 'LEXIMAN PCM41 × 2 · PCM42 × 2 DIGITAL DELAY PROCESSORS', `<div class="ovsync">${['41A', '41B', '42A', '42B'].map((u) => panelSVG(1, '#111112', (w, h) => pcmFace(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
   <div class="sk">${['41A', '41B', '42A', '42B'].map((u) => `<button type="button" data-pf="${u}:byp" title="The bypass footswitch (rear jack)">PCM${u.slice(0, 2)} ${u[2]} · BYPASS</button>${u[1] === '1' ? `<button type="button" data-pf="${u}:rpt" title="The repeat footswitch (rear jack)">REPEAT</button>` : ''}<span class="gap"></span>`).join('')}</div>
   <p class="note">Drag the knobs (Shift for fine; double-click resets), click the buttons. PCM41: ◀ ▶ DELAY SELECT steps the eleven taps (0 to 200 ms; DLY X2 doubles them at 6 kHz bandwidth), DELAY MULTIPLY stretches any tap from half to double. The sweep (DEPTH, WAVEFORM: sine, ENV follower, square; RATE) changes the sample clock itself, so the pitch bends, and at slow clock settings the PCM41 aliases. FILTER INV / LO / HI shape the repeats; INV by the mix inverts the delay. Bypass and repeat are footswitches on the real PCM41: use the buttons under the panels. PCM42: SET-MODE on DLY, UP / DOWN step 256 taps up to 800 ms (hold to repeat, hold both to slew fast), and the display shows the real delay as it sweeps; on CLK, DOWN sets the beat's numerator and UP its denominator. ∞ RPT holds the whole memory, starting and stopping on the clock's beat. Each unit replaces its channel on the insert it is patched to (PCM41 A on the hats, B on ch 9, PCM42 A on ch 10, B on ch 11 to start).</p></div>`, '<span class="ov-msg" id="pcm-msg"></span>', true)}
-${overlay('juno', 'ROWAN JUNO-1060 PROGRAMMABLE POLYPHONIC SYNTHESIZER', `<div class="ovsync"><svg width="3000" height="${Math.round(3000 * 352 / 988)}" viewBox="0 0 988 352" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => junoBody(988, 352))}</svg>
+${overlay('juno', 'ROWAN JUNO-1060 PROGRAMMABLE POLYPHONIC SYNTHESIZER', `<div class="ovsync"><svg width="3200" height="${Math.round(3200 * 356 / 1132)}" viewBox="0 0 1132 356" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => junoBody(1132, 356))}</svg>
   <div class="sk"><select id="ju-midi" class="ov-pick"><option value="">MIDI IN · computer keys</option></select><span class="gap"></span><span class="v" style="font:700 14px JetBrains Mono,monospace;color:#c9c2b0">OUT: STEREO MIX</span></div>
   <p class="note">Play it on the keys (click or drag), on your computer keyboard (A W S E D F T G Y H U J K: one octave, Z / X shift it) or from a MIDI keyboard. Drag the sliders (double-click resets one). PATCH 1-8 calls a sound from the bank shown (bank 1: STRINGS, BRASS, BASS, PAD, PIANO, LEAD, HOOVER, SWEEP); BANK picks the bank, MANUAL plays what the sliders show, WRITE then a PATCH key stores the panel there (banks 2-8). Chorus I and II as on the original: both off, either, or both together. Drag the bender left / right (its DCO and VCF sliders set how far it bends).</p></div>`, '<span class="ov-msg" id="ju-msg"></span>', true)}
 ${overlay('tr909', 'ROWAN TR-9090 RHYTHM COMPOSER', `<div class="ovsync"><svg width="2600" height="${Math.round(2600 * 453 / 758)}" viewBox="0 0 484 ${Math.round(484 * 453 / 758)}" style="display:block;margin:0 auto;user-select:none;touch-action:none">${capture(() => tr909Body(484, Math.round(484 * 453 / 758)))}</svg>

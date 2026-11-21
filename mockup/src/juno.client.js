@@ -1,5 +1,5 @@
   // ---------------- Rowan JUNO-1060: the front panel's working (the voices run in the audio engine, juno.js) ----------------
-  const JU_SL = { vol: [0, 1], tune: [-1, 1], bendDco: [0, 1], bendVcf: [0, 1], lfoRate: [0, 1], lfoDelay: [0, 1], dcoLfo: [0, 1], pwm: [0, 1], sub: [0, 1], noise: [0, 1], hpf: [0, 3], cutoff: [0, 1], res: [0, 1], env: [0, 1], vcfLfo: [0, 1], kybd: [0, 1], vcaLevel: [0, 1], a: [0, 1], d: [0, 1], s: [0, 1], r: [0, 1] };
+  const JU_SL = { vol: [0, 1], porta: [0, 1], bendLfo: [0, 1], bendDco: [0, 1], bendVcf: [0, 1], lfoRate: [0, 1], lfoDelay: [0, 1], dcoLfo: [0, 1], pwm: [0, 1], sub: [0, 1], noise: [0, 1], hpf: [0, 3], cutoff: [0, 1], res: [0, 1], env: [0, 1], vcfLfo: [0, 1], kybd: [0, 1], vcaLevel: [0, 1], a: [0, 1], d: [0, 1], s: [0, 1], r: [0, 1] };
   const JU = { p: { ...junoDefaults(), ...JUNO_PATCHES[0], vol: 0.8, tune: 0 }, bank: 0, patch: 0, manual: false, writing: false, user: {}, oct: 4, held: new Set(), node: null, transpose: 0 };
   try { const sv = JSON.parse(localStorage.getItem('as-juno') || 'null'); if (sv) { Object.assign(JU.p, sv.p || {}); JU.bank = sv.bank || 0; JU.patch = sv.patch || 0; JU.user = sv.user || {}; } } catch (e) { /* storage unavailable */ }
   let juSaveT = 0; const juSave = () => { clearTimeout(juSaveT); juSaveT = setTimeout(() => { try { localStorage.setItem('as-juno', JSON.stringify({ p: JU.p, bank: JU.bank, patch: JU.patch, user: JU.user })); } catch (e) { /* ignore */ } }, 400); };
@@ -9,10 +9,13 @@
   const juSend = () => { juPost({ set: juEngine(), vol: JU.p.vol }); };
   const juName = () => (JU.manual ? 'MANUAL' : JU.bank === 0 ? JUNO_PATCHES[JU.patch].name : (JU.user[`${JU.bank}${JU.patch}`] || {}).name || 'EMPTY');
   function juDraw() {
-    document.querySelectorAll('[data-jk]').forEach((g) => { const k = g.dataset.jk, [lo, hi] = JU_SL[k], c = g.querySelector(`.ju-s-${k}`); if (!c) return; const v = (JU.p[k] - lo) / (hi - lo); c.setAttribute('transform', `translate(0 ${((1 - v) * +c.dataset.len).toFixed(2)})`); });
+    document.querySelectorAll('[data-jk]').forEach((g) => { const k = g.dataset.jk, [lo, hi] = JU_SL[k], c = g.querySelector(`.ju-s-${k}`); if (!c) return; const v = ((JU.p[k] ?? lo) - lo) / (hi - lo);
+      if (c.dataset.knob) { const m = /rotate\([^ ]+ ([^ ]+) ([^)]+)\)/.exec(c.getAttribute('transform')); if (m) c.setAttribute('transform', `rotate(${(-135 + v * 270).toFixed(1)} ${m[1]} ${m[2]})`); } else c.setAttribute('transform', `translate(0 ${((1 - v) * +c.dataset.len).toFixed(2)})`); });
+    const swp = (k, down) => document.querySelectorAll(`.ju-w-${k}`).forEach((e) => { const y0 = +(e.dataset.y0 || (e.dataset.y0 = e.getAttribute('y'))), hh = +e.getAttribute('height'); e.setAttribute('y', down ? y0 + hh * 1.3 : y0); });
+    swp('pwmLfo', !JU.p.pwmLfo); swp('envPol', JU.p.envPol < 0); swp('vcaGate', JU.p.vcaGate); swp('bendSw', JU.p.bendOn !== false);
     const lamp = (k, on) => document.querySelectorAll(`.ju-l-${k}`).forEach((e) => e.setAttribute('opacity', on ? 1 : 0));
     lamp('pwmLfo', JU.p.pwmLfo); lamp('r16', JU.p.range === 16); lamp('r8', JU.p.range === 8); lamp('r4', JU.p.range === 4); lamp('pulse', JU.p.pulse); lamp('saw', JU.p.saw);
-    lamp('envPol', JU.p.envPol < 0); lamp('vcaGate', JU.p.vcaGate); lamp('ch1', JU.p.chorus === 1 || JU.p.chorus === 3); lamp('ch2', JU.p.chorus === 2 || JU.p.chorus === 3);
+    lamp('choff', !JU.p.chorus); lamp('ch1', JU.p.chorus === 1 || JU.p.chorus === 3); lamp('ch2', JU.p.chorus === 2 || JU.p.chorus === 3);
     for (let i = 0; i < 8; i++) { lamp('b' + i, JU.bank === i); lamp('p' + i, !JU.manual && JU.patch === i); }
     lamp('manual', JU.manual); lamp('write', JU.writing); lamp('transpose', JU.transpose !== 0);
     document.querySelectorAll('.ju-disp').forEach((e) => { e.textContent = JU.manual ? '--' : `${JU.bank + 1}${JU.patch + 1}`; });
@@ -27,7 +30,7 @@
   }
   document.querySelectorAll('[data-jk]').forEach((g) => {
     const k = g.dataset.jk, [lo, hi] = JU_SL[k], c = g.querySelector(`.ju-s-${k}`);
-    const set = (v) => { v = Math.max(lo, Math.min(hi, v)); if (k === 'hpf') v = Math.round(v); JU.p[k] = v; if (k === 'vol') juPost({ vol: v }); else if (k === 'tune') juPost({ set: { tune: v } }); else juPost({ set: { [k]: v } }); juSave(); juDraw(); juSay(`${k.toUpperCase()} ${k === 'hpf' ? v : (v * 10).toFixed(1)}`); };
+    const set = (v) => { v = Math.max(lo, Math.min(hi, v)); if (k === 'hpf') v = Math.round(v); JU.p[k] = v; if (k === 'vol') juPost({ vol: v }); else if (k === 'bendLfo') { /* the bender's LFO depth: shown, applied with the lever */ } else if (k === 'tune') juPost({ set: { tune: v } }); else juPost({ set: { [k]: v } }); juSave(); juDraw(); juSay(`${k.toUpperCase()} ${k === 'hpf' ? v : (v * 10).toFixed(1)}`); };
     g.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); g.setPointerCapture(e.pointerId); const r = c.closest('svg').getBoundingClientRect(), sc = r.height / c.closest('svg').viewBox.baseVal.height, len = +c.dataset.len * sc, y0 = e.clientY, v0 = JU.p[k];
       const mv = (ev) => set(v0 + (y0 - ev.clientY) / len * (hi - lo) * (ev.shiftKey ? 0.25 : 1));
       const up = () => { g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); };
@@ -50,6 +53,8 @@
       if (k === 'pwmLfo' || k === 'pulse' || k === 'saw' || k === 'vcaGate') { P[k] = !P[k]; juPost({ set: { [k]: P[k] } }); }
       else if (/^r(16|8|4)$/.test(k)) { P.range = +k.slice(1); juPost({ set: { range: P.range } }); }
       else if (k === 'envPol') { P.envPol = -P.envPol; juPost({ set: { envPol: P.envPol } }); }
+      else if (k === 'choff') { P.chorus = 0; juPost({ set: { chorus: 0 } }); }
+      else if (k === 'bendSw') { P.bendOn = P.bendOn === false; }
       else if (k === 'ch1' || k === 'ch2') { const b = k === 'ch1' ? 1 : 2, on1 = P.chorus === 1 || P.chorus === 3, on2 = P.chorus === 2 || P.chorus === 3, n1 = b === 1 ? !on1 : on1, n2 = b === 2 ? !on2 : on2; P.chorus = n1 && n2 ? 3 : n1 ? 1 : n2 ? 2 : 0; juPost({ set: { chorus: P.chorus } }); }
       else if (/^b\d$/.test(k)) { JU.bank = +k.slice(1); juSay(`BANK ${JU.bank + 1}: press a PATCH key`); }
       else if (/^p\d$/.test(k)) {
