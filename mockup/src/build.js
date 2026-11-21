@@ -1237,6 +1237,55 @@ function dzFace(w, h) {
   key(393, 14, '#2f7fd0', 'MENU', 'PREV', 'prev'); key(410, 15, '#9a9a96', 'CAPTURE', 'CLEAR', 'clear');
   for (const [sx, sy] of [[7, 8], [7, 48], [w - 7, 8], [w - 7, 48]]) circle(sx, sy, 2.4, '#8a8780');
 }
+// dbk 160X compressor / limiter (1U, after the 160X manual's panel drawing: logo, BYPASS, SLAVE, THRESHOLD, the three
+// threshold lamps over OVER EASY, RATIO, OUTPUT GAIN, DISPLAY, 19-LED level meter over a 12-LED gain-reduction row)
+const C160_LV = [-40, -30, -20, -15, -10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 4, 6, 10, 20];
+const C160_KNOBS = { threshold: { min: -40, max: 20, sweep: 300, ticks: [[-40, '-40'], [-30, '-30'], [-20, '-20'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20']] },
+  ratio: { min: 0, max: 1, sweep: 320, ticks: [[0, '1'], [0.13, '2'], [0.27, '3'], [0.38, '4'], [0.5, '6'], [0.62, '10'], [0.7, '∞'], [0.79, '-5'], [0.9, '-2'], [1, '-1']] },
+  outGain: { min: -20, max: 20, sweep: 300, ticks: [[-20, '-20'], [-10, '-10'], [0, '0'], [10, '+10'], [20, '+20']] } };
+globalThis.C160_KNOBS = C160_KNOBS;
+function c160Face(w, h, u) {
+  const W = '#e9e6de', DIM = '#2a2826', id = (k) => `c160-${u}-${k}`;
+  rect(0, 0, w, h, '#151515'); rect(0, 0, w, 1.5, '#fff', 'opacity="0.12"'); rect(0, h - 2, w, 2, '#000', 'opacity="0.5"');
+  for (const [sx, sy] of [[7, 9], [7, 47], [w - 7, 9], [w - 7, 47]]) { circle(sx, sy, 2.6, '#6a6862'); circle(sx, sy, 1, '#2a2826'); }
+  text(20, 27, 'dbk', 21, W, 'start', 900, 'letter-spacing="-0.8"'); text(21, 38, '160X', 7.5, W, 'start', 800, 'letter-spacing="0.6"');
+  text(21, 47, u === 'A' ? 'UNIT A' : 'UNIT B', 4, '#a9a594', 'start', 800, 'letter-spacing="0.5"');
+  const led = (x, y, col, cls, r = 1.7) => { circle(x, y, r, DIM); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="${r}" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); };
+  const btn = (x, y, k, label) => { p(`<g data-cb="${u}:${k}" style="cursor:pointer">`); rect(x - 7.5, y, 15, 6.5, '#000', 'rx="0.8"'); rect(x - 7, y + 0.3, 14, 5.5, '#262626', 'rx="0.6"'); rect(x - 7, y + 0.3, 14, 1.4, '#fff', 'opacity="0.12" rx="0.6"'); p('</g>'); text(x, y + 13, label, 3.5, W, 'middle', 800, 'letter-spacing="0.3"'); };
+  led(76, 16, '#ff3b2f', id('bypass')); btn(76, 24, 'bypass', 'BYPASS');
+  led(103, 16, '#ffd23a', id('slave')); btn(103, 24, 'slave', 'SLAVE');
+  const knob = (cx, k, l1, l2) => {
+    const K = C160_KNOBS[k], cy = 24, r = 9.5, ang = (v) => -K.sweep / 2 + (v - K.min) / (K.max - K.min) * K.sweep;
+    if (k === 'ratio') { const a0 = ang(0.7), a1 = ang(1), P = (a, rr) => [cx + rr * Math.sin(a * Math.PI / 180), cy - rr * Math.cos(a * Math.PI / 180)]; const [x0, y0] = P(a0, r + 2.2), [x1, y1] = P(a1, r + 2.2); p(`<path d="M${x0} ${y0} A${r + 2.2} ${r + 2.2} 0 0 1 ${x1} ${y1}" fill="none" stroke="${W}" stroke-width="1.3"/>`); }
+    for (const [v, lab] of K.ticks) {
+      const a = ang(v) * Math.PI / 180, sx = Math.sin(a), cyy = -Math.cos(a);
+      p(`<line x1="${cx + sx * (r + 1)}" y1="${cy + cyy * (r + 1)}" x2="${cx + sx * (r + 2.6)}" y2="${cy + cyy * (r + 2.6)}" stroke="${W}" stroke-width="0.5"/>`);
+      text(cx + sx * (r + 5.4), cy + cyy * (r + 5.4) + 1.1, lab, 3.1, W, 'middle', 700);
+    }
+    p(`<g data-ck="${u}:${k}" style="cursor:ns-resize">`);
+    circle(cx, cy + 0.8, r + 0.4, '#000', 'opacity="0.6"'); circle(cx, cy, r, '#1d1d1d'); circle(cx, cy, r - 1.6, '#262626'); circle(cx, cy, r - 1.6, 'url(#bezelHi)', 'opacity="0.35"');
+    p(`<g class="${id('k-' + k)}" transform="rotate(${ang(k === 'ratio' ? 0.38 : k === 'threshold' ? -10 : 0)} ${cx} ${cy})"><rect x="${cx - 0.55}" y="${cy - r + 0.6}" width="1.1" height="${r * 0.62}" rx="0.5" fill="${W}"/></g>`);
+    p(`<circle cx="${cx}" cy="${cy}" r="${r + 6}" fill="transparent"/></g>`);
+    text(cx, 47.5, l1, 3.4, W, 'middle', 800, 'letter-spacing="0.3"'); if (l2) text(cx, 51.5, l2, 3.4, W, 'middle', 800, 'letter-spacing="0.3"');
+  };
+  knob(140, 'threshold', 'THRESHOLD', 'dBu');
+  text(178, 9.5, 'THRESHOLD', 3.2, W, 'middle', 800); led(171.5, 15, '#4fe07a', id('th-below')); led(178, 15, '#ffb02e', id('th-knee')); led(184.5, 15, '#ff3b2f', id('th-above'));
+  text(171.5, 21, 'BELOW', 2.4, W, 'middle', 700); text(184.5, 21, 'ABOVE', 2.4, W, 'middle', 700);
+  btn(178, 24, 'overEasy', 'OVER EASY');
+  knob(214, 'ratio', 'COMPRESSION', 'RATIO');
+  knob(254, 'outGain', 'OUTPUT', 'GAIN');
+  text(286, 7.5, 'INPUT', 2.6, W, 'middle', 700); led(286, 11.5, '#ff3b2f', id('d-in'), 1.4); led(286, 17.5, '#ff3b2f', id('d-out'), 1.4); text(286, 22.3, 'OUTPUT', 2.6, W, 'middle', 700);
+  p(`<path d="M288 11.5 H292 V14.5 H297 M288 17.5 H292 V14.5" fill="none" stroke="${W}" stroke-width="0.4"/>`);
+  btn(286, 24, 'display', 'DISPLAY');
+  // meters: 19 level LEDs (yellow to -1, red from 0), scale between the rows, 12 gain-reduction LEDs under the left 12
+  const lx = (i) => 300 + i * 5.55;
+  C160_LV.forEach((d, i) => { rect(lx(i) - 1.7, 12.2, 3.4, 4.4, DIM, 'rx="0.5"'); p(`<rect class="${id('lv' + i)}" x="${lx(i) - 1.7}" y="12.2" width="3.4" height="4.4" rx="0.5" fill="${d < 0 ? '#ffd23a' : '#ff3b2f'}" opacity="0" filter="url(#glowSm)"/>`); text(lx(i), 21.6, d > 0 ? `+${d}` : String(d), 2.3, W, 'middle', 700); });
+  text(lx(18) + 5, 15.8, 'LEVEL', 3, W, 'start', 800);
+  [40, 30, 20, 15, 10, 8, 6, 5, 4, 3, 2, 1].forEach((d, j) => { rect(lx(j) - 1.7, 24, 3.4, 4.4, DIM, 'rx="0.5"'); p(`<rect class="${id('gr' + (11 - j))}" x="${lx(j) - 1.7}" y="24" width="3.4" height="4.4" rx="0.5" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); });
+  p(`<line x1="${lx(11) + 3}" y1="26.2" x2="${lx(18) + 3}" y2="26.2" stroke="${W}" stroke-width="0.4"/>`); text(lx(18) + 5, 27.4, 'GAIN REDUCTION', 3, W, 'start', 800);
+  text(355, 41, 'COMPRESSOR / LIMITER', 4.2, W, 'middle', 800, 'letter-spacing="1.2"');
+  p(`<text class="${id('route')}" x="355" y="49.5" font-family="'JetBrains Mono', monospace" font-size="3.6" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+}
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
   const U = 60, UX = 50, UW = RW - 100, DEPTH = 70;
@@ -1275,6 +1324,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     text(w - 57, 110, 'BANK', 14, '#d6cfbe', 'middle', 800);
     text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
   });
+  // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
+  for (const u of ['A', 'B']) { globalThis['RACK_C160_' + u] = RY + uy; unit(1, '#151515', (w, h) => c160Face(w, h, u)); }
   // Unified Audio 1176LN x2 (2U)
   for (let k = 0; k < 2; k++) unit(2, 'url(#rackBlack)', (w, h) => {
     text(26, 30, 'UNIFIED AUDIO', 14, '#cfcfcf', 'start', 800);
@@ -1745,6 +1796,8 @@ ${hot(3340, Math.round(globalThis.RACK_PB_Y || 1150), 450, 116, 'patchbay', 'Ope
 ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the SBX-80 sync box')}
 ${hot(3340, Math.round(globalThis.RACK_SG_Y), 450, 56, 'sg', 'Open the SG-24 master sync generator')}
 ${hot(3340, Math.round(globalThis.RACK_DZ_Y), 450, 56, 'dz', 'Open the Delta-Three synchronizer')}
+${hot(3340, Math.round(globalThis.RACK_C160_A), 450, 56, 'c160', 'Open the dbk 160X compressors')}
+${hot(3340, Math.round(globalThis.RACK_C160_B), 450, 56, 'c160', 'Open the dbk 160X compressors')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
@@ -1755,6 +1808,8 @@ ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(
 ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the JH-Tape's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → JH-Tape</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
   <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the JH-Tape's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
+${overlay('c160', 'DBK 160X COMPRESSOR / LIMITER · A + B', `<div class="ovsync">${['A', 'B'].map((u) => `<svg width="1500" height="187" viewBox="0 0 450 56" style="display:block">${capture(() => c160Face(450, 56, u))}</svg>`).join('<div style="height:10px"></div>')}
+  <p class="note">Drag a knob up or down (double-click resets it); click the buttons. Each unit works on the channel it is patched into at the patchbay (INSERT SEND → 160X IN, 160X OUT → INSERT RETURN): A is on the kick and B on the bass to start with. SLAVE on one unit links it to the other as a stereo pair: the louder channel drives both, with the other unit's controls. You hear it once the tape machine's electronics are on.</p></div>`, '<span class="ov-msg" id="c160-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
   <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
@@ -1775,9 +1830,10 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 </body></html>`;
 fs.writeFileSync(path.join(dir, 'analog-studio-mockup.html'), html);
 // artifact version: the same page without the document wrapper (the host adds it), title first

@@ -14,6 +14,9 @@ class JH24Processor extends AudioWorkletProcessor {
     this.mech = new MechSound(sampleRate); this.mechLevel = 0.6;   // the machine's own sound (motors, air, solenoids)
     this.align = { on: false, f: 1000, std: 'NAB' };   // alignment tape playing: standard-flux tones on every track
     this.vuT = 0; this.vu = new Float32Array(this.N);
+    // the rack's two dbk 160X compressors, each on a channel's insert (patched at the patchbay); null = not patched
+    this.c160 = [new Comp160(sampleRate, VU0), new Comp160(sampleRate, VU0)]; this.c160ch = [null, null];
+    this.c160buf = [new Float32Array(128), new Float32Array(128)];
     this.port.onmessage = (e) => this.msg(e.data);
   }
   msg(d) {
@@ -27,6 +30,7 @@ class JH24Processor extends AudioWorkletProcessor {
     }
     else if (d.type === 'align') { for (const c of (d.ch == null ? m.ch : [m.ch[d.ch]])) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); this.sendTrims(); }
     else if (d.type === 'opts') { if (d.quior != null) m.quior = d.quior; if (d.hiss != null) m.hiss = d.hiss; if (d.wf != null) m.wf = d.wf; if (d.opLevel && d.opLevel !== m.opLevel) { m.setOpLevel(d.opLevel); this.sendTrims(); } }
+    else if (d.type === 'c160') { if (d.params) this.c160[d.unit].set(d.params); if (d.ch !== undefined) this.c160ch[d.unit] = d.ch; }
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
     else if (d.type === 'mix') Object.assign(this.mix, d);
@@ -107,10 +111,20 @@ class JH24Processor extends AudioWorkletProcessor {
     // monitor mix to the speakers (tracks spread across the stereo field), or one channel soloed
     const L = out[0], R = out[1] || out[0];
     L.fill(0); if (R !== L) R.fill(0);
+    // channel inserts: the 160Xs process their channels' tape returns (copies: the tape meters keep reading the tape)
+    const ins = {};
+    for (let u = 0; u < 2; u++) {
+      if (this.c160buf[u].length !== n) this.c160buf[u] = new Float32Array(n);
+      const ch = this.c160ch[u], b = this.c160buf[u];
+      if (ch != null && this.out[ch]) { b.set(this.out[ch]); ins[ch] = b; } else b.fill(0);
+    }
+    // SLAVE on one unit links it to the other (the other becomes the master)
+    const [A, B] = this.c160, swap = A.params.slave && !B.params.slave;
+    if (swap) Comp160.processPair(B, this.c160buf[1], A, this.c160buf[0], n); else Comp160.processPair(A, this.c160buf[0], B, this.c160buf[1], n);
     if (!this.mix.mute) for (let i = 0; i < this.N; i++) {
       if (this.mix.solo >= 0 && this.mix.solo !== i) continue;
       const pan = this.mix.solo >= 0 ? 0.5 : 0.15 + 0.7 * (i % 8) / 7, gl = Math.cos(pan * Math.PI / 2) * this.mix.gain, gr = Math.sin(pan * Math.PI / 2) * this.mix.gain;
-      const y = this.out[i];
+      const y = ins[i] || this.out[i];
       for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
     }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
@@ -121,7 +135,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()) });
     }
     return true;
   }
