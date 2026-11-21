@@ -120,6 +120,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const T = (x, y, str, size, fill, extra = '') => `<text x="${x}" y="${y}" font-family="${SANS}" font-size="${size}" fill="${fill}" text-anchor="middle" font-weight="900" ${extra}>${esc(str)}</text>`;
   const amtex = (num) => (rl, lx, ly, la) => [txt(lx, ly - 26, 'AMTEX', 19, '#141414', 'middle', 900, 'letter-spacing="1"'), txt(lx, ly + 13, num, 40, '#a9802f', 'middle', 900, 'letter-spacing="-1"'), txt(lx, ly + 27, num === '499' ? 'GOLD MASTER' : 'GRAND MASTER', 8.8, '#141414', 'middle', 800), txt(lx, ly + 39, 'Studio Mastering Audio Tape', 8.2, '#a9802f', 'middle', 600)].join('');
   const GP9FACE = `radial-gradient(circle at 38% 30%, rgba(255,190,170,0.75), rgba(255,120,90,0) 48%), conic-gradient(from 200deg, rgba(255,210,190,0.30), rgba(0,0,0,0.10) 25%, rgba(255,210,190,0.25) 50%, rgba(0,0,0,0.12) 75%, rgba(255,210,190,0.30)), repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a`;
+  const BRASS_SCREW = (y) => `<circle cx="0" cy="${y}" r="4.4" fill="#857048"/><circle cx="0" cy="${y}" r="3.5" fill="#c7b06a"/><circle cx="-1" cy="${y - 1}" r="1.4" fill="#efe2a8" opacity="0.8"/><path d="M-2.2 ${y - 2.2} L2.2 ${y + 2.2} M2.2 ${y - 2.2} L-2.2 ${y + 2.2}" stroke="#6b5a2c" stroke-width="0.8"/>`;
   const REEL = {
     a499: { name: 'Amtex 499', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('499') },
     a456: { name: 'Amtex 456', ...SILVER, win: { n: 2, rIn: 0.5, rOut: 0.84, wIn: 0.17, wOut: 0.17, c: 0.035, a0: 0 }, legacy: amtex('456') },
@@ -152,15 +153,14 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       labRGB: '242,217,143', labK: 0.45,
     },
     scotia: {
-      // the 250 as photographed: matte aluminium, three wide windows, a solid dark-grey logo between the top two, the
-      // number on a small brass plate under it, and three brass screws round the hub (one under the plate, two lower)
+      // the 250 as photographed: matte aluminium; three windows (two at 10 and 2 o'clock, one at 6) that start just outside
+      // the hub with a shallow curved edge and narrow toward the rim; a solid grey logo between the top two, the number on
+      // a small brass plate under it, a brass screw under the plate and two more either side of the hub, lower down
       name: 'Scotia 250', ...SILVER, face: silver('#cdd0d2', '#d1d3d5', '#c9ccce', '#d5d7d9'), edge: 'linear-gradient(90deg,#86898d,#d9dbdd 40%,#74777b)', back: '#8d9094',
-      win: { n: 3, rIn: 0.46, rOut: 0.89, wIn: 0.4, wOut: 0.66, c: 0.1, a0: 60 },
-      labels: [[0, () => {
-        const scr = (y) => `<circle cx="0" cy="${y}" r="4.6" fill="#8a6a2c"/><circle cx="0" cy="${y}" r="3.6" fill="#c9a24e"/><circle cx="-1" cy="${y - 1}" r="1.6" fill="#f1dc9c" opacity="0.8"/><line x1="-2.6" y1="${y}" x2="2.6" y2="${y}" stroke="#6b501f" stroke-width="1"/>`;
-        return `<g>${T(-4, 2, 'Scotia', 46, '#4c4f53', 'letter-spacing="-0.5"')}${T(70, -22, '®', 9, '#4c4f53')}<rect x="-42" y="13" width="84" height="28" rx="1.5" fill="#a88b4a"/><rect x="-40.5" y="14.5" width="81" height="25" rx="1" fill="#cdb376"/><rect x="-40.5" y="14.5" width="81" height="8" rx="1" fill="#fff" opacity="0.18"/>${T(0, 34.5, '250', 19, '#eae2c8', 'stroke="#8f7638" stroke-width="0.6"')}${scr(56)}</g>`;
-      }], ...[128, 232].map((a) => [a, () => `<g><circle cx="0" cy="58" r="4.6" fill="#8a6a2c"/><circle cx="0" cy="58" r="3.6" fill="#c9a24e"/><circle cx="-1" cy="57" r="1.6" fill="#f1dc9c" opacity="0.8"/><line x1="-2.6" y1="58" x2="2.6" y2="58" stroke="#6b501f" stroke-width="1"/></g>`])],
-      labRGB: '76,79,83', labK: 0.35,
+      win: { n: 3, rIn: 0.41, rOut: 0.87, wIn: 0.6, wOut: 0.5, c: 0.07, arc: 1.4, a0: 62 },
+      labels: [[0, () => `<g>${T(-3, -1, 'Scotia', 44, '#55585b', 'font-weight="700" letter-spacing="-1"')}${T(70, -26, '®', 8, '#55585b')}<rect x="-47" y="11" width="94" height="34" rx="1.5" fill="#8f8a68"/><rect x="-45.5" y="12.5" width="91" height="31" rx="1" fill="#c3bc93"/><rect x="-45.5" y="12.5" width="91" height="10" rx="1" fill="#fff" opacity="0.2"/>${T(0, 35, '250', 19, '#f6f3e6', 'font-weight="500" stroke="#8a8460" stroke-width="0.5"')}${BRASS_SCREW(57)}</g>`],
+        ...[-111, 111].map((a) => [a, () => `<g>${BRASS_SCREW(61)}</g>`])],
+      labRGB: '85,88,91', labK: 0.35,
     },
     atx: {
       name: 'ATX Magnetics', ...SILVER, face: silver('#e1e3e5', '#e6e7e9', '#dadcdf', '#edeef0'),
@@ -178,6 +178,15 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
   // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
   const slot = (cx, cy, w, ang, R) => {
+    if (w.arc) {   // the 3M/Scotia-style window: inner edge a shallow arc just outside the hub, outer edge on a circle, narrowing outward
+      const t = ang * Math.PI / 180, X = ([x, d]) => [cx + x * Math.cos(t) + d * Math.sin(t), cy + x * Math.sin(t) - d * Math.cos(t)];
+      const rI = w.rIn * R, rO = w.rOut * R, hI = w.wIn * R / 2, hO = w.wOut * R / 2, c = w.c * R, dO = Math.sqrt(rO * rO - hO * hO);
+      const OL = [-hO, dO], OR = [hO, dO], IR = [hI, rI], IL = [-hI, rI];
+      const tw = (p, q, d) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]); return [p[0] + (q[0] - p[0]) * d / L, p[1] + (q[1] - p[1]) * d / L]; };
+      const g = (pt) => { const [x, y] = X(pt); return `${f(x)} ${f(y)}`; }, rk = w.arc * R;
+      const s0 = tw(OL, OR, c), e0 = tw(OR, OL, c), a1 = tw(OR, IR, c), a2 = tw(IR, OR, c), i1 = tw(IR, IL, c), i2 = tw(IL, IR, c), b1 = tw(IL, OL, c), b2 = tw(OL, IL, c);
+      return `M${g(s0)} A${f(rO)} ${f(rO)} 0 0 1 ${g(e0)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(i1)} A${f(rk)} ${f(rk)} 0 0 1 ${g(i2)} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s0)} Z `;
+    }
     const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
     const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
     let d = '';
