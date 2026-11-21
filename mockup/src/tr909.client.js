@@ -120,6 +120,6 @@
   function tr909Tick() {
     if (EL.node !== T9.node) { T9.node = EL.node; if (EL.node) { t9Post({ set: { ...T9.p, spb: T9_SCALES[T9.scale - 1] }, patterns: T9.patterns, pat: T9.pat, sync: null }); t9Track(); } }
     if (T9.p.sync === 'din' && EL.node) { const cur = SBX.cur, on = running() && tr.playingMode && cur && cur.beats >= 0; t9Post({ sync: { run: !!on, beats: cur ? cur.beats : 0, bpm: cur ? cur.bpm : T9.p.tempo } }); }
-    if (document.body.classList.contains('racksview')) t9Draw();
+    if (isOpen('tr909') || document.body.classList.contains('racksview')) t9Draw();
   }
   t9Knobs();
