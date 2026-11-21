@@ -226,7 +226,7 @@
     }
     for (const rl of reels) if (rl.k === k) rl.smKey = '';   // redraw the exposure smear for the new windows
   }
-  const TP = { key: 'a499', store: {}, aligned: true, alignedFor: 'Amtex 499', opLevel: 370 };
+  const TP = { key: 'scotia', store: {}, aligned: true, alignedFor: 'Scotia 250', opLevel: 250 };
   function threadTape(key) {
     const t = window.JH_TAPES[key]; if (!t || key === TP.key) return;
     AL.rep = false; AL.rehPunch = false; tr.command('stop');
