@@ -1,10 +1,10 @@
-<title>HJ-24 Reel Prototype</title>
+<title>JH-Tape Reel Prototype</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
   /* One-screen instrument: the 3D deck fills the window; a transport strip and readouts float over it. */
   :root {
     --room: #0e0c0b;        /* control-room dark */
-    --panel: #6f6a63;       /* HJ-24 deck taupe */
+    --panel: #6f6a63;       /* JH-Tape deck taupe */
     --panel-dk: #4c4844;
     --outline: #e6e1d8;     /* strip outline */
     --ink: #f1ece3;
@@ -52,7 +52,7 @@
 </style>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@600;700&display=swap">
 
-<div id="stage" aria-label="3D view of the HJ-24 transport"></div>
+<div id="stage" aria-label="3D view of the JH-Tape transport"></div>
 
 <div class="hud">
   <div class="counter" aria-live="off"><b id="ctr">00:00.0</b><span>tape time</span></div>
@@ -110,7 +110,7 @@
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
 <script type="module">
 // ---------------- physics (inlined from physics.js at build time) ----------------
-// HJ-24 reel and transport physics (SI units).
+// JH-Tape reel and transport physics (SI units).
 // Renderer-independent so it can be ported 1:1 to the C++ engine.
 //
 // Model
@@ -120,7 +120,7 @@
 //    Each reel turns at w = v / r, so the full reel turns slowly and the empty one fast.
 //  - PLAY / RECORD: the capstan and pinch roller hold v at the selected speed with a fast,
 //    servo-like response. From a wind, the reels brake first and the pinch roller only
-//    engages once the tape is near play speed (the HJ-24's motion sensing).
+//    engages once the tape is near play speed (the JH-Tape's motion sensing).
 //  - Winds (F FWD, REW, shuttle, stop from a wind): the reel motors are force-limited, so
 //    acceleration = force / effective mass, where the effective mass of the reels seen at the
 //    tape is I_supply / r_s^2 + I_takeup / r_t^2. A full reel therefore spools up and brakes

@@ -1,4 +1,4 @@
-// HJ-24 tape machine as a CSS 3D scene (true perspective, operator's viewpoint).
+// JH-Tape tape machine as a CSS 3D scene (true perspective, operator's viewpoint).
 // Everything is laid out in "deck units" on the flat top deck (x right, y toward the
 // operator, z up out of the deck). Chromium renders the perspective; cylinders are
 // stacked discs, boxes are planes, the tape is a 2" ribbon standing on edge.
@@ -67,7 +67,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   const R = 250 * RS, hubR = 250 * 0.36, holeR = 250 * 0.27;
   const supply = { cx: 300 + IN, cy: 292 - 2 * IN, pack: 213 * RS, rot: 18, labelAt: 198 * RS, style: 'a499' };   // 2500 ft on a 10.5" reel, 03:42 in at 30 IPS
   const takeup = { cx: DW - 300 - IN, cy: 292 - 2 * IN, pack: 145 * RS, rot: -27, style: 'gp9' };
-  // Transport layout from the user's HJ-24 photos: tape runs across the FRONT of the head block.
+  // Transport layout from the user's JH-Tape photos: tape runs across the FRONT of the head block.
   const TAPE_Y = 548 + DZ;                                         // tape line across the head faces
   const guideL = { cx: 440, cy: TAPE_Y + 24, r: 24 };         // tall black roller, in front of the tape
   const lifterPin = { cx: 410, cy: TAPE_Y - 18, r: 5 };       // thin chrome lifter pin
@@ -359,7 +359,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       <filter id="gl" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="bs" x="-30%" y="-30%" width="160%" height="200%"><feGaussianBlur stdDeviation="2"/></filter>
     </defs>`);
-    // panel in deck colour with the light outline that steps back on the right (as on the HJ-24)
+    // panel in deck colour with the light outline that steps back on the right (as on the JH-Tape)
     const stepA = w * 0.55, stepB = w * 0.61;
     const outline = `M12 ${d - 10} L12 30 L${stepA} 30 L${stepB} 8 L${w - 12} 8 L${w - 12} ${d - 10} Z`;
     s.push(`<rect x="0" y="0" width="${w}" height="${d}" rx="6" fill="url(#fp)"/>`);
@@ -511,7 +511,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     <linearGradient id="shadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
   </defs>`);
   cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="${LIPH + 2}" fill="url(#lip)"/><rect x="${CI}" y="${FRONT - 2}" width="${TW - 2 * CI}" height="1.5" fill="#fff" opacity="0.25"/>`);
-  if (A8) {   // maker's badge (the HJ-24 carries none)
+  if (A8) {   // maker's badge (the JH-Tape carries none)
     cab.push(`<rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="22" rx="2" fill="#0c0c0d"/><rect x="${CI + 44}" y="${FRONT + 12}" width="96" height="2" fill="#fff" opacity="0.15"/>`);
     cab.push(txt(CI + 92, FRONT + 29, 'STAUDER', 13, '#e3e5e8', 'middle', 900, 'letter-spacing="3"'));
   }
@@ -527,7 +527,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="${Math.max(0, TH - WOODY - 14)}" fill="none" stroke="#1e1b19" stroke-width="3"/>`);
   cab.push(`<rect x="${CI + 22}" y="${WOODY + 14}" width="${TW - 2 * CI - 44}" height="36" fill="url(#shadeTop)"/>`);
   cab.push(`<rect x="${TW - CI - 118}" y="${TH - 32}" width="62" height="22" rx="2" fill="#2a2725"/>`);
-  cab.push(txt(TW - CI - 87, TH - 17, 'HJ-24', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
+  cab.push(txt(TW - CI - 87, TH - 17, 'JH-TAPE', 10, '#d9d3c7', 'middle', 800, 'letter-spacing="1"'));
   }
   // cabinet side frames
   cab.push(`<rect x="${CI}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#7a4a28' : '#3a3633'}"/><rect x="${TW - CI - 22}" y="${FRONT - 2}" width="22" height="${TH - FRONT + 2}" fill="${A8 ? '#6d4122' : '#33302d'}"/>`);

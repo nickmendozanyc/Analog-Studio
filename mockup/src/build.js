@@ -442,7 +442,7 @@ text(3740, 34, 'PLUGINS', 13, '#a9a594', 'middle', 800, 'letter-spacing="1.5"');
 // =====================================================================
 const TX = 24, TY = 76, TW = 1360, TH = 590;   // top row trimmed to make room for the console meter bridge
 p(`<g filter="url(#shadow)">`);
-const TCI = 32;   // the HJ-24 cabinet is inset this much each side to hug its deck plate (checked against jh24.js)
+const TCI = 32;   // the JH-Tape cabinet is inset this much each side to hug its deck plate (checked against jh24.js)
 rect(TX, TY, TW - 2 * TCI, TH, '#2a2725', 'rx="10"');
 p(`</g>`);
 
@@ -459,7 +459,7 @@ const readyTracks = new Set();   // nothing armed: the demo tape plays back safe
 const LEG = '#ece7dc';   // legend colour on taupe
 
 
-// ---------------- HJ-24 audio electronics: three roll-out drawers of channel cards (manual section 4) ----------------
+// ---------------- JH-Tape audio electronics: three roll-out drawers of channel cards (manual section 4) ----------------
 const elecView = (() => {
   const trim = (key, lab, ips) => `<div class="tr" data-key="${key}"${ips ? ` data-ips="${ips}"` : ''} title="${lab}${ips ? ` (${ips === 30 ? 'HI speed, 30 ips' : 'LO speed, 15 ips'})` : ''} · drag up / down, double-click resets"><i class="scr"><b></b></i><span class="tl">${lab}</span><span class="tv">0.0</span></div>`;
   const sw = (key, a, b) => `<button type="button" class="sw" data-key="${key}" data-a="${a}" data-b="${b}">${a}</button>`;
@@ -748,7 +748,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
       // lamps above each meter: red record (live), blue status
       recLamp(i, x + w - 14, 14, 5.5);
       circle(x + w - 32, 14, 5.5, i === 23 ? '#5fb4ff' : '#16304a', i === 23 ? 'filter="url(#glow)"' : '');
-      // recessed meter window, wide like the HJ-24 bridge meters
+      // recessed meter window, wide like the JH-Tape bridge meters
       rect(x + 4, 26, w - 8, 118, '#0a0908', 'rx="6"');
       rect(x + 4, 26, w - 8, 118, 'url(#bezelHi)', 'rx="6"');
       vu(x + 14, 34, w - 28, 102, -20, { fontScale: 0.125, needleId: i });   // live: the page drives the needle
@@ -776,7 +776,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
   const plinth = capture(() => {
     rect(0, 0, TW3 + 24, PLH, 'url(#deck)'); rect(0, 0, TW3 + 24, 2, '#fff', 'opacity="0.25"');
     rect(0, 0, TW3 + 24, PLH, '#000', 'opacity="0.15"');
-    text(20, 31, 'HJ-24 METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
+    text(20, 31, 'JH-TAPE METER BRIDGE', 16, LEG, 'start', 800, 'letter-spacing="2"');
     text(TW3 - 330, 31, 'MONITOR', 14, LEG, 'end', 800, 'letter-spacing="2"');
     [['REPRO', true], ['INPUT', false], ['SYNC', false]].forEach(([k, on], i) => button(TW3 - 314 + i * 108, 9, 96, 32, 'green', on, k, { size: 14 }));
   });
@@ -791,7 +791,7 @@ const MX = 1704, MY = 60, MH = 8 + 3 * 236 + 52, MBK = (666 - MY) / MH, MW = Mat
 }
 
 // =====================================================================
-// CONSOLE (HJ-632 / HJ-600 style) — CSS 3D: knob panel + fader panel + armrest
+// CONSOLE (JH-Mix / JH-Mix style) — CSS 3D: knob panel + fader panel + armrest
 // Faces are drawn with the SVG helpers (capture); knobs and fader caps are real 3D solids.
 // Text is 14 px or larger (50" 4K legibility rule).
 // =====================================================================
@@ -859,7 +859,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
 
   // ---------------- knob panel texture ----------------
   const upper = capture(() => {
-    // HJ-600 series channel strip, laid out from the user's reference photos (top to bottom)
+    // JH-Mix series channel strip, laid out from the user's reference photos (top to bottom)
     const GOLD = '#d8c27c', WH = '#ece6da';
     const tx = (x, y, s2, size, col = WH, anchor = 'middle', w = 800) => text(x, y, s2, size, col, anchor, w);
     const blk = (x, y, w, h, label, lit = false, litCol = '#ff3b2f', bid) => {
@@ -1140,7 +1140,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
     // flat front view: knob panel, fader panel, oak cheeks, oak rail and leather armrest
     const X = CX + 34, Y = CY;
     rect(CX, CY - BRIDGE - 14, CW, 16, '#000', 'opacity="0.7" filter="url(#soft)"');
-    // console meter bridge (HJ-600 style): two staggered rows of VUs, one per channel, stereo pair over the master
+    // console meter bridge (JH-Mix style): two staggered rows of VUs, one per channel, stereo pair over the master
     const BY = Y - BRIDGE;
     rect(X, BY, PW, BRIDGE, 'url(#jh600)'); rect(X, BY, PW, BRIDGE, '#000', 'opacity="0.22"');
     rect(X, BY - 8, PW, 10, 'url(#oakH)');
@@ -1722,7 +1722,7 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
   <div id="files-msg">Tapes, mixes and audio</div>
 </div>
 <div class="tapesel"><label>TAPE <select id="tape-sel" title="Thread a different tape: its reel goes on the machine, its formulation into the electronics (realign for it)">${Object.entries(TAPE_LIST).map(([k, t]) => `<option value="${k}" title="${t.name.replace(/"/g, '&quot;')}"${k === 'a499' ? ' selected' : ''}>${t.short.replace(/"/g, '&quot;')} · ${t.ol} nWb/m</option>`).join('')}</select></label><button type="button" id="tape-align" title="Realign the machine for this tape: its operating level, then repro, sync, bias, record level and HF on every channel (manual section 7)">ALIGN</button><label class="auto" title="Realign automatically whenever a tape is threaded"><input type="checkbox" id="tape-auto" checked> AUTO</label><label>TAKE-UP <select id="takeup-sel" title="The empty reel on the take-up side">${Object.entries(globalThis.JH_REEL_NAMES).map(([k, n]) => `<option value="${k}"${k === 'gp9' ? ' selected' : ''}>${n.replace(/"/g, '&quot;')}</option>`).join('')}</select></label></div>
-<div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="HJ room: HJ-24, AutoLocator III, HJ-632 console">HJ</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
+<div class="modes" role="group" aria-label="Studio"><span class="lbl">STUDIO</span><button type="button" data-mode="cmi" aria-pressed="true" title="JH room: JH-Tape, AutoLocator III, JH-Mix console">JH</button><button type="button" data-mode="sls" aria-pressed="false" title="SLS room: Stauder A827, SLS 4000 G console">SLS</button></div>
 <div id="sls" hidden aria-label="SLS studio">
   <div style="position:absolute;left:24px;top:20px;width:1296px;height:590px;background:#232427;border-radius:10px"></div>
   ${a827}
@@ -1735,7 +1735,7 @@ ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
 <div id="strip-hot-cmi" class="shot" style="left:46px;top:800px;width:2720px;height:900px" title="Click a section of any channel"></div>
 <div id="strip-hot-sls" class="shot" hidden style="left:24px;top:860px;width:3242px;height:860px" title="Click a section of any channel"></div>
 <div id="strip-hl" hidden><span></span></div>
-${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the HJ-24')}
+${hot(TX, 76, TW - 2 * TCI, 590, 'tape', 'Open the JH-Tape')}
 ${hot(AX, AY + 60, Math.round(AW * ALK), 590 - 60 - ALDROP, 'al', 'Open the AutoLocator III')}
 ${hot(1704, 60, 1578, 606, 'meters', 'Open the meter bridge')}
 ${hot(3340, 130, 450, 176, '224', 'Open the Leximan 224X')}
@@ -1745,21 +1745,21 @@ ${hot(3340, Math.round(globalThis.RACK_SBX_Y || 1000), 450, 56, 'sbx', 'Open the
 ${hot(3340, Math.round(globalThis.RACK_SG_Y), 450, 56, 'sg', 'Open the SG-24 master sync generator')}
 ${hot(3340, Math.round(globalThis.RACK_DZ_Y), 450, 56, 'dz', 'Open the Delta-Three synchronizer')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
-<div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the HJ-24 audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
+<div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
 ${overlay('tape', 'TAPE MACHINE · 24 TRACK', tapeView, '<span class="ov-msg" id="tp-msg"></span>')}
-${overlay('elec', 'HJ-24 · AUDIO ELECTRONICS', elecView)}
+${overlay('elec', 'JH-TAPE · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
 ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
-  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the HJ-24's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
-  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the HJ-24's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
+  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the JH-Tape's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → JH-Tape</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
+  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the JH-Tape's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
-  <div class="sk"><button type="button" data-dz="chase" title="Slave the HJ-24 to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
+  <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
   <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
   <p class="note">The front panel works: click its keys. MASTER and SLAVE enable the chase · RUN starts the generator · STOP·CONT holds the system · SELECT steps the display (G_TC, M_TC, S_TC, S_OFS, S_ERR, S_SPD; the last two letters show the chase: PK park, CU cue, WT wait, PL pull-in, LK lock, TL tight lock, HD held) · ◀ ▶ trim the offset a quarter frame · CLEAR zeroes it · INDEX switches the LOCK lamp between the wide (0.05 frame) and tight (0.003 frame) windows. A red SHIFT reaches the red legends on its half: CAPTURE takes the offset, GOTO parks the slave on the master, LEARN relearns the slave's start-up, COPY resets the generator. MIDI (MTC IN) is an extension: the original read master LTC and only sent MTC.</p></div>`, '<span class="ov-msg" id="dz-msg"></span>', true)}
 ${overlay('strip', '<span id="strip-title">CH 1</span>', '<svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg>', '', true)}
-${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
+${overlay('meters', 'JH-TAPE METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
 ${overlay('224', 'LEXIMAN 224X', `<svg width="${Math.round(1070 * 0.95)}" height="${Math.round(1640 * 0.95)}" viewBox="480 190 1070 1640" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>', true)}
 ${overlay('patchbay', 'PATCHBAY', `<svg id="pbSvg" width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block;background:#0b0a09;touch-action:none"></svg>`, '<span class="ov-msg">Drag from an output (gold) to an input (blue). Click a cable to pull it.</span><span id="pb-count"></span><button id="pb-reset" type="button">Restore session</button><button id="pb-clear" type="button">Pull all</button>')}
 </div>

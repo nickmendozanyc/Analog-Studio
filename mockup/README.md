@@ -10,10 +10,10 @@ Full resolution: [`analog-studio-mockup-4k.png`](analog-studio-mockup-4k.png). A
 
 | Area | Contents |
 | --- | --- |
-| Tape machine (top left) | HJ-24 top deck: Amtex 499 supply reel (full) and Quantica GP9 take-up on black hold-down knobs; tape path supply → black guide post → roller guide → erase, record/sync and repro heads → capstan and pinch roller → cream idler → guide post → take-up; head cover with silver lid on a removable head plate. Angled front faceplate: power lamp, vari-speed and shuttle knobs, lifter lever, REW / F FWD / STOP / REV PLAY / PLAY / REC / LIFT / EDIT, 7½ / 15 / 30 IPS, AES/NAB, and the app's tape-character knobs (saturation, wow/flutter, hiss, bypass). Plain cabinet lip above the woodgrain drawer front |
+| Tape machine (top left) | JH-Tape top deck: Amtex 499 supply reel (full) and Quantica GP9 take-up on black hold-down knobs; tape path supply → black guide post → roller guide → erase, record/sync and repro heads → capstan and pinch roller → cream idler → guide post → take-up; head cover with silver lid on a removable head plate. Angled front faceplate: power lamp, vari-speed and shuttle knobs, lifter lever, REW / F FWD / STOP / REV PLAY / PLAY / REC / LIFT / EDIT, 7½ / 15 / 30 IPS, AES/NAB, and the app's tape-character knobs (saturation, wow/flutter, hiss, bypass). Plain cabinet lip above the woodgrain drawer front |
 | Autolocator (top centre) | 3D AL-III remote (shown at 72% so the console can have its meter bridge): sloped wedge on a pedestal pole and H-base with its grey cable bundle. Two red LED displays (tape time, current locate), 4 named locate memories, 24 round black TRACK READY buttons (armed tracks glow red), light-blue keypad, STORE/RECALL/LOCATE/ZERO, punch in/out/auto, all safe, and coloured transport keys |
-| Tape meter bridge (top right) | 3D stepped housing that fills the top row from the autolocator to the rack, with wide meter windows like the HJ-24 bridge: three tiers of 8 VU meters with ledges, top cap and stepped end caps. Each meter sits in a recessed window with red record and blue status lamps above, track number, masking-tape name and READY/SAFE keys below. The plinth carries the REPRO / INPUT / SYNC monitor keys |
-| Console (bottom) | Flat front view of an HJ-600 series desk, with the channel strip laid out from your reference photos: 24-bus assign keys with LEDs; INPUT / TAPE source keys, red TRIM and odd/even bus pan (the mic gain, GAIN and PHAN controls are removed: mic level is set on external preamps); PAN toggle and DIRECT level with LED; DUMP and numbered key; gold-bracketed 3-band EQ (HI blue 4.6–16 kHz, MID sage .18–10 kHz, LOW red 30–250 Hz, ±14 dB) with printed scales; IN, filter, Ø and CHN keys; SEND 1-2 (yellow, PRE / WET), SEND 3-4 (blue pan + level, PRE), SEND 5-6 (red pan + level, PRE / 2MIX); a large black BUS LVL rotary below the sends (0 dB at 2 o'clock) that feeds the assigned buses; MUTE and numbered solo key; channel pan; REV / PFL with EQ / CHN / SOLO / TAPE LEDs; a column of six small automation keys beside each fader (O / R / W / T / L / Tr for Off, Read, Write, Touch, Latch, Trim), each with an LED, the active one lit in its colour, plus a touch-sense LED; scribble strip and long-throw faders with 250 px of travel on an 85 px strip and white caps. A slim HJ-600-style console meter bridge (120 px) sits above the strips: two rows of VUs, one per channel over each pair of strips, and a large stereo L/R pair over the master section. Oak trim and stitched leather armrest. Channels 25–32 are effect returns and live inputs |
+| Tape meter bridge (top right) | 3D stepped housing that fills the top row from the autolocator to the rack, with wide meter windows like the JH-Tape bridge: three tiers of 8 VU meters with ledges, top cap and stepped end caps. Each meter sits in a recessed window with red record and blue status lamps above, track number, masking-tape name and READY/SAFE keys below. The plinth carries the REPRO / INPUT / SYNC monitor keys |
+| Console (bottom) | Flat front view of an JH-Mix series desk, with the channel strip laid out from your reference photos: 24-bus assign keys with LEDs; INPUT / TAPE source keys, red TRIM and odd/even bus pan (the mic gain, GAIN and PHAN controls are removed: mic level is set on external preamps); PAN toggle and DIRECT level with LED; DUMP and numbered key; gold-bracketed 3-band EQ (HI blue 4.6–16 kHz, MID sage .18–10 kHz, LOW red 30–250 Hz, ±14 dB) with printed scales; IN, filter, Ø and CHN keys; SEND 1-2 (yellow, PRE / WET), SEND 3-4 (blue pan + level, PRE), SEND 5-6 (red pan + level, PRE / 2MIX); a large black BUS LVL rotary below the sends (0 dB at 2 o'clock) that feeds the assigned buses; MUTE and numbered solo key; channel pan; REV / PFL with EQ / CHN / SOLO / TAPE LEDs; a column of six small automation keys beside each fader (O / R / W / T / L / Tr for Off, Read, Write, Touch, Latch, Trim), each with an LED, the active one lit in its colour, plus a touch-sense LED; scribble strip and long-throw faders with 250 px of travel on an 85 px strip and white caps. A slim JH-Mix-style console meter bridge (120 px) sits above the strips: two rows of VUs, one per channel over each pair of strips, and a large stereo L/R pair over the master section. Oak trim and stitched leather armrest. Channels 25–32 are effect returns and live inputs |
 | Master section | SEND 1 and SEND 2 effect send masters (yellow), a SEND 3-4 master (blue) with FX / CUE keys, returns R1–R4, CUE 1 (blue) and CUE 2 (red) cue mix levels. A Leximan 224X remote (drawn from your photos, at console scale) rests on the master section above the group faders, cabled toward the rack; the master controls above it are drawn at 78% to make room. Aux masters and returns, control-room source (MIX, 2-TRK, CUE 1, CUE 2) and DIM / MONO / CUT / ALT with a large monitor knob, cue / studio, talkback, oscillator and bounce-to-WAV; 8 VCA-style group faders with coloured caps (no audio passes through them; each channel joins one group, shown on a G1–G8 readout at the foot of its fader), each with a red M (mute) and green S (solo) key and an automation mode LED, and a yellow / teal stereo master pair; the stereo VUs are on the console meter bridge |
 | Automation | Moving-fader automation locked to tape position, after the classic tape-based systems: per-channel and per-group modes, global OFF / READ / WRITE / TOUCH / LATCH / TRIM keys in the master fader panel, and TAPE SYNC / DATA / PASS status. Demo states: ch 9 WRITE, ch 12 TOUCH (being touched), ch 15 LATCH, ch 20 TRIM, returns 25–32 OFF, the rest READ |
 | Outboard rack (right side panel) | 3D cabinet seen from the left: wood sides, recessed rails, back panel. Leximan 224, 2× Unified Audio 1176LN, 2× Yahaha SPX90, 2× Leximan PCM41, 2× PCM42 with 3D knobs; three VST3/AU slots; insert patchbay with cables; plugin browser (scan, list, drag into a slot) |
@@ -21,18 +21,18 @@ Full resolution: [`analog-studio-mockup-4k.png`](analog-studio-mockup-4k.png). A
 
 ## Reference photos applied
 
-Corrected against your HJ-24 photos and reference photos of the HJ-24 (with Autolocator III) and HJ-632.
+Corrected against your JH-Tape photos and reference photos of the JH-Tape (with Autolocator III) and JH-Mix.
 
 | Element | Change |
 | --- | --- |
-| HJ-24 deck, autolocator, meter bridge | Warm taupe-grey finish, from your HJ-24 photos; woodgrain laminate edge for the cabinet front |
+| JH-Tape deck, autolocator, meter bridge | Warm taupe-grey finish, from your JH-Tape photos; woodgrain laminate edge for the cabinet front |
 | Tape VU meters | Warm cream, amber-backlit faces in a 3 × 8 bridge, with a record lamp and a status lamp above each meter |
 | Transport | Raised silver strip with small coloured square buttons (REW, F FWD, STOP, PLAY, RECORD, LIFT, EDIT), a red power lamp and two black knobs |
 | Head assembly | Tall black head cover with a brushed silver lid; blue-black head stacks at the tape face; black guide posts; capstan with pinch roller on its arm; cream idler roller |
 | Deck layout | Removed the non-original logo plate, tape-time display, status lamps and swinging tension arms from the top deck. The tape counter lives on the autolocator, as on the real machine |
 | Autolocator | Light-blue keypad keys, as on the AL-III |
 | Reels | From your photos: a silver Amtex 499 (full supply reel, left) and a red Quantica GP9 (take-up, right). Solid flanges with two radial slots, a black hub with six screws, and the printed labels |
-| Console panel | Warm taupe-grey, as on the HJ-632 (was blue-grey) |
+| Console panel | Warm taupe-grey, as on the JH-Mix (was blue-grey) |
 | Knob caps | Colour-coded by row: black trim, white HPF, red HF, yellow HMF, blue LMF, white LF, red/yellow aux, black pan |
 | Scribble strip | One continuous white strip above the faders (was masking tape at the top) |
 | Fader bay | Light grey with black channel caps; group faders in yellow, green, white and black; red stereo master |
@@ -46,18 +46,18 @@ Corrected against your HJ-24 photos and reference photos of the HJ-24 (with Auto
 
 ## Tape machine rendering
 
-The HJ-24 is a real 3D scene (CSS 3D transforms, generated by `src/jh24.js`) seen from the operator's position, tilted 54°. Parts are modelled as solids:
+The JH-Tape is a real 3D scene (CSS 3D transforms, generated by `src/jh24.js`) seen from the operator's position, tilted 54°. Parts are modelled as solids:
 
 - Reels have thickness: a back flange, a 2" tape pack between the flanges, a front flange with brushed (Amtex 499) or anodized (Quantica GP9) finish, a black hub and three-lobed hold-down knobs.
 - The tape is a 2" ribbon standing on edge, routed by tangent lines and wraps. Following your photos, it runs across the front of the head block: supply reel → tall black roller guide at front left (with a chrome lifter pin beside it) → erase / record-sync / repro → black ribbed capstan, with the slim cream pinch roller pressing from the front on its black arm housing → chunky black take-up guide → take-up reel.
 - The head assembly is a box with a silver lid; the head stacks show 24 track lines.
 - The transport strip is deck-coloured with the light outline that steps back on the right: indicator pin, red button, two black knobs and a lifter toggle; white REW / F FWD / STOP, green PLAY, red REC in a black bezel; blue LIFT and orange EDIT on the stepped section, then speed, EQ and the app's tape-character trims. Below it is the woodgrain drawer front.
 
-All text on the 3D tape machine surroundings and rack is 14 px or larger. The console's printed legends and knob scales are smaller (7–11 px) so the strip can follow the real HJ-600 layout; the app's zoom brings them up to reading size, per the 50" 4K legibility rule. The VU scales show 20, 10, 7, 5, 3, 0 and +3 so the numbers stay readable at that size.
+All text on the 3D tape machine surroundings and rack is 14 px or larger. The console's printed legends and knob scales are smaller (7–11 px) so the strip can follow the real JH-Mix layout; the app's zoom brings them up to reading size, per the 50" 4K legibility rule. The VU scales show 20, 10, 7, 5, 3, 0 and +3 so the numbers stay readable at that size.
 
-## HJ-24 behaviour to implement (build phase)
+## JH-Tape behaviour to implement (build phase)
 
-These are planned behaviours. Exact timings and figures will be confirmed against the HJ-24 manual before coding.
+These are planned behaviours. Exact timings and figures will be confirmed against the JH-Tape manual before coding.
 
 | Area | Behaviour |
 | --- | --- |
@@ -77,7 +77,7 @@ These are planned behaviours. Exact timings and figures will be confirmed agains
 
 | Click | Opens |
 | --- | --- |
-| Tape machine | The live 3D HJ-24 (the reel prototype), with working transport |
+| Tape machine | The live 3D JH-Tape (the reel prototype), with working transport |
 | Tape meter bridge | All 24 meters large, with needles moving under VU ballistics, track names and READY / SAFE |
 | Leximan 224 (rack unit or the remote on the console) | The 224X remote full size next to its mainframe: drag the six sliders, press a lower key to show that parameter on the display (sec / ms / Hz / kHz), press a program key to load a program |
 | Patchbay (rack unit or the PATCHBAY tab) | The full patch panel: 14 rows of output / input pairs (interface, console, buses, tape, inserts, sends, outboard, returns, direct outs). Drag from an output to an input to patch, click a cable to pull it; normalled pairs pass signal until patched. Starts with the session's patches; changes are kept in your browser |

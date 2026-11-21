@@ -1,4 +1,4 @@
-// Demo tape: one minute of synthesized dummy audio for the HJ-24, plus 30 fps SMPTE on track 24.
+// Demo tape: one minute of synthesized dummy audio for the JH-Tape, plus 30 fps SMPTE on track 24.
 // 96 BPM in 4/4, bar 1 at 2 s after the counter zero (01:00:02:00, the SBX-80's default offset and tempo).
 // Tracks: 1 kick, 2 snare, 3 hats, 4 toms, 5 / 6 overheads L / R, 7 bass, 8 guitar, 24 SMPTE.
 // Deterministic (seeded noise), so every machine makes the same tape. Needs `encode` from prototype/sync/ltc.js.

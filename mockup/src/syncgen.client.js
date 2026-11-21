@@ -1,7 +1,7 @@
   // ---------------- house sync generator (Hollis SG-24) and two-machine synchronizer (Addison-Smyth Delta-Three) ------
   // SG-24: the studio's master clock. Word clock, black burst (NTSC / PAL), tri-level, a capstan reference for the tape
   // machine and a time-code generator (LTC + MTC). Pull-up / pull-down moves all of them together.
-  // Delta-Three: chases the HJ-24 (slave, code read off track 24) to a master: the SG-24's generator, or MTC from a DAW.
+  // Delta-Three: chases the JH-Tape (slave, code read off track 24) to a master: the SG-24's generator, or MTC from a DAW.
   // With the SG-24's reference on the capstan and the master on the same house sync, it resolves to the reference.
   const SG = {
     rates: [44100, 48000, 88200, 96000, 176400, 192000], rateI: 1,
@@ -138,14 +138,14 @@
     else if (k === 'video') SG.videoI = (SG.videoI + 1) % SG.videos.length;
     else if (k === 'run') { SG.run = !SG.run; sgSay(SG.run ? 'Time code running' : 'Time code stopped'); }
     else if (k === 'reset') { SG.tc = SG.start; DZ.trk.pos = null; }
-    else if (k === 'cap') { SG.capRef = !SG.capRef; if (!SG.capRef && !DZ.on) tr.setVarispeed(AL.varOn ? AL.vari : 0); sgSay(SG.capRef ? 'Capstan reference to the HJ-24: on' : 'Capstan reference off: the HJ-24 runs on its own crystal'); }
+    else if (k === 'cap') { SG.capRef = !SG.capRef; if (!SG.capRef && !DZ.on) tr.setVarispeed(AL.varOn ? AL.vari : 0); sgSay(SG.capRef ? 'Capstan reference to the JH-Tape: on' : 'Capstan reference off: the JH-Tape runs on its own crystal'); }
     else if (k === 'mtcout') {
       if (SG.mtcOut) { SG.mtcOut = null; sgSay('MTC out off'); }
       else try { const m = await sgMidiAccess(); const outs = [...m.outputs.values()]; if (!outs.length) throw new Error('no MIDI outputs'); SG.mtcOut = outs[0]; sgSay(`MTC out to ${outs[0].name}`); } catch (err) { sgSay(`MTC out: ${err.message}`); }
     }
     b.closest('.ovsync') && sgKeys();
   }));
-  const dzChase = () => { DZ.on = !DZ.on; DZ.hold = false; DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset }); if (!DZ.on) tr.setVarispeed(0); sgSay(DZ.on ? 'Chase on: the HJ-24 follows the master' : 'Chase off'); };
+  const dzChase = () => { DZ.on = !DZ.on; DZ.hold = false; DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset }); if (!DZ.on) tr.setVarispeed(0); sgSay(DZ.on ? 'Chase on: the JH-Tape follows the master' : 'Chase off'); };
   const dzSrc = () => { DZ.src = DZ.src === 'gen' ? 'mtc' : 'gen'; DZ.trk = new CodeTracker({ flywheel: 0.6 }); dzListen(DZ.src === 'mtc'); if (DZ.src === 'gen') sgSay('Master: the SG-24 time-code generator'); };
   const dzCapture = () => { const fps = sgFps(), m = DZ.trk.read(performance.now() / 1000), c = slaveCode(); if (m.valid && c != null) { DZ.ch.offset = Math.round((c - m.pos) * fps) / fps; sgSay(`Offset captured: ${tcStr(Math.abs(DZ.ch.offset), fps)}${DZ.ch.offset < 0 ? ' (slave behind)' : ''}`); } else sgSay('CAPTURE needs code from both machines'); };
   const dzNudge = (d) => { DZ.ch.offset += d / sgFps() / 4; DZ.item = 3; };   // a quarter frame at a time; shows S_OFS
@@ -169,7 +169,7 @@
     const g = (i) => DZ_ITEMS[i][0];
     switch (k) {
       case 'master': if (sh) sgSay('M-REC: record-enable for the master machine (here the master is the SG-24 or a DAW: nothing to arm)'); else { DZ.masterEn = !DZ.masterEn; sgSay(DZ.masterEn ? 'Master code reader enabled' : 'Master disabled: the slave stays where it is'); } break;
-      case 'slave': if (sh) sgSay('S-REC: arm tracks on the HJ-24 autolocator; once locked, record punches land on frame'); else dzChase(); break;
+      case 'slave': if (sh) sgSay('S-REC: arm tracks on the JH-Tape autolocator; once locked, record punches land on frame'); else dzChase(); break;
       case 'midi': if (sh) { Object.assign(DZ.ch, { parkAhead: 0.1, learned: false, lead: DZ.ch.c.cueLead }); sgSay('LEARN: the slave\'s start-up and wind times will be measured again'); } else dzSrc(); break;
       case 'run': if (sh) { SG.tc = SG.start; DZ.trk.pos = null; sgSay('COPY: generator reset to its start time'); } else { SG.run = !SG.run; sgSay(SG.run ? 'Generator running' : 'Generator stopped'); } break;
       case 'stop':

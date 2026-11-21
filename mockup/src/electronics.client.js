@@ -1,4 +1,4 @@
-  // ---------------- HJ-24 audio electronics (prototype/electronics/jh24audio.js in an AudioWorklet) ----------------
+  // ---------------- JH-Tape audio electronics (prototype/electronics/jh24audio.js in an AudioWorklet) ----------------
   // POWER starts the engine. Every frame the shared transport and the monitoring status (AutoLocator TAPE / INPUT /
   // AUTO, record-ready and input keys, the cards' CUE keys) go to the worklet; it sends back VU levels and sources.
   const EL = { ctx: null, node: null, on: false, trims: null, cue: new Set(), solo: -1, statusKey: '', mrl: 'off', live: null };

@@ -1,4 +1,4 @@
-// HJ-24 (MCI JH-24) audio electronics model: every channel's Record/Cue, Reproduce, Output and Bias boards, the
+// JH-Tape (MCI JH-24) audio electronics model: every channel's Record/Cue, Reproduce, Output and Bias boards, the
 // erase / record / reproduce heads and the tape between them. Renderer-independent: plain sample loops over
 // Float32Arrays, so the same code runs in an AudioWorklet in the mockup, in Node tests, and ports 1:1 to the C++ engine.
 //

@@ -1,4 +1,4 @@
-// HJ-24 reel and transport physics (SI units).
+// JH-Tape reel and transport physics (SI units).
 // Renderer-independent so it can be ported 1:1 to the C++ engine.
 //
 // Model
@@ -8,7 +8,7 @@
 //    Each reel turns at w = v / r, so the full reel turns slowly and the empty one fast.
 //  - PLAY / RECORD: the capstan and pinch roller hold v at the selected speed with a fast,
 //    servo-like response. From a wind, the reels brake first and the pinch roller only
-//    engages once the tape is near play speed (the HJ-24's motion sensing).
+//    engages once the tape is near play speed (the JH-Tape's motion sensing).
 //  - Winds (F FWD, REW, shuttle, stop from a wind): the reel motors are force-limited, so
 //    acceleration = force / effective mass, where the effective mass of the reels seen at the
 //    tape is I_supply / r_s^2 + I_takeup / r_t^2. A full reel therefore spools up and brakes

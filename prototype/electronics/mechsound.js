@@ -1,4 +1,4 @@
-// HJ-24 transport mechanics as sound: what you hear standing next to the machine (not the tape's audio).
+// JH-Tape transport mechanics as sound: what you hear standing next to the machine (not the tape's audio).
 // Driven by the same physics as the reels on screen, block by block. Renderer-independent; runs in the AudioWorklet.
 //
 //  - reel motors: two DC servo motors direct-coupled to the reels. Each whines at its rotation rate times the

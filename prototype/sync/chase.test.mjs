@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { CodeTracker, Chaser } from './chase.js';
 import { Transport } from '../reels/physics.js';
 
-// The slave: the HJ-24 transport, its track 24 striped with 01:00:00:00 at the counter zero.
+// The slave: the JH-Tape transport, its track 24 striped with 01:00:00:00 at the counter zero.
 function rig() {
   const tr = new Transport(); tr.locate(tr.total * 0.1); tr.zero = tr.take;
   const code = () => 3600 + tr.counter;   // what the synchronizer reads off the slave's track 24

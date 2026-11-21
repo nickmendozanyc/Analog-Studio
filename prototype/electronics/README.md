@@ -1,4 +1,4 @@
-# HJ-24 audio electronics model (MCI JH-24, manual section 4)
+# JH-Tape audio electronics model (MCI JH-24, manual section 4)
 
 `jh24audio.js` models every channel's audio electronics and the tape between the heads, sample by sample.
 Renderer-independent (plain loops over Float32Arrays): it runs in an AudioWorklet in the mockup

@@ -1,4 +1,4 @@
-// AudioWorklet wrapper around the HJ-24 electronics model (prototype/electronics/jh24audio.js is inlined above this).
+// AudioWorklet wrapper around the JH-Tape electronics model (prototype/electronics/jh24audio.js is inlined above this).
 // The main thread posts the shared transport every frame; the worklet runs its own sample clock and follows it.
 class JH24Processor extends AudioWorkletProcessor {
   constructor() {

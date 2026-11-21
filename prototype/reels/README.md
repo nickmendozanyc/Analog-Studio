@@ -1,6 +1,6 @@
-# HJ-24 reel prototype
+# JH-Tape reel prototype
 
-A first, runnable test of how the reels and tape move. A full reel is 2500 ft. It shows a 3D HJ-24 transport (Amtex 499 supply, Quantica GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
+A first, runnable test of how the reels and tape move. A full reel is 2500 ft. It shows a 3D JH-Tape transport (Amtex 499 supply, Quantica GP9 take-up) driven by real transport physics, so the motion can be judged on the target Mac and display before the full app is built.
 
 ## Run it
 

@@ -56,7 +56,7 @@
     cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
   }
   function stopMeters() { cancelAnimationFrame(raf); raf = 0; }
-  // the meter bridges in the studio view (HJ-24 bridge in the HJ room, the A827's amber bridge in SLS): the real line-out
+  // the meter bridges in the studio view (JH-Tape bridge in the JH room, the A827's amber bridge in SLS): the real line-out
   // levels of the tape machine when its electronics are on, needles at rest when off
   const roomNeedles = { cmi: [], sls: [] };
   document.querySelectorAll('.vuN').forEach((g) => { if (g.closest('.overlay')) return; const n = { g, i: +g.dataset.i, cx: +g.dataset.cx, cy: +g.dataset.cy, a: -45 }; (g.closest('#sls') ? roomNeedles.sls : roomNeedles.cmi).push(n); });
@@ -128,8 +128,8 @@
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
     { id: 'chin', name: 'CONSOLE LINE IN', sub: 'channels 1–24', io: 'in', items: L('', 24), normal: 'ifin' },
     { id: 'bus', name: 'BUS OUT', sub: 'console buses', io: 'out', items: L('', 24) },
-    { id: 'tin', name: 'TAPE IN', sub: 'HJ-24 track inputs', io: 'in', items: L('', 24), normal: 'bus' },
-    { id: 'tout', name: 'TAPE OUT', sub: 'HJ-24 repro', io: 'out', items: L('', 24) },
+    { id: 'tin', name: 'TAPE IN', sub: 'JH-Tape track inputs', io: 'in', items: L('', 24), normal: 'bus' },
+    { id: 'tout', name: 'TAPE OUT', sub: 'JH-Tape repro', io: 'out', items: L('', 24) },
     { id: 'tret', name: 'TAPE RETURN', sub: 'console channels 1–24', io: 'in', items: L('', 24), normal: 'tout' },
     { id: 'isend', name: 'INSERT SEND', sub: 'channels 1–32', io: 'out', items: L('', 32) },
     { id: 'iret', name: 'INSERT RETURN', sub: 'channels 1–32', io: 'in', items: L('', 32), normal: 'isend' },
@@ -238,7 +238,7 @@
   const tr = window.AS_TRANSPORT, LIVE = window.JH_LIVE;
   const TAPE = tr.tape;
   const packPx = (r) => LIVE.hubR + (r - TAPE.hubR) / (TAPE.flangeR - TAPE.hubR) * (LIVE.R - LIVE.hubR);
-  // both machines follow the same transport: the HJ-24 (HJ room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
+  // both machines follow the same transport: the JH-Tape (JH room, prefix jh) and the Stauder A827 (SLS room, prefix a8)
   const reels = [['jh', window.JH_LIVE], ['a8', window.A8_LIVE], ['jhp', window.JH_LIVE], ['a8p', window.A8_LIVE]].filter(([, L]) => L).flatMap(([pre, L]) => ['s', 't'].map((k) => ({
     k, d: L[k], rotors: [...document.querySelectorAll(`.${pre}-rotor[data-reel="${k}"]`)], blurs: [...document.querySelectorAll(`.${pre}-blur[data-reel="${k}"]`)], blurOp: 0, labs: [...document.querySelectorAll(`.${pre}-lab[data-reel="${k}"]`)], smears: [...document.querySelectorAll(`.${pre}-smear[data-reel="${k}"]`)], lights: [...document.querySelectorAll(`.${pre}-light[data-reel="${k}"]`)], smKey: '', smOp: -1,
     packs: [...document.querySelectorAll(`.${pre}-pack-${k}`)], strand: document.getElementById(`${pre}-strand-${k}`), lastR: -1,
@@ -762,7 +762,7 @@
     tapeFrame.contentWindow.postMessage({ as: 'state', s: st }, '*');
   }
 
-  // ---------------- studio modes: HJ / SLS (the rack stays; console, tape machine and autolocator swap) ----------------
+  // ---------------- studio modes: JH / SLS (the rack stays; console, tape machine and autolocator swap) ----------------
   const slsLayer = document.getElementById('sls');
   const modeKeys = [...document.querySelectorAll('.modes button')];
   function setStudio(mode) {
