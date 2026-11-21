@@ -1513,67 +1513,67 @@ function rmxFace(w, h) {
   p(`<text class="${id('route')}" x="${X(624)}" y="${Y(600)}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
 }
 function spBody(w, h) {
-  // E-mew SP-1200, drawn from the user's straight-on photo of a real SP-1200: every position is the photo's pixel
-  // (the case spans x 85-1137, y 80-940 there), mapped onto the body
+  // E-mew SP-1200. The case is from the user's straight-on photo (x 85-1137, y 80-940); everything on the faceplate is
+  // measured from the user's faceplate artwork, placed on the photo's faceplate (x 105-1112, y 128-893)
   const X = (px) => (px - 85) * w / 1052, Y = (py) => (py - 80) * h / 860, s = w / 1052;
-  const CASE = '#5e6266', PANEL = '#666a6e', STRIP = '#d5d7d2', INK = '#f1f1ec', DARK = '#26282a', BLUE = '#5d9fd6', CREAM = '#f3eedc', RED = '#e0322c';
-  const CN = 'font-stretch="condensed"';
-  const T = (x, y, t, sz, col = INK, a = 'start', wt = 500, ex = '') => text(X(x), Y(y), t, sz * s, col, a, wt, `${CN} ${ex}`);
+  const CASE = '#5e6266', PANEL = '#63676b', STRIP = '#d5d7d2', INK = '#f1f1ec', DARK = '#26282a', BLUE = '#5d9fd6', CREAM = '#f3eedc', RED = '#e0322c';
+  const T = (x, y, t, sz, col = INK, a = 'start', wt = 500, ex = '') => text(X(x), Y(y), t, sz * s, col, a, wt, `font-stretch="condensed" ${ex}`);
+  const TW = (x, y, t, sz, x1, col = INK, wt = 600) => T(x, y, t, sz, col, 'start', wt, `textLength="${(X(x1) - X(x)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"`);
   rect(X(88), Y(82), X(1135) - X(88), Y(936) - Y(82), CASE, `rx="${10 * s}"`);
   rect(X(88), Y(82), X(1135) - X(88), 3 * s, '#fff', 'opacity="0.12"');
   rect(X(94), Y(905), X(1129) - X(94), Y(936) - Y(905), '#55595c', `rx="${4 * s}"`);
   rect(X(790), Y(928), X(820) - X(790), 6 * s, '#202224'); rect(X(892), Y(928), X(915) - X(892), 6 * s, '#202224'); rect(X(1000), Y(928), X(1020) - X(1000), 6 * s, '#202224');
-  rect(X(105), Y(128), X(1112) - X(105), Y(195) - Y(128), STRIP, `rx="${3 * s}"`);
-  rect(X(115), Y(838), X(1097) - X(115), Y(893) - Y(838), STRIP, `rx="${3 * s}"`);
-  const TW = (x, y, t, sz, x1, col = INK, wt = 600) => T(x, y, t, sz, col, 'start', wt, `textLength="${(X(x1) - X(x)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"`);
-  TW(163, 183, 'SP 1200', 34, 251, DARK, 800);
-  TW(268, 183, 'S A M P L I N G \u00a0 P E R C U S S I O N', 6.2, 441, DARK, 700);
-  TW(168, 875, 'E-mew Systems, Inc.', 27, 348, '#3a3c3e', 400);
-  const HW = { 'Set-up': 37, Disk: 25, Sync: 28, Sample: 43, 'Master Control': 80, Programming: 77, Performance: 72 };
-  const head = (x, y, t, x1, ly) => { TW(x, y, t, 15, x + HW[t]); rect(X(x), Y(ly), X(x1) - X(x), 2.2 * s, BLUE); };
-  head(163, 217, 'Set-up', 316, 226); head(357, 217, 'Disk', 511, 228); head(561, 219, 'Sync', 614, 229); head(662, 219, 'Sample', 816, 229); head(875, 219, 'Master Control', 1057, 230);
-  head(165, 393, 'Programming', 812, 406); head(166, 516, 'Performance', 810, 528); rect(X(868), Y(722), X(1047) - X(868), 2.2 * s, BLUE);
-  const led = (x, y, k) => { circle(X(x), Y(y), 4.6 * s, '#3c3e40'); p(`<circle class="sp-l-${k}" cx="${X(x)}" cy="${Y(y)}" r="${3.6 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); };
-  const key = (x, y, k, col = CREAM, sz = 25) => { p(`<g data-spb="${k}" style="cursor:pointer">`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s + 1.6 * s, sz * s, sz * s, '#000', `rx="${2 * s}" opacity="0.5"`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s, sz * s, sz * s, col, `rx="${2 * s}"`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s, sz * s, sz * 0.3 * s, '#fff', `rx="${2 * s}" opacity="0.3"`); p('</g>'); };
-  const pad = (x, y, k, attr, cls = '') => { p(`<g ${attr}="${k}" style="cursor:pointer">`); rect(X(x) - 22 * s, Y(y) - 22 * s, 44 * s, 44 * s, '#3a3d40', `rx="${2 * s}"`); p(`<rect class="${cls}" x="${X(x) - 17.5 * s}" y="${Y(y) - 17.5 * s}" width="${35 * s}" height="${35 * s}" rx="${2.5 * s}" fill="#141516"/>`); rect(X(x) - 17.5 * s, Y(y) - 17.5 * s, 35 * s, 6 * s, '#fff', `rx="${2.5 * s}" opacity="0.07"`); p('</g>'); };
-  const list = (x, y0, dy, a) => a.forEach((t, i) => TW(x, y0 + i * dy, t, 6.6, x + t.length * 3.05, INK, 500));
+  rect(X(105), Y(128), X(1112) - X(105), Y(893) - Y(128), PANEL, `rx="${3 * s}" stroke="#4e5256" stroke-width="${1 * s}"`);
+  rect(X(105), Y(128), X(1112) - X(105), Y(187) - Y(128), STRIP, `rx="${3 * s}"`);
+  rect(X(105), Y(836), X(1112) - X(105), Y(893) - Y(836), STRIP, `rx="${3 * s}"`);
+  TW(158, 181, 'SP 1200', 34, 245, DARK, 800);
+  TW(262, 181, 'S A M P L I N G   P E R C U S S I O N', 6.2, 437, DARK, 700);
+  TW(157, 871, 'E-mew Systems, Inc.', 27, 336, '#3a3c3e', 400);
+  const head = (x, t, w0, y, x1, ly) => { TW(x, y, t, 15, x + w0); rect(X(x), Y(ly) - 1.1 * s, X(x1) - X(x), 2.2 * s, BLUE); };
+  head(158, 'Set-up', 38, 213, 311, 219); head(354.5, 'Disk', 23, 213, 505, 219); head(560, 'Sync', 25, 213, 609, 219); head(661, 'Sample', 42, 213, 809, 219); head(875, 'Master Control', 78, 213, 1054, 219);
+  head(158, 'Programming', 75, 389, 809, 395); head(158, 'Performance', 72, 512, 809, 518); rect(X(874), Y(712.6) - 1.1 * s, X(1054) - X(874), 2.2 * s, BLUE);
+  const led = (x, y, k) => { circle(X(x), Y(y), 4.4 * s, '#3c3e40'); p(`<circle class="sp-l-${k}" cx="${X(x)}" cy="${Y(y)}" r="${3.4 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); };
+  const key = (x, y, k, col = CREAM, sz = 23) => { p(`<g data-spb="${k}" style="cursor:pointer">`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s + 1.6 * s, sz * s, sz * s, '#000', `rx="${2 * s}" opacity="0.5"`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s, sz * s, sz * s, col, `rx="${2 * s}"`); rect(X(x) - sz / 2 * s, Y(y) - sz / 2 * s, sz * s, sz * 0.3 * s, '#fff', `rx="${2 * s}" opacity="0.3"`); p('</g>'); };
+  const pad = (x, y, k, attr, cls = '') => { p(`<g ${attr}="${k}" style="cursor:pointer">`); rect(X(x) - 22 * s, Y(y) - 20.5 * s + 2 * s, 44 * s, 41 * s, '#000', `rx="${2.5 * s}" opacity="0.5"`); p(`<rect class="${cls}" x="${X(x) - 22 * s}" y="${Y(y) - 20.5 * s}" width="${44 * s}" height="${41 * s}" rx="${2.5 * s}" fill="#141516" stroke="#303336" stroke-width="${2.5 * s}"/>`); rect(X(x) - 20 * s, Y(y) - 18.5 * s, 40 * s, 6 * s, '#fff', `rx="${2.5 * s}" opacity="0.07"`); p('</g>'); };
+  const list = (x, y0, dy, a) => a.forEach((t, i) => TW(x, y0 + i * dy, t, 6.6, x + t.length * 3.2, INK, 500));
   const knob = (x, y, k, r = 18) => { p(`<g data-spv="${k}" style="cursor:ns-resize"><circle cx="${X(x)}" cy="${Y(y)}" r="${(r + 8) * s}" fill="transparent"/><circle cx="${X(x)}" cy="${Y(y) + 1.5 * s}" r="${r * s}" fill="#000" opacity="0.5"/><circle cx="${X(x)}" cy="${Y(y)}" r="${r * s}" fill="#141517"/><circle cx="${X(x)}" cy="${Y(y)}" r="${(r - 4) * s}" fill="#1e2022"/><g class="sp-v-${k}" transform="rotate(0 ${X(x)} ${Y(y)})"><rect x="${X(x) - 1.2 * s}" y="${Y(y) - (r - 1) * s}" width="${2.4 * s}" height="${(r * 0.55) * s}" fill="#f4f2ea"/></g></g>`); };
   // Set-up, Disk, Sync, Sample
-  led(176, 238, 'setup'); key(176, 265, 'setup'); list(218, 236, 9.65, ['11 Multi Pitch', '12 Multi Level', '13 Exit Multi Mode', '14 Dynamic Buttons', '15 Define Mix', '16 Select Mix', '17 Channel Assign', '18 Decay/Tune Select', '19 Loop/Truncate', '20 Delete Sound', '21 1st Song/Step', '22 MIDI Parameters', '23 Special']);
-  led(371, 239, 'disk'); key(371, 267, 'disk'); list(417, 237, 9.65, ['1 Save Sequences', '2 Save Sounds', '3 Load Sequences', '4 Load Segment #', '5 Load Sounds', '6 Load Sounds #', '7 Catalog Sequences', '8 Catalog Sounds', '9 Format/Copy Software', '0 Load Sequences and Sounds']);
-  led(574, 241, 'sync'); key(574, 268, 'sync'); list(562, 305, 9.65, ['1 Internal', '2 MIDI', '3 SMPTE', '4 Click']);
-  led(673, 241, 'sample'); key(673, 268, 'sample', RED); list(662, 304, 9.65, ['1 VU Mode', '2 Assign Voice', '3 Level', '4 Threshold Set', '5 Sample Length', '6 Re-Sample', '7 Arm Sampling', '9 Force Sampling']);
-  knob(771, 267, 'gain', 17); T(771, 306, 'Gain', 6.6, INK, 'middle');
+  led(171, 234, 'setup'); key(170.8, 261.6, 'setup'); list(212, 234, 9.55, ['11 Multi Pitch', '12 Multi Level', '13 Exit Multi Mode', '14 Dynamic Buttons', '15 Define Mix', '16 Select Mix', '17 Channel Assign', '18 Decay/Tune Select', '19 Loop/Truncate', '20 Delete Sound', '21 1st Song/Step', '22 MIDI Parameters', '23 Special']);
+  led(367, 234, 'disk'); key(366, 261.6, 'disk'); list(408, 234, 9.55, ['1 Save Sequences', '2 Save Sounds', '3 Load Sequences', '4 Load Segment #', '5 Load Sounds', '6 Load Sounds #', '7 Catalog Sequences', '8 Catalog Sounds', '9 Format/Copy Software', '0 Load Sequences and Sounds']);
+  led(571.6, 234, 'sync'); key(570.4, 261.6, 'sync'); list(557, 299.5, 9.5, ['1 Internal', '2 MIDI', '3 SMPTE', '4 Click']);
+  led(673, 234, 'sample'); key(672, 261.6, 'sample', RED); list(660, 299.5, 9.6, ['1 VU Mode', '2 Assign Voice', '3 Level', '4 Threshold Set', '5 Sample Length', '6 Re-Sample', '7 Arm Sampling', '8 Force Sampling']);
+  knob(771.3, 261.6, 'gain', 17); T(772, 294, 'Gain', 6.6, INK, 'middle');
   // Master Control: display, four keys, two knobs, the keypad
-  rect(X(878), Y(240), X(1042) - X(878), Y(305) - Y(240), '#17191a', `rx="${2 * s}"`); rect(X(892), Y(251), X(1030) - X(892), Y(293) - Y(251), '#a9ad8c');
-  for (const [cls, yy] of [['sp-l1', 268], ['sp-l2', 286]]) p(`<text class="${cls}" x="${X(896)}" y="${Y(yy)}" font-family="${MONO2}" font-size="${14.5 * s}" font-weight="700" fill="#2a2e1c" style="white-space:pre" textLength="${(X(1026) - X(896)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
-  [[884, 'tempo', 'Tempo'], [936, 'no', '◄'], [988, 'yes', '►'], [1040, 'enter', 'Enter']].forEach(([x, k, t]) => { key(x, 373, k); T(x, 401, t, 6.6, INK, 'middle'); });
-  knob(915, 450, 'vol', 19); T(915, 480, 'Mix', 6.6, INK, 'middle'); T(915, 489, 'Volume', 6.6, INK, 'middle');
-  knob(1008, 450, 'mvol', 19); T(1008, 480, 'Metronome', 6.6, INK, 'middle'); T(1008, 489, 'Volume', 6.6, INK, 'middle');
-  [[1, 913, 535], [2, 959, 535], [3, 1005, 535], [4, 913, 581], [5, 959, 581], [6, 1005, 581], [7, 913, 627], [8, 959, 627], [9, 1005, 627], [0, 958, 672]].forEach(([d, x, y]) => { T(x, y - 18, String(d), 6.6, INK, 'middle'); key(x, y, 'k' + d); });
-  T(913, 654, 'No', 6.6, INK, 'middle'); T(1005, 654, 'Yes', 6.6, INK, 'middle');
+  rect(X(882), Y(229), X(1044) - X(882), Y(291) - Y(229), '#17191a', `rx="${2 * s}"`); rect(X(894), Y(239), X(1032) - X(894), Y(281) - Y(239), '#a9ad8c');
+  for (const [cls, yy] of [['sp-l1', 256], ['sp-l2', 274]]) p(`<text class="${cls}" x="${X(898)}" y="${Y(yy)}" font-family="${MONO2}" font-size="${14.5 * s}" font-weight="700" fill="#2a2e1c" style="white-space:pre" textLength="${(X(1028) - X(898)).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
+  [[886.8, 'tempo', 'Tempo'], [937.6, 'no', '◄'], [990.7, 'yes', '►'], [1041.6, 'enter', 'Enter']].forEach(([x, k, t]) => { key(x, 363.2, k); T(x, 392, t, 6.6, INK, 'middle'); });
+  knob(919.1, 440.9, 'vol', 18); T(919, 474, 'Mix', 6.6, INK, 'middle'); T(919, 481.5, 'Volume', 6.6, INK, 'middle');
+  knob(1011.5, 440.9, 'mvol', 18); T(1011.5, 474, 'Metronome', 6.6, INK, 'middle'); T(1011.5, 481.5, 'Volume', 6.6, INK, 'middle');
+  [[1, 916.8, 526.5], [2, 964.2, 526.5], [3, 1010.4, 526.5], [4, 916.8, 572.2], [5, 964.2, 572.2], [6, 1010.4, 572.2], [7, 916.8, 617.8], [8, 964.2, 617.8], [9, 1010.4, 617.8], [0, 964.2, 663.5]].forEach(([d, x, y]) => { T(x, y - 18, String(d), 6.6, INK, 'middle'); key(x, y, 'k' + d); });
+  T(916.8, 643, 'No', 6.6, INK, 'middle'); T(1010.4, 643, 'Yes', 6.6, INK, 'middle');
   // Programming: Song / Segment, then the eight dual-function keys
-  rect(X(200), Y(418), 6 * s, Y(480) - Y(418), '#3e4144', `rx="${2 * s}"`); key(177, 447, 'pattern'); led(203, 424, 'song'); led(203, 474, 'seg'); T(220, 425, 'Song', 6.6); T(220, 476, 'Segment', 6.6);
-  [[292, 'metro', ['Trigger'], ['Metronome']], [361, 'swing', ['Repeat'], ['Swing']], [430, 'copy', ['Subsong'], ['Copy']], [498, 'timesig', ['End'], ['Time', 'Signature']], [566, 'seglen', ['Insert'], ['Segment', 'Length']], [632, 'erase', ['Delete'], ['Erase']], [701, 'quant', ['Tempo', 'Change'], ['Auto', 'Correct']], [769, 'step', ['Mix', 'Change'], ['Step', 'Program']]].forEach(([x, k, top, bot]) => {
-    top.forEach((t, i) => T(x, 426 - (top.length - 1 - i) * 10, t, 6.6, INK, 'middle')); key(x, 449, k); bot.forEach((t, i) => T(x, 477 + i * 10, t, 6.6, INK, 'middle'));
+  key(170.8, 439.7, 'pattern'); led(200, 416, 'song'); led(200, 466, 'seg'); T(212, 418, 'Song', 6.6); T(212, 468, 'Segment', 6.6);
+  [[286.3, 'metro', ['Trigger'], ['Metronome']], [355.6, 'swing', ['Repeat'], ['Swing']], [424.9, 'copy', ['Subsong'], ['Copy']], [494.2, 'timesig', ['End'], ['Time', 'Signature']], [563.5, 'seglen', ['Insert'], ['Segment', 'Length']], [632.8, 'erase', ['Delete'], ['Erase']], [702, 'quant', ['Tempo', 'Change'], ['Auto', 'Correct']], [771.3, 'step', ['Mix', 'Change'], ['Step', 'Program']]].forEach(([x, k, top, bot]) => {
+    top.forEach((t, i) => T(x, 418 - (top.length - 1 - i) * 7.5, t, 6.6, INK, 'middle')); key(x, 440.9, k); bot.forEach((t, i) => T(x, 469 + i * 7.5, t, 6.6, INK, 'middle'));
   });
   // Performance: slider mode, the eight sliders over their scale, bank, the eight pads
-  rect(X(200), Y(590), 6 * s, Y(662) - Y(590), '#3e4144', `rx="${2 * s}"`); key(179, 623, 'sliders'); led(203, 598, 'tunedecay'); led(203, 624, 'mix'); led(203, 650, 'multi'); T(221, 601, 'Tune/Decay', 6.6); T(221, 627, 'Mix', 6.6); T(221, 652, 'Multi Mode', 6.6);
-  for (let i = 0; i < 9; i++) rect(X(267), Y(553 + i * 15.6), X(795) - X(267), 1 * s, '#8f9396');
-  rect(X(200), Y(738), 6 * s, Y(822) - Y(738), '#3e4144', `rx="${2 * s}"`); key(181, 780, 'bank'); ['A', 'B', 'C', 'D'].forEach((t, i) => { const y = [744, 764, 797, 817][i]; led(203, y, 'b' + t); T(222, y + 3, t, 6.6); });
-  const SX = [293, 362, 430, 498, 565, 632, 699, 767], top = 550, bot = 690;
+  key(170.8, 617.8, 'sliders'); led(200, 592, 'tunedecay'); led(200, 619, 'mix'); led(200, 644, 'multi'); T(212, 594, 'Tune/Decay', 6.6); T(212, 621, 'Mix', 6.6); T(212, 646, 'Multi Mode', 6.6);
+  const top = 541, bot = 694;
+  for (let i = 0; i < 11; i++) rect(X(264), Y(top + 6 + i * 14.2), X(793) - X(264), 1 * s, '#8f9396');
+  key(170.8, 777.7, 'bank'); ['A', 'B', 'C', 'D'].forEach((t, i) => { const y = [742, 761, 795, 814][i]; led(200, y, 'b' + t); T(212, y + 2.5, t, 6.6); });
+  const SX = [285.2, 354.4, 423.7, 493, 562.3, 631.6, 700.9, 770.2];
   SX.forEach((x, i) => {
     rect(X(x) - 2.2 * s, Y(top), 4.4 * s, Y(bot) - Y(top), '#0c0d0e', `rx="${1 * s}"`);
     p(`<g data-spk="${i}" style="cursor:ns-resize"><rect x="${X(x - 30)}" y="${Y(top - 10)}" width="${X(60 + 85) - X(85)}" height="${Y(bot + 16) - Y(top - 10)}" fill="transparent"/>`);
     p(`<g class="sp-s${i}" data-len="${(Y(bot) - Y(top)).toFixed(2)}" transform="translate(0 0)"><polygon points="${X(x) - 24 * s},${Y(top) + 6 * s} ${X(x) - 20 * s},${Y(top) - 6 * s} ${X(x) + 24 * s},${Y(top) - 6 * s} ${X(x) + 26 * s},${Y(top) + 6 * s}" fill="#141516" stroke="#000" stroke-width="${0.6 * s}"/><rect x="${X(x) - 21 * s}" y="${Y(top) - 1.2 * s}" width="${45 * s}" height="${2.4 * s}" fill="#eceae2"/></g></g>`);
-    T(x, 720, String(i + 1), 6.6, INK, 'middle');
-    pad(x, 781, i, 'data-spp', `sp-pad${i}`); T(x, 817, String(i + 1), 6.6, INK, 'middle');
-    p(`<text class="sp-pn${i}" x="${X(x)}" y="${Y(830)}" font-family="${MONO2}" font-size="${6.4 * s}" font-weight="700" fill="#c9cbc6" text-anchor="middle"> </text>`);
+    T(x, 713, String(i + 1), 6.6, INK, 'middle');
+    pad(x, 777.7, i, 'data-spp', `sp-pad${i}`); T(x, 813, String(i + 1), 6.6, INK, 'middle');
+    p(`<text class="sp-pn${i}" x="${X(x)}" y="${Y(826)}" font-family="${MONO2}" font-size="${6.4 * s}" font-weight="700" fill="#c9cbc6" text-anchor="middle"> </text>`);
   });
   // transport
-  led(964, 750, 'run'); led(1033, 750, 'rec');
-  pad(896, 782, 'tap', 'data-spb'); pad(965, 782, 'run', 'data-spb'); key(1033, 784, 'rec', RED, 24);
-  T(896, 820, 'Tap/Repeat', 6.6, INK, 'middle'); T(965, 820, 'Run/Stop', 6.6, INK, 'middle'); T(1033, 820, 'Record/Edit', 6.6, INK, 'middle');
+  led(973, 740, 'run'); led(1042, 740, 'rec');
+  pad(903, 777.7, 'tap', 'data-spb'); pad(972.3, 777.7, 'run', 'data-spb'); key(1041.6, 777.7, 'rec', RED);
+  T(903, 813, 'Tap/Repeat', 6.6, INK, 'middle'); T(972.3, 813, 'Run/Stop', 6.6, INK, 'middle'); T(1041.6, 813, 'Record/Edit', 6.6, INK, 'middle');
 }
 function junoBody(w, h) {
   // Rowan JUNO-1060, drawn from the user's photo of a real Juno-106 (straight down): positions are the photo's pixels
