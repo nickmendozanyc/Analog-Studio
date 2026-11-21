@@ -12,14 +12,16 @@
   function conParams(ch) {
     const s = chState('cmi', ch);
     return { src: s.src_in ? 'in' : 'tape', trim: s.trim ?? 0, phase: !!s.phase, eq_in: s.eq_in !== false, hf_f: s.hf_f, hf_g: s.hf_g, mf_f: s.mf_f, mf_g: s.mf_g, lf_f: s.lf_f, lf_g: s.lf_g, hpf: !!s.hpf, lpf: !!s.lpf,
-      pan: s.pan ?? 0, mute: !!s.mute, solo: !!s.solo, fader: CON.fader[ch] ?? 0.2,
+      pan: s.pan ?? 0, mute: !!s.mute, solo: !!s.solo, fader: CON.fader[ch] ?? 0.2, bus: s.bus || [], panbus: s.panbus !== false, oddeven: s.oddeven ?? 0, buslvl: s.buslvl ?? 0,
       s1: s.s1 ?? -60, s2: s.s2 ?? -60, s12pre: !!s.s12pre, s34: s.s34 ?? -60, s34p: s.s34p ?? 0, s34pre: !!s.s34pre, s56: s.s56 ?? -60, s56p: s.s56p ?? 0, s56pre: s.s56pre !== false };
   }
   window.CON_CHANGED = (con, ch) => { if (con === 'cmi' && EL.node) conPost({ ch, set: conParams(ch) }); };
   function conRoute() {   // line inputs 25-32 and the 224X's send, from the patchbay
     const lineSrc = Array.from({ length: 8 }, (_, j) => { const pc = patches.find((q) => q.b === `lin:LINE ${25 + j}` && /^fxout:/.test(q.a)); return pc ? pc.a.slice(6) : null; });
     const sp = patches.find((q) => q.b === 'fxin:224 L' && /^aux:SEND \d$/.test(q.a)), rvSend = sp ? +sp.a.slice(9) - 1 : -1;
-    const key = JSON.stringify([lineSrc, rvSend]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend }); }
+    // the tape inputs: BUS n -> TAPE IN n is normalled; a cable into TAPE IN n replaces it (a BUS out, or nothing else we carry)
+    const tapeSrc = Array.from({ length: 24 }, (_, i) => { const pc = patches.find((q) => q.b === `tin:${i + 1}`); return !pc ? i : /^bus:\d+$/.test(pc.a) ? +pc.a.slice(4) - 1 : null; });
+    const key = JSON.stringify([lineSrc, rvSend, tapeSrc]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend, tapeSrc }); }
   }
   function conSendAll() { CON.route = ''; conPost({ all: Array.from({ length: 32 }, (_, i) => conParams(i)), master: CON.master }); conRoute(); }
   // faders: drag, wheel, double-click = 0 dB

@@ -27,3 +27,11 @@ test('sends: post-fader follows the fader, pre does not; 3-4 pans; the master sc
   m.set(0, { s34pre: true }); m.process((j) => (j === 0 ? x : null), 1024); assert.ok(rms(m.sends[2]) < 1e-6 && rms(m.sends[3]) > 0.1, '3-4 panned to 4');
   const b = new JHMix(fs); b.master = 0.42; const [L] = runCh(b, 0, x); assert.ok(Math.abs(rms(L) / rms(x) - 10 ** (-10 / 20)) < 0.01);
 });
+
+test('buses: channel 1 on bus 3 (PAN in, centre) feeds bus 3 after the fader; PAN odd / even; no self-feed from tape', () => {
+  const x = sine(500, 1024), m = new JHMix(fs); m.set(0, { bus: [3, 4], panbus: false, src: 'in' }); m.process((j) => (j === 0 ? x : null), 1024);
+  assert.ok(Math.abs(rms(m.bus[2]) / rms(x) - 1) < 0.02 && Math.abs(rms(m.bus[3]) / rms(x) - 1) < 0.02);
+  m.set(0, { panbus: true, oddeven: -1 }); m.process((j) => (j === 0 ? x : null), 1024); assert.ok(rms(m.bus[2]) > rms(x) * 1.3 && rms(m.bus[3]) < 1e-6, 'all odd');
+  m.set(0, { fader: 1 }); m.process((j) => (j === 0 ? x : null), 1024); assert.ok(rms(m.bus[2]) < 1e-9, 'post fader');
+  const t = new JHMix(fs); t.set(2, { bus: [3, 5], panbus: false, src: 'tape' }); t.process((j) => (j === 2 ? x : null), 1024); assert.ok(rms(t.bus[2]) < 1e-9 && rms(t.bus[4]) > 0.1, 'track 3 bounces to 5, never back to 3');
+});

@@ -966,7 +966,7 @@ const CX = 12, CY = 794, CW = 3266, CH = 2160 - 794, BRIDGE = 120;   // CY = top
       p('</g>');
       // BUS level rotary below sends 5-6: feeds the assigned buses through the odd/even pan
       tx(x0 + 5, 880, 'BUS', 10, GOLD, 'start', 800); tx(x0 + 5, 892, 'LVL', 10, GOLD, 'start', 800);
-      KN(x0 + 50, 897, 18, '#1d1d1f', 60, [[60, '0']], true, 'buslvl');   // black; normally set to 0 dB (2 o'clock)
+      KN(x0 + 50, 897, 18, '#1d1d1f', 107, [[107, '0']], true, 'buslvl');   // black; normally set to 0 dB (its 0 mark, about 4 o'clock on the -60 .. +10 scale)
       tx(x0 + 27, 926, '∞', 8, WH, 'middle', 700); tx(x0 + 74, 926, '+10', 7.5, WH, 'middle', 700);
       // mute + numbered solo key, bus level and channel pan
       blk(x0 + 4, 928, 36, 18, 'MUTE', muted.has(ch), '#ff3b2f', 'mute'); wht(x0 + 44, 928, 36, 18, String(ch + 1), soloed.has(ch), 'solo');

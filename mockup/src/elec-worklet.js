@@ -63,7 +63,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.ch != null && d.set) this.con.set(d.ch, d.set);
       if (d.all) d.all.forEach((o, i) => { if (o) this.con.set(i, o); });
       if (d.master != null) this.con.master = d.master; if (d.dim != null) this.con.dim = d.dim; if (d.mono != null) this.con.mono = d.mono; if (d.cut != null) this.con.cut = d.cut;
-      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
+      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
     }
     else if (d.type === 's900') this.s9msg(d);
     else if (d.type === 'juno') { const u = this.ju; if (d.set) u.set(d.set); if (d.note != null) { if (d.vel > 0) u.noteOn(d.note, d.vel); else u.noteOff(d.note); } if (d.allOff) u.allOff(); if (d.vol != null) this.juVol = d.vol; }
@@ -162,7 +162,8 @@ class JH24Processor extends AudioWorkletProcessor {
       const buf = this.inp[i]; buf.fill(0);
       const ready = m.st.ready.has(i);
       if (o.on && (o.to === 'all' || (o.to === 'ready' && ready) || o.to === i)) for (let k = 0; k < n; k++) buf[k] = amp * Math.sin(o.ph + w * k);
-      if (this.live.on && live && ready) for (let k = 0; k < n; k++) buf[k] += live[k];
+      const tb = this.tapeSrc ? this.tapeSrc[i] : i, B = tb != null && this.con && this.con.bus[tb];   // the bus patched to this track's input (bus n -> track n normally), from the last block
+      if (B && B.length === n) for (let k = 0; k < n; k++) buf[k] += B[k];
     }
     o.ph = (o.ph + w * n) % (2 * Math.PI);
     if (ctl.v != null && T && T.mode === 'play') { this.vs = this.vs || []; this.vs.push(ctl.v / (m.ips * IPS)); if (this.vs.length > 4000) this.vs.shift(); }
@@ -227,7 +228,8 @@ class JH24Processor extends AudioWorkletProcessor {
     const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L };   // the outputs a line input can be patched from
     let s9Patched = false;
     for (let j = 0; j < 8; j++) { const nm = this.lineSrc[j], b2 = fxOut[nm]; if (nm === 'S900') s9Patched = true; if (b2 && b2.length === n) this.lineBuf[j].set(b2); else this.lineBuf[j].fill(0); }
-    C.process((i) => (i < 24 ? (i < this.N ? (C.ch[i].p.src === 'in' ? this.inp[i] : ins[i] || this.out[i]) : null) : this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null), n2);
+    const liveR = inputs[0] && (inputs[0][1] || inputs[0][0]), chIn = (i) => (this.live.on && live ? (i === 0 ? live : i === 1 ? liveR : null) : null);   // the interface inputs 1 / 2 (your computer's input) on channels 1 / 2
+    C.process((i) => (i < 24 ? (i < this.N ? (C.ch[i].p.src === 'in' ? chIn(i) : ins[i] || this.out[i]) : null) : this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null), n2);
     const BL = C.L, BR = C.R;
     // the 224X: fed from the send patched to its input (aux SEND n -> 224 L), its outputs come back on line inputs next block
     if (this.rvIn.length !== n) { this.rvIn = new Float32Array(n); this.rvL = new Float32Array(n); this.rvR = new Float32Array(n); }

@@ -27,7 +27,7 @@ export function jmFaderDb(pos) {
 const dbg = (d) => (d <= -59.9 ? 0 : 10 ** (d / 20));
 export function jmChDefaults() {
   return { src: 'tape', trim: 0, phase: false, eq_in: true, hf_f: 10000, hf_g: 0, mf_f: 1500, mf_g: 0, lf_f: 100, lf_g: 0, hpf: false, lpf: false,
-    fader: 0.2, pan: 0, mute: false, solo: false, s1: -60, s2: -60, s12pre: false, s34: -60, s34p: 0, s34pre: false, s56: -60, s56p: 0, s56pre: true };
+    fader: 0.2, pan: 0, mute: false, solo: false, bus: [], panbus: true, oddeven: 0, buslvl: 0, s1: -60, s2: -60, s12pre: false, s34: -60, s34p: 0, s34pre: false, s56: -60, s56p: 0, s56pre: true };
 }
 export class JHMix {
   constructor(fs, n = 32) {
@@ -36,6 +36,7 @@ export class JHMix {
     this.ch.forEach((c, i) => this.update(i));
     this.L = new Float32Array(128); this.R = new Float32Array(128); this.sends = Array.from({ length: 6 }, () => new Float32Array(128)); this.tmp = new Float32Array(128);
     this.vuL = 0; this.vuR = 0; this.peakL = 0; this.peakR = 0;
+    this.bus = Array.from({ length: 24 }, () => new Float32Array(128)); this.busVu = new Float32Array(24);
   }
   set(i, o) { Object.assign(this.ch[i].p, o); this.update(i); }
   update(i) {
@@ -47,11 +48,16 @@ export class JHMix {
     c.gl = Math.min(1, c.gl); c.gr = Math.min(1, c.gr);   // centre = unity on both sides (the JH-Mix pan law, -3 dB is too quiet against tape levels)
     const sp = (v) => { const b = (v + 1) * Math.PI / 4; return [Math.cos(b), Math.sin(b)]; };
     c.s = [dbg(P.s1), dbg(P.s2), dbg(P.s34), dbg(P.s56)]; c.s34 = sp(P.s34p); c.s56 = sp(P.s56p);
+    // bus assignment: the selected buses (1-24) after the fader, at BUS LVL; with PAN in, ODD / EVEN split by the pan pot.
+    // A channel playing its own track back (source TAPE) never feeds that track's bus: no loop tape -> bus -> same tape
+    const [po, pe] = sp(P.oddeven), bl = dbg(P.buslvl);
+    c.busList = (P.bus || []).filter((b) => b >= 1 && b <= 24 && !(P.src === 'tape' && b - 1 === i)).map((b) => [b - 1, bl * (P.panbus ? (b % 2 ? po : pe) * Math.SQRT2 : 1)]);
   }
   // src(i) -> Float32Array of the channel's source for this block (or null for silence)
   process(src, n) {
     if (this.L.length !== n) { this.L = new Float32Array(n); this.R = new Float32Array(n); this.sends = this.sends.map(() => new Float32Array(n)); this.tmp = new Float32Array(n); }
     const L = this.L, R = this.R, S = this.sends, y = this.tmp; L.fill(0); R.fill(0); for (const s of S) s.fill(0);
+    if (this.bus[0].length !== n) this.bus = this.bus.map(() => new Float32Array(n)); for (const b of this.bus) b.fill(0);
     const soloAny = this.ch.some((c) => c.p.solo), kv = 1 / (0.1 * this.fs);
     for (let i = 0; i < this.n; i++) {
       const c = this.ch[i], P = c.p, x = src(i);
@@ -76,6 +82,8 @@ export class JHMix {
         v += (Math.abs(s * g) - v) * kv;
       }
       c.vu = v;
+      const gb = P.mute ? 0 : c.g;   // the buses follow the fader and the mute (not the solo)
+      if (gb) for (const [bi, k0] of c.busList) { const B = this.bus[bi], gg = gb * k0; for (let k = 0; k < n; k++) B[k] += y[k] * gg; }
     }
   }
   // after anything else is summed into L / R: the master fader, DIM / MONO / CUT, the bus meters
@@ -88,5 +96,5 @@ export class JHMix {
     }
     this.vuL = vl; this.vuR = vr; this.peakL = pl; this.peakR = pr;
   }
-  meters(vu0) { const d = (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * vu0)); return { ch: this.ch.map((c) => Math.round(d(c.vu) * 10) / 10), L: d(this.vuL), R: d(this.vuR), peakL: 20 * Math.log10(this.peakL + 1e-9), peakR: 20 * Math.log10(this.peakR + 1e-9) }; }
+  meters(vu0) { const d = (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * vu0)); for (let b = 0; b < 24; b++) { const B = this.bus[b]; let pk = 0; for (let k = 0; k < B.length; k++) pk = Math.max(pk, Math.abs(B[k])); this.busVu[b] = pk; } return { bus: Array.from(this.busVu, (v) => Math.round(20 * Math.log10(v + 1e-9))), ch: this.ch.map((c) => Math.round(d(c.vu) * 10) / 10), L: d(this.vuL), R: d(this.vuR), peakL: 20 * Math.log10(this.peakL + 1e-9), peakR: 20 * Math.log10(this.peakR + 1e-9) }; }
 }
