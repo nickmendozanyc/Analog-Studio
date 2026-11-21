@@ -1,4 +1,4 @@
-  // ---------------- Rowan TR-808: the front panel's working (after the TR-808 owner's manual, in short) ----------------
+  // ---------------- Rowan TR-8080: the front panel's working (after the TR-808 owner's manual, in short) ----------------
   // MODE: CLEAR / 1st PART / 2nd PART (write) / MANUAL / PLAY. INSTRUMENT SELECT picks the voice to write (AC = accent).
   // The voices and the sequencer run in the tape machine's audio engine (tr808.js), sample-accurate; this side holds the
   // patterns and the knobs and sends them over. SYNC: internal, or DIN sync from the SBX-80 (locked to the tape).

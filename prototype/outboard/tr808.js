@@ -1,4 +1,4 @@
-// Rowan TR-808 (after the Roland TR-808 Rhythm Composer, 1980): the voices and the sequencer, sample by sample.
+// Rowan TR-8080 (after the Roland TR-808 Rhythm Composer, 1980): the voices and the sequencer, sample by sample.
 // Voices are synthesised the way the circuits work, simplified: the bass drum and toms are ringing resonators (a decaying
 // sine whose pitch settles), the snare two resonators plus "snappy" noise, the hand clap a burst of noise bands with a
 // tail, the cymbal and hi-hats six square-wave oscillators at odd ratios through band-pass and high-pass filters, the

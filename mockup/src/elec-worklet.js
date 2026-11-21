@@ -26,8 +26,8 @@ class JH24Processor extends AudioWorkletProcessor {
     this.pcm = [new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 42), new PCM4x(sampleRate, 42)]; this.pcmch = [null, null, null, null];
     this.pcmOut = this.pcm.map(() => new Float32Array(128));
     // the Akita S900 sampler: records from the channel patched to its input, plays to the mix (its own line return)
-    this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-909 on the desk (into the mix)
-    this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-808 (into the mix)
+    this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-9090 on the desk (into the mix)
+    this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-8080 (into the mix)
     this.s9 = new S900(sampleRate); this.s9ch = null; this.s9on = true; this.s9L = new Float32Array(128); this.s9R = new Float32Array(128); this.s9In = new Float32Array(128);
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
     this.h949 = new H949Unit(sampleRate); this.rmx = new RMX16(sampleRate); this.par = { h949: null, rmx: null };
@@ -225,10 +225,10 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
     if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
     if (this.s9on) { this.s9.process(this.s9In, this.s9L, this.s9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain; for (let k = 0; k < n; k++) { L[k] += this.s9L[k] * g; if (R !== L) R[k] += this.s9R[k] * g; } } }
-    // the TR-909 on the desk, into the mix
+    // the TR-9090 on the desk, into the mix
     if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
     this.t9.process(this.t9L, this.t9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain * 0.9; for (let k = 0; k < n; k++) { L[k] += this.t9L[k] * g; if (R !== L) R[k] += this.t9R[k] * g; } }
-    // the TR-808: its own voices and sequencer, into the mix
+    // the TR-8080: its own voices and sequencer, into the mix
     if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
     this.tr.process(this.trL, this.trR, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain * 0.9; for (let k = 0; k < n; k++) { L[k] += this.trL[k] * g; if (R !== L) R[k] += this.trR[k] * g; } }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids

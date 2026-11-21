@@ -1,4 +1,4 @@
-// Rowan TR-909 (after the Roland TR-909 Rhythm Composer, 1983): voices and sequencer, sample by sample.
+// Rowan TR-9090 (after the Roland TR-909 Rhythm Composer, 1983): voices and sequencer, sample by sample.
 // The drums are analog-style: the bass drum a sine swept down from a high start (TUNE = how far, ATTACK = the click,
 // DECAY), snare two tuned oscillators plus noise (TONE filters it, SNAPPY sets it), toms swept sines, rim shot and hand
 // clap from noise and resonators. The hi-hats, crash and ride were 6-bit samples on the original: here they are made from

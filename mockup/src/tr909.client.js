@@ -1,4 +1,4 @@
-  // ---------------- Rowan TR-909 on the desk in the racks room: its front panel's working ----------------
+  // ---------------- Rowan TR-9090 on the desk in the racks room: its front panel's working ----------------
   // PATTERN WRITE: INST SELECT then a step key picks the voice (the names under the keys; 12 = ACCENT, 13 = FLAM), then
   // the step keys switch its steps. PATTERN PLAY: the step keys pick the pattern (at the end of the bar while running).
   // LAST STEP then a step key sets the pattern's length. SHUFFLE/FLAM then a step key: 1-8 shuffle 0-7, 9-16 flam 0-7.
@@ -16,7 +16,7 @@
   try { const sv = JSON.parse(localStorage.getItem('as-tr909') || 'null'); if (sv && sv.p) { for (const k in sv.p) { if (typeof sv.p[k] === 'object') Object.assign(T9.p[k] || (T9.p[k] = {}), sv.p[k]); else T9.p[k] = sv.p[k]; } T9.patterns = sv.patterns || T9.patterns; T9.pat = sv.pat || 0; } } catch (e) { /* storage unavailable */ }
   let t9SaveT = 0; const t9Save = () => { clearTimeout(t9SaveT); t9SaveT = setTimeout(() => { try { localStorage.setItem('as-tr909', JSON.stringify({ p: T9.p, patterns: T9.patterns, pat: T9.pat })); } catch (e) { /* ignore */ } }, 400); };
   const t9Post = (o) => elPost({ type: 'tr909', ...o });
-  const t9Say = (t, disp) => { const m = document.getElementById('t9-msg'); if (m) m.textContent = 'TR-909 · ' + t; if (disp) T9.show = { t: disp, until: performance.now() + 1100 }; };
+  const t9Say = (t, disp) => { const m = document.getElementById('t9-msg'); if (m) m.textContent = 'TR-9090 · ' + t; if (disp) T9.show = { t: disp, until: performance.now() + 1100 }; };
   const t9Pat = () => t9Post({ patIx: T9.pat, pattern: T9.patterns[T9.pat] });
   const T9_KN = { tempo: [37, 290], master: [0, 1], accent: [0, 1] };
   const t9Get = (k) => (k.includes('.') ? T9.p[k.split('.')[0]][k.split('.')[1]] : T9.p[k]);
