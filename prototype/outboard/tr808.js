@@ -13,7 +13,7 @@ export class TrBp {   // 2-pole band-pass / high-pass / low-pass (state-variable
   run(x) { const v3 = x - this.s2, v1 = this.a1 * this.s1 + this.a2 * v3, v2 = this.s2 + this.a2 * this.s1 + this.a3 * v3; this.s1 = 2 * v1 - this.s1; this.s2 = 2 * v2 - this.s2; this.lp = v2; this.bp = v1; this.hp = x - this.k * v1 - v2; return v1; }
 }
 export function trDefaults() {
-  return { master: 0.8, accent: 0.6, tempo: 120, var: 'A', sync: 'int',
+  return { master: 0.8, accent: 0.6, tempo: 120, var: 'A', sync: 'int', spb: 4, autoFill: 0, fill: 12, ifVar: 'A',
     BD: { level: 0.8, tone: 0.4, decay: 0.55 }, SD: { level: 0.7, tone: 0.5, snappy: 0.6 }, LT: { level: 0.6, tune: 0.5, conga: false }, MT: { level: 0.6, tune: 0.5, conga: false }, HT: { level: 0.6, tune: 0.5, conga: false },
     RS: { level: 0.6, claves: false }, CP: { level: 0.7, maracas: false }, CB: { level: 0.5 }, CY: { level: 0.5, tone: 0.5, decay: 0.6 }, OH: { level: 0.55, decay: 0.4 }, CH: { level: 0.6 } };
 }
@@ -23,6 +23,7 @@ export class TR808 {
   constructor(fs) {
     this.fs = fs; this.p = trDefaults(); this.patterns = Array.from({ length: 16 }, trEmptyPattern); this.pat = 0; this.next = null;
     this.run = false; this.ph = 0; this.step = -1; this.part = 'A'; this.sync = null;
+    this.track = []; this.trackMode = false; this.meas = 0; this.bar = 0; this.inFill = false; this.fillReq = false; this.introReq = false; this.basePat = 0;
     this.v = {}; for (const k of TR_INST) this.v[k] = { on: false, t: 0, acc: 1 };
     this.metalPh = new Float64Array(6); this.seed = 22222; this.peak = 0;
     this.f = { sdN: new TrBp(fs, 6000, 0.5), cp: new TrBp(fs, 1100, 2.2), cpT: new TrBp(fs, 1100, 2), ma: new TrBp(fs, 7000, 0.7), cyB: new TrBp(fs, 3440, 1.2), cyH: new TrBp(fs, 7100, 0.8), hhB: new TrBp(fs, 3440, 1.2), hhH: new TrBp(fs, 7500, 0.8), cb: new TrBp(fs, 2640, 3.5), bd: new TrBp(fs, 2500, 0.7), rs: new TrBp(fs, 1200, 0.8) };
@@ -36,16 +37,27 @@ export class TR808 {
     if (k === 'CH' && this.v.OH.on) this.v.OH.choke = true;   // the closed hat cuts the open one
     if (k === 'OH') this.v.OH.choke = false;
   }
-  start() { this.run = true; this.step = -1; this.ph = 0.999999; this.part = this.p.var === 'B' ? 'B' : 'A'; }
+  start() {
+    this.run = true; this.step = -1; this.ph = 0.999999; this.bar = 0; this.meas = 0; this.inFill = false; this.basePat = this.pat;
+    this.part = this.p.var === 'B' ? 'B' : 'A';
+    if (this.trackMode) { const m = this.track[0]; if (m) { this.pat = m.pat; this.part = m.part; } else this.run = false; }
+    else if (this.introReq) { this.introReq = false; this.inFill = true; this.pat = this.p.fill; this.part = this.p.ifVar; }   // INTRO SET: the fill plays first
+  }
+  // the end of a bar: the rhythm track's next measure, or back from a fill, the pattern change, the variation, fills
+  barEnd() {
+    this.bar++;
+    if (this.trackMode) { if (!this.track.length) { this.run = false; return; } this.meas = (this.meas + 1) % this.track.length; const m = this.track[this.meas]; this.pat = m.pat; this.part = m.part; return; }
+    if (this.inFill) { this.inFill = false; this.pat = this.basePat; }
+    if (this.next != null) { this.pat = this.basePat = this.next; this.next = null; }
+    if (this.p.var === 'AB') this.part = this.part === 'A' ? 'B' : 'A'; else this.part = this.p.var === 'B' ? 'B' : 'A';
+    const N = this.p.autoFill;
+    if (this.fillReq || (N && this.bar % N === N - 1)) { this.fillReq = false; this.inFill = true; this.basePat = this.pat; this.pat = this.p.fill; this.part = this.p.ifVar; }
+  }
   stop() { this.run = false; this.step = -1; }
   partLen() { return this.patterns[this.pat][this.part].len || 16; }
   advance() {   // the next 16th: fire its instruments
     this.step++;
-    if (this.step >= this.partLen()) {
-      this.step = 0;
-      if (this.p.var === 'AB') this.part = this.part === 'A' ? 'B' : 'A'; else this.part = this.p.var === 'B' ? 'B' : 'A';
-      if (this.next != null && this.part === (this.p.var === 'B' ? 'B' : 'A')) { this.pat = this.next; this.next = null; }
-    }
+    if (this.step >= this.partLen()) { this.step = 0; this.barEnd(); if (!this.run) return; }
     const S = this.patterns[this.pat][this.part].steps, acc = !!S.AC[this.step];
     for (const k of TR_INST) if (S[k][this.step]) this.trig(k, acc);
   }
@@ -57,13 +69,13 @@ export class TR808 {
     if (sy && P.sync === 'din') {
       if (!sy.run) { if (this.run) this.stop(); }
       else {
-        const want = sy.beats * 4;   // steps since bar 1
+        const want = sy.beats * (P.spb || 4);   // steps since bar 1
         if (!this.run) { this.run = true; this.part = P.var === 'B' ? 'B' : 'A'; const k = Math.floor(want); this.step = (k - 1 + 16 * 64) % this.partLen(); this.ph = want - k; }
         else { const have = this.absStep != null ? this.absStep + this.ph : want, err = want - have; if (Math.abs(err) > 0.5) { const k = Math.floor(want); this.step = (k - 1 + 16 * 64) % this.partLen(); this.ph = want - k; this.absStep = k - 1; } }
         P.tempo = sy.bpm;
       }
     }
-    const inc = P.tempo / 60 * 4 / fs;
+    const inc = P.tempo / 60 * (P.spb || 4) / fs;   // PRE-SCALE: steps per beat
     const lv = (k) => P[k].level * P.master * 0.5;
     let pk = this.peak * 0.97 ** (n / 128);
     for (let i = 0; i < n; i++) {
@@ -106,5 +118,5 @@ export class TR808 {
     }
     this.peak = pk;
   }
-  meters() { return { run: this.run, step: this.step, part: this.part, pat: this.pat, next: this.next, tempo: this.p.tempo, peakDb: 20 * Math.log10(this.peak + 1e-9), hits: TR_INST.filter((k) => this.v[k].on && this.v[k].t < 0.05) }; }
+  meters() { return { run: this.run, step: this.step, part: this.part, pat: this.pat, next: this.next, meas: this.meas, inFill: this.inFill, fillReq: this.fillReq || this.introReq, tempo: this.p.tempo, peakDb: 20 * Math.log10(this.peak + 1e-9), hits: TR_INST.filter((k) => this.v[k].on && this.v[k].t < 0.05) }; }
 }

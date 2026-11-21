@@ -60,13 +60,13 @@ class JH24Processor extends AudioWorkletProcessor {
       const u = this.t9; if (d.set) u.set(d.set); if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) u.patterns[d.patIx] = d.pattern;
       if (d.pat != null) { if (u.run) u.next = d.pat; else u.pat = d.pat; }
       if (d.play === true) u.start(); else if (d.play === false) u.stop();
-      if (d.trig) u.trig(d.trig, !!d.acc); if (d.sync !== undefined) u.sync = d.sync;
+      if (d.trig) u.trig(d.trig, !!d.acc); if (d.sync !== undefined) u.sync = d.sync; if (d.track) u.track = d.track; if (d.trackMode !== undefined) u.trackMode = d.trackMode;
     }
     else if (d.type === 'tr808') {
       const u = this.tr; if (d.set) u.set(d.set); if (d.patterns) u.patterns = d.patterns; if (d.patIx != null) { u.patterns[d.patIx] = d.pattern; }
       if (d.pat != null) { if (u.run) u.next = d.pat; else u.pat = d.pat; }
       if (d.play === true) u.start(); else if (d.play === false) u.stop();
-      if (d.trig) u.trig(d.trig, !!d.acc); if (d.sync !== undefined) u.sync = d.sync;
+      if (d.trig) u.trig(d.trig, !!d.acc); if (d.sync !== undefined) u.sync = d.sync; if (d.track) u.track = d.track; if (d.trackMode !== undefined) u.trackMode = d.trackMode; if (d.fillReq) u.fillReq = true; if (d.introReq) u.introReq = !u.introReq;
     }
     else if (d.type === 'pcm') { const u = this.pcm[d.unit]; if (!u) return; if (d.ch !== undefined) this.pcmch[d.unit] = d.ch; if (d.set) u.set(d.set); }
     else if (d.type === 'spx') { const u = this.spx[d.unit]; if (!u) return; if (d.ch !== undefined) this.spxch[d.unit] = d.ch; if (d.set) u.set(d.set); if (d.cmd === 'trig') u.trigger(); }

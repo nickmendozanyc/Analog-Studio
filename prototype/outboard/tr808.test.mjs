@@ -32,3 +32,13 @@ test('closed hat chokes the open hat; DIN sync follows the song position', () =>
   assert.ok(fired.includes('BD'), 'step 9 (beat 3) fires as the song passes beat 2'); assert.equal(s.p.tempo, 100);
   s.sync = { run: false }; run(s, 0.01); assert.equal(s.run, false);
 });
+
+test('fill-in every 2 bars (AUTO FILL IN), the rhythm track (COMPOSE / PLAY), PRE-SCALE', () => {
+  const u = new TR808(fs).set({ tempo: 120, autoFill: 2, fill: 12 }); u.patterns[0].A.steps.BD[0] = 1; u.patterns[12].A.steps.SD[0] = 1;
+  const seen = []; const g = u.trig.bind(u); u.trig = (k, a) => { seen.push(k); g(k, a); }; u.start(); run(u, 8.1);
+  assert.deepEqual(seen, ['BD', 'SD', 'BD', 'SD', 'BD'], 'bar 2 and bar 4 are fills');
+  const t = new TR808(fs).set({ tempo: 120 }); t.patterns[1].A.steps.CB[0] = 1; t.patterns[2].A.steps.CP[0] = 1; t.track = [{ pat: 1, part: 'A' }, { pat: 2, part: 'A' }, { pat: 2, part: 'A' }]; t.trackMode = true;
+  const s2 = []; const g2 = t.trig.bind(t); t.trig = (k, a) => { s2.push(k); g2(k, a); }; t.start(); run(t, 6.1); assert.deepEqual(s2, ['CB', 'CP', 'CP', 'CB']);
+  const q = new TR808(fs).set({ tempo: 120, spb: 3 }); q.patterns[0].A.steps.BD[0] = 1; q.patterns[0].A.len = 12; const s3 = []; const g3 = q.trig.bind(q); let n = 0; q.trig = (k, a) => { s3.push(n); g3(k, a); };
+  q.start(); const L = new Float32Array(1); for (n = 0; n < 2.1 * fs; n++) q.process(L, L, 1); assert.ok(Math.abs((s3[1] - s3[0]) / fs - 2) < 0.01, '12 eighth-note triplets = one 4/4 bar');
+});

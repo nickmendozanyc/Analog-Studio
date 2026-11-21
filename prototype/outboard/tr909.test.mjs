@@ -22,3 +22,10 @@ test('shuffle delays the second 16th; flam doubles the hit; last step shortens t
   const f = when({ flam: 5 }, [['SD', 0], ['FL', 0]]); assert.equal(f.filter((x) => x[0] === 'SD').length >= 2, true);
   const s = when({}, [['BD', 0]], 8); assert.ok(Math.abs((s[1][1] - s[0][1]) / fs - 1) < 0.01, '8 steps = one second at 120');
 });
+
+test('a strong step is accented; the track plays its patterns in order', () => {
+  const lvl = (v) => { const u = new TR909(fs).set({ tempo: 120 }); u.patterns[0].steps.SD[0] = v; u.start(); const [y] = run(u, 0.15); let e = 0; for (const s of y) e = Math.max(e, Math.abs(s)); return e; };
+  assert.ok(lvl(2) > lvl(1) * 1.15);
+  const t = new TR909(fs).set({ tempo: 120 }); t.patterns[3].steps.BD[0] = 1; t.patterns[7].steps.CP[0] = 1; t.track = [3, 7, 3]; t.trackMode = true;
+  const s2 = []; const g = t.trig.bind(t); t.trig = (k, a, l) => { s2.push(k); g(k, a, l); }; t.start(); run(t, 6.1); assert.deepEqual(s2, ['BD', 'CP', 'BD', 'BD']);
+});

@@ -9,7 +9,7 @@ import { TrBp } from './tr808.js';
 export const TR9_INST = ['BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CH', 'OH', 'CR', 'RD'];
 const T9_TAU = 2 * Math.PI, q6 = (x) => Math.round(Math.max(-1, Math.min(1, x)) * 31) / 31;
 export function tr9Defaults() {
-  return { master: 0.8, accent: 0.6, tempo: 125, shuffle: 0, flam: 5, sync: 'int',
+  return { master: 0.8, accent: 0.6, tempo: 125, shuffle: 0, flam: 5, sync: 'int', spb: 4,
     BD: { tune: 0.5, level: 0.85, attack: 0.5, decay: 0.5 }, SD: { tune: 0.5, level: 0.7, tone: 0.5, snappy: 0.6 },
     LT: { tune: 0.5, level: 0.6, decay: 0.5 }, MT: { tune: 0.5, level: 0.6, decay: 0.5 }, HT: { tune: 0.5, level: 0.6, decay: 0.5 },
     RS: { level: 0.6 }, CP: { level: 0.7 }, CH: { level: 0.6, decay: 0.3 }, OH: { level: 0.55, decay: 0.5 }, CR: { level: 0.5, tune: 0.5 }, RD: { level: 0.5, tune: 0.5 } };
@@ -18,7 +18,7 @@ export function tr9EmptyPattern() { return { len: 16, steps: Object.fromEntries(
 
 export class TR909 {
   constructor(fs) {
-    this.fs = fs; this.p = tr9Defaults(); this.patterns = Array.from({ length: 16 }, tr9EmptyPattern); this.pat = 0; this.next = null;
+    this.fs = fs; this.p = tr9Defaults(); this.patterns = Array.from({ length: 48 }, tr9EmptyPattern); this.pat = 0; this.next = null; this.track = []; this.trackMode = false; this.meas = 0;
     this.run = false; this.ph = 0; this.step = -1; this.sync = null; this.pend = []; this.peak = 0; this.seed = 90909;
     this.v = {}; for (const k of TR9_INST) this.v[k] = { on: false, t: 0, acc: 1, ph: 0 };
     this.mph = new Float64Array(6);
@@ -32,16 +32,17 @@ export class TR909 {
     v.on = true; v.t = 0; v.ph = 0; v.acc = (acc ? 1 + this.p.accent * 0.8 : 1) * lvl; v.g = 1;
     if (k === 'CH' && this.v.OH.on) this.v.OH.choke = true; if (k === 'OH') this.v.OH.choke = false;
   }
-  start() { this.run = true; this.step = -1; this.ph = 0.999999; this.pend = []; }
+  start() { this.run = true; this.step = -1; this.ph = 0.999999; this.pend = []; this.meas = 0; if (this.trackMode) { if (this.track.length) this.pat = this.track[0]; else this.run = false; } }
   stop() { this.run = false; this.step = -1; this.pend = []; }
   advance() {
     this.step++;
     const P = this.patterns[this.pat];
-    if (this.step >= (P.len || 16)) { this.step = 0; if (this.next != null) { this.pat = this.next; this.next = null; } }
-    const Q = this.patterns[this.pat], S = Q.steps, st = this.step, acc = !!S.AC[st], fl = !!S.FL[st];
+    if (this.step >= (P.len || 16)) { this.step = 0; if (this.trackMode) { if (!this.track.length) { this.run = false; return; } this.meas = (this.meas + 1) % this.track.length; this.pat = this.track[this.meas]; } else if (this.next != null) { this.pat = this.next; this.next = null; } }
+    const Q = this.patterns[this.pat], S = Q.steps, st = this.step, tot = !!S.AC[st], fl = !!S.FL[st];
     // shuffle: every second 16th comes late (up to a third of a step at 7)
-    const stepLen = 60 / this.p.tempo / 4 * this.fs, late = st % 2 ? Math.round(this.p.shuffle / 7 * stepLen / 3) : 0;
+    const stepLen = 60 / this.p.tempo / (this.p.spb || 4) * this.fs, late = st % 2 ? Math.round(this.p.shuffle / 7 * stepLen / 3) : 0;
     for (const k of TR9_INST) if (S[k][st]) {
+      const acc = tot || S[k][st] === 2;   // a strong step (2) or the total-accent row
       this.pend.push({ at: late, k, acc, lvl: 1 });
       if (fl) this.pend.push({ at: late + Math.round((2 + this.p.flam * 2.2) * this.fs / 1000), k, acc, lvl: 1 });   // flam: a softer first, then the hit
     }
@@ -54,13 +55,13 @@ export class TR909 {
     if (sy && P.sync === 'din') {
       if (!sy.run) { if (this.run) this.stop(); }
       else {
-        const want = sy.beats * 4, len = this.patterns[this.pat].len || 16;
+        const want = sy.beats * (P.spb || 4), len = this.patterns[this.pat].len || 16;
         if (!this.run) { this.run = true; const k = Math.floor(want); this.step = (k - 1 + len * 64) % len; this.ph = want - k; this.abs = k - 1; }
         else if (Math.abs(want - ((this.abs ?? want) + this.ph)) > 0.5) { const k = Math.floor(want); this.step = (k - 1 + len * 64) % len; this.ph = want - k; this.abs = k - 1; }
         P.tempo = sy.bpm;
       }
     }
-    const inc = P.tempo / 60 * 4 / fs, lv = (k) => P[k].level * P.master * 0.5;
+    const inc = P.tempo / 60 * (P.spb || 4) / fs, lv = (k) => P[k].level * P.master * 0.5;
     let pk = this.peak * 0.97 ** (n / 128);
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.abs = (this.abs ?? -1) + 1; } }
@@ -98,5 +99,5 @@ export class TR909 {
     }
     this.peak = pk;
   }
-  meters() { return { run: this.run, step: this.step, pat: this.pat, next: this.next, tempo: this.p.tempo, peakDb: 20 * Math.log10(this.peak + 1e-9), hits: TR9_INST.filter((k) => this.v[k].on && this.v[k].t < 0.05) }; }
+  meters() { return { run: this.run, step: this.step, pat: this.pat, next: this.next, meas: this.meas, tempo: this.p.tempo, peakDb: 20 * Math.log10(this.peak + 1e-9), hits: TR9_INST.filter((k) => this.v[k].on && this.v[k].t < 0.05) }; }
 }

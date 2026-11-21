@@ -1550,12 +1550,12 @@ function tr909Body(bw, bh) {
   p(`<text class="t9-disp" x="${X(187.5)}" y="${Y(300)}" font-family="${MONO2}" font-size="${8.2 * s}" font-weight="700" fill="#ff2a14" filter="url(#glowSm)" text-anchor="middle">125</text>`);
   T(X(262), Y(262), 'TEMPO', 2.6, K, 'middle', 900); knob(262, 293, 11.5 * s, 'tempo', ''); T(X(240), Y(318), 'SLOW', 1.9, K); T(X(285), Y(318), 'FAST', 1.9, K);
   // the small keys: TRACK PLAY (looks), PATTERN PLAY (write / play), TEMPO / BACK=TAP / FWD / MEAS, CYCLE, TAPE SYNC (= DIN sync)
-  T(X(339), Y(259), 'TRACK PLAY', 2.1, K); [306, 327, 348, 369].forEach((x, i) => { small(x, 270); T(X(x), Y(286), String(i + 1), 2, K); });
+  T(X(339), Y(259), 'TRACK PLAY', 2.1, K); [306, 327, 348, 369].forEach((x, i) => { small(x, 270, 'trk' + i, 't9-trk' + i); T(X(x), Y(286), String(i + 1), 2, K); });
   rect(X(296), Y(294), X(382) - X(296), Y(306) - Y(294), O, `rx="${0.4 * s}"`); T(X(339), Y(302.6), 'TRACK  WRITE', 2, '#fff', 'middle', 900);
-  T(X(426), Y(259), 'PATTERN PLAY', 2.1, K); [395, 416, 437, 458].forEach((x, i) => { small(x, 270, i === 0 ? 'mode' : '', i === 0 ? 't9-modeL' : ''); if (i < 3) T(X(x), Y(286), String(i + 1), 2, K); });
+  T(X(426), Y(259), 'PATTERN PLAY', 2.1, K); [395, 416, 437, 458].forEach((x, i) => { small(x, 270, i < 3 ? 'grp' + i : '', i < 3 ? 't9-grp' + i : ''); if (i < 3) T(X(x), Y(286), ['I', 'II', 'III'][i], 2, K); });
   rect(X(384), Y(294), X(455) - X(384), Y(306) - Y(294), O, `rx="${0.4 * s}"`); T(X(419.5), Y(302.6), 'PATTERN  WRITE', 2, '#fff', 'middle', 900);
   rect(X(457), Y(281), X(478) - X(457), Y(306) - Y(281), O, `rx="${0.4 * s}"`); T(X(467.5), Y(292), 'EXT', 1.9, '#fff', 'middle', 900); T(X(467.5), Y(299), 'INST', 1.9, '#fff', 'middle', 900);
-  [['TEMPO', 'STEP', 497, ''], ['BACK', 'TAP', 518, 'tap'], ['FWD', 'I', 539, ''], ['AVAILABLE', 'II', 560, '']].forEach(([a, b, x, k]) => { T(X(x), Y(a === 'AVAILABLE' ? 255 : 259), a, 1.8, K); if (a === 'AVAILABLE') T(X(x), Y(260), 'MEAS', 1.8, K); small(x, 270, k); T(X(x), Y(286), b, 1.9, K); });
+  [['TEMPO', 'STEP', 497, 'tempo'], ['BACK', 'TAP', 518, 'tap'], ['FWD', 'I', 539, 'fwd'], ['AVAILABLE', 'II', 560, 'meas']].forEach(([a, b, x, k]) => { T(X(x), Y(a === 'AVAILABLE' ? 255 : 259), a, 1.8, K); if (a === 'AVAILABLE') T(X(x), Y(260), 'MEAS', 1.8, K); small(x, 270, k, 't9-' + k + 'L'); T(X(x), Y(286), b, 1.9, K); });
   rect(X(486), Y(291), X(532) - X(486), Y(306) - Y(291), O, `rx="${0.4 * s}"`); T(X(509), Y(297.6), 'PATTERN WRITE', 1.7, '#fff', 'middle', 900); T(X(509), Y(303.4), 'MODE', 1.7, '#fff', 'middle', 900);
   rect(X(535), Y(291), X(575) - X(535), Y(306) - Y(291), O, `rx="${0.4 * s}"`); T(X(555), Y(300.5), 'BANK', 1.9, '#fff', 'middle', 900);
   T(X(582), Y(255), 'CYCLE', 1.8, K); T(X(582), Y(260), '/GUIDE', 1.8, K); small(582, 270); T(X(603), Y(255), 'TAPE', 1.8, K); T(X(603), Y(260), 'SYNC', 1.8, K); small(603, 270, 'sync', 't9-syncL');
@@ -1566,7 +1566,7 @@ function tr909Body(bw, bh) {
   // the boxed step section
   p(`<rect x="${X(68)}" y="${Y(318)}" width="${X(722) - X(68)}" height="${Y(452) - Y(318)}" fill="none" stroke="${K}" stroke-width="${0.5 * s}"/>`);
   p(`<line x1="${X(121)}" y1="${Y(318)}" x2="${X(121)}" y2="${Y(410)}" stroke="${K}" stroke-width="${0.5 * s}"/>`);
-  [[85, 340, 'last', 'LAST STEP', 't9-last'], [110, 340, '', 'SCALE', ''], [85, 372, 'shuf', 'SHUFFLE', 't9-shuf'], [110, 372, 'clear', 'CLEAR', ''], [85, 397, 'inst', 'INSTRUMENT', 't9-inst'], [110, 397, '', 'SHIFT', '']].forEach(([x, y, k, lab, cls]) => {
+  [[85, 340, 'last', 'LAST STEP', 't9-last'], [110, 340, 'scale', 'SCALE', 't9-scale'], [85, 372, 'shuf', 'SHUFFLE', 't9-shuf'], [110, 372, 'clear', 'CLEAR', 't9-clear'], [85, 397, 'inst', 'INSTRUMENT', 't9-inst'], [110, 397, 'shift', 'SHIFT', 't9-shift']].forEach(([x, y, k, lab, cls]) => {
     small(x, y, k, cls); if (lab === 'SHIFT') { rect(X(x) - 4 * s, Y(y) + 3.4 * s, 8 * s, 2.8 * s, O); T(X(x), Y(y) + 5.5 * s, lab, 1.7, '#fff', 'middle', 900); } else T(X(x), Y(y) + 5.6 * s, lab, 1.7, K, 'middle', 800);
     if (lab === 'SHUFFLE') T(X(x), Y(y) + 7.8 * s, '/FLAM', 1.7, K); if (lab === 'INSTRUMENT') T(X(x), Y(y) + 7.8 * s, 'SELECT', 1.7, K);
   });
@@ -1600,9 +1600,9 @@ function tr808Body(bw, bh) {
   rect(X(0.5), Y(63.4), X(99) - X(0.5), Y(35.4), '#8f8e8b', `rx="${2 * s}"`); rect(X(0.5), Y(63.4), X(99) - X(0.5), 0.8 * s, '#c8c7c2', 'opacity="0.6"');
   for (const [sx, sy] of [[1.5, 2.5], [98.5, 2.5], [1.5, 97], [98.5, 97], [21, 2.5], [60, 2.5], [21, 60.5], [60, 60.5]]) circle(X(sx), Y(sy), 1.4 * s, '#4a4a4c');
   // name: logo, Rhythm Composer, Computer Controlled
-  rect(X(71.2), Y(5.6), 3.4 * s, 3.4 * s, 'none', `stroke="${O}" stroke-width="${0.9 * s}"`); T(X(73), Y(10.2), 'Rowan', 8, O, 'start', 700, 'letter-spacing="0.4"');
-  rect(X(21), Y(55.4), X(87) - X(21), 0.5 * s, O); T(X(76), Y(54), 'Rhythm Composer', 9.2, O, 'end', 500); T(X(86.5), Y(54), 'TR-8080', 7.6, O, 'end', 700);
-  T(X(86.5), Y(59.4), 'Computer Controlled', 5, '#c9c6be', 'end', 600);
+  rect(X(64.7), Y(6.4), 7 * s, 6 * s, 'none', `stroke="${O}" stroke-width="${1.2 * s}"`); T(X(64.7) + 9 * s, Y(12.2), 'Rowan', 15, O, 'start', 600, 'letter-spacing="0.2"');
+  rect(X(21), Y(56.6), X(87) - X(21), 0.5 * s, O); T(X(74.2), Y(55.6), 'Rhythm Composer', 11, O, 'end', 500); T(X(84.6), Y(55.4), 'TR-8080', 7.6, O, 'end', 700);
+  T(X(84.6), Y(59.4), 'Computer Controlled', 6.2, '#c9c6be', 'end', 500);
   // power
   T(X(6.6), Y(3.6), 'POWER', 2.4); rect(X(6.6) - 4 * s, Y(5.3), 8 * s, 5 * s, '#0b0b0c', `rx="${0.6 * s}"`); rect(X(6.6) - 3.2 * s, Y(5.6), 3.6 * s, 3.6 * s, '#3a3a3d'); T(X(6.6) + 6 * s, Y(6.8), 'ON', 1.8); T(X(6.6) + 6.2 * s, Y(9.8), 'OFF', 1.8);
   // knobs: LEVEL = yellow cap on a black skirt; the others black with a white pointer; ticks round them
@@ -1639,19 +1639,19 @@ function tr808Body(bw, bh) {
   rect(X(11.6), Y(14.2), 19 * s, 5.2 * s, 'none', `stroke="${O}" stroke-width="${0.4 * s}"`); T(X(11.6) + 9.5 * s, Y(14.2) + 2.1 * s, 'INSTRUMENT-SELECT', 1.6, W); T(X(11.6) + 9.5 * s, Y(14.2) + 4.4 * s, 'RHYTHM TRACK', 1.6, O);
   const rotary = (cx, cy, r, k, labs, tags) => {
     labs.forEach((l, i) => {
-      if (tags) { const h = labs.length / 2, left = i < h, j = left ? i : i - h, lx = cx + (left ? -1 : 1) * (r + 4.4 * s) + (j === h - 1 || (!left && j === 0) ? 0 : 0), ly = left ? cy + 7 * s - j * 2.8 * s : cy - 7 * s + j * 2.8 * s;
-        rect(lx - 2.9 * s, ly - 1.25 * s, 5.8 * s, 2.5 * s, '#f2d23a', `rx="${0.3 * s}"`); T(lx, ly + 0.75 * s, l, 1.7, '#1a1a1a', 'middle', 900); }
+      if (tags) { const h = labs.length / 2, left = i < h, j = left ? i : i - h, lx = cx + (left ? -1 : 1) * 0.036 * pw, ly = left ? Y(28.8) - j * (Y(28.8) - Y(18.2)) / 5 : Y(18.2) + j * (Y(28.8) - Y(18.2)) / 5;
+        rect(lx - 4.2 * s, ly - 2.3 * s, 8.4 * s, 4.6 * s, '#f2d23a', `rx="${0.4 * s}"`); T(lx, ly + 1.1 * s, l, 2.9, '#1a1a1a', 'middle', 900); }
       else { const a = (-120 + i * 240 / (labs.length - 1)) * Math.PI / 180; T(cx + Math.sin(a) * (r + 5.2 * s), cy - Math.cos(a) * (r + 5.2 * s) + 0.7 * s, l, 1.6, W, 'middle', 800); } });
     p(`<g data-trr="${k}" style="cursor:pointer">`); circle(cx + 0.4 * s, cy + 0.9 * s, r, '#000', 'opacity="0.6"'); circle(cx, cy, r, '#101011'); for (let i = 0; i < 16; i++) { const a = i * 22.5 * Math.PI / 180; p(`<line x1="${cx + Math.sin(a) * r * 0.72}" y1="${cy - Math.cos(a) * r * 0.72}" x2="${cx + Math.sin(a) * r * 0.98}" y2="${cy - Math.cos(a) * r * 0.98}" stroke="#2c2c2e" stroke-width="${0.6 * s}"/>`); }
     p(`<g class="tr-r-${k}" transform="rotate(-120 ${cx} ${cy})"><rect x="${cx - 0.5 * s}" y="${cy - r}" width="${1 * s}" height="${r * 0.5}" fill="#f4f2ec"/></g>`); circle(cx, cy, r + 5 * s, 'transparent'); p('</g>');
   };
-  rotary(X(6.8), Y(21.8), 4.6 * s, 'mode', ['CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY'], false);
+  rotary(X(6.8), Y(21.8), 4.6 * s, 'mode', ['P.CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY', 'COMPOSE'], false);
   rotary(X(16.6), Y(21.5), 4.6 * s, 'inst', ['AC', 'BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'], true);
   T(X(6.8), Y(29), 'PATTERN CLEAR', 1.8, W);
-  p(`<g data-trb="clear" style="cursor:pointer">`); circle(X(6.8), Y(32), 2.2 * s, '#0b0b0c'); circle(X(6.8), Y(32), 1.7 * s, '#d0352b'); circle(X(6.8), Y(32), 5 * s, 'transparent'); p('</g>');
+  p(`<g data-trb="stepno" style="cursor:pointer">`); circle(X(6.8), Y(32), 2.2 * s, '#0b0b0c'); circle(X(6.8), Y(32), 1.7 * s, '#d0352b'); circle(X(6.8), Y(32), 5 * s, 'transparent'); p('</g>');
   T(X(3.2), Y(31.4), 'STEP', 1.6, W); T(X(3.2), Y(33.6), 'NUMBER', 1.6, W); T(X(11), Y(31.4), 'TRACK', 1.6, O); T(X(11), Y(33.6), 'CLEAR', 1.6, O);
   // MEASURES / AUTO FILL IN (looks only), TEMPO dial + FINE, MASTER VOLUME
-  ticks(X(16.6), Y(38.5), 3.6 * s); circle(X(16.6), Y(38.5), 3.6 * s, '#0e0e0f'); rect(X(16.6) - 0.4 * s, Y(38.5) - 3.6 * s, 0.8 * s, 2 * s, '#f4f2ec'); T(X(16.6), Y(44.3), 'MEASURES', 1.8, W); T(X(16.6), Y(46.5), 'AUTO FILL IN', 1.8, W);
+  rotary(X(16.6), Y(38.5), 3.6 * s, 'fill', ['MAN', '2', '4', '8', '12', '16'], false); T(X(16.6), Y(44.3), 'MEASURES', 1.8, W); T(X(16.6), Y(46.5), 'AUTO FILL IN', 1.8, W);
   T(X(7.3), Y(40.6), 'TEMPO', 2.6, W);
   circle(X(7.3), Y(52), 13 * s, '#a3a19b'); circle(X(7.3), Y(52), 11.4 * s, '#c4c2bc'); for (let i = 0; i <= 10; i++) { const a = (-150 + i * 30) * Math.PI / 180; T(X(7.3) + Math.sin(a) * 12.2 * s, Y(52) - Math.cos(a) * 12.2 * s + 0.7 * s, String(i), 1.9, '#2a2a2a', 'middle', 900); }
   knob(X(7.3), Y(52), 8.6 * s, 'tempo', false);
@@ -1663,29 +1663,30 @@ function tr808Body(bw, bh) {
   p(`<g data-trb="var" style="cursor:pointer">`); rect(X(4.6), Y(68.6), X(10.2) - X(4.6), Y(2.6), '#141415', `rx="${1.2 * s}"`); p(`<rect class="tr-var" x="${X(4.8)}" y="${Y(68.8)}" width="${(X(10.2) - X(4.6)) / 3}" height="${Y(2.2)}" rx="${1 * s}" fill="#e5e2da"/>`); p('</g>');
   T(X(5.2), Y(73.6), 'A', 1.6, '#232323'); T(X(7.4), Y(73.6), 'AB', 1.6, '#232323'); T(X(9.6), Y(73.6), 'B', 1.6, '#232323');
   for (const [lx, cls] of [[X(5.8), 'tr-va'], [X(9), 'tr-vb']]) { circle(lx, Y(75.2) + 1.2 * s, 0.9 * s, '#3a1412'); p(`<circle class="${cls}" cx="${lx}" cy="${Y(75.2) + 1.2 * s}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
-  p(`<g data-trb="start" style="cursor:pointer">`); rect(X(2.2), Y(79.5), X(11.8) - X(2.2), Y(11), '#4a4a48', `rx="${1 * s}"`); rect(X(2.6), Y(80.3), X(11.4) - X(2.6), Y(9.4), '#efe8d2', `rx="${0.8 * s}"`); rect(X(2.6), Y(80.3), X(11.4) - X(2.6), Y(3), '#fff', `opacity="0.4" rx="${0.8 * s}"`); T(X(7), Y(84.4), 'START', 2.3, '#2a2522', 'middle', 900); T(X(7), Y(87.6), 'STOP', 2.3, '#2a2522', 'middle', 900); p('</g>');
+  p(`<g data-trb="start" style="cursor:pointer">`); rect(X(2.1), Y(79.8), X(11.2) - X(2.1), Y(9.9), '#4a4a48', `rx="${1 * s}"`); rect(X(2.5), Y(80.5), X(10.8) - X(2.5), Y(8.5), '#efe8d2', `rx="${0.8 * s}"`); rect(X(2.5), Y(80.5), X(10.8) - X(2.5), Y(2.6), '#fff', `opacity="0.4" rx="${0.8 * s}"`); T(X(6.6), Y(84.2), 'START', 2.6, '#2a2522', 'middle', 900); T(X(6.6), Y(87.4), 'STOP', 2.6, '#2a2522', 'middle', 900); p('</g>');
   circle(X(7), Y(78), 0.9 * s, '#3a1412'); p(`<circle class="tr-run" cx="${X(7)}" cy="${Y(78)}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
-  T(X(16.4), Y(66.8), 'PRE-SCALE', 1.8, '#232323', 'middle', 900); rect(X(16.4) - 1.3 * s, Y(68.2), 2.6 * s, Y(8), '#141415', `rx="${0.5 * s}"`); rect(X(16.4) - 1 * s, Y(70), 2 * s, 3 * s, '#d8d5cc');
+  T(X(16.4), Y(66.8), 'PRE-SCALE', 1.8, '#232323', 'middle', 900); p(`<g data-trb="pre" style="cursor:pointer">`); rect(X(16.4) - 1.3 * s, Y(68.2), 2.6 * s, Y(8), '#141415', `rx="${0.5 * s}"`); p(`<rect class="tr-pre" x="${X(16.4) - 1 * s}" y="${Y(68.4)}" width="${2 * s}" height="${Y(1.9)}" fill="#d8d5cc"/>`); rect(X(16.4) - 4 * s, Y(67), 8 * s, Y(10.5), 'transparent'); p('</g>');
+  ['1', '2', '3', '4'].forEach((t, i) => T(X(16.4) + 2.6 * s, Y(69.6 + i * 2), t, 1.5, '#232323', 'start', 900));
   const bars = [[[22.3, 33.5], [34.5, 45.7], [46.8, 58], [59, 70.3], [71.3, 82.5], [83.5, 87.6]], [[22.3, 45.7], [46.8, 70.3], [71.3, 82.5]], [[22.3, 37], [38, 58]], [[22.3, 58], [59, 82.5]]];
   bars.forEach((row, r) => row.forEach(([a, b]) => { rect(X(a), Y(64.8 + r * 3.3), X(b) - X(a), Y(2.6), '#b9b7b1', `rx="${0.6 * s}"`); for (let x = X(a) + 3 * s; x < X(b) - 2 * s; x += Math.max(10 * s, (X(b) - X(a)) / 3)) T(x, Y(64.8 + r * 3.3) + 2.1 * s, '♪', 2.2, '#3a3a3a', 'middle', 700); }));
-  T(X(93.5), Y(66), '1/F - VARIATION', 1.7, '#232323', 'middle', 900); rect(X(91.5), Y(67.5), X(95.5) - X(91.5), Y(2.6), '#141415', `rx="${1.2 * s}"`); rect(X(91.7), Y(67.7), (X(95.5) - X(91.5)) / 2.2, Y(2.2), '#e5e2da', `rx="${1 * s}"`); T(X(92.4), Y(72.4), 'A', 1.5, '#232323'); T(X(94.6), Y(72.4), 'B', 1.5, '#232323');
+  T(X(93.5), Y(66), '1/F - VARIATION', 1.7, '#232323', 'middle', 900); p(`<g data-trb="ifv" style="cursor:pointer">`); rect(X(91.5), Y(67.5), X(95.5) - X(91.5), Y(2.6), '#141415', `rx="${1.2 * s}"`); p(`<rect class="tr-ifv" x="${X(91.7)}" y="${Y(67.7)}" width="${(X(95.5) - X(91.5)) / 2.2}" height="${Y(2.2)}" rx="${1 * s}" fill="#e5e2da"/>`); p('</g>'); T(X(92.4), Y(72.4), 'A', 1.5, '#232323'); T(X(94.6), Y(72.4), 'B', 1.5, '#232323');
   T(X(93.5), Y(76.5), 'INTRO SET', 1.6, '#232323', 'middle', 900); T(X(93.5), Y(78.6), 'FILL IN TRIGGER', 1.6, '#232323', 'middle', 900);
   p(`<g data-trb="tap" style="cursor:pointer">`); rect(X(90.6), Y(80), X(96.4) - X(90.6), Y(10.5), '#4a4a48', `rx="${0.8 * s}"`); rect(X(91), Y(80.8), X(96) - X(91), Y(8.9), '#efe8d2', `rx="${0.6 * s}"`); T(X(93.5), Y(86.2), 'TAP', 2.3, '#2a2522', 'middle', 900); p('</g>');
   // step keys: 1-4 red-orange, 5-8 orange, 9-12 yellow, 13-16 cream; the light sits in the key; numbers above and below
   const KX = [362, 409, 455, 501, 547, 594, 640, 686, 731, 777, 822, 868, 917, 963, 1009, 1055].map((v) => (v - 128) / 1062 * 100), KC = ['#e8553a', '#f39a3a', '#f3dc5a', '#efe9d6'];
-  rect(X(20.5), Y(79), X(99) - X(20.5), Y(19), '#7f7e7b', `rx="${1 * s}"`);
-  T(X(19.6), Y(79.6), 'STEP NO ➜', 1.8, '#232323', 'end', 900);
-  T(X(16.2), Y(85.4), '1st PART', 1.6, '#232323', 'start'); T(X(16.2), Y(90), '2nd PART', 1.6, '#232323', 'start');
-  for (const [ly, cls] of [[Y(84.8), 'tr-p1'], [Y(89.4), 'tr-p2']]) { circle(X(15.2), ly, 0.8 * s, '#3a1412'); p(`<circle class="${cls}" cx="${X(15.2)}" cy="${ly}" r="${0.8 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
+  rect(X(20.8), Y(76.6), X(89.6) - X(20.8), Y(19.5), '#7f7e7b', `rx="${1 * s}"`);
+  rect(X(14.4), Y(76.2), X(20.6) - X(14.4), Y(3), '#e9e6dd'); T(X(17.5), Y(78.4), 'STEP NO ➜', 2, '#232323', 'middle', 900);
+  T(X(17.2), Y(83), '1st PART', 2, '#232323', 'start'); T(X(17.2), Y(88.8), '2nd PART', 2, '#232323', 'start');
+  for (const [ly, cls] of [[Y(81), 'tr-p1'], [Y(85.9), 'tr-p2']]) { circle(X(16.2), ly, 0.8 * s, '#3a1412'); p(`<circle class="${cls}" cx="${X(16.2)}" cy="${ly}" r="${0.8 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
   KX.forEach((kx, i) => {
-    const cx = X(kx), w = 8.4 * s, h = Y(11);
-    T(cx, Y(80.6), String(i + 1), 2.1, '#1d1d1d', 'middle', 900);
-    p(`<g data-trs="${i}" style="cursor:pointer">`); rect(cx - w / 2 - 0.5 * s, Y(82) - 0.5 * s, w + 1 * s, h + 1 * s, '#3a3a38', `rx="${0.8 * s}"`); rect(cx - w / 2, Y(82), w, h, KC[Math.floor(i / 4)], `rx="${0.6 * s}"`); rect(cx - w / 2, Y(82) + h * 0.72, w, h * 0.28, '#000', `opacity="0.12" rx="${0.6 * s}"`); p('</g>');
-    circle(cx, Y(84), 0.85 * s, '#5a1a12'); p(`<circle class="tr-l${i}" cx="${cx}" cy="${Y(84)}" r="${0.85 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
-    T(cx, Y(96.8), String(i < 12 ? i + 1 : i - 11), 3, '#1d1d1d', 'middle', 700);
+    const cx = X(kx), w = 0.0358 * pw, h = Y(88.3) - Y(79.2);
+    T(cx, Y(77.9), String(i + 1), 2.5, '#1d1d1d', 'middle', 900);
+    p(`<g data-trs="${i}" style="cursor:pointer">`); rect(cx - w / 2 - 0.5 * s, Y(79.2) - 0.5 * s, w + 1 * s, h + 1 * s, '#3a3a38', `rx="${0.8 * s}"`); rect(cx - w / 2, Y(79.2), w, h, KC[Math.floor(i / 4)], `rx="${0.6 * s}"`); rect(cx - w / 2, Y(79.2) + h * 0.75, w, h * 0.25, '#000', `opacity="0.1" rx="${0.6 * s}"`); p('</g>');
+    circle(cx, Y(80.8), 0.95 * s, '#5a1a12'); p(`<circle class="tr-l${i}" cx="${cx}" cy="${Y(80.8)}" r="${0.95 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
+    T(cx, Y(93.4), String(i < 12 ? i + 1 : i - 11), 4.6, '#1d1d1d', 'middle', 500);
   });
-  rect(X(KX[12]) - 5.6 * s, Y(93.6), X(KX[15]) - X(KX[12]) + 11.2 * s, 0.4 * s, '#1d1d1d');
-  T(X(3.5), Y(97), 'BASIC RHYTHM ➜', 2.1, '#1d1d1d', 'start', 900); T(X(98.5), Y(97), '⟵ INTRO/FILL IN', 1.9, '#1d1d1d', 'end', 900);
+  rect(X(KX[12]) - 0.0358 * pw / 2, Y(89.6), X(KX[15]) - X(KX[12]) + 0.0358 * pw, 0.5 * s, '#1d1d1d');
+  rect(X(7.2), Y(90.2), X(19.6) - X(7.2), Y(3.2), '#e9e6dd'); T(X(13.4), Y(92.6), 'BASIC RHYTHM ➜', 2.2, '#1d1d1d', 'middle', 900); T(X(99.3), Y(93), '⟵ INTRO/FILL IN', 2.2, '#1d1d1d', 'end', 900);
 }
 function tr808Shelf(w, h) {
   // a 6U black rack shelf (ears, screws, a front lip) with the 808 sitting on it, tilted toward you
