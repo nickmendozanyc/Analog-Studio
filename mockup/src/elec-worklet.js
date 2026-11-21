@@ -17,6 +17,9 @@ class JH24Processor extends AudioWorkletProcessor {
     // the rack's two dbk 160X compressors, each on a channel's insert (patched at the patchbay); null = not patched
     this.c160 = [new Comp160(sampleRate, VU0), new Comp160(sampleRate, VU0)]; this.c160ch = [null, null];
     this.c160buf = [new Float32Array(128), new Float32Array(128)];
+    // the Publizon IM90's two channels, on inserts too (each can trigger from either channel's input)
+    this.im = [new IM90Channel(sampleRate), new IM90Channel(sampleRate)]; this.imch = [null, null];
+    this.imIn = [new Float32Array(128), new Float32Array(128)]; this.imOut = [new Float32Array(128), new Float32Array(128)];
     this.port.onmessage = (e) => this.msg(e.data);
   }
   msg(d) {
@@ -31,6 +34,13 @@ class JH24Processor extends AudioWorkletProcessor {
     else if (d.type === 'align') { for (const c of (d.ch == null ? m.ch : [m.ch[d.ch]])) for (const s of SPEEDS) align(c, s, m.opLevel); m.setSpeed(m.ips); this.sendTrims(); }
     else if (d.type === 'opts') { if (d.quior != null) m.quior = d.quior; if (d.hiss != null) m.hiss = d.hiss; if (d.wf != null) m.wf = d.wf; if (d.opLevel && d.opLevel !== m.opLevel) { m.setOpLevel(d.opLevel); this.sendTrims(); } }
     else if (d.type === 'c160') { if (d.params) this.c160[d.unit].set(d.params); if (d.ch !== undefined) this.c160ch[d.unit] = d.ch; }
+    else if (d.type === 'im90') {
+      const c = this.im[d.unit]; if (!c) return;
+      if (d.ch !== undefined) this.imch[d.unit] = d.ch;
+      if (d.set) c.set(d.set);
+      if (d.smp) { const o = { ...d.smp }; if (o.fromMs != null) { o.start = Math.min(c.N - 1, Math.max(0, o.fromMs * sampleRate / 1000)); delete o.fromMs; } if (o.toMs != null) { o.end = Math.min(c.N - 1, Math.max(0, o.toMs * sampleRate / 1000)); delete o.toMs; } c.setSample(o); }
+      if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
+    }
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
     else if (d.type === 'mix') Object.assign(this.mix, d);
@@ -121,6 +131,17 @@ class JH24Processor extends AudioWorkletProcessor {
     // SLAVE on one unit links it to the other (the other becomes the master)
     const [A, B] = this.c160, swap = A.params.slave && !B.params.slave;
     if (swap) Comp160.processPair(B, this.c160buf[1], A, this.c160buf[0], n); else Comp160.processPair(A, this.c160buf[0], B, this.c160buf[1], n);
+    // IM90 (after the compressors): its inputs are the channels it is patched on (silence when not); each channel
+    // records / retriggers from input A or input B
+    for (let u = 0; u < 2; u++) {
+      if (this.imIn[u].length !== n) { this.imIn[u] = new Float32Array(n); this.imOut[u] = new Float32Array(n); }
+      const ch = this.imch[u]; if (ch != null && this.out[ch]) this.imIn[u].set(ins[ch] || this.out[ch]); else this.imIn[u].fill(0);
+    }
+    for (let u = 0; u < 2; u++) {
+      const c = this.im[u], by = c.smp.rec === 'armed' ? c.smp.startBy : (c.smp.trigBy || 'A');
+      c.process(this.imIn[u], this.imOut[u], n, this.imIn[by === 'B' ? 1 : 0]);
+      const ch = this.imch[u]; if (ch != null) ins[ch] = this.imOut[u];
+    }
     if (!this.mix.mute) for (let i = 0; i < this.N; i++) {
       if (this.mix.solo >= 0 && this.mix.solo !== i) continue;
       const pan = this.mix.solo >= 0 ? 0.5 : 0.15 + 0.7 * (i % 8) / 7, gl = Math.cos(pan * Math.PI / 2) * this.mix.gain, gr = Math.sin(pan * Math.PI / 2) * this.mix.gain;
@@ -135,7 +156,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()) });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()) });
     }
     return true;
   }

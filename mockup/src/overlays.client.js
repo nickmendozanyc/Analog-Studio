@@ -150,7 +150,7 @@
 
   // ---------------- patchbay ----------------
   const L = (pre, n, from = 1) => Array.from({ length: n }, (_, k) => `${pre}${k + from}`);
-  const FX = ['224 L', '224 R', '1176 A', '1176 B', '160X A', '160X B', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
+  const FX = ['224 L', '224 R', '1176 A', '1176 B', '160X A', '160X B', 'IM90 A', 'IM90 B', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
   // rows come in output / input pairs; "normal" means the pair is wired through until you patch the input
   const ROWS = [
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
@@ -172,6 +172,7 @@
   const DEFAULT = [
     ['isend:20', 'fxin:1176 A'], ['fxout:1176 A', 'iret:20'], ['isend:13', 'fxin:1176 B'], ['fxout:1176 B', 'iret:13'],
     ['isend:1', 'fxin:160X A'], ['fxout:160X A', 'iret:1'], ['isend:7', 'fxin:160X B'], ['fxout:160X B', 'iret:7'],
+    ['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8'],
     ['aux:SEND 1', 'fxin:224 L'], ['fxout:224 L', 'lin:LINE 25'], ['fxout:224 R', 'lin:LINE 26'],
     ['aux:SEND 2', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'lin:LINE 29'],
     ['aux:SEND 3', 'fxin:SPX A L'], ['aux:SEND 4', 'fxin:SPX A R'], ['fxout:SPX A L', 'lin:LINE 27'], ['fxout:SPX A R', 'lin:LINE 28'],
@@ -179,7 +180,10 @@
     ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
   ];
   let patches = DEFAULT.map(([a, b], k) => ({ a, b, c: COLS[k % COLS.length] }));
-  try { const s = JSON.parse(localStorage.getItem('as-patches-v4') || 'null'); if (Array.isArray(s)) patches = s; } catch (e) { /* storage unavailable */ }
+  try {
+    const s = JSON.parse(localStorage.getItem('as-patches-v4') || 'null');
+    if (Array.isArray(s)) { patches = s; if (!patches.some((pc) => /IM90/.test(pc.a + pc.b))) for (const [a, b] of [['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8']]) if (!patches.some((pc) => pc.a === a || pc.b === b)) patches.push({ a, b, c: COLS[patches.length % COLS.length] }); }   // the IM90 joins an existing session
+  } catch (e) { /* storage unavailable */ }
   const save = () => { try { localStorage.setItem('as-patches-v4', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
 
   const PB = { x0: 430, pitch: 104, top: 70, rowH: 128, pairGap: 22 };
@@ -829,6 +833,7 @@
     sbxTick(dt, now);
     dzTick(dt);
     c160Tick();
+    im90Tick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it
