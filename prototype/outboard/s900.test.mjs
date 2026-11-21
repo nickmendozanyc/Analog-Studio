@@ -14,13 +14,13 @@ test('12-bit storage and the root note plays at pitch; an octave up doubles it (
   const v = unit(); v.noteOn(81, 127); const z = run(v, 0.4); const f2 = zc(z, 4800, 16000); assert.ok(Math.abs(f2 - 880) < 8, `octave ${f2}`);
 });
 test('loop sustains while the key is held, release ends it; a one-shot ignores note off', () => {
-  const u = unit({ mode: 'loop', loopAt: 20000, loopLen: 400 * 100 / 44 | 0 }); u.noteOn(69, 127); const y = run(u, 2.5);
+  const u = unit({ mode: 'loop', loopLen: 909 }); u.noteOn(69, 127); const y = run(u, 2.5);
   let e = 0; for (let k = Math.round(2.3 * fs); k < 2.5 * fs; k++) e = Math.max(e, Math.abs(y[k])); assert.ok(e > 0.1, `held loop ${e}`);
   u.noteOff(69); const z = run(u, 1.5); let e2 = 0; for (let k = Math.round(1.3 * fs); k < 1.5 * fs; k++) e2 = Math.max(e2, Math.abs(z[k])); assert.ok(e2 < 0.01, `released ${e2}`);
-  const o = unit({ mode: 'one' }); o.noteOn(69, 127); run(o, 0.05); o.noteOff(69); const w = run(o, 0.5); let e3 = 0; for (let k = Math.round(0.3 * fs); k < 0.5 * fs; k++) e3 = Math.max(e3, Math.abs(w[k])); assert.ok(e3 > 0.1, 'one-shot plays on');
+  const o = unit({ mode: 'one' }, { oneShot: true }); o.noteOn(69, 127); run(o, 0.05); o.noteOff(69); const w = run(o, 0.5); let e3 = 0; for (let k = Math.round(0.3 * fs); k < 0.5 * fs; k++) e3 = Math.max(e3, Math.abs(w[k])); assert.ok(e3 > 0.1, 'one-shot plays on');
 });
 test('8 voices: a ninth note steals the oldest', () => {
-  const u = unit({ mode: 'loop', loopAt: 1000, loopLen: 30000 }); for (let k = 0; k < 9; k++) { u.noteOn(60 + k, 100); run(u, 0.01); }
+  const u = unit({ mode: 'loop', loopLen: 30000 }); for (let k = 0; k < 9; k++) { u.noteOn(60 + k, 100); run(u, 0.01); }
   assert.equal(u.voices.filter((v) => v.on).length, 8); assert.ok(!u.voices.some((v) => v.on && v.note === 60), 'note 60 stolen');
 });
 test('recording: waits for the threshold, samples at the chosen rate, stores a new sample; memory limits it', () => {

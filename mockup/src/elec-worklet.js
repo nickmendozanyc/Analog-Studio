@@ -97,6 +97,9 @@ class JH24Processor extends AudioWorkletProcessor {
     if (d.rec === 'arm') u.armRecord(d.opts || {}); else if (d.rec === 'stop') u.stopRecord();
     if (d.load) { const s = s9Sample(d.load.name, d.load.data, d.load.rate, d.load.o || {}); const i = d.replace != null ? (u.samples[d.replace] = s, d.replace) : u.addSample(s); this.port.postMessage({ type: 's900', loaded: i, name: s.name, n: s.data.length, err: i < 0 ? 'MEMORY FULL' : null }); }
     if (d.sampleEdit) Object.assign(u.samples[d.sampleEdit.i] || {}, d.sampleEdit.set);
+    if (d.reverse != null && u.samples[d.reverse]) { u.allOff(); u.samples[d.reverse].data.reverse(); }
+    if (d.discard != null && u.samples[d.discard]) { u.allOff(); const S = u.samples[d.discard]; S.data = S.data.slice(S.start, S.end); S.end = S.data.length; S.start = 0; S.loopLen = Math.min(S.loopLen, S.end); this.port.postMessage({ type: 's900', trimmed: d.discard, n: S.end }); }
+    if (d.master != null) u.master = d.master;
     if (d.del != null) { u.allOff(); u.samples.splice(d.del, 1); for (const P of u.programs) for (const kg of P.kgs) { if (kg.sample >= d.del) kg.sample = Math.max(0, kg.sample - (kg.sample > d.del ? 1 : 0)); if (kg.loud > d.del) kg.loud--; else if (kg.loud === d.del) kg.loud = -1; } }
     if (d.programs) { u.programs = d.programs; u.prog = Math.min(u.prog, u.programs.length - 1); }
     if (d.prog != null) { u.allOff(); u.prog = d.prog; }
@@ -205,7 +208,8 @@ class JH24Processor extends AudioWorkletProcessor {
     if (!this.mix.mute && this.mix.solo < 0) for (let u = 0; u < 2; u++) if (this.spxch[u] != null) { const g = this.mix.gain * 0.75, a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) { L[k] += a[k] * g; if (R !== L) R[k] += b[k] * g; } }
     // the S900: records from its patched channel; its output joins the mix (like a line return)
     if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
-    if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(ins[this.s9ch] || this.out[this.s9ch]); else this.s9In.fill(0);
+    if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
+    if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
     if (this.s9on) { this.s9.process(this.s9In, this.s9L, this.s9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain; for (let k = 0; k < n; k++) { L[k] += this.s9L[k] * g; if (R !== L) R[k] += this.s9R[k] * g; } } }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
     if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }

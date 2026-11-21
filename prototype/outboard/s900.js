@@ -17,10 +17,13 @@ export const s9Cut = (v) => 150 * 2 ** (Math.max(0, Math.min(99, v)) / 99 * 7.3)
 
 export function s9Sample(name, data, rate, o = {}) {
   const q = new Float32Array(data.length); for (let i = 0; i < data.length; i++) q[i] = s9q(data[i]);
-  return { name, data: q, rate, root: 60, tune: 0, start: 0, end: q.length, loopAt: Math.max(0, q.length - Math.round(rate * 0.1)), loopLen: Math.min(q.length, Math.round(rate * 0.1)), mode: 'one', ...o };
+  // S900 loop model: the loop ENDS at the end point and is loopLen long (no separate loop start); loud in 0.5 dB steps
+  const S = { name, data: q, rate, root: 60, tune: 0, loud: 0, start: 0, end: q.length, loopLen: Math.min(q.length, Math.round(rate * 0.1)), mode: 'one', ...o };
+  if (o.loopAt != null && o.loopLen == null) S.loopLen = S.end - o.loopAt;
+  return S;
 }
 export function s9Keygroup(o = {}) {
-  return { lo: 0, hi: 127, sample: 0, loud: -1, xfade: 64, tune: 0, filter: 99, attack: 0, decay: 50, sustain: 99, release: 15, velLevel: 50, velFilter: 0, out: 1, ...o };
+  return { lo: 0, hi: 127, sample: 0, loud: -1, xfade: 64, tune: 0, transpose: 0, level: 0, filter: 99, attack: 0, decay: 50, sustain: 99, release: 15, velLevel: 50, velFilter: 0, oneShot: false, out: 1, ...o };
 }
 
 class S9Voice {
@@ -47,7 +50,7 @@ export class S900 {
   stopRecord() { if (this.rec.state === 'rec') this.finishRecord(); else this.rec.state = 'idle'; }
   finishRecord() {
     const r = this.rec; r.state = 'done';
-    const s = s9Sample(r.name, r.buf.subarray(0, r.n), r.rate); s.loopAt = Math.max(0, r.n - Math.round(r.rate * 0.25)); s.loopLen = r.n - s.loopAt;
+    const s = s9Sample(r.name, r.buf.subarray(0, r.n), r.rate, { root: r.root ?? 60, loopLen: Math.min(r.n, Math.round(r.rate * 0.25)) });
     r.last = this.addSample(s); r.buf = null; return r.last;
   }
   recIn(x, n) {
@@ -68,12 +71,12 @@ export class S900 {
       if (note < kg.lo || note > kg.hi) continue;
       const si = kg.loud >= 0 && vel >= kg.xfade ? kg.loud : kg.sample, S = this.samples[si]; if (!S) continue;
       let v = this.voices.find((x) => !x.on) || this.voices.reduce((a, b) => (a.stage === 'rel' && b.stage !== 'rel' ? a : b.stage === 'rel' && a.stage !== 'rel' ? b : a.age < b.age ? a : b));   // a free voice, else a releasing one, else the oldest
-      const semis = note - S.root + (S.tune + kg.tune + P.tune) / 100;   // tunes in cents
+      const semis = note - S.root + (kg.transpose || 0) + (S.tune + kg.tune + P.tune + (this.master || 0) * 100 / 16) / 100;   // tunes in cents; master tune in 1/16 semitones
       Object.assign(v, { on: true, note, kg, S, pos: S.start, dir: 1, step: S.rate * 2 ** (semis / 12) / this.fs, env: 0, stage: 'att', held: true, vel, age: ++this.t, f1: 0, f2: 0,
-        gain: (1 - kg.velLevel / 99 * (1 - vel / 127)), cut: Math.min(this.fs * 0.45, s9Cut(kg.filter) * 2 ** (kg.velFilter / 99 * 2 * (vel / 127 - 0.5))) });
+        gain: (1 - kg.velLevel / 99 * (1 - vel / 127)) * 10 ** (((S.loud || 0) + (kg.level || 0)) * 0.5 / 20), cut: Math.min(this.fs * 0.45, s9Cut(kg.filter) * 2 ** (kg.velFilter / 99 * 2 * (vel / 127 - 0.5))) });
     }
   }
-  noteOff(note) { for (const v of this.voices) if (v.on && v.note === note && v.held) { v.held = false; if (v.S.mode !== 'one') v.stage = 'rel'; } }
+  noteOff(note) { for (const v of this.voices) if (v.on && v.note === note && v.held) { v.held = false; if (!v.kg.oneShot) v.stage = 'rel'; } }
   allOff() { for (const v of this.voices) v.on = false; }
   process(x, L, R, n) {
     if (x) this.recIn(x, n);
@@ -82,7 +85,7 @@ export class S900 {
     let pk = this.peak * 0.97 ** (n / 128);
     for (const v of this.voices) {
       if (!v.on) continue;
-      const S = v.S, d = S.data, kg = v.kg, end = Math.min(S.end, d.length), la = S.loopAt, le = Math.min(end, la + S.loopLen), loops = S.mode !== 'one' && S.loopLen > 16;
+      const S = v.S, d = S.data, kg = v.kg, end = Math.min(S.end, d.length), le = end, la = Math.max(S.start, end - S.loopLen), loops = S.mode !== 'one' && le - la > 4;
       const att = 1 / (s9Time(kg.attack) * fs), dec = 1 - Math.exp(-1 / (s9Time(kg.decay) * fs / 4)), rel = 1 - Math.exp(-1 / (s9Time(kg.release) * fs / 4)), sus = kg.sustain / 99;
       const g = Math.tan(Math.PI * Math.min(v.cut, fs * 0.45) / fs), kq = 1.2, a1 = 1 / (1 + g * (g + kq)), a2 = g * a1, a3 = g * a2;   // 2-pole low-pass (stable state-variable form), gentle resonance
       for (let i = 0; i < n; i++) {
@@ -94,7 +97,7 @@ export class S900 {
         let p = v.pos | 0; if (p >= end || p < 0) { v.on = false; break; }
         const s = d[p];
         v.pos += v.step * v.dir;
-        if (loops && v.held) {
+        if (loops) {   // the S900 keeps looping through the release
           if (S.mode === 'alt') { if (v.dir > 0 && v.pos >= le) { v.dir = -1; v.pos = 2 * le - v.pos; } else if (v.dir < 0 && v.pos < la) { v.dir = 1; v.pos = 2 * la - v.pos; } }
           else if (v.pos >= le) v.pos -= S.loopLen;
         } else if (v.dir < 0) { v.dir = 1; }
