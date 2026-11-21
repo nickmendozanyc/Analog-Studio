@@ -182,7 +182,7 @@
 
   // ---------------- patchbay ----------------
   const L = (pre, n, from = 1) => Array.from({ length: n }, (_, k) => `${pre}${k + from}`);
-  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
+  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
   // rows come in output / input pairs; "normal" means the pair is wired through until you patch the input
   const ROWS = [
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
@@ -204,6 +204,7 @@
   const DEFAULT = [
     ['isend:1', 'fxin:160X A'], ['fxout:160X A', 'iret:1'], ['isend:7', 'fxin:160X B'], ['fxout:160X B', 'iret:7'],
     ['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8'],
+    ['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5'],
     ['aux:SEND 1', 'fxin:224 L'], ['fxout:224 L', 'lin:LINE 25'], ['fxout:224 R', 'lin:LINE 26'],
     ['aux:SEND 2', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'lin:LINE 29'],
     ['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
@@ -216,6 +217,7 @@
     if (Array.isArray(s)) { patches = s.filter((pc) => !/1176/.test(pc.a + pc.b));   // the 1176s left the rack: their cables go too
       // the SPX90IIs work on channel inserts now: their old aux-send / line-return cables give way to the new defaults
       if (!patches.some((pc) => /^isend:/.test(pc.a) && /SPX/.test(pc.b))) { patches = patches.filter((pc) => !/SPX/.test(pc.a + pc.b)); for (const [a2, b2] of [['isend:2', 'fxin:SPX A L'], ['fxout:SPX A L', 'iret:2'], ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }
+      if (!localStorage.getItem('as-units-h949rmx')) { localStorage.setItem('as-units-h949rmx', '1'); for (const [a2, b2] of [['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the new units join a saved layout, once
       if (!patches.some((pc) => /IM90/.test(pc.a + pc.b))) for (const [a, b] of [['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8']]) if (!patches.some((pc) => pc.a === a || pc.b === b)) patches.push({ a, b, c: COLS[patches.length % COLS.length] }); }   // the IM90 joins an existing session
   } catch (e) { /* storage unavailable */ }
   const save = () => { try { localStorage.setItem('as-patches-v4', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
@@ -876,6 +878,7 @@
     c160Tick();
     im90Tick();
     spxTick();
+    h949Tick(); rmxTick();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it

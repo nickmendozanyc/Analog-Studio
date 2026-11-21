@@ -22,6 +22,9 @@ class JH24Processor extends AudioWorkletProcessor {
     this.imIn = [new Float32Array(128), new Float32Array(128)]; this.imOut = [new Float32Array(128), new Float32Array(128)];
     // two SPX90IIs: mono in from a channel insert, stereo out straight to the mix (the channel itself is replaced)
     this.spx = [new SPX90(sampleRate), new SPX90(sampleRate)]; this.spxch = [null, null];
+    // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
+    this.h949 = new H949Unit(sampleRate); this.rmx = new RMX16(sampleRate); this.par = { h949: null, rmx: null };
+    this.parIn = new Float32Array(128); this.parL = new Float32Array(128); this.parR = new Float32Array(128);
     this.spxIn = [new Float32Array(128), new Float32Array(128)]; this.spxL = [new Float32Array(128), new Float32Array(128)]; this.spxR = [new Float32Array(128), new Float32Array(128)]; this.silent = new Float32Array(128);
     this.port.onmessage = (e) => this.msg(e.data);
   }
@@ -44,6 +47,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.smp) { const o = { ...d.smp }; if (o.fromMs != null) { o.start = Math.min(c.N - 1, Math.max(0, o.fromMs * sampleRate / 1000)); delete o.fromMs; } if (o.toMs != null) { o.end = Math.min(c.N - 1, Math.max(0, o.toMs * sampleRate / 1000)); delete o.toMs; } c.setSample(o); }
       if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
     }
+    else if (d.type === 'h949' || d.type === 'rmx') { const u = d.type === 'h949' ? this.h949 : this.rmx; if (d.ch !== undefined) this.par[d.type] = d.ch; if (d.set) u.set(d.set); }
     else if (d.type === 'spx') { const u = this.spx[d.unit]; if (!u) return; if (d.ch !== undefined) this.spxch[d.unit] = d.ch; if (d.set) u.set(d.set); if (d.cmd === 'trig') u.trigger(); }
     else if (d.type === 'osc') Object.assign(this.osc, d);
     else if (d.type === 'live') this.live.on = d.on;
@@ -159,6 +163,15 @@ class JH24Processor extends AudioWorkletProcessor {
       const y = ins[i] || this.out[i];
       for (let k = 0; k < n; k++) { L[k] += y[k] * gl; if (R !== L) R[k] += y[k] * gr; }
     }
+    // the H949 and the RMX16, alongside their channels
+    if (this.parIn.length !== n) { this.parIn = new Float32Array(n); this.parL = new Float32Array(n); this.parR = new Float32Array(n); }
+    for (const [key, unit] of [['h949', this.h949], ['rmx', this.rmx]]) {
+      const ch = this.par[key]; if (ch == null || !this.out[ch]) { this.parIn.fill(0); unit.process(this.parIn, this.parL, this.parR, n); continue; }
+      this.parIn.set(ins[ch] || this.out[ch]); unit.process(this.parIn, this.parL, this.parR, n);
+      if (this.mix.mute || this.mix.solo >= 0) continue;
+      const g = this.mix.gain * 0.8, dl = key === 'h949' && unit.p.dlyMs > 0;
+      for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; L[k] += a * g; if (R !== L) R[k] += b * g; }
+    }
     if (!this.mix.mute && this.mix.solo < 0) for (let u = 0; u < 2; u++) if (this.spxch[u] != null) { const g = this.mix.gain * 0.75, a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) { L[k] += a[k] * g; if (R !== L) R[k] += b[k] * g; } }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
     if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }
@@ -168,7 +181,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()) });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters() });
     }
     return true;
   }

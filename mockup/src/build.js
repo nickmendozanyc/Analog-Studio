@@ -1432,6 +1432,80 @@ function spxFace(w, h, u) {
   text(X(92.4), h - 3.2, u, 3, '#8e8c92', 'middle', 900);
   p(`<text class="${id('route')}" x="${X(26.5)}" y="${h - 1.6}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
 }
+// Evertide H949 Harmonizer (2U), drawn from the user's photo (panel 10..770 x 113..234 px)
+const H949_KEYS = [6.25, 12.5, 25, 50, 100, 200];
+function h949Face(w, h) {
+  const W = '#ece8de', X = (px) => (px - 10) * w / 760, Y = (py) => (py - 113) * h / 121, id = (k) => `h949-${k}`;
+  rect(0, 0, w, h, '#151517', 'rx="1.5"'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.1"'); rect(0, h - 1.5, w, 1.5, '#000', 'opacity="0.5"');
+  for (const ex of [0, w - 22]) { rect(ex, 0, 22, h, '#111113'); for (const ey of [6.6, PNL.U - 8.6, PNL.U + 6.6, h - 6.6]) { rect(ex + 4, ey - 3, 14, 6, '#060606', 'rx="3"'); screw(ex + 11, ey, 3.6); } }
+  const frame = (x0, y0, x1, y1) => p(`<rect x="${X(x0)}" y="${Y(y0)}" width="${X(x1) - X(x0)}" height="${Y(y1) - Y(y0)}" rx="1.4" fill="none" stroke="#d8d4ca" stroke-width="0.55"/>`);
+  const T = (px, py, t, sz, col = W, a = 'middle', wt = 800, ex = '') => text(X(px), Y(py), t, sz, col, a, wt, ex);
+  const knob = (px, py, r, k, big) => { p(`<g data-hk="${k}" style="cursor:ns-resize"><circle cx="${X(px)}" cy="${Y(py) + 0.6}" r="${r}" fill="#000" opacity="0.6"/><circle cx="${X(px)}" cy="${Y(py)}" r="${r}" fill="#1c1c1e"/><circle cx="${X(px)}" cy="${Y(py)}" r="${r * 0.8}" fill="#262628"/><g class="${id('k-' + k)}" transform="rotate(0 ${X(px)} ${Y(py)})"><rect x="${X(px) - 0.4}" y="${Y(py) - r + 0.6}" width="0.8" height="${r * 0.55}" fill="${W}"/></g><circle cx="${X(px)}" cy="${Y(py)}" r="${r + 4}" fill="transparent"/></g>`); if (big) for (let a = -150; a <= 150; a += 30) { const s2 = Math.sin(a * Math.PI / 180), c2 = -Math.cos(a * Math.PI / 180); p(`<line x1="${X(px) + s2 * (r + 1)}" y1="${Y(py) + c2 * (r + 1)}" x2="${X(px) + s2 * (r + 2.4)}" y2="${Y(py) + c2 * (r + 2.4)}" stroke="${W}" stroke-width="0.4"/>`); } };
+  const ckey = (px, py, k, lamp) => { const s2 = 4.6; p(`<g data-hk="${k}" style="cursor:pointer"><rect x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2 + 0.5}" width="${s2}" height="${s2}" rx="0.5" fill="#000"/><rect x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2}" width="${s2}" height="${s2}" rx="0.5" fill="#e9e1cc"/><rect class="${id('kd-' + k)}" x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2}" width="${s2}" height="${s2}" rx="0.5" fill="#000" opacity="0"/></g>`); if (lamp) { circle(X(px), Y(py) - 5, 0.9, '#3a1412'); p(`<circle class="${id('l-' + k)}" cx="${X(px)}" cy="${Y(py) - 5}" r="0.9" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); } };
+  T(395, 127, 'E V E R T I D E   H A R M O N I Z E R ™', 4.2, W, 'middle', 900, 'xml:space="preserve"'); T(612, 128, 'MODEL H949', 2.8, W);
+  // input level
+  frame(58, 131, 178, 193); T(100, 140, 'INPUT LEVEL', 2.7, W);
+  [['LIMIT', '#ff3b2f'], ['', '#59e05a'], ['NOMINAL', '#59e05a'], ['', '#59e05a'], ['PRESENT', '#ffd23a']].forEach(([l, col], i) => { const y = Y(150 + i * 8); circle(X(95), y, 1.1, '#2a2a2a'); p(`<circle class="${id('m' + i)}" cx="${X(95)}" cy="${y}" r="1.1" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); if (l) text(X(88), y + 0.8, l, 2, col === '#ffd23a' ? '#ffd23a' : col, 'end', 800); });
+  knob(133, 172, 4.4, 'input', true); T(133, 190, 'MIN    MAX', 1.8, W, 'middle', 700, 'xml:space="preserve"');
+  ckey(162, 152, 'repeat', true); T(162, 160, 'REPEAT', 1.8, W);
+  // feedback
+  frame(182, 131, 350, 193); T(266, 140, 'FEEDBACK', 2.9, W);
+  T(228, 147, 'LEVEL', 2.2, W); T(305, 147, 'EQ', 2.2, W);
+  [['fbm', 210, 'MAIN', 'OFF   MAX'], ['fbd', 248, 'DLY ONLY', 'OFF   MAX'], ['eql', 288, 'LOW', 'CUT  BOOST'], ['eqh', 323, 'HIGH', 'CUT  BOOST']].forEach(([k, px, l, sc]) => { T(px, 155, l, 2.1, W); knob(px, 172, 3.4, k); T(px, 188, sc, 1.6, W, 'middle', 700, 'xml:space="preserve"'); });
+  // pitch ratio display, MANUAL, CONTROL MODE
+  frame(352, 131, 670, 193); T(440, 141, 'PITCH RATIO', 2.7, W);
+  rect(X(395), Y(149), X(490) - X(395), Y(183) - Y(149), '#160304', 'rx="0.8"');
+  p(`<text class="${id('disp')}" x="${X(442)}" y="${Y(176)}" font-family="${MONO2}" font-size="11" font-weight="700" fill="#ff2a1a" filter="url(#glowSm)" text-anchor="middle" letter-spacing="1">1.000</text>`);
+  T(545, 141, 'MANUAL', 2.7, W); knob(545, 168, 7.6, 'manual', true);
+  T(615, 141, 'CONTROL MODE', 2.5, W);
+  ['MANUAL', 'KEYBOARD', 'CV + MAN'].forEach((l, i) => { const py = 153 + i * 13; ckey(590, py, 'cm' + i); circle(X(578), Y(py), 0.9, '#3a1412'); p(`<circle class="${id('lc' + i)}" cx="${X(578)}" cy="${Y(py)}" r="0.9" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); T(604, py + 1, l, 2, W, 'start'); });
+  // bottom row: LINE, DELAY ONLY keys, FUNCTION SELECT + the four function keys, ALGORITHM, MAIN keys, POWER
+  ckey(66, 208, 'line'); T(66, 220, 'LINE', 1.9, W); T(66, 223.6, 'IN/OUT', 1.6, W);
+  H949_KEYS.forEach((v, i) => { ckey(152 + i * 20, 208, 'd' + i); T(152 + i * 20, 201, String(v), 1.9, W); });
+  p(`<path d="M${X(146)} ${Y(216)} H${X(258)}" stroke="${W}" stroke-width="0.35"/>`); T(202, 222, 'DELAY ONLY OUTPUT (M SEC)', 2, W);
+  ckey(297, 208, 'fsel', true); T(297, 218, 'FUNCTION', 1.7, W); T(297, 221.4, 'SELECT', 1.7, W);
+  [['DELAY', 'NORM'], ['RANDOM', 'EXTEND'], ['FLANGE', 'µPC SHARP'], ['REVERSE', 'µPC FLAT']].forEach(([g, r], i) => { const px = 323 + i * 27; ckey(px, 208, 'f' + i); circle(X(px), Y(199), 1, '#2a2a2a'); p(`<circle class="${id('lf' + i)}" cx="${X(px)}" cy="${Y(199)}" r="1" fill="#59e05a" opacity="0" filter="url(#glowSm)"/>`); T(px, 216.6, g, 1.6, '#7be07b'); T(px, 220.2, r, 1.6, '#ff6a5a'); });
+  p(`<rect x="${X(312)}" y="${Y(194)}" width="${X(415) - X(312)}" height="${Y(224) - Y(194)}" rx="1" fill="none" stroke="#ff6a5a" stroke-width="0.35" opacity="0.7"/>`);
+  ckey(428, 208, 'alg'); T(428, 201, '1/2', 1.8, W); T(428, 218, 'ALGORITHM', 1.6, W); T(428, 221.4, 'SELECT', 1.6, W);
+  H949_KEYS.forEach((v, i) => { ckey(457 + i * 20, 208, 'm' + i); T(457 + i * 20, 201, String(v), 1.9, W); });
+  p(`<path d="M${X(451)} ${Y(216)} H${X(563)}" stroke="${W}" stroke-width="0.35"/>`); T(507, 222, 'MAIN OUTPUT (M SEC)', 2, W);
+  T(633, 199, 'POWER', 2, W); p(`<g data-hk="power" style="cursor:pointer"><rect x="${X(633) - 1}" y="${Y(204)}" width="2" height="6" rx="1" fill="#c9ccd0"/><circle class="${id('pw')}" cx="${X(633)}" cy="${Y(204)}" r="1.4" fill="#e9eaec"/><circle cx="${X(633)}" cy="${Y(208)}" r="5" fill="transparent"/></g>`); T(633, 222, 'OFF   ON', 1.8, W, 'middle', 700, 'xml:space="preserve"');
+  p(`<text class="${id('route')}" x="${X(395)}" y="${h - 1.6}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+}
+// AXS RMX16 (2U), drawn from the user's photo (panel 98..1150 x 402..592 px)
+const RMX_PAD = ['1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D'];
+function rmxFace(w, h) {
+  const W = '#e6e3dc', X = (px) => (px - 98) * w / 1052, Y = (py) => (py - 402) * h / 190, id = (k) => `rmx-${k}`;
+  rect(0, 0, w, h, '#18191b', 'rx="1.5"'); rect(0, 0, w, 1.2, '#fff', 'opacity="0.1"'); rect(0, h - 1.5, w, 1.5, '#000', 'opacity="0.5"');
+  for (const [ex, ey] of [[X(112), Y(411)], [X(112), Y(583)], [X(1135), Y(411)], [X(1135), Y(583)]]) { rect(ex - 6, ey - 3, 12, 6, '#060606', 'rx="3"'); screw(ex, ey, 3.4); }
+  for (const [sx, sy] of [[150, 420], [150, 575], [1095, 420], [1095, 575]]) circle(X(sx), Y(sy), 2, '#55575c');
+  const frame = (x0, y0, x1, y1) => p(`<rect x="${X(x0)}" y="${Y(y0)}" width="${X(x1) - X(x0)}" height="${Y(y1) - Y(y0)}" fill="none" stroke="#cfcbc2" stroke-width="0.55"/>`);
+  const T = (px, py, t, sz, col = W, a = 'middle', wt = 700, ex = '') => text(X(px), Y(py), t, sz, col, a, wt, ex);
+  const silver = (px, py, r, k) => { p(`<g data-rk="${k}" style="cursor:ns-resize"><circle cx="${X(px)}" cy="${Y(py) + 0.7}" r="${r}" fill="#000" opacity="0.6"/><circle cx="${X(px)}" cy="${Y(py)}" r="${r}" fill="#9a9ca1"/><circle cx="${X(px)}" cy="${Y(py)}" r="${r * 0.72}" fill="#d9dbde"/><g class="${id('k-' + k)}" transform="rotate(0 ${X(px)} ${Y(py)})"><rect x="${X(px) - 0.45}" y="${Y(py) - r + 0.4}" width="0.9" height="${r * 0.6}" fill="#2a2a2c"/></g><circle cx="${X(px)}" cy="${Y(py)}" r="${r + 4}" fill="transparent"/></g>`); for (let i = 0; i <= 9; i++) { const a = (-150 + i * 33.3) * Math.PI / 180; text(X(px) + Math.sin(a) * (r + 3.4), Y(py) - Math.cos(a) * (r + 3.4) + 1, String(i), 2.3, W, 'middle', 700); } };
+  const key = (px, py, k, lamp = true) => { const s2 = 9; p(`<g data-rk="${k}" style="cursor:pointer"><rect x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2 + 0.6}" width="${s2}" height="${s2}" rx="0.6" fill="#000"/><rect x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2}" width="${s2}" height="${s2}" rx="0.6" fill="#2a2b2e" stroke="#000" stroke-width="0.4"/><rect x="${X(px) - s2 / 2}" y="${Y(py) - s2 / 2}" width="${s2}" height="${s2 * 0.3}" rx="0.6" fill="#fff" opacity="0.08"/></g>`); if (lamp) { circle(X(px), Y(py) - 1.6, 0.9, '#3a1412'); p(`<circle class="${id('l-' + k)}" cx="${X(px)}" cy="${Y(py) - 1.6}" r="0.9" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); } };
+  // logo box and in / out
+  frame(168, 405, 314, 482); rect(X(178), Y(414), X(304) - X(178), Y(472) - Y(414), 'none', 'stroke="#e6e3dc" stroke-width="1.2" rx="1"');
+  T(241, 457, 'axs', 17, 'none', 'middle', 900, 'stroke="#e6e3dc" stroke-width="0.9" letter-spacing="1.5"');
+  frame(168, 485, 314, 568); T(198, 497, 'in', 2.8, W); T(282, 497, 'out', 2.8, W); T(240, 497, 'o/flo', 2.6, W);
+  silver(198, 540, 5, 'in'); silver(282, 540, 5, 'out');
+  ['#ff3b2f', '#ff3b2f', '#ffb02e', '#59e05a'].forEach((col, i) => { const y = Y(510 + i * 14.5); circle(X(240), y, 1.2, '#2a2a2a'); p(`<circle class="${id('m' + i)}" cx="${X(240)}" cy="${y}" r="1.2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); });
+  // pot
+  frame(318, 405, 387, 568); silver(352, 440, 5, 'pot'); T(352, 497, 'pot', 2.8, W); key(352, 524, 'potk');
+  // display and the function keys
+  frame(390, 405, 877, 568); rect(X(410), Y(424), X(866) - X(410), Y(470) - Y(424), '#120607');
+  const fld = (k2, px, t, sz = 7.4, anchor = 'middle') => p(`<text class="${id(k2)}" x="${X(px)}" y="${Y(455)}" font-family="${MONO2}" font-size="${sz}" font-weight="700" fill="#ff2a1a" filter="url(#glowSm)" text-anchor="${anchor}" xml:space="preserve">${t}</text>`);
+  fld('prog', 437, ' 1'); fld('pre', 505, '  0'); fld('dec', 548, '4.0'); fld('low', 599, ' 0'); fld('high', 636, '-4'); fld('store', 715, ' t'); fld('name', 812, 'AMBIENCE', 5, 'middle');
+  [['program', 433, '', 'program'], ['predelay', 488, '', 'predelay'], ['decay', 545, '', 'decay time'], ['low', 603, 'decay filter', 'low'], ['high', 643, '', 'high'], ['save', 697, 'store control', 'save'], ['recall', 737, '', 'recall'], ['ndn', 793, 'nudge', 'down'], ['nup', 833, '', 'up']].forEach(([k2, px, top, l]) => { key(px, 525, k2); T(px, 504, l, 2.6, W); if (top) T(px + 20, 497, top, 2.6, W); });
+  // keypad
+  rect(X(882), Y(406), X(1025) - X(882), Y(563) - Y(406), '#0c0c0d', 'rx="2"');
+  RMX_PAD.forEach((c, i) => { const px = 920 + (i % 4) * 28.5, py = 443 + Math.floor(i / 4) * 27.6; p(`<g data-rk="pad${c}" style="cursor:pointer"><rect x="${X(px) - 3.3}" y="${Y(py) - 3}" width="6.6" height="6" rx="0.6" fill="#e7e0c9"/><rect x="${X(px) - 3.3}" y="${Y(py) - 3}" width="6.6" height="1.6" rx="0.6" fill="#fff" opacity="0.35"/></g>`); text(X(px), Y(py) + 1.2, c === '*' ? '✱' : c, 3.1, '#1a1814', 'middle', 800); });
+  // power
+  frame(1033, 405, 1080, 568); T(1057, 427, 'on', 2.6, W); T(1057, 470, 'off', 2.6, W);
+  p(`<g data-rk="power" style="cursor:pointer"><rect x="${X(1057) - 1.4}" y="${Y(437)}" width="2.8" height="7" rx="1.4" fill="#c9ccd0"/><circle class="${id('sw')}" cx="${X(1057)}" cy="${Y(439)}" r="1.6" fill="#eef0f2"/><circle cx="${X(1057)}" cy="${Y(445)}" r="6" fill="transparent"/></g>`);
+  circle(X(1057), Y(528), 1.5, '#3a0a10'); p(`<circle class="${id('pw')}" cx="${X(1057)}" cy="${Y(528)}" r="1.5" fill="#ff2a5a" opacity="1" filter="url(#glowSm)"/>`); T(1057, 557, 'power', 2.6, W);
+  frame(168, 570, 1080, 589); T(624, 584, 'model rmx16 : digital reverberation system : advanced axis systems : burnley, england', 3.6, W, 'middle', 700, 'letter-spacing="0.2"');
+  p(`<text class="${id('route')}" x="${X(624)}" y="${Y(600)}" font-family="${MONO2}" font-size="2.3" font-weight="700" fill="#e8a33a" text-anchor="middle">NOT PATCHED</text>`);
+}
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
   // Real 19-inch proportions: every panel spans the rails (its ears, with their rack screws, cover them) and one rack
@@ -1462,6 +1536,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
   globalThis.RACK_HOT.im90 = unit(3, '#16161a', (w, h) => im90Face(w, h), { native: true });   // Publizon IM90 (3U)
   // Yahaha SPX90II x2 (1U each): working multi-effects, each on its own patch point
   for (const u of ['A', 'B']) globalThis.RACK_HOT['spx' + u] = unit(1, '#161618', (w, h) => spxFace(w, h, u), { native: true });
+  globalThis.RACK_HOT.h949 = unit(2, '#151517', (w, h) => h949Face(w, h), { native: true });   // Evertide H949 Harmonizer (2U)
+  globalThis.RACK_HOT.rmx = unit(2, '#18191b', (w, h) => rmxFace(w, h), { native: true });   // AXS RMX16 (2U)
   // Leximan PCM41 x2 (1U)
   for (let k = 0; k < 2; k++) unit(1, 'url(#rackBlack)', (w, h) => {
     text(26, 26, 'leximan', 18, '#f0f0f0', 'start', 900);
@@ -1936,6 +2012,8 @@ ${rhot('c160B', 'c160', 'Open the dbk 160X compressors')}
 ${rhot('im90', 'im90', 'Open the Publizon IM90')}
 ${rhot('spxA', 'spx', 'Open the Yahaha SPX90II units')}
 ${rhot('spxB', 'spx', 'Open the Yahaha SPX90II units')}
+${rhot('h949', 'h949', 'Open the Evertide H949 Harmonizer')}
+${rhot('rmx', 'rmx', 'Open the AXS RMX16')}
 <div class="hot elkey" data-open="elec" style="left:1184px;top:540px;width:58px;height:38px" title="ELECTRONICS: open the channel cards to tweak the tape machine"><span>ELECTRONICS</span></div>
 <div class="el-plate" data-open="elec" id="el-plate" style="left:${TX + 640}px;top:${76 + 548}px" title="Open the JH-Tape audio electronics (the three drawers under the transport)"><i></i>AUDIO ELECTRONICS</div>
 ${hot(3480, 8, 160, 40, 'patchbay', 'Open the patchbay')}
@@ -1952,6 +2030,10 @@ ${overlay('im90', 'PUBLIZON IM90 REMOTE CONTROL', `<div class="ovsync"><svg widt
   <p class="note">Like the original: choose the channel with SET A / SET B (or A, A&amp;B, B on the remote), call a function with FUNCTIONS, its number and PARAMETERS (01 DELAY, 02 ECHO, 04 PITCH-SHIFTING, 09 SAMPLER), step through its pages with + and −, type a value and ENTER, or press PARAMETERS for increment mode, where + / − step it and 1–9 ramp it (0 stops). Turn the wheel to change a value. Sampling: 09, PARAMETERS, 0 ENTER arms it to record on input A, then it records from the first sound; AUX stops, AUX again records the next, PARAMETERS plays. MEMORY SELECT + number, MEMORY IN stores, MEMORY OUT recalls. GAINS sets input, effect and direct levels. Patch it at the patchbay (IM90 A / B on a channel insert): A is on the guitar to start with.</p></div>`, '<span class="ov-msg" id="im90-msg"></span>', true)}
 ${overlay('spx', 'YAHAHA SPX90II DIGITAL MULTI-EFFECT PROCESSOR · A + B', `<div class="ovsync">${['A', 'B'].map((u) => panelSVG(1, '#161618', (w, h) => spxFace(w, h, u), { native: true })).join('<div style="height:6px"></div>')}
   <p class="note">Each unit runs on its own: MEMORY ▲▼ picks a program (the number flashes) and RECALL loads it (1–30 factory, 31–90 yours). PARAMETER steps through the program's parameters, DATA ▲▼ changes the one shown; BALANCE switches to BALANCE and OUTPUT LEVEL. STORE saves to 31–90. UTILITY shows title and MIDI pages. FOOT TRIGGER makes the footswitch jack (click it) fire the gate, pan, vibrato and freeze programs instead of stepping memories. On FREEZE, the RECORD and PLAY pages run with DATA ▲. BYPASS passes the dry signal. Drag INPUT to set the level. Patch each at the patchbay (SPX A / B on a channel insert; the stereo effect goes straight to the mix): A starts on the snare with GATE REVERB, B on the toms with REV 4 PLATE.</p></div>`, '<span class="ov-msg" id="spx-msg"></span>', true)}
+${overlay('h949', 'EVERTIDE H949 HARMONIZER', `<div class="ovsync">${panelSVG(2, '#151517', (w, h) => h949Face(w, h), { native: true })}
+  <p class="note">The keys latch like the original's: the DELAY ONLY and MAIN rows add up (6.25 to 200 ms each, up to 393.75 ms). FUNCTION SELECT switches the four function keys between the green set (DELAY, RANDOM, FLANGE, REVERSE) and the red set (NORM, EXTEND, µPC SHARP, µPC FLAT). In pitch functions the main keys 50 / 100 / 200 add delay (and set EXTEND's window). MANUAL sets the pitch ratio (or RANDOM / FLANGE speed); 1/2 picks the algorithm (2 = de-glitched). REPEAT freezes the memory; LINE IN/OUT bypasses. Drag the knobs. Patched alongside a channel (H949 at the patchbay): it starts on overhead R, adding to the dry sound like an effect send.</p></div>`, '<span class="ov-msg" id="h949-msg"></span>', true)}
+${overlay('rmx', 'AXS RMX16 DIGITAL REVERBERATION SYSTEM', `<div class="ovsync">${panelSVG(2, '#18191b', (w, h) => rmxFace(w, h), { native: true })}
+  <p class="note">Press a function key (its lamp lights), then type on the keypad and press # (✱ is the decimal point for decay and the minus sign for the filters), or step with nudge down / up. program + number + # changes program (1–18: AMBIENCE, ROOM A1, HALL C1, PLATE A1, HALL B3, CHORUS, ECHO, NONLIN 2, REVERSE 1, then HALL A1, PLATE B1, ROOM A0, ROOM B1, NONLIN 1, REVERSE 2, DELAY, FREEZE, IMAGE P1). save / recall + 1–9 + # store and recall. The pot key hands decay time to the pot knob. On ECHO, A and B pick which delay you edit. An illegal entry shows E. It starts on overhead L, adding to the dry sound like an effect send.</p></div>`, '<span class="ov-msg" id="rmx-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync">${panelSVG(1, '#cfcdc7', (w, h) => dzFace(w, h))}
   <div class="sk"><button type="button" data-dz="chase" title="Slave the JH-Tape to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
   <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
@@ -1972,11 +2054,12 @@ window.DEMO = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'proto
 return demoTape; })();
 window.ASF = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'files', 'audiofiles.js'), 'utf8').replace(/^export /gm, '')}
 return { wav, aiff, flac, zip, concat, writeTap, readTap, crc32 }; })();</script>
-<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
+<script type="text/plain" id="jh24-worklet-src">${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'jh24audio.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'electronics', 'mechsound.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'im90.js'), 'utf8').replace(/^export /gm, '') + '\n' + fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '') + '\n' + ['h949.js', 'rmx16.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', f), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '').replace(/\bclass Line\b/g, 'class RmxLine').replace(/new Line\(/g, 'new RmxLine(').replace(/\bTAU\b/g, f === 'h949.js' ? 'H_TAU' : 'R_TAU')).join('\n') + '\n' + fs.readFileSync(path.join(__dirname, 'elec-worklet.js'), 'utf8')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'c160.js'), 'utf8').replace(/^export /gm, '')}</script>
 <script>${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'spx90presets.js'), 'utf8').replace(/^export /gm, '')}</script>
+<script>const RMX_PROGRAMS_UI = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'rmx16.js'), 'utf8').replace(/^export /gm, '')}; return RMX_PROGRAMS; })(); const h949Ratio = (() => { ${fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'outboard', 'h949.js'), 'utf8').replace(/^import .*$/gm, '').replace(/^export /gm, '')}; return h949Ratio; })();</script>
 <script>${['ltc.js', 'midiclock.js', 'chase.js'].map((f) => fs.readFileSync(path.join(__dirname, '..', '..', 'prototype', 'sync', f), 'utf8').replace(/^export /gm, '')).join('\n')}</script>
-<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
+<script>${fs.readFileSync(path.join(__dirname, 'overlays.client.js'), 'utf8').replace('  // ---------------- the studio clock ----------------', fs.readFileSync(path.join(__dirname, 'strip.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'electronics.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'files.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'syncgen.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'c160.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'im90.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'spx.client.js'), 'utf8') + fs.readFileSync(path.join(__dirname, 'h949rmx.client.js'), 'utf8') + '  // ---------------- the studio clock ----------------')}</script>
 <script>(() => {   // the OldTools splash: names what is coming up, then fades
   const el = document.getElementById('splash'); if (!el) return;
   const steps = ['Spooling the JH-Tape transport', 'Warming up the JH-Tape electronics: 24 channels', 'Aligning heads for Amtex 499', 'Powering the JH-Mix console: 32 inputs', 'Racking the Leximan 224X', 'Racking the dbk 160X compressors', 'Racking the Publizon IM90', 'Racking the Yahaha SPX90IIs', 'Locking the SG-24 house sync', 'Patching the patchbay', 'Ready'];
