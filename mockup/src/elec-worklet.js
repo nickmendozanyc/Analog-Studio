@@ -25,6 +25,8 @@ class JH24Processor extends AudioWorkletProcessor {
     // two PCM41s and two PCM42s: mono delays on channel inserts (their output replaces the channel)
     this.pcm = [new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 41), new PCM4x(sampleRate, 42), new PCM4x(sampleRate, 42)]; this.pcmch = [null, null, null, null];
     this.pcmOut = this.pcm.map(() => new Float32Array(128));
+    // the Akita S900 sampler: records from the channel patched to its input, plays to the mix (its own line return)
+    this.s9 = new S900(sampleRate); this.s9ch = null; this.s9on = true; this.s9L = new Float32Array(128); this.s9R = new Float32Array(128); this.s9In = new Float32Array(128);
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
     this.h949 = new H949Unit(sampleRate); this.rmx = new RMX16(sampleRate); this.par = { h949: null, rmx: null };
     this.parIn = new Float32Array(128); this.parL = new Float32Array(128); this.parR = new Float32Array(128);
@@ -51,6 +53,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.cmd === 'arm') c.arm(d.by); else if (d.cmd === 'play') c.play(); else if (d.cmd === 'stop') c.stop();
     }
     else if (d.type === 'h949' || d.type === 'rmx') { const u = d.type === 'h949' ? this.h949 : this.rmx; if (d.ch !== undefined) this.par[d.type] = d.ch; if (d.set) u.set(d.set); }
+    else if (d.type === 's900') this.s9msg(d);
     else if (d.type === 'pcm') { const u = this.pcm[d.unit]; if (!u) return; if (d.ch !== undefined) this.pcmch[d.unit] = d.ch; if (d.set) u.set(d.set); }
     else if (d.type === 'spx') { const u = this.spx[d.unit]; if (!u) return; if (d.ch !== undefined) this.spxch[d.unit] = d.ch; if (d.set) u.set(d.set); if (d.cmd === 'trig') u.trigger(); }
     else if (d.type === 'osc') Object.assign(this.osc, d);
@@ -83,6 +86,23 @@ class JH24Processor extends AudioWorkletProcessor {
     }
     else if (d.type === 'debugReset') this.vs = [];
     else if (d.type === 'debug') this.port.postMessage({ locked: !!this.locked, type: 'debug', take: m.take, v: m.v, mode: m.st.mode, ready: [...m.st.ready], pieces: m.tracks.map((t) => t.pieces.length), pass: m.pass.map((p) => !!p), jumps: this.jumps || 0, vmin: this.vs ? Math.min(...this.vs) : 0, vmax: this.vs ? Math.max(...this.vs) : 0 });
+  }
+  s9msg(d) {   // the sampler's commands: notes, recording, samples in and out, edits
+    const u = this.s9;
+    if (d.ch !== undefined) this.s9ch = d.ch;
+    if (d.on !== undefined) { this.s9on = d.on; if (!d.on) u.allOff(); }
+    if (d.note != null) { if (d.vel > 0) u.noteOn(d.note, d.vel); else u.noteOff(d.note); }
+    if (d.allOff) u.allOff();
+    if (d.level != null) u.level = d.level;
+    if (d.rec === 'arm') u.armRecord(d.opts || {}); else if (d.rec === 'stop') u.stopRecord();
+    if (d.load) { const s = s9Sample(d.load.name, d.load.data, d.load.rate, d.load.o || {}); const i = d.replace != null ? (u.samples[d.replace] = s, d.replace) : u.addSample(s); this.port.postMessage({ type: 's900', loaded: i, name: s.name, n: s.data.length, err: i < 0 ? 'MEMORY FULL' : null }); }
+    if (d.sampleEdit) Object.assign(u.samples[d.sampleEdit.i] || {}, d.sampleEdit.set);
+    if (d.del != null) { u.allOff(); u.samples.splice(d.del, 1); for (const P of u.programs) for (const kg of P.kgs) { if (kg.sample >= d.del) kg.sample = Math.max(0, kg.sample - (kg.sample > d.del ? 1 : 0)); if (kg.loud > d.del) kg.loud--; else if (kg.loud === d.del) kg.loud = -1; } }
+    if (d.programs) { u.programs = d.programs; u.prog = Math.min(u.prog, u.programs.length - 1); }
+    if (d.prog != null) { u.allOff(); u.prog = d.prog; }
+    if (d.clear) { u.allOff(); u.samples = []; }
+    if (d.getSample != null) { const s = u.samples[d.getSample]; if (s) this.port.postMessage({ type: 's900', sample: d.getSample, name: s.name, rate: s.rate, data: s.data.slice(), id: d.id }); }
+    if (d.list) this.port.postMessage({ type: 's900', list: u.samples.map((s) => ({ name: s.name, n: s.data.length, rate: s.rate, root: s.root, tune: s.tune, start: s.start, end: s.end, loopAt: s.loopAt, loopLen: s.loopLen, mode: s.mode })), free: u.free() });
   }
   sendTrims() { this.port.postMessage({ type: 'trims', trims: this.m.ch.map((c) => c.t) }); }
   process(inputs, outputs) {
@@ -183,6 +203,10 @@ class JH24Processor extends AudioWorkletProcessor {
       for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; L[k] += a * g; if (R !== L) R[k] += b * g; }
     }
     if (!this.mix.mute && this.mix.solo < 0) for (let u = 0; u < 2; u++) if (this.spxch[u] != null) { const g = this.mix.gain * 0.75, a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) { L[k] += a[k] * g; if (R !== L) R[k] += b[k] * g; } }
+    // the S900: records from its patched channel; its output joins the mix (like a line return)
+    if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
+    if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(ins[this.s9ch] || this.out[this.s9ch]); else this.s9In.fill(0);
+    if (this.s9on) { this.s9.process(this.s9In, this.s9L, this.s9R, n); if (!this.mix.mute && this.mix.solo < 0) { const g = this.mix.gain; for (let k = 0; k < n; k++) { L[k] += this.s9L[k] * g; if (R !== L) R[k] += this.s9R[k] * g; } } }
     // the transport mechanics, heard in the room (not on tape): motors, air, solenoids
     if (T && this.mechLevel > 0) { this.mech.update({ v: m.v, rS: T.rS, rT: T.rT, acc: T.acc, mode: T.mode, lift: T.lift, endOfTape: T.eot }); this.mech.render(L, R, this.mechLevel); }
     // VU levels (average-responding, ~300 ms; 0 VU = 0 dB) and what each channel is monitoring, ~30 times a second
@@ -191,7 +215,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.vuT += n;
     if (this.vuT > sampleRate / 30) {
       this.vuT = 0;
-      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()) });
+      this.port.postMessage({ type: 'vu', locked: !!this.locked, db: Array.from(this.vu, (v) => 20 * Math.log10(Math.max(v, 1e-9) / (0.6366 * VU0))), src: m.ch.map((c, i) => monitorSource(i, m.st)), take: m.take, c160: this.c160.map((c) => c.meters()), im90: this.im.map((c) => c.meters()), spx: this.spx.map((c) => c.meters()), h949: this.h949.meters(), rmx: this.rmx.meters(), pcm: this.pcm.map((c) => c.meters()), s900: this.s9.meters() });
     }
     return true;
   }

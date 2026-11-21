@@ -45,9 +45,10 @@
     if (d.type === 'trims') { EL.trims = d.trims; elShowTrims(); }
     else if (d.type === 'debug') window.JH24_DEBUG = d;
     else if (d.type === 'reel') { const w = EL.waiting && EL.waiting[d.id]; if (w) { delete EL.waiting[d.id]; w(d); } }
+    else if (d.type === 's900') { if (window.S900_RECV) window.S900_RECV(d); }
     else if (d.type === 'loaded') { if (EL.quietLoads > 0) EL.quietLoads--; else elMsg(`Track ${d.track + 1} loaded onto the tape.`); }
     else if (d.type === 'vu') {
-      window.JH24_VU = EL.on ? d.db : null; window.C160_M = EL.on ? d.c160 : null; window.IM90_M = EL.on ? d.im90 : null; window.SPX_M = EL.on ? d.spx : null; window.PCM_M = EL.on ? d.pcm : null; window.H949_M = EL.on ? d.h949 : null; window.RMX_M = EL.on ? d.rmx : null; EL.locked = d.locked; EL.aTake = d.take; EL.aTime = performance.now();
+      window.JH24_VU = EL.on ? d.db : null; window.C160_M = EL.on ? d.c160 : null; window.IM90_M = EL.on ? d.im90 : null; window.SPX_M = EL.on ? d.spx : null; window.PCM_M = EL.on ? d.pcm : null; window.S900_M = EL.on ? d.s900 : null; window.H949_M = EL.on ? d.h949 : null; window.RMX_M = EL.on ? d.rmx : null; EL.locked = d.locked; EL.aTake = d.take; EL.aTime = performance.now();
       if (elRoot && !elRoot.closest('.overlay').hidden) elRoot.querySelectorAll('.ch').forEach((c) => {
         const i = +c.dataset.ch, db = d.db[i], s = d.src[i];
         c.querySelector('.vub i').style.width = `${Math.max(0, Math.min(100, (db + 20) / 23 * 100)).toFixed(1)}%`;
