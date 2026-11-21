@@ -47,7 +47,7 @@
     });
     for (const [k, n] of [['mode', 5], ['inst', 12]]) for (const r of document.querySelectorAll(`.tr-r-${k}`)) { const m = /rotate\([^ ]+ ([^ ]+) ([^)]+)\)/.exec(r.getAttribute('transform') || ''); if (m) r.setAttribute('transform', `rotate(${(-120 + TR[k] * 240 / (n - 1)).toFixed(1)} ${m[1]} ${m[2]})`); }
     for (const [k, sw] of [['LT', 'conga'], ['MT', 'conga'], ['HT', 'conga'], ['RS', 'claves'], ['CP', 'maracas']]) for (const e of document.querySelectorAll(`.tr-w-${k}`)) { const y0 = +(e.dataset.y0 || (e.dataset.y0 = e.getAttribute('y'))), h = +e.getAttribute('height'); e.setAttribute('y', TR.p[k][sw] ? y0 + h * 1.2 : y0); }
-    for (const e of document.querySelectorAll('.tr-var')) { const x0 = +(e.dataset.x0 || (e.dataset.x0 = e.getAttribute('x'))), w = +e.getAttribute('width'); e.setAttribute('x', x0 + ({ A: 0, AB: 1, B: 2 })[TR.p.var] * w * 1.2); }
+    for (const e of document.querySelectorAll('.tr-var')) { const x0 = +(e.dataset.x0 || (e.dataset.x0 = e.getAttribute('x'))), w = +e.getAttribute('width'); e.setAttribute('x', x0 + ({ A: 0, AB: 1, B: 2 })[TR.p.var] * w * 0.97); }
     const sb = document.querySelector('[data-trx="sync"] .v'); if (sb) sb.textContent = TR.p.sync === 'din' ? 'DIN SYNC · SBX-80' : 'INTERNAL';
   }
   document.querySelectorAll('[data-trk]').forEach((g) => {
@@ -102,6 +102,8 @@
       c1Lamp(`tr-l${i}`, on);
     }
     c1Lamp('tr-run', !!run && (M.step % 4 === 0));
+    c1Lamp('tr-va', run ? M.part === 'A' : TR.p.var !== 'B'); c1Lamp('tr-vb', run ? M.part === 'B' : TR.p.var !== 'A');   // which part plays
+    c1Lamp('tr-p1', TR.mode === 1); c1Lamp('tr-p2', TR.mode === 2);
     sgTxt('.tr-pat', `P${String(pat + 1).padStart(2, '0')} ${(TR.mode === 1 || TR.mode === 2) && !run ? trPart() + '*' : part}`);
   }
   function tr808Tick() {

@@ -1571,74 +1571,106 @@ function tr909Body(bw, bh) {
   if (bw) rect(x0 + sw * 0.08, Y(96.5), sw * 15.84, 0.4 * s, '#77746c');
 }
 function tr808Body(bw, bh) {
-  // Rowan TR-808 (after the Roland TR-808), seen from above: the instrument knobs across the top, tempo, mode, instrument
-  // select, start / stop and the basic-variation switch at the lower left, the 16 coloured step keys with their lights
-  const X = (pc) => pc / 100 * bw, Y = (pc) => pc / 100 * bh, W = '#ece6d6', O = '#f08a24';
-  rect(0, 0, bw, bh, '#1c1c1e', `rx="${bw * 0.008}"`); rect(X(1), Y(1.5), X(98), Y(97), '#262628', `rx="${bw * 0.006}"`);
-  rect(X(1), Y(1.5), X(98), Y(56), '#2f2f32'); rect(X(1), Y(57.3), X(98), 0.5, '#000', 'opacity="0.6"');
-  const s = bw / 450;   // sizes are tuned at 450 wide
-  const T = (x, y, t, sz, col = W, a = 'middle', wt = 800, ex = '') => text(x, y, t, sz * s, col, a, wt, ex);
-  // the name
-  T(X(97.5), Y(8), 'Rhythm Composer', 8.6, O, 'end', 700, 'font-style="italic" font-family="Georgia,serif"');
-  T(X(97.5), Y(14.5), 'TR-808', 10, W, 'end', 900, 'letter-spacing="0.6"');
-  T(X(80.5), Y(14), 'Computer Controlled', 4.2, W, 'end', 700, 'letter-spacing="0.3"');
-  T(X(3), Y(9.5), 'Rowan', 8.2, W, 'start', 900, 'letter-spacing="0.2"');
-  // a knob: dark cap, cream pointer, scale dots; data-trk="KEY" (drag); class tr-k-KEY rotates
-  const knob = (cx, cy, r, k, cap = '#121213', ring = O) => {
-    for (let i = 0; i <= 10; i++) { const a = (-135 + i * 27) * Math.PI / 180; circle(cx + Math.sin(a) * (r + 2.2 * s), cy - Math.cos(a) * (r + 2.2 * s), 0.35 * s, '#9a968c'); }
-    p(`<g data-trk="${k}" style="cursor:ns-resize">`); circle(cx + 0.4 * s, cy + 0.8 * s, r, '#000', 'opacity="0.6"'); circle(cx, cy, r, ring); circle(cx, cy, r * 0.8, cap);
-    p(`<g class="tr-k-${k.replace('.', '-')}" transform="rotate(0 ${cx} ${cy})"><rect x="${cx - 0.45 * s}" y="${cy - r * 0.8}" width="${0.9 * s}" height="${r * 0.55}" fill="${W}"/></g>`); circle(cx, cy, r + 4 * s, 'transparent'); p('</g>');
+  // Rowan TR-808, laid out from the user's photos of a real one: black end caps, a dark charcoal top panel with the
+  // controls in thin grey-outlined boxes, yellow-capped LEVEL knobs, black knobs for tone / tuning / decay, cream tags
+  // with the instrument names, an orange logo and "Rhythm Composer", and the lighter grey lower panel with START/STOP,
+  // the note-value bars and the 16 coloured step keys. Positions are measured on the photo (% of the panel between the
+  // end caps; y = % of its height).
+  const cap = bw * 0.058, pw = bw - 2 * cap, s = bw / 528;
+  const X = (pc) => cap + pc / 100 * pw, Y = (pc) => pc / 100 * bh, O = '#e0782a', W = '#e8e4da', G = '#a9a7a1', CR = '#efe3b4';
+  const T = (x, y, t, sz, col = G, a = 'middle', wt = 800, ex = '') => text(x, y, t, sz * s, col, a, wt, ex);
+  // end caps, panel, the lower section
+  for (const ex of [0, bw - cap]) { rect(ex, Y(-1), cap, Y(102), '#111112', `rx="${4 * s}"`); rect(ex + cap * 0.15, Y(1), cap * 0.7, Y(98), '#1b1b1c', `rx="${3 * s}"`); }
+  rect(cap, 0, pw, bh, '#2c2c2e'); rect(cap, 0, pw, 1 * s, '#fff', 'opacity="0.08"');
+  rect(X(0.5), Y(63.4), X(99) - X(0.5), Y(35.4), '#8f8e8b', `rx="${2 * s}"`); rect(X(0.5), Y(63.4), X(99) - X(0.5), 0.8 * s, '#c8c7c2', 'opacity="0.6"');
+  for (const [sx, sy] of [[1.5, 2.5], [98.5, 2.5], [1.5, 97], [98.5, 97], [21, 2.5], [60, 2.5], [21, 60.5], [60, 60.5]]) circle(X(sx), Y(sy), 1.4 * s, '#4a4a4c');
+  // name: logo, Rhythm Composer, Computer Controlled
+  rect(X(71.2), Y(5.6), 3.4 * s, 3.4 * s, 'none', `stroke="${O}" stroke-width="${0.9 * s}"`); T(X(73), Y(10.2), 'Rowan', 8, O, 'start', 700, 'letter-spacing="0.4"');
+  rect(X(21), Y(55.4), X(87) - X(21), 0.5 * s, O); T(X(76), Y(54), 'Rhythm Composer', 9.2, O, 'end', 500); T(X(86.5), Y(54), 'TR-808', 7.6, O, 'end', 700);
+  T(X(86.5), Y(59.4), 'Computer Controlled', 5, '#c9c6be', 'end', 600);
+  // power
+  T(X(6.6), Y(3.6), 'POWER', 2.4); rect(X(6.6) - 4 * s, Y(5.3), 8 * s, 5 * s, '#0b0b0c', `rx="${0.6 * s}"`); rect(X(6.6) - 3.2 * s, Y(5.6), 3.6 * s, 3.6 * s, '#3a3a3d'); T(X(6.6) + 6 * s, Y(6.8), 'ON', 1.8); T(X(6.6) + 6.2 * s, Y(9.8), 'OFF', 1.8);
+  // knobs: LEVEL = yellow cap on a black skirt; the others black with a white pointer; ticks round them
+  const ticks = (cx, cy, r) => { for (let i = 0; i <= 10; i++) { const a = (-135 + i * 27) * Math.PI / 180; p(`<line x1="${cx + Math.sin(a) * (r + 0.8 * s)}" y1="${cy - Math.cos(a) * (r + 0.8 * s)}" x2="${cx + Math.sin(a) * (r + 2.2 * s)}" y2="${cy - Math.cos(a) * (r + 2.2 * s)}" stroke="${G}" stroke-width="${0.35 * s}"/>`); } };
+  const knob = (cx, cy, r, k, yellow) => {
+    ticks(cx, cy, r);
+    p(`<g data-trk="${k}" style="cursor:ns-resize">`); circle(cx + 0.4 * s, cy + 0.8 * s, r, '#000', 'opacity="0.55"'); circle(cx, cy, r, '#0e0e0f');
+    if (yellow) { circle(cx, cy, r * 0.62, '#f2d23a'); circle(cx - r * 0.15, cy - r * 0.18, r * 0.3, '#fff', 'opacity="0.25"'); }
+    p(`<g class="tr-k-${k.replace('.', '-')}" transform="rotate(0 ${cx} ${cy})"><rect x="${cx - 0.4 * s}" y="${cy - r}" width="${0.8 * s}" height="${r * (yellow ? 0.42 : 0.6)}" fill="${yellow ? '#ff5a2a' : '#f4f2ec'}"/></g>`); circle(cx, cy, r + 3.5 * s, 'transparent'); p('</g>');
   };
-  // instrument columns
-  const COLS = [['AC', 'ACCENT', [['level', 'LEVEL']]], ['BD', 'BASS DRUM', [['level', 'LEVEL'], ['tone', 'TONE'], ['decay', 'DECAY']]], ['SD', 'SNARE DRUM', [['level', 'LEVEL'], ['tone', 'TONE'], ['snappy', 'SNAPPY']]],
-    ['LT', 'LOW TOM', [['level', 'LEVEL'], ['tune', 'TUNING']], 'conga', 'LOW CONGA'], ['MT', 'MID TOM', [['level', 'LEVEL'], ['tune', 'TUNING']], 'conga', 'MID CONGA'], ['HT', 'HI TOM', [['level', 'LEVEL'], ['tune', 'TUNING']], 'conga', 'HI CONGA'],
-    ['RS', 'RIM SHOT', [['level', 'LEVEL']], 'claves', 'CLAVES'], ['CP', 'HAND CLAP', [['level', 'LEVEL']], 'maracas', 'MARACAS'], ['CB', 'COW BELL', [['level', 'LEVEL']]],
-    ['CY', 'CYMBAL', [['level', 'LEVEL'], ['tone', 'TONE'], ['decay', 'DECAY']]], ['OH', 'OPEN HIHAT', [['level', 'LEVEL'], ['decay', 'DECAY']]], ['CH', 'CLS\'D HIHAT', [['level', 'LEVEL']]]];
-  const cw = X(98) / 12;
-  COLS.forEach(([k, name, ks, sw, alt], i) => {
-    const cx = X(1) + cw * (i + 0.5);
-    if (i) rect(X(1) + cw * i, Y(20), 0.4 * s, Y(36), '#000', 'opacity="0.5"');
-    T(cx, Y(22.5), name, 3.1, i ? W : O, 'middle', 900, 'letter-spacing="0.2"');
-    ks.forEach(([pk, lab], j) => { const cy = Y(31 + j * 10.5); knob(cx, cy, 4.3 * s, k === 'AC' ? 'accent' : `${k}.${pk}`); T(cx, cy + 7.3 * s, lab, 2.4, '#bdb6a6', 'middle', 800); });
-    if (sw) {   // the instrument switch (tom / conga, rim shot / claves, clap / maracas)
-      const sy = Y(31 + ks.length * 10.5) + 1 * s; T(cx, sy - 3.2 * s, name.split(' ').slice(-1)[0], 2.2, '#bdb6a6', 'middle', 800); T(cx, sy + 8.4 * s, alt, 2.2, O, 'middle', 800);
-      p(`<g data-trw="${k}.${sw}" style="cursor:pointer">`); rect(cx - 2.2 * s, sy - 1.6 * s, 4.4 * s, 7.2 * s, '#0c0c0d', `rx="${1 * s}"`); p(`<rect class="tr-w-${k}" x="${cx - 1.7 * s}" y="${sy - 1.1 * s}" width="${3.4 * s}" height="${3 * s}" rx="${0.6 * s}" fill="#d9d4c6"/>`); rect(cx - 6 * s, sy - 4 * s, 12 * s, 14 * s, 'transparent'); p('</g>');
-    }
+  // cream tag with the 808's mixed-size capitals (an upper-case letter is full size, a lower-case one a smaller capital)
+  const tag = (cx, cy, w, t, sz = 3.2) => {
+    rect(cx - w / 2, cy - 2.8 * s, w, 5.6 * s, CR, `rx="${0.5 * s}"`);
+    let sp = ''; for (const ch of t) sp += ch === ' ' ? ' ' : ch === ch.toUpperCase() ? `<tspan font-size="${(sz * s).toFixed(2)}">${ch}</tspan>` : `<tspan font-size="${(sz * 0.72 * s).toFixed(2)}">${ch.toUpperCase()}</tspan>`;
+    p(`<text x="${cx}" y="${cy + 1.1 * s}" font-family="Archivo,Arial" font-weight="700" fill="#2a2522" text-anchor="middle" letter-spacing="${0.1 * s}">${sp}</text>`);
+  };
+  // the instrument columns
+  const CX = [25.1, 31.2, 37.2, 43.2, 49.2, 55.3, 61.2, 67.2, 73.2, 79.3, 85.3, 91.2], cw = (X(91.2) - X(25.1)) / 11;
+  const COL = [['AC', 'ACcent', []], ['BD', 'BassDrum', [['tone', 'TONE'], ['decay', 'DECAY']]], ['SD', 'SnareDrum', [['tone', 'TONE'], ['snappy', 'SNAPPY']]],
+    ['LT', 'LowTom', [['tune', 'TUNING']], 'conga', 'LowConga'], ['MT', 'MidTom', [['tune', 'TUNING']], 'conga', 'MidConga'], ['HT', 'HiTom', [['tune', 'TUNING']], 'conga', 'HiConga'],
+    ['RS', 'RimShot', [], 'claves', 'CLaves'], ['CP', 'handClaP', [], 'maracas', 'MAracas'], ['CB', 'CowBell', []], ['CY', 'CYmbal', [['tone', 'TONE'], ['decay', 'DECAY']]], ['OH', 'OpenHihat', [['decay', 'DECAY']]], ['CH', 'ClsdHihat', []]];
+  rect(X(22), Y(17.5) - 9 * s, X(94.3) - X(22), Y(50.5) - Y(17.5) + 9 * s, 'none', `stroke="#5a5a5d" stroke-width="${0.5 * s}"`);
+  COL.forEach(([k, name, ks, sw, alt], i) => {
+    const cx = X(CX[i]);
+    if (i) p(`<line x1="${cx - cw / 2}" y1="${Y(17.5) - 9 * s}" x2="${cx - cw / 2}" y2="${Y(50.5)}" stroke="#5a5a5d" stroke-width="${0.5 * s}"/>`);
+    T(cx, Y(13.8), 'LEVEL', 2.3); knob(cx, Y(16.9), 3.2 * s, k === 'AC' ? 'accent' : `${k}.level`, true);
+    ks.forEach(([pk, lab], j) => { const ry = k === 'OH' || (k === 'CY' && j === 1) ? Y(38.5) : j === 0 ? Y(28.2) : Y(38.5); T(cx, ry - 3.6 * s - 1 * s, lab, 2.3); knob(cx, ry, 3 * s, `${k}.${pk}`, false); });
+    if (sw) { tag(cx, Y(38), cw * 0.86, alt, 2.9); p(`<g data-trw="${k}.${sw}" style="cursor:pointer">`); rect(cx - 1.8 * s, Y(41.3), 3.6 * s, 6.4 * s, '#0b0b0c', `rx="${0.5 * s}"`); p(`<rect class="tr-w-${k}" x="${cx - 1.3 * s}" y="${Y(41.3) + 0.5 * s}" width="${2.6 * s}" height="${2.6 * s}" fill="#3e3e41"/>`); rect(cx - 5 * s, Y(40), 10 * s, 10 * s, 'transparent'); p('</g>'); }
+    tag(cx, Y(47.2), cw * 0.86, name, 2.9);
   });
-  // lower left: master volume, tempo (+ fine), start / stop, tap, mode, instrument select, basic variation
-  knob(X(5.5), Y(66), 4.8 * s, 'master'); T(X(5.5), Y(73.5), 'MASTER VOLUME', 2.3, '#bdb6a6');
-  knob(X(14), Y(68), 8 * s, 'tempo', '#3a3a3d', '#8a8780'); T(X(14), Y(80), 'TEMPO', 3, W, 'middle', 900); knob(X(19.6), Y(64.5), 2.8 * s, 'fine', '#3a3a3d', '#8a8780'); T(X(19.6), Y(69.5), 'FINE', 2, '#bdb6a6');
-  p(`<g data-trb="start" style="cursor:pointer">`); rect(X(3), Y(83), X(9.5), Y(11), '#0a0a0b', `rx="${1.2 * s}"`); rect(X(3.4), Y(83.8), X(8.7), Y(9.4), '#cf2f25', `rx="${1 * s}"`); rect(X(3.4), Y(83.8), X(8.7), Y(3), '#fff', `opacity="0.18" rx="${1 * s}"`); T(X(7.75), Y(90.4), 'START/STOP', 2.6, '#fff', 'middle', 900); p('</g>');
-  circle(X(7.75), Y(80.5), 1 * s, '#3a1412'); p(`<circle class="tr-run" cx="${X(7.75)}" cy="${Y(80.5)}" r="${1 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
-  const smallBtn = (x, y, k, lab) => { p(`<g data-trb="${k}" style="cursor:pointer">`); rect(x - 3.6 * s, y - 2.6 * s, 7.2 * s, 5.2 * s, '#0a0a0b', `rx="${0.8 * s}"`); rect(x - 3.2 * s, y - 2.2 * s, 6.4 * s, 4.4 * s, '#d9d4c6', `rx="${0.6 * s}"`); p('</g>'); T(x, y + 6 * s, lab, 2.3, '#bdb6a6'); };
-  smallBtn(X(16), Y(88.5), 'tap', 'TAP'); smallBtn(X(21), Y(88.5), 'clear', 'CLEAR');
-  // rotary selectors: data-trr (click: next position, drag / scroll), pointer class tr-r-KEY
-  const rotary = (cx, cy, r, k, labs, title) => {
-    T(cx, cy - r - 6.2 * s, title, 2.4, W, 'middle', 900);
-    labs.forEach((l, i) => { const a = (-120 + i * 240 / (labs.length - 1)) * Math.PI / 180; T(cx + Math.sin(a) * (r + 4.6 * s), cy - Math.cos(a) * (r + 4.6 * s) + 0.8 * s, l, 1.8, '#bdb6a6', 'middle', 800); });
-    p(`<g data-trr="${k}" style="cursor:pointer">`); circle(cx, cy, r, '#8a8780'); circle(cx, cy, r * 0.82, '#3a3a3d');
-    p(`<g class="tr-r-${k}" transform="rotate(-120 ${cx} ${cy})"><rect x="${cx - 0.6 * s}" y="${cy - r * 0.95}" width="${1.2 * s}" height="${r * 0.6}" fill="${W}"/></g>`); circle(cx, cy, r + 6 * s, 'transparent'); p('</g>');
+  // top-left block: PATTERN WRITE / mode rotary, INSTRUMENT-SELECT, the small red button, MEASURES
+  rect(X(1.6), Y(13.2), X(21.3) - X(1.6), Y(35) - Y(13.2), 'none', `stroke="#b8b5ad" stroke-width="${0.5 * s}" rx="${1 * s}"`);
+  rect(X(3.6), Y(14.6), 17 * s, 3 * s, 'none', `stroke="#b8b5ad" stroke-width="${0.4 * s}"`); T(X(3.6) + 8.5 * s, Y(14.6) + 2.3 * s, 'PATTERN WRITE', 1.9, W);
+  rect(X(11.6), Y(14.2), 19 * s, 5.2 * s, 'none', `stroke="${O}" stroke-width="${0.4 * s}"`); T(X(11.6) + 9.5 * s, Y(14.2) + 2.1 * s, 'INSTRUMENT-SELECT', 1.6, W); T(X(11.6) + 9.5 * s, Y(14.2) + 4.4 * s, 'RHYTHM TRACK', 1.6, O);
+  const rotary = (cx, cy, r, k, labs, tags) => {
+    labs.forEach((l, i) => {
+      if (tags) { const h = labs.length / 2, left = i < h, j = left ? i : i - h, lx = cx + (left ? -1 : 1) * (r + 4.4 * s) + (j === h - 1 || (!left && j === 0) ? 0 : 0), ly = left ? cy + 7 * s - j * 2.8 * s : cy - 7 * s + j * 2.8 * s;
+        rect(lx - 2.9 * s, ly - 1.25 * s, 5.8 * s, 2.5 * s, '#f2d23a', `rx="${0.3 * s}"`); T(lx, ly + 0.75 * s, l, 1.7, '#1a1a1a', 'middle', 900); }
+      else { const a = (-120 + i * 240 / (labs.length - 1)) * Math.PI / 180; T(cx + Math.sin(a) * (r + 5.2 * s), cy - Math.cos(a) * (r + 5.2 * s) + 0.7 * s, l, 1.6, W, 'middle', 800); } });
+    p(`<g data-trr="${k}" style="cursor:pointer">`); circle(cx + 0.4 * s, cy + 0.9 * s, r, '#000', 'opacity="0.6"'); circle(cx, cy, r, '#101011'); for (let i = 0; i < 16; i++) { const a = i * 22.5 * Math.PI / 180; p(`<line x1="${cx + Math.sin(a) * r * 0.72}" y1="${cy - Math.cos(a) * r * 0.72}" x2="${cx + Math.sin(a) * r * 0.98}" y2="${cy - Math.cos(a) * r * 0.98}" stroke="#2c2c2e" stroke-width="${0.6 * s}"/>`); }
+    p(`<g class="tr-r-${k}" transform="rotate(-120 ${cx} ${cy})"><rect x="${cx - 0.5 * s}" y="${cy - r}" width="${1 * s}" height="${r * 0.5}" fill="#f4f2ec"/></g>`); circle(cx, cy, r + 5 * s, 'transparent'); p('</g>');
   };
-  rotary(X(27.5), Y(70), 5.5 * s, 'mode', ['CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY'], 'MODE');
-  rotary(X(37.5), Y(70), 5.5 * s, 'inst', ['AC', 'BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'], 'INSTRUMENT SELECT');
-  // basic variation switch A / AB / B
-  T(X(27.5), Y(87), 'BASIC VARIATION', 2.2, W, 'middle', 900);
-  p(`<g data-trb="var" style="cursor:pointer">`); rect(X(24), Y(89.2), X(7), Y(4.4), '#0c0c0d', `rx="${1 * s}"`); p(`<rect class="tr-var" x="${X(24.4)}" y="${Y(89.7)}" width="${X(2)}" height="${Y(3.4)}" rx="${0.6 * s}" fill="#d9d4c6"/>`); p('</g>');
-  T(X(24.9), Y(97), 'A', 2.2, '#bdb6a6'); T(X(27.5), Y(97), 'AB', 2.2, '#bdb6a6'); T(X(30.1), Y(97), 'B', 2.2, '#bdb6a6');
-  // pattern / part readout (small amber LCD-like window, our addition for which pattern is up)
-  rect(X(33.5), Y(85), X(8.5), Y(9), '#0b0702', `rx="${0.6 * s}"`);
-  p(`<text class="tr-pat" x="${X(37.75)}" y="${Y(91.6)}" font-family="${MONO2}" font-size="${4.4 * s}" font-weight="700" fill="#ffb02e" text-anchor="middle" filter="url(#glowSm)">P01 A</text>`);
-  // the 16 step keys: red, orange, yellow, cream in fours; a light above each; the instrument names for MANUAL play
-  const KC = ['#d8352a', '#f0821e', '#f2c230', '#ece4cf'], MAN = ['BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH', 'AC', '', '', '', ''];
-  const x0 = X(44), sw2 = (X(98) - x0) / 16;
-  T(x0, Y(63.5), 'RHYTHM COMPOSER STEPS', 2.4, W, 'start', 900, 'letter-spacing="0.6"');
-  for (let i = 0; i < 16; i++) {
-    const cx = x0 + sw2 * (i + 0.5);
-    T(cx, Y(69.5), String(i + 1), 2.6, '#bdb6a6', 'middle', 900);
-    circle(cx, Y(74), 1.05 * s, '#3a1412'); p(`<circle class="tr-l${i}" cx="${cx}" cy="${Y(74)}" r="${1.05 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
-    p(`<g data-trs="${i}" style="cursor:pointer">`); rect(cx - sw2 * 0.4, Y(78), sw2 * 0.8, Y(13), '#0a0a0b', `rx="${0.8 * s}"`); rect(cx - sw2 * 0.36, Y(78.6), sw2 * 0.72, Y(11.6), KC[Math.floor(i / 4)], `rx="${0.6 * s}"`); rect(cx - sw2 * 0.36, Y(78.6), sw2 * 0.72, Y(3.5), '#fff', `opacity="0.22" rx="${0.6 * s}"`); p('</g>');
-    if (MAN[i]) T(cx, Y(96), MAN[i], 2.1, '#8f897c', 'middle', 800);
-  }
+  rotary(X(6.8), Y(21.8), 4.6 * s, 'mode', ['CLEAR', '1st PART', '2nd PART', 'MANUAL', 'PLAY'], false);
+  rotary(X(16.6), Y(21.5), 4.6 * s, 'inst', ['AC', 'BD', 'SD', 'LT', 'MT', 'HT', 'RS', 'CP', 'CB', 'CY', 'OH', 'CH'], true);
+  T(X(6.8), Y(29), 'PATTERN CLEAR', 1.8, W);
+  p(`<g data-trb="clear" style="cursor:pointer">`); circle(X(6.8), Y(32), 2.2 * s, '#0b0b0c'); circle(X(6.8), Y(32), 1.7 * s, '#d0352b'); circle(X(6.8), Y(32), 5 * s, 'transparent'); p('</g>');
+  T(X(3.2), Y(31.4), 'STEP', 1.6, W); T(X(3.2), Y(33.6), 'NUMBER', 1.6, W); T(X(11), Y(31.4), 'TRACK', 1.6, O); T(X(11), Y(33.6), 'CLEAR', 1.6, O);
+  // MEASURES / AUTO FILL IN (looks only), TEMPO dial + FINE, MASTER VOLUME
+  ticks(X(16.6), Y(38.5), 3.6 * s); circle(X(16.6), Y(38.5), 3.6 * s, '#0e0e0f'); rect(X(16.6) - 0.4 * s, Y(38.5) - 3.6 * s, 0.8 * s, 2 * s, '#f4f2ec'); T(X(16.6), Y(44.3), 'MEASURES', 1.8, W); T(X(16.6), Y(46.5), 'AUTO FILL IN', 1.8, W);
+  T(X(7.3), Y(40.6), 'TEMPO', 2.6, W);
+  circle(X(7.3), Y(52), 13 * s, '#a3a19b'); circle(X(7.3), Y(52), 11.4 * s, '#c4c2bc'); for (let i = 0; i <= 10; i++) { const a = (-150 + i * 30) * Math.PI / 180; T(X(7.3) + Math.sin(a) * 12.2 * s, Y(52) - Math.cos(a) * 12.2 * s + 0.7 * s, String(i), 1.9, '#2a2a2a', 'middle', 900); }
+  knob(X(7.3), Y(52), 8.6 * s, 'tempo', false);
+  T(X(16.2), Y(48.5), 'FINE', 2.2, W); knob(X(16.2), Y(54), 2.9 * s, 'fine', false); T(X(13.4), Y(59), 'SLOW', 1.6); T(X(19), Y(59), 'FAST', 1.6);
+  knob(X(92.7), Y(53.4), 3.6 * s, 'master', false); T(X(92.7), Y(60.4), 'MASTER VOLUME', 1.9, W); T(X(89.4), Y(58), 'MIN', 1.5); T(X(96), Y(58), 'MAX', 1.5);
+  // lower section: BASIC-VARIATION + LEDs, START/STOP, PRE-SCALE, the note bars, I/F-VARIATION, TAP
+  rect(X(2.2), Y(65), X(12.6) - X(2.2), Y(76.5) - Y(65), 'none', `stroke="#6c6b68" stroke-width="${0.4 * s}" rx="${0.6 * s}"`);
+  T(X(7.4), Y(67.5), 'BASIC - VARIATION', 1.9, '#232323', 'middle', 900);
+  p(`<g data-trb="var" style="cursor:pointer">`); rect(X(4.6), Y(68.6), X(10.2) - X(4.6), Y(2.6), '#141415', `rx="${1.2 * s}"`); p(`<rect class="tr-var" x="${X(4.8)}" y="${Y(68.8)}" width="${(X(10.2) - X(4.6)) / 3}" height="${Y(2.2)}" rx="${1 * s}" fill="#e5e2da"/>`); p('</g>');
+  T(X(5.2), Y(73.6), 'A', 1.6, '#232323'); T(X(7.4), Y(73.6), 'AB', 1.6, '#232323'); T(X(9.6), Y(73.6), 'B', 1.6, '#232323');
+  for (const [lx, cls] of [[X(5.8), 'tr-va'], [X(9), 'tr-vb']]) { circle(lx, Y(75.2) + 1.2 * s, 0.9 * s, '#3a1412'); p(`<circle class="${cls}" cx="${lx}" cy="${Y(75.2) + 1.2 * s}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
+  p(`<g data-trb="start" style="cursor:pointer">`); rect(X(2.2), Y(79.5), X(11.8) - X(2.2), Y(11), '#4a4a48', `rx="${1 * s}"`); rect(X(2.6), Y(80.3), X(11.4) - X(2.6), Y(9.4), '#efe8d2', `rx="${0.8 * s}"`); rect(X(2.6), Y(80.3), X(11.4) - X(2.6), Y(3), '#fff', `opacity="0.4" rx="${0.8 * s}"`); T(X(7), Y(84.4), 'START', 2.3, '#2a2522', 'middle', 900); T(X(7), Y(87.6), 'STOP', 2.3, '#2a2522', 'middle', 900); p('</g>');
+  circle(X(7), Y(78), 0.9 * s, '#3a1412'); p(`<circle class="tr-run" cx="${X(7)}" cy="${Y(78)}" r="${0.9 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
+  T(X(16.4), Y(66.8), 'PRE-SCALE', 1.8, '#232323', 'middle', 900); rect(X(16.4) - 1.3 * s, Y(68.2), 2.6 * s, Y(8), '#141415', `rx="${0.5 * s}"`); rect(X(16.4) - 1 * s, Y(70), 2 * s, 3 * s, '#d8d5cc');
+  const bars = [[[22.3, 33.5], [34.5, 45.7], [46.8, 58], [59, 70.3], [71.3, 82.5], [83.5, 87.6]], [[22.3, 45.7], [46.8, 70.3], [71.3, 82.5]], [[22.3, 37], [38, 58]], [[22.3, 58], [59, 82.5]]];
+  bars.forEach((row, r) => row.forEach(([a, b]) => { rect(X(a), Y(64.8 + r * 3.3), X(b) - X(a), Y(2.6), '#b9b7b1', `rx="${0.6 * s}"`); for (let x = X(a) + 3 * s; x < X(b) - 2 * s; x += Math.max(10 * s, (X(b) - X(a)) / 3)) T(x, Y(64.8 + r * 3.3) + 2.1 * s, '♪', 2.2, '#3a3a3a', 'middle', 700); }));
+  T(X(93.5), Y(66), '1/F - VARIATION', 1.7, '#232323', 'middle', 900); rect(X(91.5), Y(67.5), X(95.5) - X(91.5), Y(2.6), '#141415', `rx="${1.2 * s}"`); rect(X(91.7), Y(67.7), (X(95.5) - X(91.5)) / 2.2, Y(2.2), '#e5e2da', `rx="${1 * s}"`); T(X(92.4), Y(72.4), 'A', 1.5, '#232323'); T(X(94.6), Y(72.4), 'B', 1.5, '#232323');
+  T(X(93.5), Y(76.5), 'INTRO SET', 1.6, '#232323', 'middle', 900); T(X(93.5), Y(78.6), 'FILL IN TRIGGER', 1.6, '#232323', 'middle', 900);
+  p(`<g data-trb="tap" style="cursor:pointer">`); rect(X(90.6), Y(80), X(96.4) - X(90.6), Y(10.5), '#4a4a48', `rx="${0.8 * s}"`); rect(X(91), Y(80.8), X(96) - X(91), Y(8.9), '#efe8d2', `rx="${0.6 * s}"`); T(X(93.5), Y(86.2), 'TAP', 2.3, '#2a2522', 'middle', 900); p('</g>');
+  // step keys: 1-4 red-orange, 5-8 orange, 9-12 yellow, 13-16 cream; the light sits in the key; numbers above and below
+  const KX = [362, 409, 455, 501, 547, 594, 640, 686, 731, 777, 822, 868, 917, 963, 1009, 1055].map((v) => (v - 128) / 1062 * 100), KC = ['#e8553a', '#f39a3a', '#f3dc5a', '#efe9d6'];
+  rect(X(20.5), Y(79), X(99) - X(20.5), Y(19), '#7f7e7b', `rx="${1 * s}"`);
+  T(X(19.6), Y(79.6), 'STEP NO ➜', 1.8, '#232323', 'end', 900);
+  T(X(16.2), Y(85.4), '1st PART', 1.6, '#232323', 'start'); T(X(16.2), Y(90), '2nd PART', 1.6, '#232323', 'start');
+  for (const [ly, cls] of [[Y(84.8), 'tr-p1'], [Y(89.4), 'tr-p2']]) { circle(X(15.2), ly, 0.8 * s, '#3a1412'); p(`<circle class="${cls}" cx="${X(15.2)}" cy="${ly}" r="${0.8 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`); }
+  KX.forEach((kx, i) => {
+    const cx = X(kx), w = 8.4 * s, h = Y(11);
+    T(cx, Y(80.6), String(i + 1), 2.1, '#1d1d1d', 'middle', 900);
+    p(`<g data-trs="${i}" style="cursor:pointer">`); rect(cx - w / 2 - 0.5 * s, Y(82) - 0.5 * s, w + 1 * s, h + 1 * s, '#3a3a38', `rx="${0.8 * s}"`); rect(cx - w / 2, Y(82), w, h, KC[Math.floor(i / 4)], `rx="${0.6 * s}"`); rect(cx - w / 2, Y(82) + h * 0.72, w, h * 0.28, '#000', `opacity="0.12" rx="${0.6 * s}"`); p('</g>');
+    circle(cx, Y(84), 0.85 * s, '#5a1a12'); p(`<circle class="tr-l${i}" cx="${cx}" cy="${Y(84)}" r="${0.85 * s}" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
+    T(cx, Y(96.8), String(i < 12 ? i + 1 : i - 11), 3, '#1d1d1d', 'middle', 700);
+  });
+  rect(X(KX[12]) - 5.6 * s, Y(93.6), X(KX[15]) - X(KX[12]) + 11.2 * s, 0.4 * s, '#1d1d1d');
+  T(X(3.5), Y(97), 'BASIC RHYTHM ➜', 2.1, '#1d1d1d', 'start', 900); T(X(98.5), Y(97), '⟵ INTRO/FILL IN', 1.9, '#1d1d1d', 'end', 900);
 }
 function tr808Shelf(w, h) {
   // a 6U black rack shelf (ears, screws, a front lip) with the 808 sitting on it, tilted toward you
