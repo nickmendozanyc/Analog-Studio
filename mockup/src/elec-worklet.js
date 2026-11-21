@@ -188,7 +188,7 @@ class JH24Processor extends AudioWorkletProcessor {
     }
     // SLAVE on one unit links it to the other (the other becomes the master)
     const [A, B] = this.c160, swap = A.params.slave && !B.params.slave;
-    if (swap) Comp160.processPair(B, this.c160buf[1], A, this.c160buf[0], n); else Comp160.processPair(A, this.c160buf[0], B, this.c160buf[1], n);
+    if (this.c160ch[0] != null || this.c160ch[1] != null) { if (swap) Comp160.processPair(B, this.c160buf[1], A, this.c160buf[0], n); else Comp160.processPair(A, this.c160buf[0], B, this.c160buf[1], n); }   // unpatched: off
     // IM90 (after the compressors): its inputs are the channels it is patched on (silence when not); each channel
     // records / retriggers from input A or input B
     for (let u = 0; u < 2; u++) {
@@ -197,6 +197,7 @@ class JH24Processor extends AudioWorkletProcessor {
     }
     for (let u = 0; u < 2; u++) {
       const c = this.im[u], by = c.smp.rec === 'armed' ? c.smp.startBy : (c.smp.trigBy || 'A');
+      if (this.imch[0] == null && this.imch[1] == null) { this.imOut[u].fill(0); continue; }   // unpatched: off
       c.process(this.imIn[u], this.imOut[u], n, this.imIn[by === 'B' ? 1 : 0]);
       const ch = this.imch[u]; if (ch != null) ins[ch] = this.imOut[u];
     }
@@ -210,6 +211,7 @@ class JH24Processor extends AudioWorkletProcessor {
     for (let u = 0; u < 2; u++) {
       if (this.spxIn[u].length !== n) { this.spxIn[u] = new Float32Array(n); this.spxL[u] = new Float32Array(n); this.spxR[u] = new Float32Array(n); this.silent = new Float32Array(n); }
       const ch = this.spxch[u]; if (ch != null && this.out[ch]) this.spxIn[u].set(ins[ch] || this.out[ch]); else this.spxIn[u].fill(0);
+      if (ch == null) { this.spxL[u].fill(0); this.spxR[u].fill(0); continue; }   // unpatched: off
       this.spx[u].process(this.spxIn[u], this.spxL[u], this.spxR[u], n);
       if (ch != null) { if (!this.spxRet || this.spxRet[u].length !== n) this.spxRet = [new Float32Array(n), new Float32Array(n)]; const r = this.spxRet[u], a = this.spxL[u], b = this.spxR[u]; for (let k = 0; k < n; k++) r[k] = (a[k] + b[k]) * 0.5; ins[ch] = r; }   // the SPX returns on its channel (through its fader)
     }
@@ -218,7 +220,7 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
     if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
     if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
-    if (this.s9on) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }
+    if (this.s9on && (this.s9ch != null || this.lineSrc.includes('S900'))) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }   // unpatched: off
     if (this.lineBuf.length !== 8 || this.lineBuf[0].length !== n) this.lineBuf = Array.from({ length: 8 }, () => new Float32Array(n));
     const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L };   // the outputs a line input can be patched from
     let s9Patched = false;
@@ -228,16 +230,15 @@ class JH24Processor extends AudioWorkletProcessor {
     // the 224X: fed from the send patched to its input (aux SEND n -> 224 L), its outputs come back on line inputs next block
     if (this.rvIn.length !== n) { this.rvIn = new Float32Array(n); this.rvL = new Float32Array(n); this.rvR = new Float32Array(n); }
     if (this.rvSend >= 0) this.rvIn.set(C.sends[this.rvSend]); else this.rvIn.fill(0);
-    this.rv.process(this.rvIn, this.rvL, this.rvR, n);
+    if (this.rvSend >= 0 || this.lineSrc.some((x) => x === '224 L' || x === '224 R')) this.rv.process(this.rvIn, this.rvL, this.rvR, n); else { this.rvL.fill(0); this.rvR.fill(0); }   // unpatched: off
     // the H949 and the RMX16, alongside their channels (effect sends of their own), the SPXs, the drum machines, the S900
     if (this.parIn.length !== n) { this.parIn = new Float32Array(n); this.parL = new Float32Array(n); this.parR = new Float32Array(n); }
     for (const [key, unit] of [['h949', this.h949], ['rmx', this.rmx]]) {
-      const ch = this.par[key]; if (ch == null || !this.out[ch]) { this.parIn.fill(0); unit.process(this.parIn, this.parL, this.parR, n); continue; }
+      const ch = this.par[key]; if (ch == null || !this.out[ch]) continue;   // unpatched: off
       this.parIn.set(ins[ch] || this.out[ch]); unit.process(this.parIn, this.parL, this.parR, n);
       const g = 0.8, dl = key === 'h949' && unit.p.dlyMs > 0;
       for (let k = 0; k < n; k++) { const a = this.parL[k], b = key === 'h949' ? (dl ? this.parR[k] : a) : this.parR[k]; BL[k] += a * g; BR[k] += b * g; }
     }
-    if (!s9Patched) for (let k = 0; k < n; k++) { BL[k] += this.s9L[k]; BR[k] += this.s9R[k]; }
     if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
     this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { BL[k] += this.t9L[k] * 0.9; BR[k] += this.t9R[k] * 0.9; }
     if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }

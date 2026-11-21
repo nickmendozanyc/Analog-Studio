@@ -874,6 +874,7 @@
   // ---------------- the studio clock ----------------
   let last = performance.now();
   function studio(now) {
+    studio.n = studio.n || 0;
     const dt = Math.min(1, (now - last) / 1000); last = now;   // tape time keeps up with real time, even through a slow frame (the quartz-locked audio never waits)
     sgTick(dt, now); syncAdvance(dt, now);   // the synchronizer's servo steps the transport at 100 Hz while it chases
     const full = document.body.classList.contains('fullview');   // the studio is hidden behind a full-screen view: skip its drawing
@@ -883,7 +884,7 @@
     c160Tick();
     im90Tick();
     spxTick();
-    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick(); consoleTick();
+    h949Tick(); rmxTick(); pcmTick(); fmTick(); s900Tick(); tr808Tick(); tr909Tick(); consoleTick(); if (++studio.n % 20 === 0) patchGate();
     if (document.body.dataset.studio === 'sls') drawA827();   // also drives the A827 pop-up's display and lamps
     postState();
     if (AL.rep) {   // 8/9/REP loop: at memory 9, back to memory 8 and play again; anything else cancels it
