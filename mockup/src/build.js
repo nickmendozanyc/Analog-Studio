@@ -1700,7 +1700,7 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     }
   });
   const woodV = 'linear-gradient(90deg,#6e4420,#b37a3e 40%,#8a5a2c 70%,#4a2c14)';
-  scenes3d.push(`<div style="position:absolute;left:${RX}px;top:${RY}px;width:${RW}px;height:${RH}px;perspective:2200px;perspective-origin:-60% 40%;">
+  scenes3d.push(`<div id="rack-main" class="rk-keep" style="position:absolute;left:${RX}px;top:${RY}px;width:${RW}px;height:${RH}px;perspective:2200px;perspective-origin:-60% 40%;">
     <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px`)}">
       <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-${DEPTH}px);background:#0b0a09`)}"></div>
       <div style="${B3(`left:26px;top:0;width:${DEPTH}px;height:${RH}px;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#3a2414,#1a0f08)`)}"></div>
@@ -1716,6 +1716,24 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
       <div style="${B3(`left:${UX}px;top:${by0}px;width:${bw}px;height:${bh}px;transform:translateZ(2px)`)}">${svgWrap(bw, bh, browser)}</div>
     </div>
   </div>`);
+  // ---- the racks room (RACKS button): the outboard rack where it stands, and three more cabinets to its left, empty for
+  // now (audio and MIDI gear to come). Same cabinet, same rails and the same 19-inch unit pitch as the outboard rack.
+  const rackCab = (x, title, sub, n) => `<div class="rk-cab" data-rack="${n}" style="position:absolute;left:${x}px;top:${RY}px;width:${RW}px;height:${RH}px;perspective:2200px;perspective-origin:-60% 40%;">
+    <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px`)}">
+      <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-${DEPTH}px);background:#0b0a09`)}"></div>
+      <div style="${B3(`left:26px;top:0;width:${DEPTH}px;height:${RH}px;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#3a2414,#1a0f08)`)}"></div>
+      <div style="${B3(`left:${RW - 26}px;top:0;width:${DEPTH}px;height:${RH}px;transform-origin:0 50%;transform:rotateY(90deg);background:linear-gradient(90deg,#2a190c,#120a05)`)}"></div>
+      <div style="${B3(`left:0;top:0;width:${RW}px;height:${RH}px;transform:translateZ(-4px)`)}">${svgWrap(RW, RH, rails)}</div>
+      <div style="${B3(`left:0;top:0;width:26px;height:${RH}px;transform:translateZ(8px);background:${woodV}`)}"></div>
+      <div style="${B3(`left:${RW - 26}px;top:0;width:26px;height:${RH}px;transform:translateZ(8px);background:${woodV}`)}"></div>
+      <div style="${B3(`left:0;top:0;width:8px;height:${RH}px;transform-origin:0 50%;transform:translateZ(8px) rotateY(90deg);background:#4a2c14`)}"></div>
+      <div style="position:absolute;left:0;top:14px;width:${RW}px;text-align:center;font:800 18px ${SANS};letter-spacing:4px;color:#e9e3d0">${title}</div>
+      <div style="position:absolute;left:0;top:40px;width:${RW}px;text-align:center;font:600 14px ${SANS};color:#bdb8aa">${sub}</div>
+      <div class="rk-empty" style="${B3(`left:${UX}px;top:70px;width:${UW}px;height:${RH - 110}px;transform:translateZ(1px)`)}"><span>EMPTY</span><small>${Math.floor((RH - 110) / U)} U · 19-inch rails</small></div>
+    </div>
+  </div>`;
+  const ROOM_RACKS = [1, 2, 3].map((k) => rackCab(RX - k * (RW + 40), `RACK ${4 - k}`, 'audio &amp; MIDI gear · to come', 4 - k));
+  scenes3d.unshift(`<div id="racks-room"><div class="rr-title">RACKS</div><div class="rr-sub">The outboard rack and three more, for the audio and MIDI gear to come. Click a unit in the outboard rack to open it.</div><button type="button" class="rr-back" data-f="racks">◀ STUDIO</button>${ROOM_RACKS.reverse().join('')}</div>`);
 }
 
 // rack edge shadow over console + room lighting
@@ -1929,7 +1947,7 @@ const overlay = (view, title, body, extra = '', float = false) => float
   ? `<div class="overlay float" id="ov-${view}" data-view="${view}" hidden><div class="ov-win"><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕</button></div><div class="ov-body">${body}</div></div></div>`
   : `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
 // a rack unit's hot area, from where unit() put it (full panel width, over the rails)
-const rhot = (key, view, title) => { const H = globalThis.RACK_HOT[key]; return hot(RX + 26, Math.round(H.y), RW - 52, Math.round(H.h), view, title); };
+const rhot = (key, view, title) => { const H = globalThis.RACK_HOT[key]; return hot(RX + 26, Math.round(H.y), RW - 52, Math.round(H.h), view, title).replace('class="hot', 'class="hot rk-keep'); };
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JH-Studio by NMAudiowerks · 4K mockup</title>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@700;800&display=block" rel="stylesheet">
 <style>
@@ -1999,6 +2017,17 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #strip-hl span{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:6px 12px;border-radius:5px;background:rgba(20,18,16,.92);color:#ffd27a;font:800 18px Archivo,Arial,sans-serif;letter-spacing:1px}
   #files-bar{position:absolute;z-index:72;font-family:Archivo,Arial,sans-serif}
   #files-bar .fbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  #files-bar .fbtns .rk-btn{grid-column:1 / -1;background:linear-gradient(#e8b54a,#c8902c)}
+  body.racksview #files-bar .fbtns .rk-btn{background:linear-gradient(#cfe0c2,#9fb88f)}
+  #racks-room{position:absolute;left:0;top:0;width:3840px;height:2160px;display:none;background:radial-gradient(ellipse at 60% 35%,#2c2622,#141110 70%),#141110}
+  #racks-room::after{content:'';position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(#1b1512,#0d0a08);border-top:2px solid #2e241c;z-index:-1}
+  body.racksview #racks-room{display:block}
+  body.racksview #stage>*:not(.rk-keep):not(.overlay):not(#racks-room){visibility:hidden}
+  #racks-room .rr-title{position:absolute;left:90px;top:80px;font:900 64px Archivo,Arial;letter-spacing:14px;color:#efe6d2}
+  #racks-room .rr-sub{position:absolute;left:94px;top:170px;width:1200px;font:600 24px Archivo,Arial;color:#a9a294;line-height:1.5}
+  #racks-room .rr-back{position:absolute;left:94px;top:260px;font:900 20px Archivo,Arial;letter-spacing:3px;padding:16px 30px;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
+  .rk-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:2px dashed rgba(233,227,208,0.16);border-radius:6px;color:rgba(233,227,208,0.32);font:900 30px Archivo,Arial;letter-spacing:10px}
+  .rk-empty small{font:700 16px Archivo,Arial;letter-spacing:3px}
   #files-bar .fbtns button{font:900 16px Archivo,Arial;letter-spacing:2px;padding:14px 0;border-radius:6px;border:1px solid #000;background:linear-gradient(#ece6d6,#cfc7b2);color:#1a1612;cursor:pointer;box-shadow:0 4px 0 #0c0b0a}
   #files-bar .fbtns button:active{transform:translateY(3px);box-shadow:0 1px 0 #0c0b0a}
   #files-msg{margin-top:9px;font:600 13px Archivo,Arial;color:#a9a594;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -2035,8 +2064,8 @@ ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
 ${wallClock(AX + (12 + 376 / 2) * ALK, 66)}
-<div id="files-bar" style="left:${globalThis.RACK_FILES.x}px;top:${globalThis.RACK_FILES.y}px;width:${globalThis.RACK_FILES.w}px">
-  <div class="fbtns"><button type="button" data-f="load" title="Open a .TAP tape or a .MIX mix">LOAD</button><button type="button" data-f="save" title="Save the tape (.TAP) or the mix (.MIX)">SAVE</button><button type="button" data-f="import" title="Audio files onto tape tracks (WAV, AIFF, FLAC, MP3, AAC, OGG, CAF … numbered stems or one multichannel file), or a .TAP / .MIX">IMPORT</button><button type="button" data-f="export" title="The tape's tracks out as audio files">EXPORT</button></div>
+<div id="files-bar" class="rk-keep" style="left:${globalThis.RACK_FILES.x}px;top:${globalThis.RACK_FILES.y}px;width:${globalThis.RACK_FILES.w}px">
+  <div class="fbtns"><button type="button" data-f="load" title="Open a .TAP tape or a .MIX mix">LOAD</button><button type="button" data-f="save" title="Save the tape (.TAP) or the mix (.MIX)">SAVE</button><button type="button" data-f="import" title="Audio files onto tape tracks (WAV, AIFF, FLAC, MP3, AAC, OGG, CAF … numbered stems or one multichannel file), or a .TAP / .MIX">IMPORT</button><button type="button" data-f="export" title="The tape's tracks out as audio files">EXPORT</button><button type="button" data-f="racks" class="rk-btn" title="The racks room: the outboard rack and three more racks for audio and MIDI gear">RACKS</button></div>
   <div class="fmenu" id="fm-save" hidden><button type="button" data-f="save-tap">TAPE <i>.TAP</i><small>the reel: its recordings, SMPTE, tempo map, locate points, alignment</small></button><button type="button" data-f="save-mix">MIX <i>.MIX</i><small>both consoles' channel settings and the patchbay</small></button></div>
   <div class="fmenu" id="fm-export" hidden><label>FORMAT <select id="fx-fmt"><option value="wav:24">WAV 24-bit</option><option value="wav:16">WAV 16-bit</option><option value="wav:32">WAV 32-bit float</option><option value="aiff:24">AIFF 24-bit</option><option value="aiff:16">AIFF 16-bit</option><option value="flac:24">FLAC 24-bit</option><option value="flac:16">FLAC 16-bit</option><option value="mp3:16">MP3 320 kbps</option></select></label><label>TRACKS <select id="fx-which"><option value="rec">recorded tracks</option><option value="all">all 24</option></select></label><button type="button" data-f="go-export">EXPORT STEMS</button></div>
   <div id="files-msg">Tapes, mixes and audio</div>

@@ -383,7 +383,7 @@
   function reelVisible(pre) {
     const sls = document.body.dataset.studio === 'sls', tapeOpen = isOpen('tape');
     if (pre === 'jhp' || pre === 'a8p') return tapeOpen && (pre === 'a8p') === sls;
-    return !document.body.classList.contains('fullview') && (pre === 'a8') === sls;
+    return !document.body.classList.contains('fullview') && !document.body.classList.contains('racksview') && (pre === 'a8') === sls;
   }
   function drawConsoleReels() {
     const vis = {}; for (const p of ['jh', 'a8', 'jhp', 'a8p']) vis[p] = reelVisible(p);

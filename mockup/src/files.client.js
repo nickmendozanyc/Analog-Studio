@@ -157,6 +157,15 @@
   }
 
   // ---- the buttons and their little menus
+  // the RACKS button: the racks room (the outboard rack where it stands, three more racks to its left); again to go back
+  const racksBtn = fbar && fbar.querySelector('[data-f="racks"]');
+  window.AS_RACKS = (on) => {
+    on = on ?? !document.body.classList.contains('racksview');
+    document.body.classList.toggle('racksview', on);
+    if (racksBtn) racksBtn.textContent = on ? '◀ BACK TO THE STUDIO' : 'RACKS';
+  };
+  document.addEventListener('click', (e) => { if (e.target.closest('#racks-room [data-f="racks"]')) window.AS_RACKS(false); });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('racksview') && !document.querySelector('.overlay:not([hidden])')) window.AS_RACKS(false); }, true);   // capture: a pop-up's own Esc closes it first, not the room
   if (fbar) {
     const pickFiles = (accept, mode) => { const i = document.createElement('input'); i.type = 'file'; i.multiple = true; i.accept = accept; i.onchange = () => { const f = [...i.files]; if (f.length) openFiles(f, mode).catch((e) => fsay(e.message)); }; i.click(); };
     const menu = (id) => { fbar.querySelectorAll('.fmenu').forEach((m) => { m.hidden = m.id !== id || !m.hidden; }); };
@@ -164,6 +173,7 @@
       const b = e.target.closest('[data-f]'); if (!b) return;
       const f = b.dataset.f;
       try {
+        if (f === 'racks') { menu(''); window.AS_RACKS(); return; }
         if (f === 'load') { menu(''); pickFiles('.tap,.TAP,.mix,.MIX,.zip', 'load'); }
         else if (f === 'save' || f === 'export') menu(`fm-${f}`);
         else if (f === 'import') { menu(''); pickFiles('audio/*,video/*,.wav,.wave,.bwf,.aif,.aiff,.aifc,.flac,.mp3,.m4a,.aac,.mp4,.ogg,.oga,.opus,.webm,.caf,.zip,.tap,.mix', 'import'); }
