@@ -31,7 +31,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-9090 on the desk (into the mix)
     this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-8080 (into the mix)
     // the JH-Mix console, and the 224X it sends to (an RMX16-family reverb on the hall program)
-    this.con = new JHMix(sampleRate, 32); this.lineSrc = Array(8).fill(null); this.lineBuf = []; this.rvSend = 0;
+    this.con = new JHMix(sampleRate, 32); this.lineSrc = Array(8).fill(null); this.lineBuf = []; this.gearSrc = Array(32).fill(null); this.gb = {}; this.rvSend = 0;
     this.rv = new RMX16(sampleRate); this.rv.set({ prog: 3, pre: 20, decay: 2.4 }); this.rvIn = new Float32Array(128); this.rvL = new Float32Array(128); this.rvR = new Float32Array(128);
     this.s9 = new S900(sampleRate); this.s9ch = null; this.s9on = true; this.s9L = new Float32Array(128); this.s9R = new Float32Array(128); this.s9In = new Float32Array(128);
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
@@ -64,7 +64,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.ch != null && d.set) this.con.set(d.ch, d.set);
       if (d.all) d.all.forEach((o, i) => { if (o) this.con.set(i, o); });
       if (d.master != null) this.con.master = d.master; if (d.dim != null) this.con.dim = d.dim; if (d.mono != null) this.con.mono = d.mono; if (d.cut != null) this.con.cut = d.cut;
-      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
+      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.gearSrc) this.gearSrc = d.gearSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
     }
     else if (d.type === 's900') this.s9msg(d);
     else if (d.type === 'sp1200') {
@@ -241,13 +241,30 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
     if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
     if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
-    if (this.s9on && (this.s9ch != null || this.lineSrc.includes('S900'))) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }   // unpatched: off
+    // ---- the MIDI gear (desk and racks): its outputs at the patchbay (MIDI GEAR OUT / DRUM VOICE OUT), into console inputs
+    const used = new Set([...this.gearSrc, ...this.lineSrc].filter(Boolean)), gb = (nm) => { let b = this.gb[nm]; if (!b || b.length !== n) b = this.gb[nm] = new Float32Array(n); return b; };
+    const GU = { sp: used.has('SP1200 L') || used.has('SP1200 R'), ju: used.has('JUNO L') || used.has('JUNO R'), t9: used.has('TR9090 L') || used.has('TR9090 R'), tr: used.has('TR8080 L') || used.has('TR8080 R'), s9: used.has('S900 L') || used.has('S900 R') };
+    const voices = (eng, pre, list) => { let io = null; for (const k of list) if (used.has(pre + k)) (io || (io = {}))[k] = gb(pre + k); eng.io = io; };
+    voices(this.tr, '808 ', TR_INST); voices(this.t9, '909 ', TR9_INST);
+    { let io = null; for (let k = 0; k < 8; k++) if (used.has('SP ' + (k + 1))) (io || (io = Array(8).fill(null)))[k] = gb('SP ' + (k + 1)); this.sp.io = io; }
+    if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
+    this.sp.process(this.spL, this.spR, n);
+    if (this.juL.length !== n) { this.juL = new Float32Array(n); this.juR = new Float32Array(n); }
+    this.ju.process(this.juL, this.juR, n); for (let k = 0; k < n; k++) { this.juL[k] *= this.juVol; this.juR[k] *= this.juVol; }
+    if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
+    this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { this.t9L[k] *= 0.9; this.t9R[k] *= 0.9; }
+    if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
+    this.tr.process(this.trL, this.trR, n); for (let k = 0; k < n; k++) { this.trL[k] *= 0.9; this.trR[k] *= 0.9; }
+    if (this.s9on && (this.s9ch != null || this.lineSrc.includes('S900') || GU.s9)) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }   // unpatched: off
     if (this.lineBuf.length !== 8 || this.lineBuf[0].length !== n) this.lineBuf = Array.from({ length: 8 }, () => new Float32Array(n));
-    const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L };   // the outputs a line input can be patched from
+    const G = { 'TR8080 L': this.trL, 'TR8080 R': this.trR, 'TR9090 L': this.t9L, 'TR9090 R': this.t9R, 'JUNO L': this.juL, 'JUNO R': this.juR, 'S900 L': this.s9L, 'S900 R': this.s9R, 'SP1200 L': this.spL, 'SP1200 R': this.spR };
+    for (const nm of used) if (/^(808|909|SP) /.test(nm)) G[nm] = gb(nm);
+    const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L, ...G };   // the outputs a line input can be patched from
     let s9Patched = false;
     for (let j = 0; j < 8; j++) { const nm = this.lineSrc[j], b2 = fxOut[nm]; if (nm === 'S900') s9Patched = true; if (b2 && b2.length === n) this.lineBuf[j].set(b2); else this.lineBuf[j].fill(0); }
     const liveR = inputs[0] && (inputs[0][1] || inputs[0][0]), chIn = (i) => (this.live.on && live ? (i === 0 ? live : i === 1 ? liveR : null) : null);   // the interface inputs 1 / 2 (your computer's input) on channels 1 / 2
-    C.process((i) => (i < 24 ? (i < this.N ? (C.ch[i].p.src === 'in' ? chIn(i) : ins[i] || this.out[i]) : null) : this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null), n2);
+    const gs = this.gearSrc;   // CONSOLE INPUT n (or LINE IN n): MIDI gear patched straight to a channel's input
+    C.process((i) => { const g = gs[i] && G[gs[i]]; if (i < 24) return i < this.N ? (C.ch[i].p.src === 'in' ? g || chIn(i) : ins[i] || this.out[i]) : null; return g || (this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null); }, n2);
     const BL = C.L, BR = C.R;
     // the 224X: fed from the send patched to its input (aux SEND n -> 224 L), its outputs come back on line inputs next block
     if (this.rvIn.length !== n) { this.rvIn = new Float32Array(n); this.rvL = new Float32Array(n); this.rvR = new Float32Array(n); }
@@ -265,14 +282,8 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.spRec) { const r = this.spRec, ch = this.spInCh, x = ch != null && this.out[ch] ? this.out[ch] : null, step = SP_FS / sampleRate;
       if (x) for (let k = 0; k < n; k++) { if (r.armed > 0) { if (Math.abs(x[k]) < r.armed) continue; r.armed = 0; } r.ph += step; while (r.ph >= 1) { r.ph -= 1; r.buf.push(Math.max(-1, Math.min(1, x[k] * r.gain))); } if (r.buf.length >= r.len) break; }
       if (r.buf.length >= r.len || !x) { const d2 = Float32Array.from(r.buf); this.sp.sounds[r.pad] = spSound(d2, 'SAMPLE ' + (r.pad + 1)); this.port.postMessage({ type: 'sp1200', sampled: r.pad, data: this.sp.sounds[r.pad].data, empty: !x }); this.spRec = null; } }
-    if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
-    this.sp.process(this.spL, this.spR, n); for (let k = 0; k < n; k++) { BL[k] += this.spL[k]; BR[k] += this.spR[k]; }
-    if (this.juL.length !== n) { this.juL = new Float32Array(n); this.juR = new Float32Array(n); }
-    this.ju.process(this.juL, this.juR, n); for (let k = 0; k < n; k++) { BL[k] += this.juL[k] * this.juVol; BR[k] += this.juR[k] * this.juVol; }
-    if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
-    this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { BL[k] += this.t9L[k] * 0.9; BR[k] += this.t9R[k] * 0.9; }
-    if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
-    this.tr.process(this.trL, this.trR, n); for (let k = 0; k < n; k++) { BL[k] += this.trL[k] * 0.9; BR[k] += this.trR[k] * 0.9; }
+    // MIDI gear whose main outputs are not patched plays straight into the stereo bus (patched, it comes up on its console channel)
+    for (const [l2, r2, on] of [[this.spL, this.spR, !GU.sp], [this.juL, this.juR, !GU.ju], [this.t9L, this.t9R, !GU.t9], [this.trL, this.trR, !GU.tr]]) if (on) for (let k = 0; k < n; k++) { BL[k] += l2[k]; BR[k] += r2[k]; }
     C.finish(n);
     // to the speakers: the stereo bus at the monitor level, or one tape channel soloed on its electronics card
     if (!this.mix.mute) {

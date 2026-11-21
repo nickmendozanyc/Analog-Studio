@@ -274,7 +274,7 @@
   }
   // ---- routing: the channel patched to S900 IN (insert send, direct out or tape out) ----
   function s9Route() {
-    const pc = patches.find((q) => q.b === 'fxin:S900' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1];
+    const pc = patches.find((q) => (q.b === 'mgin:S900 IN' || q.b === 'fxin:S900') && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1];
     const ch = n && n <= 24 ? n - 1 : null; if (ch !== S9.ch) { S9.ch = ch; s9Post({ ch }); }
   }
   // ---- the panel ----

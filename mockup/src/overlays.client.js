@@ -183,7 +183,7 @@
 
   // ---------------- patchbay ----------------
   const L = (pre, n, from = 1) => Array.from({ length: n }, (_, k) => `${pre}${k + from}`);
-  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'S900', 'SP1200', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
+  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
   // rows come in output / input pairs; "normal" means the pair is wired through until you patch the input
   const ROWS = [
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
@@ -200,6 +200,11 @@
     { id: 'lin', name: 'LINE IN · RET', sub: 'channels 25–32 and returns', io: 'in', items: [...L('LINE ', 8, 25), 'RET1 L', 'RET1 R', 'RET2 L', 'RET2 R', 'RET3 L', 'RET3 R', 'RET4 L', 'RET4 R'] },
     { id: 'dir', name: 'DIRECT OUT', sub: 'channels 1–24', io: 'out', items: L('', 24) },
     { id: 'ifout', name: 'INTERFACE OUT', sub: 'Studio Bridge outputs', io: 'in', items: L('', 24) },
+    // MIDI gear (the desk and the racks): its outputs, and the console's channel inputs to patch them into
+    { id: 'mgo', name: 'MIDI GEAR OUT', sub: 'MIDI gear', io: 'out', items: ['TR8080 L', 'TR8080 R', 'TR9090 L', 'TR9090 R', 'JUNO L', 'JUNO R', 'S900 L', 'S900 R', 'SP1200 L', 'SP1200 R', ...L('SP ', 8), ...L('SPARE ', 6)] },
+    { id: 'mcin', name: 'CONSOLE INPUT', sub: 'channels 1–32', io: 'in', items: L('', 32) },
+    { id: 'mgv', name: 'DRUM VOICE OUT', sub: '808 / 909 voices', io: 'out', items: [...TR_INST.map((k) => '808 ' + k), ...TR9_INST.map((k) => '909 ' + k), 'SPARE 7', 'SPARE 8'] },
+    { id: 'mgin', name: 'MIDI GEAR IN', sub: 'samplers, spares', io: 'in', items: ['S900 IN', 'SP1200 IN', ...L('SPARE ', 6, 9)] },
   ];
   const COLS = ['#c0392b', '#2f6fb3', '#e8c34a', '#3f8f3a', '#1b1b1b', '#e9e5da', '#e07b28', '#8e44ad'];
   const DEFAULT = [
@@ -210,7 +215,7 @@
     ['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'],
     ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11'],
     ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
-    ['dir:2', 'fxin:S900'], ['fxout:S900', 'lin:LINE 27'],
+    ['dir:2', 'mgin:S900 IN'], ['mgo:S900 L', 'lin:LINE 27'],
     ['aux:MIX L', 'ifout:1'], ['aux:MIX R', 'ifout:2'],
     ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
   ];
@@ -225,10 +230,12 @@
       if (!localStorage.getItem('as-units-pcm')) { localStorage.setItem('as-units-pcm', '1'); patches = patches.filter((pc) => !(pc.a === 'aux:SEND 2' && pc.b === 'fxin:PCM42 A') && !(pc.a === 'fxout:PCM42 A' && pc.b === 'lin:LINE 29')); for (const [a2, b2] of [['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'], ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the PCMs now work on inserts
       if (!localStorage.getItem('as-units-h949rmx')) { localStorage.setItem('as-units-h949rmx', '1'); for (const [a2, b2] of [['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the new units join a saved layout, once
       if (!patches.some((pc) => /IM90/.test(pc.a + pc.b))) for (const [a, b] of [['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8']]) if (!patches.some((pc) => pc.a === a || pc.b === b)) patches.push({ a, b, c: COLS[patches.length % COLS.length] }); }   // the IM90 joins an existing session
+      // the S900 and the SP-1200 moved to the MIDI GEAR panels
+      patches.forEach((pc) => { pc.a = pc.a === 'fxout:S900' ? 'mgo:S900 L' : pc.a; pc.b = pc.b === 'fxin:S900' ? 'mgin:S900 IN' : pc.b === 'fxin:SP1200' ? 'mgin:SP1200 IN' : pc.b; });
   } catch (e) { /* storage unavailable */ }
   const save = () => { try { localStorage.setItem('as-patches-v4', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
 
-  const PB = { x0: 430, pitch: 104, top: 70, rowH: 128, pairGap: 22 };
+  const PB = { x0: 430, pitch: 104, top: 66, rowH: 104, pairGap: 18 };
   const jackPos = {};
   function layout() {
     let y = PB.top;
@@ -280,6 +287,7 @@
           if (A.row.io === B.row.io) { say(`Patch an output (gold rows) to an input (blue rows). ${A.row.io === 'out' ? 'Both ends are outputs.' : 'Both ends are inputs.'}`); return; }
           const [a, b] = A.row.io === 'out' ? [from, to] : [to, from];
           patches.push({ a, b, c: col }); save(); renderCables(); say(`Patched ${label(a)} → ${label(b)}`);
+          if (/^(mgo|mgv):/.test(a) && /^(mcin|chin):/.test(b) && +b.split(':')[1] <= 24 && window.CH_SET) { window.CH_SET('cmi', +b.split(':')[1] - 1, 'src_in', true); say(`Patched ${label(a)} → ${label(b)} · channel ${b.split(':')[1]} switched to INPUT`); }
         };
         move(e);
         svgPB.addEventListener('pointermove', move);

@@ -51,6 +51,7 @@ export class TR909 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
       if (!sy.run) { if (this.run) this.stop(); }
@@ -66,7 +67,7 @@ export class TR909 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.abs = (this.abs ?? -1) + 1; } }
       if (this.pend.length) { for (const q of this.pend) if (q.at-- <= 0) { this.trig(q.k, q.acc, q.lvl); q.done = true; } this.pend = this.pend.filter((q) => !q.done); }
-      let l = 0, r = 0; const add = (k, y) => { const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
+      let l = 0, r = 0; const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
       // metal for the hats and the ride (six squares, higher than the 808's)
       let metal = 0; const mph = this.mph, MF = [263, 400, 421, 474, 587, 845];
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + MF[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; } metal /= 6;

@@ -60,6 +60,7 @@ export class SP1200 {
   }
   process(L, R, n) {
     const fs = this.fs; L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const b of io) if (b) b.fill(0);   // outputs 1-8 (set by the host): a patched channel leaves the mix
     if (this.sync && this.sync.run !== undefined) {   // DIN sync / tape: follow the song position
       if (!this.sync.run) { if (this.run) this.stop(); } else { const len = this.patterns[this.pat].bars * 4 * SP_PPQ, want = Math.floor(this.sync.beats * SP_PPQ) % len; if (!this.run) { this.run = true; this.tick = want - 1; } this.tempo = this.sync.bpm; }
     }
@@ -76,7 +77,7 @@ export class SP1200 {
         if (c.dec) { c.env -= c.env * c.dec; if (c.env < 1e-4) { c.on = false; continue; } }
         // output filters: 1-2 dynamic (closing with the envelope), 3-6 fixed, 7-8 none
         if (k < 6) { const fc = k < 2 ? 1200 + 11000 * c.env * c.env : 11500, a = 1 - Math.exp(-2 * Math.PI * fc / fs); c.lp[0] += a * (x - c.lp[0]); c.lp[1] += a * (c.lp[0] - c.lp[1]); x = c.lp[1]; }
-        const y = x * c.env * c.g; l += y * (1 - PAN[k]); r += y * (1 + PAN[k]);
+        const y = x * c.env * c.g; if (io && io[k]) io[k][i] += y; else { l += y * (1 - PAN[k]); r += y * (1 + PAN[k]); }
       }
       if (this.clickT > 0) { const c = (this.clickT-- % 20 < 10 ? 0.15 : -0.15) * this.mvol / this.vol; l += c; r += c; }
       l *= this.vol; r *= this.vol; L[i] = l; if (R !== L) R[i] = r; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > pk) pk = a;

@@ -168,7 +168,7 @@
   function spTick() {
     if (EL.node !== SPU.node) { SPU.node = EL.node; if (EL.node) spSendAll(); }
     if (SPU.sync && EL.node) { const cur = SBX.cur, on = running() && tr.playingMode && cur && cur.beats >= 0; spPost({ sync: { run: !!on, beats: cur ? cur.beats : 0, bpm: cur ? cur.bpm : SPU.tempo } }); }
-    const pc = patches.find((q) => q.b === 'fxin:SP1200' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1], ch = n && n <= 24 ? n - 1 : null;
+    const pc = patches.find((q) => q.b === 'mgin:SP1200 IN' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1], ch = n && n <= 24 ? n - 1 : null;
     if (ch !== SPU.inCh) { SPU.inCh = ch; spPost({ sampleCh: ch }); }
     if (isOpen('sp1200') || document.body.classList.contains('racksview')) { spDraw(); spKnobs(); }
   }

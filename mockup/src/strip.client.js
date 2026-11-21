@@ -182,6 +182,7 @@
     for (const el of E.k) { const c = knobDef(con, el.dataset.kid), pg = el.querySelector('.kptr'); if (pg && s[el.dataset.kid] !== undefined) pg.setAttribute('transform', `rotate(${(angOf(c, s[el.dataset.kid]) - +el.dataset.a0).toFixed(2)} ${el.dataset.cx} ${el.dataset.cy})`); }
     for (const el of E.b) { const id = el.dataset.bid, on = /^bus\d+$/.test(id) ? s.bus.includes(+id.slice(3)) : !!s[id], l = el.querySelector('.klit'); if (l) l.setAttribute('opacity', on ? 1 : 0); }
   }
+  window.CH_SET = (con, ch, id, v) => { const st = chState(con, ch); if (st[id] === v) return; st[id] = v; saveST2(); applyCh(con, ch); };
   window.CH_TOGGLE = (con, ch, id) => { const st = chState(con, ch); st[id] = !st[id]; saveST2(); applyCh(con, ch); return st[id]; };
   // saved settings show on the consoles at load
   for (const key of Object.keys(ST)) { const m = /^(cmi|sls)(\d+)$/.exec(key); if (m) { ST[key].__init = false; applyCh(m[1], +m[2]); } }

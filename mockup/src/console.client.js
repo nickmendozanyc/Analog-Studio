@@ -17,11 +17,12 @@
   }
   window.CON_CHANGED = (con, ch) => { if (con === 'cmi' && EL.node) conPost({ ch, set: conParams(ch) }); };
   function conRoute() {   // line inputs 25-32 and the 224X's send, from the patchbay
-    const lineSrc = Array.from({ length: 8 }, (_, j) => { const pc = patches.find((q) => q.b === `lin:LINE ${25 + j}` && /^fxout:/.test(q.a)); return pc ? pc.a.slice(6) : null; });
+    const lineSrc = Array.from({ length: 8 }, (_, j) => { const pc = patches.find((q) => q.b === `lin:LINE ${25 + j}` && /^(fxout|mgo|mgv):/.test(q.a)); return pc ? pc.a.slice(pc.a.indexOf(':') + 1) : null; });
+    const gearSrc = Array.from({ length: 32 }, (_, i) => { const pc = patches.find((q) => (q.b === `mcin:${i + 1}` || (i < 24 && q.b === `chin:${i + 1}`)) && /^(mgo|mgv):/.test(q.a)); return pc ? pc.a.slice(4) : null; });
     const sp = patches.find((q) => q.b === 'fxin:224 L' && /^aux:SEND \d$/.test(q.a)), rvSend = sp ? +sp.a.slice(9) - 1 : -1;
     // the tape inputs: BUS n -> TAPE IN n is normalled; a cable into TAPE IN n replaces it (a BUS out, or nothing else we carry)
     const tapeSrc = Array.from({ length: 24 }, (_, i) => { const pc = patches.find((q) => q.b === `tin:${i + 1}`); return !pc ? i : /^bus:\d+$/.test(pc.a) ? +pc.a.slice(4) - 1 : null; });
-    const key = JSON.stringify([lineSrc, rvSend, tapeSrc]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend, tapeSrc }); }
+    const key = JSON.stringify([lineSrc, rvSend, tapeSrc, gearSrc]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend, tapeSrc, gearSrc }); }
   }
   function conSendAll() { CON.route = ''; conPost({ all: Array.from({ length: 32 }, (_, i) => conParams(i)), master: CON.master }); conRoute(); }
   // faders: drag, wheel, double-click = 0 dB

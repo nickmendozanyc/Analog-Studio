@@ -64,6 +64,7 @@ export class TR808 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     // the clock: 4 steps a beat. DIN sync: follow the song position (snap if it is more than a little off)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
@@ -81,7 +82,7 @@ export class TR808 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.absStep = (this.absStep ?? -1) + 1; } }
       let l = 0, r = 0;
-      const add = (k, y) => { const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
+      const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
       // metal: six squares, shared by the cymbal, hats and (two of them) the cowbell
       let metal = 0; const mph = this.metalPh;
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + TR_METAL[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; }

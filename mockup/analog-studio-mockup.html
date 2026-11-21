@@ -119475,6 +119475,7 @@ class TR808 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     // the clock: 4 steps a beat. DIN sync: follow the song position (snap if it is more than a little off)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
@@ -119492,7 +119493,7 @@ class TR808 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.absStep = (this.absStep ?? -1) + 1; } }
       let l = 0, r = 0;
-      const add = (k, y) => { const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
+      const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
       // metal: six squares, shared by the cymbal, hats and (two of them) the cowbell
       let metal = 0; const mph = this.metalPh;
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + TR_METAL[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; }
@@ -119585,6 +119586,7 @@ class TR909 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
       if (!sy.run) { if (this.run) this.stop(); }
@@ -119600,7 +119602,7 @@ class TR909 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.abs = (this.abs ?? -1) + 1; } }
       if (this.pend.length) { for (const q of this.pend) if (q.at-- <= 0) { this.trig(q.k, q.acc, q.lvl); q.done = true; } this.pend = this.pend.filter((q) => !q.done); }
-      let l = 0, r = 0; const add = (k, y) => { const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
+      let l = 0, r = 0; const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
       // metal for the hats and the ride (six squares, higher than the 808's)
       let metal = 0; const mph = this.mph, MF = [263, 400, 421, 474, 587, 845];
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + MF[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; } metal /= 6;
@@ -119909,6 +119911,7 @@ class SP1200 {
   }
   process(L, R, n) {
     const fs = this.fs; L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const b of io) if (b) b.fill(0);   // outputs 1-8 (set by the host): a patched channel leaves the mix
     if (this.sync && this.sync.run !== undefined) {   // DIN sync / tape: follow the song position
       if (!this.sync.run) { if (this.run) this.stop(); } else { const len = this.patterns[this.pat].bars * 4 * SP_PPQ, want = Math.floor(this.sync.beats * SP_PPQ) % len; if (!this.run) { this.run = true; this.tick = want - 1; } this.tempo = this.sync.bpm; }
     }
@@ -119925,7 +119928,7 @@ class SP1200 {
         if (c.dec) { c.env -= c.env * c.dec; if (c.env < 1e-4) { c.on = false; continue; } }
         // output filters: 1-2 dynamic (closing with the envelope), 3-6 fixed, 7-8 none
         if (k < 6) { const fc = k < 2 ? 1200 + 11000 * c.env * c.env : 11500, a = 1 - Math.exp(-2 * Math.PI * fc / fs); c.lp[0] += a * (x - c.lp[0]); c.lp[1] += a * (c.lp[0] - c.lp[1]); x = c.lp[1]; }
-        const y = x * c.env * c.g; l += y * (1 - PAN[k]); r += y * (1 + PAN[k]);
+        const y = x * c.env * c.g; if (io && io[k]) io[k][i] += y; else { l += y * (1 - PAN[k]); r += y * (1 + PAN[k]); }
       }
       if (this.clickT > 0) { const c = (this.clickT-- % 20 < 10 ? 0.15 : -0.15) * this.mvol / this.vol; l += c; r += c; }
       l *= this.vol; r *= this.vol; L[i] = l; if (R !== L) R[i] = r; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > pk) pk = a;
@@ -119983,7 +119986,7 @@ class JH24Processor extends AudioWorkletProcessor {
     this.t9 = new TR909(sampleRate); this.t9L = new Float32Array(128); this.t9R = new Float32Array(128);   // the Rowan TR-9090 on the desk (into the mix)
     this.tr = new TR808(sampleRate); this.trL = new Float32Array(128); this.trR = new Float32Array(128);   // the Rowan TR-8080 (into the mix)
     // the JH-Mix console, and the 224X it sends to (an RMX16-family reverb on the hall program)
-    this.con = new JHMix(sampleRate, 32); this.lineSrc = Array(8).fill(null); this.lineBuf = []; this.rvSend = 0;
+    this.con = new JHMix(sampleRate, 32); this.lineSrc = Array(8).fill(null); this.lineBuf = []; this.gearSrc = Array(32).fill(null); this.gb = {}; this.rvSend = 0;
     this.rv = new RMX16(sampleRate); this.rv.set({ prog: 3, pre: 20, decay: 2.4 }); this.rvIn = new Float32Array(128); this.rvL = new Float32Array(128); this.rvR = new Float32Array(128);
     this.s9 = new S900(sampleRate); this.s9ch = null; this.s9on = true; this.s9L = new Float32Array(128); this.s9R = new Float32Array(128); this.s9In = new Float32Array(128);
     // the H949 and the RMX16: fed from a channel, their outputs ADDED to the mix (the channel stays: an effect send)
@@ -120016,7 +120019,7 @@ class JH24Processor extends AudioWorkletProcessor {
       if (d.ch != null && d.set) this.con.set(d.ch, d.set);
       if (d.all) d.all.forEach((o, i) => { if (o) this.con.set(i, o); });
       if (d.master != null) this.con.master = d.master; if (d.dim != null) this.con.dim = d.dim; if (d.mono != null) this.con.mono = d.mono; if (d.cut != null) this.con.cut = d.cut;
-      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
+      if (d.lineSrc) this.lineSrc = d.lineSrc; if (d.gearSrc) this.gearSrc = d.gearSrc; if (d.tapeSrc) this.tapeSrc = d.tapeSrc; if (d.rvSend !== undefined) this.rvSend = d.rvSend; if (d.rv) this.rv.set(d.rv);
     }
     else if (d.type === 's900') this.s9msg(d);
     else if (d.type === 'sp1200') {
@@ -120193,13 +120196,30 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.s9L.length !== n) { this.s9L = new Float32Array(n); this.s9R = new Float32Array(n); this.s9In = new Float32Array(n); }
     if (this.s9ch != null && this.out[this.s9ch]) this.s9In.set(this.out[this.s9ch]); else this.s9In.fill(0);   // the channel itself (an SPX on its insert would otherwise hand the sampler silence)
     if (this.s9.rec.state === 'done' && this.s9.rec.last != null && this.s9.rec.told !== this.s9.rec.last) { const r = this.s9.rec, S = this.s9.samples[r.last]; r.told = r.last; this.port.postMessage({ type: 's900', recorded: r.last, name: S.name, n: S.data.length, rate: S.rate, root: S.root, loopLen: S.loopLen }); }
-    if (this.s9on && (this.s9ch != null || this.lineSrc.includes('S900'))) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }   // unpatched: off
+    // ---- the MIDI gear (desk and racks): its outputs at the patchbay (MIDI GEAR OUT / DRUM VOICE OUT), into console inputs
+    const used = new Set([...this.gearSrc, ...this.lineSrc].filter(Boolean)), gb = (nm) => { let b = this.gb[nm]; if (!b || b.length !== n) b = this.gb[nm] = new Float32Array(n); return b; };
+    const GU = { sp: used.has('SP1200 L') || used.has('SP1200 R'), ju: used.has('JUNO L') || used.has('JUNO R'), t9: used.has('TR9090 L') || used.has('TR9090 R'), tr: used.has('TR8080 L') || used.has('TR8080 R'), s9: used.has('S900 L') || used.has('S900 R') };
+    const voices = (eng, pre, list) => { let io = null; for (const k of list) if (used.has(pre + k)) (io || (io = {}))[k] = gb(pre + k); eng.io = io; };
+    voices(this.tr, '808 ', TR_INST); voices(this.t9, '909 ', TR9_INST);
+    { let io = null; for (let k = 0; k < 8; k++) if (used.has('SP ' + (k + 1))) (io || (io = Array(8).fill(null)))[k] = gb('SP ' + (k + 1)); this.sp.io = io; }
+    if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
+    this.sp.process(this.spL, this.spR, n);
+    if (this.juL.length !== n) { this.juL = new Float32Array(n); this.juR = new Float32Array(n); }
+    this.ju.process(this.juL, this.juR, n); for (let k = 0; k < n; k++) { this.juL[k] *= this.juVol; this.juR[k] *= this.juVol; }
+    if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
+    this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { this.t9L[k] *= 0.9; this.t9R[k] *= 0.9; }
+    if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
+    this.tr.process(this.trL, this.trR, n); for (let k = 0; k < n; k++) { this.trL[k] *= 0.9; this.trR[k] *= 0.9; }
+    if (this.s9on && (this.s9ch != null || this.lineSrc.includes('S900') || GU.s9)) this.s9.process(this.s9In, this.s9L, this.s9R, n); else { this.s9L.fill(0); this.s9R.fill(0); }   // unpatched: off
     if (this.lineBuf.length !== 8 || this.lineBuf[0].length !== n) this.lineBuf = Array.from({ length: 8 }, () => new Float32Array(n));
-    const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L };   // the outputs a line input can be patched from
+    const G = { 'TR8080 L': this.trL, 'TR8080 R': this.trR, 'TR9090 L': this.t9L, 'TR9090 R': this.t9R, 'JUNO L': this.juL, 'JUNO R': this.juR, 'S900 L': this.s9L, 'S900 R': this.s9R, 'SP1200 L': this.spL, 'SP1200 R': this.spR };
+    for (const nm of used) if (/^(808|909|SP) /.test(nm)) G[nm] = gb(nm);
+    const fxOut = { '224 L': this.rvL, '224 R': this.rvR, 'S900': this.s9L, ...G };   // the outputs a line input can be patched from
     let s9Patched = false;
     for (let j = 0; j < 8; j++) { const nm = this.lineSrc[j], b2 = fxOut[nm]; if (nm === 'S900') s9Patched = true; if (b2 && b2.length === n) this.lineBuf[j].set(b2); else this.lineBuf[j].fill(0); }
     const liveR = inputs[0] && (inputs[0][1] || inputs[0][0]), chIn = (i) => (this.live.on && live ? (i === 0 ? live : i === 1 ? liveR : null) : null);   // the interface inputs 1 / 2 (your computer's input) on channels 1 / 2
-    C.process((i) => (i < 24 ? (i < this.N ? (C.ch[i].p.src === 'in' ? chIn(i) : ins[i] || this.out[i]) : null) : this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null), n2);
+    const gs = this.gearSrc;   // CONSOLE INPUT n (or LINE IN n): MIDI gear patched straight to a channel's input
+    C.process((i) => { const g = gs[i] && G[gs[i]]; if (i < 24) return i < this.N ? (C.ch[i].p.src === 'in' ? g || chIn(i) : ins[i] || this.out[i]) : null; return g || (this.lineSrc[i - 24] ? this.lineBuf[i - 24] : null); }, n2);
     const BL = C.L, BR = C.R;
     // the 224X: fed from the send patched to its input (aux SEND n -> 224 L), its outputs come back on line inputs next block
     if (this.rvIn.length !== n) { this.rvIn = new Float32Array(n); this.rvL = new Float32Array(n); this.rvR = new Float32Array(n); }
@@ -120217,14 +120237,8 @@ class JH24Processor extends AudioWorkletProcessor {
     if (this.spRec) { const r = this.spRec, ch = this.spInCh, x = ch != null && this.out[ch] ? this.out[ch] : null, step = SP_FS / sampleRate;
       if (x) for (let k = 0; k < n; k++) { if (r.armed > 0) { if (Math.abs(x[k]) < r.armed) continue; r.armed = 0; } r.ph += step; while (r.ph >= 1) { r.ph -= 1; r.buf.push(Math.max(-1, Math.min(1, x[k] * r.gain))); } if (r.buf.length >= r.len) break; }
       if (r.buf.length >= r.len || !x) { const d2 = Float32Array.from(r.buf); this.sp.sounds[r.pad] = spSound(d2, 'SAMPLE ' + (r.pad + 1)); this.port.postMessage({ type: 'sp1200', sampled: r.pad, data: this.sp.sounds[r.pad].data, empty: !x }); this.spRec = null; } }
-    if (this.spL.length !== n) { this.spL = new Float32Array(n); this.spR = new Float32Array(n); }
-    this.sp.process(this.spL, this.spR, n); for (let k = 0; k < n; k++) { BL[k] += this.spL[k]; BR[k] += this.spR[k]; }
-    if (this.juL.length !== n) { this.juL = new Float32Array(n); this.juR = new Float32Array(n); }
-    this.ju.process(this.juL, this.juR, n); for (let k = 0; k < n; k++) { BL[k] += this.juL[k] * this.juVol; BR[k] += this.juR[k] * this.juVol; }
-    if (this.t9L.length !== n) { this.t9L = new Float32Array(n); this.t9R = new Float32Array(n); }
-    this.t9.process(this.t9L, this.t9R, n); for (let k = 0; k < n; k++) { BL[k] += this.t9L[k] * 0.9; BR[k] += this.t9R[k] * 0.9; }
-    if (this.trL.length !== n) { this.trL = new Float32Array(n); this.trR = new Float32Array(n); }
-    this.tr.process(this.trL, this.trR, n); for (let k = 0; k < n; k++) { BL[k] += this.trL[k] * 0.9; BR[k] += this.trR[k] * 0.9; }
+    // MIDI gear whose main outputs are not patched plays straight into the stereo bus (patched, it comes up on its console channel)
+    for (const [l2, r2, on] of [[this.spL, this.spR, !GU.sp], [this.juL, this.juR, !GU.ju], [this.t9L, this.t9R, !GU.t9], [this.trL, this.trR, !GU.tr]]) if (on) for (let k = 0; k < n; k++) { BL[k] += l2[k]; BR[k] += r2[k]; }
     C.finish(n);
     // to the speakers: the stereo bus at the monitor level, or one tape channel soloed on its electronics card
     if (!this.mix.mute) {
@@ -120621,6 +120635,7 @@ class TR808 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     // the clock: 4 steps a beat. DIN sync: follow the song position (snap if it is more than a little off)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
@@ -120638,7 +120653,7 @@ class TR808 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.absStep = (this.absStep ?? -1) + 1; } }
       let l = 0, r = 0;
-      const add = (k, y) => { const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
+      const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pan = this.pan[k]; l += y * (1 - pan); r += y * (1 + pan); };
       // metal: six squares, shared by the cymbal, hats and (two of them) the cowbell
       let metal = 0; const mph = this.metalPh;
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + TR_METAL[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; }
@@ -120731,6 +120746,7 @@ class TR909 {
   process(L, R, n) {
     const fs = this.fs, P = this.p, dt = 1 / fs;
     L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const k in io) io[k].fill(0);   // individual outputs (set by the host)
     const sy = this.sync;
     if (sy && P.sync === 'din') {
       if (!sy.run) { if (this.run) this.stop(); }
@@ -120746,7 +120762,7 @@ class TR909 {
     for (let i = 0; i < n; i++) {
       if (this.run) { this.ph += inc; if (this.ph >= 1) { this.ph -= 1; this.advance(); this.abs = (this.abs ?? -1) + 1; } }
       if (this.pend.length) { for (const q of this.pend) if (q.at-- <= 0) { this.trig(q.k, q.acc, q.lvl); q.done = true; } this.pend = this.pend.filter((q) => !q.done); }
-      let l = 0, r = 0; const add = (k, y) => { const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
+      let l = 0, r = 0; const add = (k, y) => { const ob = io && io[k]; if (ob) { ob[i] += y; return; } const pn = this.pan[k]; l += y * (1 - pn); r += y * (1 + pn); };
       // metal for the hats and the ride (six squares, higher than the 808's)
       let metal = 0; const mph = this.mph, MF = [263, 400, 421, 474, 587, 845];
       for (let j = 0; j < 6; j++) { mph[j] = (mph[j] + MF[j] * dt) % 1; metal += mph[j] < 0.5 ? 1 : -1; } metal /= 6;
@@ -121055,6 +121071,7 @@ class SP1200 {
   }
   process(L, R, n) {
     const fs = this.fs; L.fill(0); if (R !== L) R.fill(0);
+    const io = this.io; if (io) for (const b of io) if (b) b.fill(0);   // outputs 1-8 (set by the host): a patched channel leaves the mix
     if (this.sync && this.sync.run !== undefined) {   // DIN sync / tape: follow the song position
       if (!this.sync.run) { if (this.run) this.stop(); } else { const len = this.patterns[this.pat].bars * 4 * SP_PPQ, want = Math.floor(this.sync.beats * SP_PPQ) % len; if (!this.run) { this.run = true; this.tick = want - 1; } this.tempo = this.sync.bpm; }
     }
@@ -121071,7 +121088,7 @@ class SP1200 {
         if (c.dec) { c.env -= c.env * c.dec; if (c.env < 1e-4) { c.on = false; continue; } }
         // output filters: 1-2 dynamic (closing with the envelope), 3-6 fixed, 7-8 none
         if (k < 6) { const fc = k < 2 ? 1200 + 11000 * c.env * c.env : 11500, a = 1 - Math.exp(-2 * Math.PI * fc / fs); c.lp[0] += a * (x - c.lp[0]); c.lp[1] += a * (c.lp[0] - c.lp[1]); x = c.lp[1]; }
-        const y = x * c.env * c.g; l += y * (1 - PAN[k]); r += y * (1 + PAN[k]);
+        const y = x * c.env * c.g; if (io && io[k]) io[k][i] += y; else { l += y * (1 - PAN[k]); r += y * (1 + PAN[k]); }
       }
       if (this.clickT > 0) { const c = (this.clickT-- % 20 < 10 ? 0.15 : -0.15) * this.mvol / this.vol; l += c; r += c; }
       l *= this.vol; r *= this.vol; L[i] = l; if (R !== L) R[i] = r; const a = Math.max(Math.abs(l), Math.abs(r)); if (a > pk) pk = a;
@@ -121802,7 +121819,7 @@ class Chaser {
 
   // ---------------- patchbay ----------------
   const L = (pre, n, from = 1) => Array.from({ length: n }, (_, k) => `${pre}${k + from}`);
-  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'S900', 'SP1200', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
+  const FX = ['224 L', '224 R', '160X A', '160X B', 'IM90 A', 'IM90 B', 'H949', 'RMX16', 'SPX A L', 'SPX A R', 'SPX B L', 'SPX B R', 'PCM41 A', 'PCM41 B', 'PCM42 A', 'PCM42 B', 'SLOT1 L', 'SLOT1 R', 'SLOT2 L', 'SLOT2 R', 'SLOT3 L', 'SLOT3 R'];
   // rows come in output / input pairs; "normal" means the pair is wired through until you patch the input
   const ROWS = [
     { id: 'ifin', name: 'INTERFACE IN', sub: 'Studio Bridge inputs', io: 'out', items: L('', 24) },
@@ -121819,6 +121836,11 @@ class Chaser {
     { id: 'lin', name: 'LINE IN · RET', sub: 'channels 25–32 and returns', io: 'in', items: [...L('LINE ', 8, 25), 'RET1 L', 'RET1 R', 'RET2 L', 'RET2 R', 'RET3 L', 'RET3 R', 'RET4 L', 'RET4 R'] },
     { id: 'dir', name: 'DIRECT OUT', sub: 'channels 1–24', io: 'out', items: L('', 24) },
     { id: 'ifout', name: 'INTERFACE OUT', sub: 'Studio Bridge outputs', io: 'in', items: L('', 24) },
+    // MIDI gear (the desk and the racks): its outputs, and the console's channel inputs to patch them into
+    { id: 'mgo', name: 'MIDI GEAR OUT', sub: 'MIDI gear', io: 'out', items: ['TR8080 L', 'TR8080 R', 'TR9090 L', 'TR9090 R', 'JUNO L', 'JUNO R', 'S900 L', 'S900 R', 'SP1200 L', 'SP1200 R', ...L('SP ', 8), ...L('SPARE ', 6)] },
+    { id: 'mcin', name: 'CONSOLE INPUT', sub: 'channels 1–32', io: 'in', items: L('', 32) },
+    { id: 'mgv', name: 'DRUM VOICE OUT', sub: '808 / 909 voices', io: 'out', items: [...TR_INST.map((k) => '808 ' + k), ...TR9_INST.map((k) => '909 ' + k), 'SPARE 7', 'SPARE 8'] },
+    { id: 'mgin', name: 'MIDI GEAR IN', sub: 'samplers, spares', io: 'in', items: ['S900 IN', 'SP1200 IN', ...L('SPARE ', 6, 9)] },
   ];
   const COLS = ['#c0392b', '#2f6fb3', '#e8c34a', '#3f8f3a', '#1b1b1b', '#e9e5da', '#e07b28', '#8e44ad'];
   const DEFAULT = [
@@ -121829,7 +121851,7 @@ class Chaser {
     ['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'],
     ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11'],
     ['isend:4', 'fxin:SPX B L'], ['fxout:SPX B L', 'iret:4'],
-    ['dir:2', 'fxin:S900'], ['fxout:S900', 'lin:LINE 27'],
+    ['dir:2', 'mgin:S900 IN'], ['mgo:S900 L', 'lin:LINE 27'],
     ['aux:MIX L', 'ifout:1'], ['aux:MIX R', 'ifout:2'],
     ['aux:CUE1 L', 'ifout:3'], ['aux:CUE1 R', 'ifout:4'], ['aux:CUE2 L', 'ifout:5'], ['aux:CUE2 R', 'ifout:6'],
   ];
@@ -121844,10 +121866,12 @@ class Chaser {
       if (!localStorage.getItem('as-units-pcm')) { localStorage.setItem('as-units-pcm', '1'); patches = patches.filter((pc) => !(pc.a === 'aux:SEND 2' && pc.b === 'fxin:PCM42 A') && !(pc.a === 'fxout:PCM42 A' && pc.b === 'lin:LINE 29')); for (const [a2, b2] of [['isend:3', 'fxin:PCM41 A'], ['fxout:PCM41 A', 'iret:3'], ['isend:9', 'fxin:PCM41 B'], ['fxout:PCM41 B', 'iret:9'], ['isend:10', 'fxin:PCM42 A'], ['fxout:PCM42 A', 'iret:10'], ['isend:11', 'fxin:PCM42 B'], ['fxout:PCM42 B', 'iret:11']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the PCMs now work on inserts
       if (!localStorage.getItem('as-units-h949rmx')) { localStorage.setItem('as-units-h949rmx', '1'); for (const [a2, b2] of [['isend:6', 'fxin:H949'], ['fxout:H949', 'iret:6'], ['isend:5', 'fxin:RMX16'], ['fxout:RMX16', 'iret:5']]) if (!patches.some((pc) => pc.a === a2 || pc.b === b2)) patches.push({ a: a2, b: b2, c: COLS[patches.length % COLS.length] }); }   // the new units join a saved layout, once
       if (!patches.some((pc) => /IM90/.test(pc.a + pc.b))) for (const [a, b] of [['isend:8', 'fxin:IM90 A'], ['fxout:IM90 A', 'iret:8']]) if (!patches.some((pc) => pc.a === a || pc.b === b)) patches.push({ a, b, c: COLS[patches.length % COLS.length] }); }   // the IM90 joins an existing session
+      // the S900 and the SP-1200 moved to the MIDI GEAR panels
+      patches.forEach((pc) => { pc.a = pc.a === 'fxout:S900' ? 'mgo:S900 L' : pc.a; pc.b = pc.b === 'fxin:S900' ? 'mgin:S900 IN' : pc.b === 'fxin:SP1200' ? 'mgin:SP1200 IN' : pc.b; });
   } catch (e) { /* storage unavailable */ }
   const save = () => { try { localStorage.setItem('as-patches-v4', JSON.stringify(patches)); } catch (e) { /* ignore */ } };
 
-  const PB = { x0: 430, pitch: 104, top: 70, rowH: 128, pairGap: 22 };
+  const PB = { x0: 430, pitch: 104, top: 66, rowH: 104, pairGap: 18 };
   const jackPos = {};
   function layout() {
     let y = PB.top;
@@ -121899,6 +121923,7 @@ class Chaser {
           if (A.row.io === B.row.io) { say(`Patch an output (gold rows) to an input (blue rows). ${A.row.io === 'out' ? 'Both ends are outputs.' : 'Both ends are inputs.'}`); return; }
           const [a, b] = A.row.io === 'out' ? [from, to] : [to, from];
           patches.push({ a, b, c: col }); save(); renderCables(); say(`Patched ${label(a)} → ${label(b)}`);
+          if (/^(mgo|mgv):/.test(a) && /^(mcin|chin):/.test(b) && +b.split(':')[1] <= 24 && window.CH_SET) { window.CH_SET('cmi', +b.split(':')[1] - 1, 'src_in', true); say(`Patched ${label(a)} → ${label(b)} · channel ${b.split(':')[1]} switched to INPUT`); }
         };
         move(e);
         svgPB.addEventListener('pointermove', move);
@@ -122679,6 +122704,7 @@ class Chaser {
     for (const el of E.k) { const c = knobDef(con, el.dataset.kid), pg = el.querySelector('.kptr'); if (pg && s[el.dataset.kid] !== undefined) pg.setAttribute('transform', `rotate(${(angOf(c, s[el.dataset.kid]) - +el.dataset.a0).toFixed(2)} ${el.dataset.cx} ${el.dataset.cy})`); }
     for (const el of E.b) { const id = el.dataset.bid, on = /^bus\d+$/.test(id) ? s.bus.includes(+id.slice(3)) : !!s[id], l = el.querySelector('.klit'); if (l) l.setAttribute('opacity', on ? 1 : 0); }
   }
+  window.CH_SET = (con, ch, id, v) => { const st = chState(con, ch); if (st[id] === v) return; st[id] = v; saveST2(); applyCh(con, ch); };
   window.CH_TOGGLE = (con, ch, id) => { const st = chState(con, ch); st[id] = !st[id]; saveST2(); applyCh(con, ch); return st[id]; };
   // saved settings show on the consoles at load
   for (const key of Object.keys(ST)) { const m = /^(cmi|sls)(\d+)$/.exec(key); if (m) { ST[key].__init = false; applyCh(m[1], +m[2]); } }
@@ -124436,7 +124462,7 @@ class Chaser {
   }
   // ---- routing: the channel patched to S900 IN (insert send, direct out or tape out) ----
   function s9Route() {
-    const pc = patches.find((q) => q.b === 'fxin:S900' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1];
+    const pc = patches.find((q) => (q.b === 'mgin:S900 IN' || q.b === 'fxin:S900') && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1];
     const ch = n && n <= 24 ? n - 1 : null; if (ch !== S9.ch) { S9.ch = ch; s9Post({ ch }); }
   }
   // ---- the panel ----
@@ -124756,11 +124782,12 @@ class Chaser {
   }
   window.CON_CHANGED = (con, ch) => { if (con === 'cmi' && EL.node) conPost({ ch, set: conParams(ch) }); };
   function conRoute() {   // line inputs 25-32 and the 224X's send, from the patchbay
-    const lineSrc = Array.from({ length: 8 }, (_, j) => { const pc = patches.find((q) => q.b === `lin:LINE ${25 + j}` && /^fxout:/.test(q.a)); return pc ? pc.a.slice(6) : null; });
+    const lineSrc = Array.from({ length: 8 }, (_, j) => { const pc = patches.find((q) => q.b === `lin:LINE ${25 + j}` && /^(fxout|mgo|mgv):/.test(q.a)); return pc ? pc.a.slice(pc.a.indexOf(':') + 1) : null; });
+    const gearSrc = Array.from({ length: 32 }, (_, i) => { const pc = patches.find((q) => (q.b === `mcin:${i + 1}` || (i < 24 && q.b === `chin:${i + 1}`)) && /^(mgo|mgv):/.test(q.a)); return pc ? pc.a.slice(4) : null; });
     const sp = patches.find((q) => q.b === 'fxin:224 L' && /^aux:SEND \d$/.test(q.a)), rvSend = sp ? +sp.a.slice(9) - 1 : -1;
     // the tape inputs: BUS n -> TAPE IN n is normalled; a cable into TAPE IN n replaces it (a BUS out, or nothing else we carry)
     const tapeSrc = Array.from({ length: 24 }, (_, i) => { const pc = patches.find((q) => q.b === `tin:${i + 1}`); return !pc ? i : /^bus:\d+$/.test(pc.a) ? +pc.a.slice(4) - 1 : null; });
-    const key = JSON.stringify([lineSrc, rvSend, tapeSrc]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend, tapeSrc }); }
+    const key = JSON.stringify([lineSrc, rvSend, tapeSrc, gearSrc]); if (key !== CON.route) { CON.route = key; conPost({ lineSrc, rvSend, tapeSrc, gearSrc }); }
   }
   function conSendAll() { CON.route = ''; conPost({ all: Array.from({ length: 32 }, (_, i) => conParams(i)), master: CON.master }); conRoute(); }
   // faders: drag, wheel, double-click = 0 dB
@@ -124823,7 +124850,7 @@ class Chaser {
   }).filter(Boolean);
   function patchGate() {
     for (const G of GATE) {
-      const ins = patches.some((pc) => G.jacks.some((j) => pc.b === 'fxin:' + j)), outs = patches.some((pc) => G.jacks.some((j) => pc.a === 'fxout:' + j));
+      const ins = patches.some((pc) => G.jacks.some((j) => pc.b === 'fxin:' + j || pc.b === `mgin:${j} IN`)), outs = patches.some((pc) => G.jacks.some((j) => pc.a === 'fxout:' + j || pc.a.startsWith(`mgo:${j} `)) && /^(lin|mcin|chin|iret|tin|fxin|mgin|ifout):/.test(pc.b));
       const on = G.insert ? ins && outs : ins || outs;
       if (on !== G.on) { G.on = on; G.veil.hidden = on; }
     }
@@ -125098,7 +125125,7 @@ class Chaser {
   function spTick() {
     if (EL.node !== SPU.node) { SPU.node = EL.node; if (EL.node) spSendAll(); }
     if (SPU.sync && EL.node) { const cur = SBX.cur, on = running() && tr.playingMode && cur && cur.beats >= 0; spPost({ sync: { run: !!on, beats: cur ? cur.beats : 0, bpm: cur ? cur.bpm : SPU.tempo } }); }
-    const pc = patches.find((q) => q.b === 'fxin:SP1200' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1], ch = n && n <= 24 ? n - 1 : null;
+    const pc = patches.find((q) => q.b === 'mgin:SP1200 IN' && /^(isend|dir|tout):\d+$/.test(q.a)), n = pc && +pc.a.split(':')[1], ch = n && n <= 24 ? n - 1 : null;
     if (ch !== SPU.inCh) { SPU.inCh = ch; spPost({ sampleCh: ch }); }
     if (isOpen('sp1200') || document.body.classList.contains('racksview')) { spDraw(); spKnobs(); }
   }

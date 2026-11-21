@@ -19,7 +19,7 @@
   }).filter(Boolean);
   function patchGate() {
     for (const G of GATE) {
-      const ins = patches.some((pc) => G.jacks.some((j) => pc.b === 'fxin:' + j)), outs = patches.some((pc) => G.jacks.some((j) => pc.a === 'fxout:' + j));
+      const ins = patches.some((pc) => G.jacks.some((j) => pc.b === 'fxin:' + j || pc.b === `mgin:${j} IN`)), outs = patches.some((pc) => G.jacks.some((j) => pc.a === 'fxout:' + j || pc.a.startsWith(`mgo:${j} `)) && /^(lin|mcin|chin|iret|tin|fxin|mgin|ifout):/.test(pc.b));
       const on = G.insert ? ins && outs : ins || outs;
       if (on !== G.on) { G.on = on; G.veil.hidden = on; }
     }
