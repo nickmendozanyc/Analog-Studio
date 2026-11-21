@@ -358,19 +358,20 @@
   const f2 = (v) => v.toFixed(2);
   // conic gradients for one reel's exposure smear (reel frame; angles clockwise from the top, as CSS conic-gradient)
   function smearBg(el, S, dir) {
+    // a natural exposure: each point's colour is the reel's appearance averaged over the last S degrees of turn, weighted
+    // by a smooth (Hann) shutter so streaks fade in and out at their ends, with soft-edged slots and label
     const d = el.dataset, slots = d.slots.split(',').map(Number), sw = +d.slotw, las = d.lab.split(',').map(Number), lw = +d.labw, lk = +d.labk;
-    const cov = (th, a, wd) => {   // fraction of the exposure that point th spent under a feature of width wd centred at a
-      let u = ((th - a) * dir % 360 + 540) % 360 - 180;   // along the trail, -180..180
-      if (u < -wd / 2 - 1) u += 360;
-      const lo = Math.max(u - wd / 2, 0), hi = Math.min(u + wd / 2, S);
-      return Math.max(0, hi - lo) / Math.max(S, 1e-3);
-    };
+    const M = Math.max(6, Math.min(40, Math.round(S / 5))), wts = [], offs = []; let wsum = 0;
+    for (let m = 0; m < M; m++) { const t = (m + 0.5) / M, wgt = Math.sin(Math.PI * t) ** 2; wts.push(wgt); offs.push(t * S); wsum += wgt; }
+    const fe = 1.6;   // degrees of edge softness
+    const inside = (x, wd) => { let u = ((x % 360) + 540) % 360 - 180; return Math.max(0, Math.min(1, (wd / 2 + fe - Math.abs(u)) / (2 * fe))); };
     const N = 180, hole = [], lab = [];
     for (let i = 0; i <= N; i++) {
-      const th = i * 360 / N;
-      const ch = Math.min(1, slots.reduce((a, s) => a + cov(th, s, sw), 0));
+      const th = i * 360 / N; let ch = 0, cl = 0;
+      for (let m = 0; m < M; m++) { const at = th - dir * offs[m]; let h = 0, l = 0; for (const s2 of slots) h += inside(at - s2, sw); for (const l2 of las) l += inside(at - l2, lw); ch += wts[m] * Math.min(1, h); cl += wts[m] * Math.min(1, l); }
+      ch /= wsum; cl /= wsum;
       hole.push(`rgba(${d.hole},${(ch * 0.97).toFixed(3)}) ${th.toFixed(1)}deg`);
-      lab.push(`rgba(${d.labc},${(Math.min(1, las.reduce((a, l) => a + cov(th, l, lw), 0)) * lk).toFixed(3)}) ${th.toFixed(1)}deg`);
+      lab.push(`rgba(${d.labc},${(cl * lk).toFixed(3)}) ${th.toFixed(1)}deg`);
     }
     return `conic-gradient(${hole.join(',')}), conic-gradient(${lab.join(',')}), ${d.avg}`;
   }
@@ -386,14 +387,20 @@
       if (!vis[rl.pre]) { rl.lastR = -1; rl.smKey = rl.smOp = null; continue; }   // redrawn in full when it comes back on screen
       const ang = (rl.k === 's' ? tr.angleS : tr.angleT) * 180 / Math.PI;
       for (const r of rl.rotors) r.style.transform = `rotateZ(${f2(-ang)}deg)`;   // seen from above both reels turn CCW in play
+      // the smeared image turns with the reel, so each streak trails its own slot (moved by the GPU, never repainted)
+      for (const el of rl.smears) if (el.dataset.slots) { if (el.dataset.tz == null) { el.dataset.tz = el.style.transform; el.style.willChange = 'transform'; } el.style.transform = `${el.dataset.tz} rotateZ(${f2(-ang)}deg)`; }
       // motion blur, modelled as a camera exposure of ~1/30 s: in that time the reel turns S degrees, so each slot and the
       // label drag an arc S long behind them (coverage = how long each point spent under them). Short arcs at play
       // speed, long arcs while spooling up, and past a full turn a uniform smear (the static ring disc takes over).
       const w = (rl.k === 's' ? tr.v / tr.rS : tr.v / tr.rT);   // rad/s, signed
-      const S = Math.min(360, Math.abs(w) / 30 * 180 / Math.PI), dir = w >= 0 ? 1 : -1;
+      const Sx = Math.abs(w) / 50 * 180 / Math.PI, S = Math.min(360, Sx), dir = w >= 0 ? 1 : -1;   // degrees turned in an eye-like 1/50 s exposure
       // below ~25° (play speed) the real reel shows and the label stays readable
-      const o1 = Math.min(1, Math.max(0, (S - 22) / 30)), o2 = Math.min(1, Math.max(0, (S - 250) / 110)), ease = (x) => x * x * (3 - 2 * x);
-      const key = `${Math.round(S)}|${dir}`;
+      // the blur builds gradually: it starts just above play speed and is complete only near full wind speed; the smooth
+      // disc look arrives last
+      // the exposure image is right at every speed (short streaks look just like the reel), so it takes over as soon as
+      // the reel turns faster than play speed; the blur itself grows with the streaks' length as the reels gather speed
+      const o1 = Math.min(1, Math.max(0, (S - 6) / 14)), o2 = Math.min(1, Math.max(0, (Sx - 200) / 260)), ease = (x) => x * x * (3 - 2 * x);
+      const key = `${S < 60 ? Math.round(S) : Math.round(S / 3) * 3}|${dir}`;   // redraw the streaks as the speed changes (coarser when fast)
       if (o1 > 0 && key !== rl.smKey) { rl.smKey = key; for (const el of rl.smears) if (el.dataset.slots) el.style.background = smearBg(el, Math.max(1, Math.round(S)), dir); }
       const opKey = `${ease(o1).toFixed(2)}|${ease(o2).toFixed(2)}`;
       if (opKey !== rl.smOp) {

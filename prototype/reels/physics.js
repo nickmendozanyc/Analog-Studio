@@ -39,6 +39,7 @@ export const MACHINE = {
   brakeForce: 70,           // N, electronic braking (approx)
   stopDecel: 10,             // m/s^2, peak deceleration when STOP is pressed during a wind: about 2 s from full wind, eased at both ends (approx)
   stopLanding: 3.2,
+  windAccel: 7,             // m/s^2, peak acceleration starting FF / REW: the big reels take about 2 s to reach full wind speed (approx)
   stopJerk: 20,             // m/s^3, how quickly the wind-stop brake comes on and eases off (approx)         // m/s, speed band over which a stop from a wind eases off into a gentle final settle
   jerk: 12,                 // m/s^3, gentle S-curve ramps (approx)
   landing: 2.4,             // m/s
@@ -151,7 +152,8 @@ export class Transport {
       const F = braking ? this.m.brakeForce : this.m.windForce;
       // STOP from a wind: a long, graceful brake (capped deceleration, wide landing band) instead of a hard stop
       const windStop = this.mode === 'stop' && braking;
-      const aMax = windStop ? Math.min(F / this.effectiveMass(), this.m.stopDecel ?? Infinity) : F / this.effectiveMass();
+      const windStart = (this.mode === 'ff' || this.mode === 'rew') && !braking;   // spinning up into a wind: the reels gather speed over a couple of seconds
+      const aMax = windStop ? Math.min(F / this.effectiveMass(), this.m.stopDecel ?? Infinity) : windStart ? Math.min(F / this.effectiveMass(), this.m.windAccel ?? Infinity) : F / this.effectiveMass();
       // soft landing: ease off within the machine's landing band so the reels settle instead of snapping
       const land = windStop ? (this.m.stopLanding ?? this.m.landing ?? 0.4) : (this.m.landing ?? 0.4);
       const jerk = windStop ? (this.m.stopJerk ?? this.m.jerk ?? 400) : (this.m.jerk ?? 400);
