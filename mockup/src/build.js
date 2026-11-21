@@ -1868,6 +1868,40 @@ const hot = (x, y, w, h, view, label) => `<div class="hot" data-open="${view}" s
 const overlay = (view, title, body, extra = '', float = false) => float
   ? `<div class="overlay float" id="ov-${view}" data-view="${view}" hidden><div class="ov-win"><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕</button></div><div class="ov-body">${body}</div></div></div>`
   : `<div class="overlay" id="ov-${view}" data-view="${view}" hidden><div class="ov-bar"><b>${title}</b>${extra}<button class="ov-close" type="button">✕ Close · Esc</button></div><div class="ov-body">${body}</div></div>`;
+// the splash's reels: the app's own Amtex 499 (brushed silver) and Quantica GP9 (red), turning under a still light
+function splashReels() {
+  const silverFace = 'repeating-conic-gradient(from 0deg, #e4e6e9 0deg 0.35deg, #d9dce0 0.35deg 0.8deg, #eceef0 0.8deg 1.1deg), #dfe2e5';
+  const redFace = 'repeating-conic-gradient(from 0deg, #dc4529 0deg 0.35deg, #d33e24 0.35deg 0.8deg, #e14d31 0.8deg 1.1deg), #d8432a';
+  const reel = (cx, cy, R, face, label, t) => {
+    const D = 2 * R, slots = [0, 180].map((a) => {   // two windows from 0.5 R to 0.84 R, 0.17 R wide, onto the tape pack
+      const len = 0.34 * R, wid = 0.2 * R, r0 = 0.67 * R, x = R + Math.sin(a * Math.PI / 180) * r0 - wid / 2, y = R - Math.cos(a * Math.PI / 180) * r0 - len / 2;
+      return `<div class="slot" style="left:${x}px;top:${y}px;width:${wid}px;height:${len}px;--sr:${wid * 0.3}px;--cx:${R - x}px;--cy:${R - y}px;transform:rotate(${a}deg)"></div>`;
+    }).join('');
+    const dots = Array.from({ length: 6 }, (_, i) => { const a = i * 60 + 30, r = 0.37 * R; return `<div style="position:absolute;left:${R + Math.sin(a * Math.PI / 180) * r - 5}px;top:${R - Math.cos(a * Math.PI / 180) * r - 5}px;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3a3a3c,#0c0c0d)"></div>`; }).join('');
+    const holes = Array.from({ length: 3 }, (_, i) => { const a = i * 120, r = 0.1 * R; return `<div style="position:absolute;left:${R + Math.sin(a * Math.PI / 180) * r - 7}px;top:${R - Math.cos(a * Math.PI / 180) * r - 7}px;width:14px;height:14px;border-radius:50%;background:#e8e8ea;box-shadow:inset 0 2px 3px rgba(0,0,0,.6)"></div>`; }).join('');
+    return `<div class="sr" style="left:${cx - R}px;top:${cy - R}px;width:${D}px;height:${D}px"><div class="shadow"></div>
+      <div class="turn" style="--t:${t}s"><div class="face" style="background:${face}"></div>${slots}${dots}
+        <div class="hub" style="left:${R * 0.78}px;top:${R * 0.78}px;width:${R * 0.44}px;height:${R * 0.44}px"></div>${holes}
+        <div style="position:absolute;left:${R - 9}px;top:${R - 9}px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f4f4f6,#8a8c90)"></div>
+        <div style="position:absolute;left:0;top:0;width:${D}px;height:${D}px">${label(R)}</div></div>
+      <div class="spot"></div><div class="rim"></div></div>`;
+  };
+  const amtex = (R) => `<div style="position:absolute;left:${R * 0.12}px;top:${R * 0.78}px;width:${R * 0.5}px;text-align:center;transform:rotate(-90deg);font-family:Archivo,Arial;line-height:1">
+      <div style="font:900 ${R * 0.1}px Archivo;letter-spacing:2px;color:#151515">AMTEX</div><div style="font:900 ${R * 0.21}px Archivo;color:#b38a32;letter-spacing:-2px">499</div>
+      <div style="font:800 ${R * 0.045}px Archivo;color:#151515;letter-spacing:1px">GOLD MASTER</div><div style="font:600 ${R * 0.04}px Archivo;color:#b38a32;margin-top:3px">Studio Mastering Audio Tape</div></div>`;
+  const gp9 = (R) => `<div style="position:absolute;left:${R * 0.1}px;top:${R * 0.8}px;width:${R * 0.5}px;text-align:center;transform:rotate(-90deg);font-family:Archivo,Arial;line-height:1">
+      <div style="font:900 ${R * 0.08}px Archivo;letter-spacing:2px;color:#1b1b1b">QUANTICA</div>
+      <div style="display:inline-block;margin-top:${R * 0.02}px;padding:${R * 0.02}px ${R * 0.06}px;border-radius:50%;background:#f3f1ec;transform:rotate(-12deg);font:900 ${R * 0.16}px Archivo;color:#1b1b1b;letter-spacing:-1px">GP9</div>
+      <div style="font:800 ${R * 0.04}px Archivo;color:#1b1b1b;margin-top:${R * 0.02}px;letter-spacing:1px">PLATINUM MASTER</div></div>`;
+  const A = [1450, 395, 255], B = [1715, 640, 228];   // to the right of the wordmark, the GP9 overlapping in front
+  // the tape between the two packs, over a guide roller
+  const tape = `<svg class="tape" viewBox="0 0 1880 1060" aria-hidden="true"><defs><linearGradient id="spl-tp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3020"/><stop offset=".5" stop-color="#2a180e"/><stop offset="1" stop-color="#140b06"/></linearGradient></defs>
+    <path d="M${A[0] - 0.62 * A[2]} ${A[1] + 0.72 * A[2]} Q1240 820 1300 842 L1318 846" fill="none" stroke="url(#spl-tp)" stroke-width="12" stroke-linecap="round" opacity=".95"/>
+    <path d="M1318 846 L${B[0] - 0.55 * B[2]} ${B[1] + 0.76 * B[2]}" fill="none" stroke="url(#spl-tp)" stroke-width="12" stroke-linecap="round" opacity=".95"/>
+    <circle cx="1318" cy="836" r="20" fill="#cfd2d6"/><circle cx="1318" cy="836" r="20" fill="url(#spl-rl)"/><circle cx="1318" cy="836" r="7" fill="#4a4c50"/>
+    <defs><radialGradient id="spl-rl" cx=".38" cy=".32" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs></svg>`;
+  return tape + reel(...A, silverFace, amtex, 16) + reel(...B, redFace, gp9, 11);
+}
 // a rack unit's hot area, from where unit() put it (full panel width, over the rails)
 const rhot = (key, view, title) => { const H = globalThis.RACK_HOT[key]; return hot(RX + 26, Math.round(H.y), RW - 52, Math.round(H.h), view, title); };
 const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JH-Studio by NMAudiowerks · 4K mockup</title>
@@ -1899,9 +1933,15 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   #splash{position:absolute;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);transition:opacity .9s ease}
   #splash.gone{opacity:0;pointer-events:none}
   #splash .card{position:relative;width:1880px;height:1060px;border-radius:14px;overflow:hidden;background:radial-gradient(120% 90% at 70% 30%,#2a2620 0%,#16140f 55%,#0d0c0a 100%);box-shadow:0 40px 140px rgba(0,0,0,.8),0 0 0 2px rgba(255,255,255,.05);font-family:Archivo,Arial,sans-serif;color:#efe6d2;cursor:pointer}
-  #splash .reels{position:absolute;right:-120px;top:-60px;width:1240px;height:1240px;opacity:.26}
-  #splash .reels .spin{transform-origin:center;transform-box:fill-box;animation:spl-spin 9s linear infinite}
-  #splash .reels .spin2{animation-duration:6.5s}
+  #splash .sr{position:absolute;border-radius:50%}
+  #splash .sr .shadow{position:absolute;inset:0;border-radius:50%;box-shadow:0 40px 90px rgba(0,0,0,.65),0 10px 26px rgba(0,0,0,.5)}
+  #splash .sr .turn{position:absolute;inset:0;border-radius:50%;animation:spl-spin var(--t,14s) linear infinite}
+  #splash .sr .face{position:absolute;inset:0;border-radius:50%}
+  #splash .sr .slot{position:absolute;border-radius:var(--sr);background:repeating-radial-gradient(circle at var(--cx) var(--cy),#2a1a10 0 2px,#1e120a 2px 4px);box-shadow:inset 0 6px 14px rgba(0,0,0,.85),inset 0 -2px 4px rgba(255,255,255,.08)}
+  #splash .sr .hub{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3a3a3d,#111113 60%,#050506);box-shadow:inset 0 0 0 3px #1c1c1e,0 0 0 2px rgba(0,0,0,.6)}
+  #splash .sr .spot{position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 34% 26%,rgba(255,255,255,.55),rgba(255,255,255,0) 42%),radial-gradient(circle at 70% 80%,rgba(0,0,0,.28),rgba(0,0,0,0) 55%)}
+  #splash .sr .rim{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 3px rgba(255,255,255,.28),inset 0 0 0 7px rgba(0,0,0,.18)}
+  #splash .tape{position:absolute;inset:0;pointer-events:none}
   @keyframes spl-spin{to{transform:rotate(-360deg)}}
   #splash .presents{position:absolute;left:130px;top:250px;font:800 30px Archivo,Arial;letter-spacing:9px;text-transform:uppercase;color:#cfc4ae}
   #splash .word{position:absolute;left:118px;top:300px;font:900 250px/1 Archivo,Arial;letter-spacing:-6px;color:#f2eadb}
@@ -1973,7 +2013,7 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewp
   .sls-area span{font-size:22px;font-weight:600;color:#9c9384;max-width:80%}
 ${elecCss}
 </style></head><body><div id="stage">
-<div id="splash" role="dialog" aria-label="OldTools is starting"><div class="card"><svg class="reels" viewBox="0 0 1240 1240" aria-hidden="true"><g class="spin " transform-origin="330 620"><circle cx="330" cy="620" r="300" fill="none" stroke="#e8dcc4" stroke-width="10"/><circle cx="330" cy="620" r="210" fill="none" stroke="#e8dcc4" stroke-width="3" opacity=".6"/><circle cx="330" cy="620" r="70" fill="none" stroke="#e8dcc4" stroke-width="10"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(0 330 620)"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(120 330 620)"/><path d="M330 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(240 330 620)"/></g><g class="spin spin2" transform-origin="910 620"><circle cx="910" cy="620" r="300" fill="none" stroke="#e8dcc4" stroke-width="10"/><circle cx="910" cy="620" r="210" fill="none" stroke="#e8dcc4" stroke-width="3" opacity=".6"/><circle cx="910" cy="620" r="70" fill="none" stroke="#e8dcc4" stroke-width="10"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(0 910 620)"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(120 910 620)"/><path d="M910 620 m0 -95 l60 -170 a300 300 0 0 0 -120 0 z" fill="#e8dcc4" opacity=".55" transform="rotate(240 910 620)"/></g><path d="M30 620 Q330 1080 620 1010 T1210 620" fill="none" stroke="#e8dcc4" stroke-width="6" opacity=".7"/></svg><div class="presents">NMAudiowerks presents</div><div class="word">Old<i>T</i>ools</div><div class="edition">JH-Studio · Analog Edition</div><div class="tag">Tape. Console. Rack. No undo.</div><div class="status" id="spl-status">Starting…</div><div class="bar"><b id="spl-bar"></b></div><div class="foot"><span>Version 1.0 · © NMAudiowerks</span><span>Click to continue</span></div></div></div>
+<div id="splash" role="dialog" aria-label="OldTools is starting"><div class="card">${splashReels()}<div class="presents">NMAudiowerks presents</div><div class="word">Old<i>T</i>ools</div><div class="edition">JH-Studio · Analog Edition</div><div class="tag">Tape. Console. Rack. No undo.</div><div class="status" id="spl-status">Starting…</div><div class="bar"><b id="spl-bar"></b></div><div class="foot"><span>Version 1.0 · © NMAudiowerks</span><span>Click to continue</span></div></div></div>
 ${svg}
 ${jh24}
 ${scenes3d.join('\n')}
