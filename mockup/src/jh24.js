@@ -157,7 +157,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
       // the hub with a shallow curved edge and narrow toward the rim; a solid grey logo between the top two, the number on
       // a small brass plate under it, a brass screw under the plate and two more either side of the hub, lower down
       name: 'Scotia 250', ...SILVER, face: silver('#cdd0d2', '#d1d3d5', '#c9ccce', '#d5d7d9'), edge: 'linear-gradient(90deg,#86898d,#d9dbdd 40%,#74777b)', back: '#8d9094',
-      win: { n: 3, rIn: 0.466, rOut: 0.87, wIn: 0.535, wOut: 0.385, c: 0.05, hub: 1.8, a0: 60 },
+      win: { n: 3, rIn: 0.435, rOut: 0.885, aIn: 36, aOut: 14, c: 0.045, sector: true, a0: 60 },
       labels: [[0, () => `<g>${T(-3, 6, 'Scotia', 42, '#55585b', 'font-weight="700" letter-spacing="-1"')}${T(66, -18, '®', 8, '#55585b')}<rect x="-48" y="15" width="96" height="44" rx="1.5" fill="#8f8a68"/><rect x="-46.5" y="16.5" width="93" height="41" rx="1" fill="#c3bc93"/><rect x="-46.5" y="16.5" width="93" height="13" rx="1" fill="#fff" opacity="0.2"/>${T(0, 44, '250', 21, '#f6f3e6', 'font-weight="500" stroke="#8a8460" stroke-width="0.5"')}${BRASS_SCREW(66)}</g>`],
         ...[-118, 118].map((a) => [a, () => `<g>${BRASS_SCREW(62)}</g>`])],
       labRGB: '85,88,91', labK: 0.35,
@@ -178,16 +178,14 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
   globalThis.JH_REEL_NAMES = Object.fromEntries(Object.entries(REEL).map(([k, v]) => [k, v.name]));
   // a window: rounded trapezoid from rIn to rOut, centred on the direction `ang` (degrees clockwise from the top)
   const slot = (cx, cy, w, ang, R) => {
-    if (w.hub) {   // the Scotia-style window, traced over the photo: a nearly straight inner edge that bows slightly toward
-      // the hub (w.hub = its radius), an outer edge on a circle near the rim, straight sides narrowing outward, rounded corners
+    if (w.sector) {   // the Scotia window, measured from the photo: inner and outer edges are both arcs round the hub
+      // (inner rIn over +/-aIn degrees, outer rOut over +/-aOut), joined by straight sides; rounded corners
       const P = (r, a) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
-      const rI = w.rIn * R, rO = w.rOut * R, aI = Math.asin(w.wIn / 2 / w.rIn) * 180 / Math.PI, aO = Math.asin(w.wOut / 2 / w.rOut) * 180 / Math.PI, c = w.c * R, dI = c / rI * 180 / Math.PI;
-      const OL = P(rO, ang - aO), OR = P(rO, ang + aO), IR = P(rI, ang + aI), IL = P(rI, ang - aI);
+      const rI = w.rIn * R, rO = w.rOut * R, c = w.c * R, dI = c / rI * 180 / Math.PI, dO = c / rO * 180 / Math.PI;
+      const OL = P(rO, ang - w.aOut), OR = P(rO, ang + w.aOut), IR = P(rI, ang + w.aIn), IL = P(rI, ang - w.aIn);
       const tw = (p, q, d) => { const L = Math.hypot(q[0] - p[0], q[1] - p[1]); return [p[0] + (q[0] - p[0]) * d / L, p[1] + (q[1] - p[1]) * d / L]; };
       const g = (pt) => `${f(pt[0])} ${f(pt[1])}`;
-      const s0 = tw(OL, OR, c), e0 = tw(OR, OL, c), a1 = tw(OR, IR, c), a2 = tw(IR, OR, c), i1 = P(rI, ang + aI - dI), i2 = P(rI, ang - aI + dI), b1 = tw(IL, OL, c), b2 = tw(OL, IL, c);
-      const rk = w.hub * R, dO = c / rO * 180 / Math.PI, s1 = P(rO, ang - aO + dO), e1 = P(rO, ang + aO - dO);
-      return `M${g(s1)} A${f(rO)} ${f(rO)} 0 0 1 ${g(e1)} Q${g(OR)} ${g(a1)} L${g(a2)} Q${g(IR)} ${g(tw(IR, IL, c))} A${f(rk)} ${f(rk)} 0 0 1 ${g(tw(IL, IR, c))} Q${g(IL)} ${g(b1)} L${g(b2)} Q${g(OL)} ${g(s1)} Z `;
+      return `M${g(P(rO, ang - w.aOut + dO))} A${f(rO)} ${f(rO)} 0 0 1 ${g(P(rO, ang + w.aOut - dO))} Q${g(OR)} ${g(tw(OR, IR, c))} L${g(tw(IR, OR, c))} Q${g(IR)} ${g(P(rI, ang + w.aIn - dI))} A${f(rI)} ${f(rI)} 0 0 0 ${g(P(rI, ang - w.aIn + dI))} Q${g(IL)} ${g(tw(IL, OL, c))} L${g(tw(OL, IL, c))} Q${g(OL)} ${g(P(rO, ang - w.aOut + dO))} Z `;
     }
     const t = ang * Math.PI / 180, rot = ([x, y]) => [cx + x * Math.cos(t) - y * Math.sin(t), cy + x * Math.sin(t) + y * Math.cos(t)];
     const P = [[-w.wOut * R / 2, -w.rOut * R], [w.wOut * R / 2, -w.rOut * R], [w.wIn * R / 2, -w.rIn * R], [-w.wIn * R / 2, -w.rIn * R]].map(rot), c = w.c * R;
@@ -240,7 +238,7 @@ module.exports = function buildJH24({ TX, TY, TW, TH, skin = 'hj24' }) {
     return {
       r: R, cx: rl.cx, cy: rl.cy, bandMask, d, face: st.face, edge: st.edge, back: st.back, faceAvg, faceLight, label: lab.join(''),
       lightBg: `radial-gradient(circle, transparent ${f(R * 0.395)}px, rgba(20,20,22,0.16) ${f(R * 0.412)}px, rgba(20,20,22,0.16) ${f(R * 0.428)}px, transparent ${f(R * 0.445)}px), ${faceLight}`,
-      slots: winAngles(st, rl.rot).map((a) => f(a)).join(','), slotW: f(((st.win.wIn + st.win.wOut) / 2) / 0.67 * 180 / Math.PI),
+      slots: winAngles(st, rl.rot).map((a) => f(a)).join(','), slotW: f(st.win.sector ? st.win.aIn + st.win.aOut : ((st.win.wIn + st.win.wOut) / 2) / 0.67 * 180 / Math.PI),
       labs: labAngles.map((a) => f(a)).join(','), labW: f(2 * Math.atan(58 / (R * 0.62)) * 180 / Math.PI),
       hole: st.holeRGB || '24,16,11', labc: st.labRGB || '150,120,64', labk: st.labK || 0.4,
       ringBg: `radial-gradient(circle, transparent ${f(hubR - 1)}px, #0d0d0e ${f(hubR)}px, #0d0d0e ${f(hubR + 4)}px, transparent ${f(hubR + 5)}px), ${ring}, radial-gradient(circle, transparent ${f(R - 2.6)}px, rgba(255,255,255,0.45) ${f(R - 1.6)}px, transparent ${f(R - 0.4)}px), ${base}`,
