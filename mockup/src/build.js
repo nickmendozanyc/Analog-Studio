@@ -1197,26 +1197,39 @@ function sgFace(w, h) {
   text(364, 47, 'WORD · BB · TRI', 5.5, '#77746a', 'start', 700);
 }
 function dzFace(w, h) {
+  // after the Zeta-Three manual: five status LEDs, 20-character display, blue primary / red shifted legends, a SHIFT per half
   rect(0, 0, w, h, '#cfcdc7'); rect(0, 0, w, 2, '#fff', 'opacity="0.5"'); rect(0, h - 2, w, 2, '#000', 'opacity="0.25"');
-  [['WREF', 'wref', '#4fe07a'], ['MTC', 'mtc', '#4fe07a'], ['EFC', 'efc', '#4fe07a'], ['CHASE', 'chase', '#ffd23a'], ['LOCK', 'lock', '#ff3b2f']].forEach(([l, c, col], i) => {
-    const y = 12 + i * 8.4; circle(22, y, 2.2, '#5a5652'); p(`<circle class="dz-l-${c}" cx="22" cy="${y}" r="2.2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(27, y + 1.8, l, 4.6, '#3a3632', 'start', 800);
+  [['XREF', 'xref', '#ffb02e'], ['MTC', 'mtc', '#4fe07a'], ['STC', 'stc', '#4fe07a'], ['CHASE', 'chase', '#ffb02e'], ['LOCK', 'lock', '#ff3b2f']].forEach(([l, c, col], i) => {
+    const y = 11 + i * 8.4; circle(18, y, 2.2, '#5a5652'); p(`<circle class="dz-l-${c}" cx="18" cy="${y}" r="2.2" fill="${col}" opacity="0" filter="url(#glowSm)"/>`); text(23, y + 1.7, l, 4.4, '#3a3632', 'start', 800);
   });
-  const key = (x, y, ww, hh, col, l1, l2, cls = '') => { rect(x + 0.6, y + 1.2, ww, hh, '#000', 'opacity="0.35" rx="1.5"'); rect(x, y, ww, hh, col, 'rx="1.5"'); rect(x, y, ww, hh * 0.35, '#fff', 'opacity="0.2" rx="1.5"'); if (l1) text(x + ww / 2, y - (cls === 'led' ? 11 : 6), l1, 4.2, '#2a2622', 'middle', 900); if (l2) text(x + ww / 2, y - (cls === 'led' ? 6.4 : 1.6), l2, 4.2, '#2a2622', 'middle', 900); };
-  const kled = (x, y, cls) => { circle(x, y, 1.6, '#4a2a22'); p(`<circle class="${cls}" cx="${x}" cy="${y}" r="1.6" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>`); };
-  text(76, 9, 'ENABLE', 4.6, '#2a2622', 'middle', 900, 'letter-spacing="0.6"'); rect(52, 10, 48, 0.8, '#2a2622');
-  [['W/REC', 'MASTER', 'dz-k-master'], ['S/REC', 'SLAVE', 'dz-k-slave'], ['LEARN', 'MIDI', '']].forEach(([a, b, c], i) => { const x = 54 + i * 16; key(x, 28, 13, 15, '#2f7fd0', a, b, 'led'); kled(x + 6.5, 25.2, c || 'dz-k-none'); });
-  key(108, 28, 14, 15, '#e0392c', '', 'SHIFT');
-  text(141, 9, 'GEN    SYSTEM', 4.6, '#2a2622', 'middle', 900); key(128, 28, 12, 15, '#9a9a96', 'COPY', 'RUN'); key(143, 28, 12, 15, '#9a9a96', 'GOTO', 'STOP');
-  text(225, 10, 'ADDISON•SMYTH', 6.2, '#1e3c74', 'end', 900, 'letter-spacing="0.4"'); text(230, 10, 'DELTA-THREE', 6.2, '#1e3c74', 'start', 900, 'letter-spacing="0.4"');
-  rect(164, 15, 136, 17, '#1a0503', 'rx="1"'); rect(165, 16, 134, 15, '#2a0806', 'rx="1"');
-  p(`<text class="dz-disp" x="168" y="27.6" font-family="${MONO2}" font-size="11.2" font-weight="700" fill="#ff3a24" filter="url(#glowSm)" letter-spacing="0.6">G_TC 01:00:00:00</text>`);
-  ['DEST', 'BIN', 'HOURS', 'MINUTES', 'SEC/BAR', 'FRAMES/BEAT'].forEach((l, i) => text(172 + i * 24, 37.5, l, 3.4, '#3a3632', 'middle', 800));
-  text(232, 48, 'AUDIO · VIDEO · MIDI   SYNCHRONIZER / CONTROLLER / EMULATOR', 3.8, '#3a3632', 'middle', 800, 'letter-spacing="0.3"');
-  text(325, 9, 'DISPLAY', 4.6, '#2a2622', 'middle', 900); key(311, 28, 13, 15, '#2f7fd0', 'SELECT', 'GROUP'); key(327, 28, 12, 15, '#9a9a96', '', '⧗');
-  key(346, 28, 14, 15, '#e0392c', '', 'SHIFT');
-  text(397, 9, 'CURSOR', 4.6, '#2a2622', 'middle', 900); key(367, 28, 11, 15, '#9a9a96', '◀', ''); key(380, 28, 11, 15, '#9a9a96', '▶', '');
-  key(393, 28, 13, 15, '#2f7fd0', 'PREV', 'MENU'); key(409, 28, 14, 15, '#9a9a96', 'CLEAR', 'CAPT');
-  for (const [sx, sy] of [[8, 10], [8, 46], [w - 8, 10], [w - 8, 46]]) circle(sx, sy, 2.6, '#8a8780');
+  const BLUE = '#1d4f9a', RED = '#c4231a';
+  // key: id for the pop-up (data-dzk), shifted legend (red, top), primary legend (blue, under it), optional LED on the cap
+  const key = (x, ww, col, sh, pr, id, led) => {
+    const y = 28, hh = 15;
+    p(`<g class="dzk" data-dzk="${id}" style="cursor:pointer">`);
+    rect(x + 0.6, y + 1.2, ww, hh, '#000', 'opacity="0.35" rx="1.5"'); rect(x, y, ww, hh, col, 'rx="1.5"'); rect(x, y, ww, hh * 0.35, '#fff', 'opacity="0.2" rx="1.5"');
+    if (led) { circle(x + ww / 2, y + 4, 1.5, '#4a2a22'); p(`<circle class="${led}" cx="${x + ww / 2}" cy="${y + 4}" r="1.5" fill="#ffd23a" opacity="0" filter="url(#glowSm)"/>`); }
+    if (sh) text(x + ww / 2, y - 6.6, sh, 3.4, RED, 'middle', 900);
+    if (pr) text(x + ww / 2, y - 2, pr, 3.4, BLUE, 'middle', 900);
+    p(`<rect x="${x - 1}" y="${y - 11}" width="${ww + 2}" height="${hh + 12}" fill="transparent"/></g>`);
+  };
+  const group = (x0, x1, l) => { text((x0 + x1) / 2, 9, l, 4.2, '#2a2622', 'middle', 900, 'letter-spacing="0.6"'); rect(x0, 10.6, x1 - x0, 0.7, '#2a2622'); };
+  group(42, 88, 'ENABLE');
+  key(42, 13, '#9a9a96', 'M-REC', 'MASTER', 'master', 'dz-k-master'); key(58.5, 13, '#9a9a96', 'S-REC', 'SLAVE', 'slave', 'dz-k-slave'); key(75, 13, '#9a9a96', 'LEARN', 'MIDI', 'midi', 'dz-k-midi');
+  key(91.5, 12, '#e0392c', '', 'SHIFT', 'shiftL', 'dz-k-shl');
+  group(106, 118, 'GEN'); key(106, 12, '#9a9a96', 'COPY', 'RUN', 'run', 'dz-k-run');
+  group(121, 137, 'SYSTEM'); key(122, 15, '#9a9a96', 'GOTO', 'STOP·CONT', 'stop', 'dz-k-hold');
+  // the display: 20 red characters over the field legends
+  text(226, 9, 'ADDISON•SMYTH  DELTA-THREE', 5.6, '#1e3c74', 'middle', 900, 'letter-spacing="0.4"');
+  rect(144, 14, 164, 18, '#1a0503', 'rx="1"'); rect(145, 15, 162, 16, '#2a0806', 'rx="1"');
+  p(`<text class="dz-disp" x="148" y="26.4" font-family="${MONO2}" font-size="9.4" font-weight="700" fill="#ff3a24" filter="url(#glowSm)" letter-spacing="0.42" xml:space="preserve">M_TC  01:00:00:00   </text>`);
+  ['IDENT', 'BPM', 'HOURS', 'MINUTES', 'SECONDS/BAR', 'FRAMES/BEAT'].forEach((l, i) => text(155 + i * 28.4, 37, l, 3.1, '#3a3632', 'middle', 800));
+  text(226, 49, 'AUDIO · VIDEO · MIDI SYNCHRONIZER / CONTROLLER', 3.7, '#3a3632', 'middle', 800, 'letter-spacing="0.3"');
+  group(314, 344, 'DISPLAY'); key(314, 14, '#2f7fd0', 'GROUP', 'SELECT', 'select'); key(331, 13, '#9a9a96', '', 'INDEX', 'index', 'dz-k-tight');
+  key(349, 12, '#e0392c', '', 'SHIFT', 'shiftR', 'dz-k-shr');
+  group(365, 389, 'CURSOR'); key(365, 11, '#9a9a96', '', '◀', 'left'); key(378, 11, '#9a9a96', '', '▶', 'right');
+  key(393, 14, '#2f7fd0', 'MENU', 'PREV', 'prev'); key(410, 15, '#9a9a96', 'CAPTURE', 'CLEAR', 'clear');
+  for (const [sx, sy] of [[7, 8], [7, 48], [w - 7, 8], [w - 7, 48]]) circle(sx, sy, 2.4, '#8a8780');
 }
 const RX = 3290, RY = 60, RW = 550, RH = 2100;
 {
@@ -1731,11 +1744,12 @@ ${overlay('elec', 'CMI HJ-24 · AUDIO ELECTRONICS', elecView)}
 ${overlay('al', 'CMI AUTOLOCATOR III', `<svg id="alSvg" width="${Math.round((AL_W * 4.6 + 76) * 0.86)}" height="${Math.round((AL_H * 4.6 + 92) * 0.86)}" viewBox="${900 - 26} ${150 - 26} ${AL_W * 4.6 + 76} ${AL_H * 4.6 + 92}" style="display:block;user-select:none">${alView}</svg>`, '<span class="ov-msg" id="al-msg">Ready</span>', true)}
 ${overlay('sbx', 'ROWAN SBX-80 SYNC BOX', `<svg id="sbxSvg" width="${Math.round(SBX_BOX[2] * 0.82)}" height="${Math.round(SBX_BOX[3] * 0.82)}" viewBox="${SBX_BOX.join(' ')}" style="display:block;user-select:none">${sbxView}</svg>`, '<span class="ov-msg" id="sbx-status">SMPTE on track 24 · MIDI clock + DIN sync out</span><span id="sbx-file" class="ov-param"></span><span id="sbx-out" hidden></span><span id="sbx-out2" hidden></span><label class="ov-pick">LOAD TRACK 24 AUDIO<input id="sbx-in" type="file" accept="audio/*,.wav,.aif,.aiff,.flac" hidden></label><select id="sbx-midi" class="ov-pick"><option value="">MIDI OUT · off</option></select>', true)}
 ${overlay('sg', 'HOLLIS SG-24 MASTER SYNC GENERATOR', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => sgFace(450, 56))}</svg>
-  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 9.6 kHz capstan reference into the HJ-24's EXT input">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
-  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 9.6 kHz capstan reference. Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
+  <div class="sk"><button type="button" data-sg="rate">RATE <span class="v"></span></button><button type="button" data-sg="pull">PULL <span class="v"></span></button><button type="button" data-sg="video">VIDEO / TC <span class="v"></span></button><span class="gap"></span><button type="button" data-sg="run">TC RUN</button><button type="button" data-sg="reset">TC RESET</button><span class="gap"></span><button type="button" data-sg="cap" title="The 19.2 kHz capstan reference into the HJ-24's EXT input (the MCI-style machines take 19.2 kHz)">CAPSTAN REF → HJ-24</button><button type="button" data-sg="mtcout" title="Send the generator's time code to your DAW as MIDI time code">MTC OUT</button></div>
+  <p class="note">Outputs: word clock ×4 (at the rate shown, pulled with PULL), black burst ×4 (NTSC / PAL), tri-level ×2, LTC and MTC from the time-code generator, and a 19.2 kHz capstan reference (what the HJ-24's capstan servo locks to). Clock your interface and your DAW from the word clock, and the tape machine from the capstan reference, and nothing can drift.</p></div>`, '<span class="ov-msg" id="sg-msg"></span>', true)}
 ${overlay('dz', 'ADDISON-SMYTH DELTA-THREE SYNCHRONIZER', `<div class="ovsync"><svg width="1500" height="187" viewBox="0 0 450 56">${capture(() => dzFace(450, 56))}</svg>
   <div class="sk"><button type="button" data-dz="chase" title="Slave the HJ-24 to the master">CHASE</button><button type="button" data-dz="src" title="Where the master time code comes from">MASTER <span class="v"></span></button><button type="button" data-dz="ref" title="Master and slave share the SG-24 reference: resolve to it">HOUSE REF</button><span class="gap"></span><button type="button" data-dz="capture" title="Take the current difference between slave and master as the offset">CAPTURE OFFSET</button><button type="button" data-dz="nudge-">◀ ¼ FR</button><button type="button" data-dz="nudge+">¼ FR ▶</button><button type="button" data-dz="zero">OFFSET 0</button></div>
-  <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div></div>`, '<span class="ov-msg" id="dz-msg"></span>', true)}
+  <div class="rd"><span>STATE <b id="dz-state">OFF</b></span><span>OFFSET <b id="dz-off">+00:00:00:00</b></span><span>ERROR <b id="dz-err">—</b></span><span>CAPSTAN <b id="dz-spd">0.000 %</b></span></div>
+  <p class="note">The front panel works: click its keys. MASTER and SLAVE enable the chase · RUN starts the generator · STOP·CONT holds the system · SELECT steps the display (G_TC, M_TC, S_TC, S_OFS, S_ERR, S_SPD; the last two letters show the chase: PK park, CU cue, WT wait, PL pull-in, LK lock, TL tight lock, HD held) · ◀ ▶ trim the offset a quarter frame · CLEAR zeroes it · INDEX switches the LOCK lamp between the wide (0.05 frame) and tight (0.003 frame) windows. A red SHIFT reaches the red legends on its half: CAPTURE takes the offset, GOTO parks the slave on the master, LEARN relearns the slave's start-up, COPY resets the generator. MIDI (MTC IN) is an extension: the original read master LTC and only sent MTC.</p></div>`, '<span class="ov-msg" id="dz-msg"></span>', true)}
 ${overlay('strip', 'CHANNEL', '<svg id="stripSvg" width="400" height="1200" viewBox="0 0 400 1200" style="display:block;user-select:none;touch-action:none"></svg>', '<span class="ov-msg" id="strip-title"></span><span class="ov-msg" id="strip-val"></span>', true)}
 ${overlay('meters', 'HJ-24 METER BRIDGE', `<svg width="3840" height="${OVH}" viewBox="0 0 3840 ${OVH}" style="display:block">${meterView}</svg>`)}
 ${overlay('224', 'LEXIMAN 224X', `<svg width="${Math.round(1070 * 0.95)}" height="${Math.round(1640 * 0.95)}" viewBox="480 190 1070 1640" style="display:block">${lexView}</svg>`, '<span class="ov-param">BASS RT</span>', true)}

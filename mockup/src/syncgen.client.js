@@ -9,7 +9,9 @@
     videos: [['NTSC', 29.97, true], ['NTSC', 29.97, false], ['PAL', 25, false], ['FILM', 24, false], ['TC', 30, false]], videoI: 4,
     run: false, tc: 3600, start: 3600, capRef: true, mtcOut: null, lastQF: null, phase: 0,
   };
-  const DZ = { on: false, src: 'gen', ref: true, trk: new CodeTracker({ flywheel: 0.6 }), ch: new Chaser(), mtc: { pieces: [], F: null, fps: 30, k: -1 }, msg: '' };
+  const DZ = { on: false, src: 'gen', ref: true, trk: new CodeTracker({ flywheel: 0.6 }), ch: new Chaser(), mtc: { pieces: [], F: null, fps: 30, k: -1 }, msg: '',
+    masterEn: true, hold: false, item: 1, tightMode: false, tight: false, shL: false, shR: false };
+  const DZ_ITEMS = ['G_TC', 'M_TC', 'S_TC', 'S_OFS', 'S_ERR', 'S_SPD'];   // display items (Zeta naming: group letter _ item)
   const sgRef = () => 1 + SG.pulls[SG.pullI];
   const sgFps = () => SG.videos[SG.videoI][1];
   const tcStr = (sec, fps) => { const f = Math.round(fps), n = Math.floor(sec * fps + 1e-6); const fr = ((n % f) + f) % f, s = Math.floor(n / f); return `${String(Math.floor(s / 3600) % 24).padStart(2, '0')}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}:${String(fr).padStart(2, '0')}`; };
@@ -61,13 +63,13 @@
   }
   // synchronizer servo: runs at 100 Hz inside the transport's time step, whatever the screen's frame rate
   function syncAdvance(dt, now) {
-    if (!DZ.on) { tr.advance(dt); return; }
+    if (!DZ.on || DZ.hold) { tr.advance(dt); return; }
     const h = 0.01; let t = 0;
     // master and slave are read at the same instant: the start of each 10 ms step, before the tape moves
     while (t < dt - 1e-9) { const st = Math.min(h, dt - t); dzStep(st, now / 1000 - (dt - t)); tr.advance(st); t += st; }
   }
   function dzStep(dt, tNow) {
-    const m = DZ.trk.read(tNow);
+    const m = DZ.masterEn ? DZ.trk.read(tNow) : { valid: false, running: false, pos: null, rate: 0 };
     DZ.ch.ref = DZ.ref && SG.capRef ? sgRef() : null;
     {
       const ps = tr.playSpeed, atSpeed = tr.mode === 'play' && tr.pinch > 0.5 && Math.abs(tr.v - ps) < 0.01 * ps;
@@ -77,7 +79,7 @@
       if (o.play) tr.command('play');
       if (o.stop) tr.command('stop');
       tr.setVarispeed(o.speed || 0);
-      DZ.err = code != null && m.valid ? m.pos + DZ.ch.offset - code : null;
+      DZ.err = code != null && m.valid ? m.pos + DZ.ch.offset - code : null; DZ.tight = !!o.tight;
     }
   }
   // every frame: the generator's reference on the capstan when not chasing, and the displays
@@ -100,18 +102,30 @@
     sgTxt('.sg-d2', tcStr(SG.tc, fps));
     const blink = SG.phase % 1 < 0.5;
     sgLamp('.sg-l-ref', true); sgLamp('.sg-l-wc', true); sgLamp('.sg-l-bb', blink); sgLamp('.sg-l-tri', !blink); sgLamp('.sg-l-ltc', SG.run && blink); sgLamp('.sg-l-mtc', SG.run && !!SG.mtcOut); sgLamp('.sg-l-cap', SG.capRef);
-    // synchronizer: G_TC (generator / master) or the slave's offset error
-    const st = DZ.ch.state, locked = DZ.on && st === 'LOCK', chasing = DZ.on && st !== 'IDLE';
-    let line;
-    if (!DZ.on) line = `${DZ.src === 'gen' ? 'G' : 'M'}_TC ${m.valid ? tcStr(m.pos, fps) : '--:--:--:--'}`;
-    else if (DZ.err != null && Math.abs(DZ.err) < 10) line = `${st.padEnd(4)} ${DZ.err >= 0 ? '+' : '-'}${(Math.abs(DZ.err) * fps).toFixed(2).padStart(5, '0')}F`;
-    else line = `${st.padEnd(4)} ${m.valid ? tcStr(m.pos, fps) : '--:--:--:--'}`;
-    sgTxt('.dz-disp', line.slice(0, 16));
-    sgLamp('.dz-l-wref', DZ.ref && SG.capRef); sgLamp('.dz-l-mtc', DZ.src === 'mtc' && m.running); sgLamp('.dz-l-efc', DZ.src === 'gen' && m.running);
-    sgLamp('.dz-l-chase', chasing && !locked); sgLamp('.dz-l-lock', locked);
-    sgLamp('.dz-k-master', DZ.on); sgLamp('.dz-k-slave', DZ.on && chasing);
+    // synchronizer: the selected item on the 20-character display, with the chase state at the right
+    const st = DZ.ch.state, active = DZ.on && !DZ.hold, locked = active && st === 'LOCK', chasing = active && st !== 'IDLE';
+    const sc = slaveCode(), sgn = (x) => (x >= 0 ? '+' : '-'), item = DZ_ITEMS[DZ.item];
+    const val = {
+      G_TC: () => tcStr(SG.tc, fps),
+      M_TC: () => (m.valid ? tcStr(m.pos, fps) : '--:--:--:--'),
+      S_TC: () => (sc != null ? tcStr(sc, fps) : '--:--:--:--'),
+      S_OFS: () => sgn(DZ.ch.offset) + tcStr(Math.abs(DZ.ch.offset), fps),
+      S_ERR: () => (DZ.err != null && active ? (Math.abs(DZ.err) < 10 ? `${sgn(DZ.err)}${(Math.abs(DZ.err) * fps).toFixed(3)}F` : `${sgn(DZ.err)}${tcStr(Math.abs(DZ.err), fps)}`) : '----'),
+      S_SPD: () => `${sgn(tr.varispeed || 0)}${(Math.abs(tr.varispeed || 0) * 100).toFixed(3)}%`,
+    }[item]();
+    const tag = !DZ.on ? '' : DZ.hold ? 'HD' : ({ PARK: 'PK', CUE: 'CU', WAIT: 'WT', PULL: 'PL', LOCK: DZ.tight ? 'TL' : 'LK', IDLE: '--' })[st] || '';
+    const line = (item.padEnd(6) + val).padEnd(18).slice(0, 18) + tag.padStart(2);   // 6 + up to 12 of value + 2 of state = 20
+    sgTxt('.dz-disp', line.slice(0, 20));
+    const blink2 = (performance.now() % 500) < 250;
+    sgLamp('.dz-l-xref', DZ.ref && SG.capRef);
+    sgLamp('.dz-l-mtc', DZ.masterEn && m.running);
+    sgLamp('.dz-l-stc', sc != null && tr.mode !== 'stop' && Math.abs(tr.v) > 1e-3);
+    sgLamp('.dz-l-chase', chasing && !locked);
+    sgLamp('.dz-l-lock', locked && (!DZ.tightMode || DZ.tight || blink2));   // tight mode: the lamp blinks until inside 0.003 frame
+    sgLamp('.dz-k-master', DZ.masterEn); sgLamp('.dz-k-slave', DZ.on); sgLamp('.dz-k-midi', DZ.src === 'mtc');
+    sgLamp('.dz-k-shl', DZ.shL); sgLamp('.dz-k-shr', DZ.shR); sgLamp('.dz-k-run', SG.run); sgLamp('.dz-k-hold', DZ.hold); sgLamp('.dz-k-tight', DZ.tightMode);
     // pop-up readouts
-    sgTxt('#dz-state', DZ.on ? ({ PARK: 'PARKED', CUE: 'WINDING TO CUE', WAIT: 'WAITING FOR MASTER', PULL: 'PULLING IN', LOCK: 'LOCKED', IDLE: 'NO MASTER' })[st] || st : 'OFF');
+    sgTxt('#dz-state', DZ.hold && DZ.on ? 'HELD (STOP·CONT)' : DZ.on ? ({ PARK: 'PARKED', CUE: 'WINDING TO CUE', WAIT: 'WAITING FOR MASTER', PULL: 'PULLING IN', LOCK: 'LOCKED', IDLE: 'NO MASTER' })[st] || st : 'OFF');
     sgTxt('#dz-off', `${DZ.ch.offset >= 0 ? '+' : '-'}${tcStr(Math.abs(DZ.ch.offset), fps)}`);
     sgTxt('#dz-err', DZ.err != null && DZ.on ? `${(DZ.err * 1000).toFixed(2)} ms` : '—');
     sgTxt('#dz-spd', `${((tr.varispeed || 0) * 100).toFixed(3)} %`);
@@ -131,21 +145,50 @@
     }
     b.closest('.ovsync') && sgKeys();
   }));
+  const dzChase = () => { DZ.on = !DZ.on; DZ.hold = false; DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset }); if (!DZ.on) tr.setVarispeed(0); sgSay(DZ.on ? 'Chase on: the HJ-24 follows the master' : 'Chase off'); };
+  const dzSrc = () => { DZ.src = DZ.src === 'gen' ? 'mtc' : 'gen'; DZ.trk = new CodeTracker({ flywheel: 0.6 }); dzListen(DZ.src === 'mtc'); if (DZ.src === 'gen') sgSay('Master: the SG-24 time-code generator'); };
+  const dzCapture = () => { const fps = sgFps(), m = DZ.trk.read(performance.now() / 1000), c = slaveCode(); if (m.valid && c != null) { DZ.ch.offset = Math.round((c - m.pos) * fps) / fps; sgSay(`Offset captured: ${tcStr(Math.abs(DZ.ch.offset), fps)}${DZ.ch.offset < 0 ? ' (slave behind)' : ''}`); } else sgSay('CAPTURE needs code from both machines'); };
+  const dzNudge = (d) => { DZ.ch.offset += d / sgFps() / 4; DZ.item = 3; };   // a quarter frame at a time; shows S_OFS
   document.querySelectorAll('[data-dz]').forEach((b) => b.addEventListener('click', () => {
-    const k = b.dataset.dz, fps = sgFps();
-    if (k === 'chase') { DZ.on = !DZ.on; DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset }); if (!DZ.on) tr.setVarispeed(0); sgSay(DZ.on ? 'Chase on: the HJ-24 follows the master' : 'Chase off'); }
-    else if (k === 'src') { DZ.src = DZ.src === 'gen' ? 'mtc' : 'gen'; DZ.trk = new CodeTracker({ flywheel: 0.6 }); dzListen(DZ.src === 'mtc'); }
+    const k = b.dataset.dz;
+    if (k === 'chase') dzChase();
+    else if (k === 'src') dzSrc();
     else if (k === 'ref') DZ.ref = !DZ.ref;
-    else if (k === 'capture') { const m = DZ.trk.read(performance.now() / 1000), c = slaveCode(); if (m.valid && c != null) { DZ.ch.offset = Math.round((c - m.pos) * fps) / fps; sgSay(`Offset captured: ${tcStr(Math.abs(DZ.ch.offset), fps)}${DZ.ch.offset < 0 ? ' (slave behind)' : ''}`); } }
+    else if (k === 'capture') dzCapture();
     else if (k === 'zero') DZ.ch.offset = 0;
-    else if (k === 'nudge+' || k === 'nudge-') DZ.ch.offset += (k === 'nudge+' ? 1 : -1) / fps / 4;   // a quarter frame at a time
+    else if (k === 'nudge+' || k === 'nudge-') dzNudge(k === 'nudge+' ? 1 : -1);
     sgKeys();
   }));
+  // the front panel's own keys (in the pop-up): blue legends direct, red legends after that half's SHIFT
+  const DZ_LEFT = ['master', 'slave', 'midi', 'run', 'stop'];
+  function dzKey(k) {
+    if (k === 'shiftL') { DZ.shL = !DZ.shL; return; }
+    if (k === 'shiftR') { DZ.shR = !DZ.shR; return; }
+    const left = DZ_LEFT.includes(k), sh = left ? DZ.shL : DZ.shR;
+    if (left) DZ.shL = false; else DZ.shR = false;
+    const g = (i) => DZ_ITEMS[i][0];
+    switch (k) {
+      case 'master': if (sh) sgSay('M-REC: record-enable for the master machine (here the master is the SG-24 or a DAW: nothing to arm)'); else { DZ.masterEn = !DZ.masterEn; sgSay(DZ.masterEn ? 'Master code reader enabled' : 'Master disabled: the slave stays where it is'); } break;
+      case 'slave': if (sh) sgSay('S-REC: arm tracks on the HJ-24 autolocator; once locked, record punches land on frame'); else dzChase(); break;
+      case 'midi': if (sh) { Object.assign(DZ.ch, { parkAhead: 0.1, learned: false, lead: DZ.ch.c.cueLead }); sgSay('LEARN: the slave\'s start-up and wind times will be measured again'); } else dzSrc(); break;
+      case 'run': if (sh) { SG.tc = SG.start; DZ.trk.pos = null; sgSay('COPY: generator reset to its start time'); } else { SG.run = !SG.run; sgSay(SG.run ? 'Generator running' : 'Generator stopped'); } break;
+      case 'stop':
+        if (sh) { const m = DZ.trk.read(performance.now() / 1000), tk = m.valid ? codeToTake(m.pos + DZ.ch.offset) : null; if (tk != null) { AL.rehPunch = false; tr.locateTo(tk, 'stop'); sgSay('GOTO: slave to the master position'); } else sgSay('GOTO: no master code, or that code isn\'t on this tape'); }
+        else { DZ.hold = !DZ.hold; if (DZ.hold) { tr.command('stop'); tr.setVarispeed(0); } else DZ.ch = Object.assign(new Chaser(), { offset: DZ.ch.offset, parkAhead: DZ.ch.parkAhead }); sgSay(DZ.hold ? 'STOP: chase held, slave stopped' : 'CONT: chase continues'); }
+        break;
+      case 'select': if (sh) { const cur = g(DZ.item); do DZ.item = (DZ.item + 1) % DZ_ITEMS.length; while (g(DZ.item) === cur); } else DZ.item = (DZ.item + 1) % DZ_ITEMS.length; break;
+      case 'prev': if (sh) { const cur = g(DZ.item); do DZ.item = (DZ.item + DZ_ITEMS.length - 1) % DZ_ITEMS.length; while (g(DZ.item) === cur); } else DZ.item = (DZ.item + DZ_ITEMS.length - 1) % DZ_ITEMS.length; break;
+      case 'index': DZ.tightMode = !DZ.tightMode; sgSay(DZ.tightMode ? 'LOCK lamp: tight window (0.003 frame)' : 'LOCK lamp: wide window (0.05 frame)'); break;
+      case 'left': case 'right': dzNudge(k === 'right' ? 1 : -1); break;
+      case 'clear': if (sh) dzCapture(); else { DZ.ch.offset = 0; DZ.item = 3; sgSay('Offset cleared'); } break;
+    }
+  }
+  document.querySelectorAll('.ovsync [data-dzk]').forEach((g) => g.addEventListener('click', (e) => { e.stopPropagation(); dzKey(g.dataset.dzk); sgKeys(); }));
   function sgKeys() {
     const on = (sel, v) => sgAll(sel, (e) => e.classList.toggle('on', !!v));
     on('[data-sg="run"]', SG.run); on('[data-sg="cap"]', SG.capRef); on('[data-sg="mtcout"]', SG.mtcOut);
     on('[data-dz="chase"]', DZ.on); on('[data-dz="ref"]', DZ.ref);
-    sgTxt('[data-dz="src"] .v', DZ.src === 'gen' ? 'SG-24 GEN' : 'MTC IN'); sgTxt('[data-sg="rate"] .v', `${SG.rates[SG.rateI] / 1000} kHz`);
+    sgTxt('[data-dz="src"] .v', DZ.src === 'gen' ? 'SG-24 GEN' : 'MTC IN (ext.)'); sgTxt('[data-sg="rate"] .v', `${SG.rates[SG.rateI] / 1000} kHz`);
     sgTxt('[data-sg="pull"] .v', SG.pulls[SG.pullI] ? `${SG.pulls[SG.pullI] > 0 ? '+' : ''}${SG.pulls[SG.pullI] * 100}%` : '0'); sgTxt('[data-sg="video"] .v', `${SG.videos[SG.videoI][0]} ${SG.videos[SG.videoI][1]}${SG.videos[SG.videoI][2] ? ' DF' : ''}`);
   }
   sgKeys();

@@ -43,20 +43,21 @@ export class CodeTracker {
 export const CHASE = {
   parkWindow: 2 / 30,      // s: a stopped slave within this of its target stays parked
   cueLead: 3.0,            // s: when chasing from far away, cue this far ahead of the master and wait for it
-  playWindow: 1.0,         // s: farther than this while rolling = wind (cue) instead of the speed loop
+  playWindow: 41 / 30,     // s: farther than this while rolling = wind (cue) instead of the speed loop (Zeta constant 34: 41 frames)
   spinup: 0.3,             // s: time the slave takes from STOP to play speed
   windRate: 9,             // code seconds per second the slave covers in a wind, on average (first cue estimate)
   windSettle: 3.5,         // s: a wind's spool-up and easing onto the cue
   pullKp: 3.0,             // 1/s: speed loop gain while pulling in
   pullKi: 1.5,            // 1/s^2
-  maxPull: 0.12,           // max speed correction while pulling in (fraction)
-  lockIn: 0.1 / 30,        // s: inside a tenth of a frame for lockHold seconds = LOCK (phase lock)
+  maxPull: 0.12,           // max speed correction while pulling in: ±12 %, as the Zeta-Three's capstan range
+  lockIn: 0.05 / 30,       // s: inside the Zeta's wide lock window (0.05 frame) for lockHold seconds = LOCK
+  tightIn: 0.003 / 30,     // s: the narrow window (0.003 frame): TIGHT lock
   lockOut: 2 / 30,         // s: drifting past this drops back to PULL
   lockHold: 1.0,
   resolveKp: 0.3,          // 1/s: in LOCK only a slow trim moves the capstan: tape speed stays steady
   resolveMax: 0.002,       // ±0.2 % trim at most
-  resolveTau: 3.0,
-  resolveKpRef: 0.06,      // 1/s: with a house reference nothing can drift, so the phase trim can be much gentler         // s: in LOCK the master's speed is averaged this long before it moves the capstan
+  resolveTau: 3.0,         // s: in LOCK the master's speed is averaged this long before it moves the capstan
+  resolveKpRef: 0.06,      // 1/s: with a house reference nothing can drift, so the phase trim can be much gentler
 };
 
 export class Chaser {
@@ -65,6 +66,7 @@ export class Chaser {
     this.offset = 0;           // slave = master + offset
     this.state = 'IDLE';       // IDLE | PARK | CUE | WAIT | PULL | LOCK
     this.integ = 0; this.speed = 0; this.inWin = 0; this.cueAt = null; this.enabled = true;
+    this.parkAhead = 0.1;      // s: parked this far ahead of the master, so the slave's start-up lag lands it in step (learned)
     this.ref = null;           // house reference speed ratio (1 = nominal, 1.001 = pulled up) when master and slave share a sync generator
     this.time = 0; this.lead = this.c.cueLead; this.locStart = 0;   // the cue lead adapts to how long this slave takes to wind
   }
@@ -83,7 +85,8 @@ export class Chaser {
     if (!m.running) {
       // master stopped: park the slave on the same frame
       this.integ = 0; this.speed = 0; out.speed = 0;
-      if (Math.abs(err) > c.parkWindow) { if (this.state !== 'PARK' || s.stopped) out.locate = target; this.state = 'PARK'; }
+      const parkAt = target + this.parkAhead * Math.max(1, m.rate || 1), perr = parkAt - s.code;
+      if (Math.abs(perr) > c.parkWindow) { if (this.state !== 'PARK' || s.stopped) out.locate = parkAt; this.state = 'PARK'; }
       else { if (!s.stopped) out.stop = true; this.state = 'PARK'; }
       return out;
     }
@@ -97,7 +100,7 @@ export class Chaser {
       return out;
     }
     if (!s.playing && !(this.state === 'PULL' && s.starting)) {
-      if (Math.abs(err) < c.playWindow && s.stopped) { out.play = true; this.state = 'PULL'; this.integ = 0; return out; }
+      if (Math.abs(err) < c.playWindow && s.stopped) { out.play = true; this.state = 'PULL'; this.integ = 0; this.learnStart = true; return out; }
       if (this.state === 'CUE' && s.stopped && this.cueAt != null && Math.abs(s.code - this.cueAt) < c.parkWindow * 3) {
         // arrived on the cue: learn how long that wind took, so the next cue is placed far enough ahead
         const took = this.time - this.locStart; this.lead = Math.max(c.cueLead, Math.min(60, took * 1.2 + c.spinup + 0.5)); this.learned = true;
@@ -113,6 +116,9 @@ export class Chaser {
     this.rateAvg = this.rateAvg == null ? m.rate : this.rateAvg + (m.rate - this.rateAvg) * Math.min(1, dt / tau);
     // with a house reference the master's speed is known exactly (both run off the same crystal): resolve to it
     const ff = (this.ref != null && m.running ? this.ref : this.rateAvg) - 1;
+    // learn the park-ahead (Zeta constants 42/43): the error left the moment the slave reaches speed is its start-up lag
+    if (this.learnStart && s.playing) { this.learnStart = false; this.parkAhead = Math.max(0, Math.min(2, this.parkAhead + 0.7 * err)); }
+    if (this.state !== 'LOCK' && this.state !== 'PULL') this.errF = null;
     if (this.state === 'LOCK') {
       const kp = this.ref != null ? c.resolveKpRef : c.resolveKp;
       this.speed = ff + Math.max(-c.resolveMax, Math.min(c.resolveMax, this.integ + kp * err));
@@ -122,10 +128,12 @@ export class Chaser {
       this.integ = Math.max(-c.maxPull, Math.min(c.maxPull, this.integ + c.pullKi * err * dt));
       this.speed = ff + Math.max(-c.maxPull, Math.min(c.maxPull, c.pullKp * err + this.integ));
       this.state = 'PULL';
-      this.inWin = Math.abs(err) < c.lockIn ? this.inWin + dt : 0;
+      // the lock window judges the error averaged over a quarter second, so code jitter alone can't hold LOCK off
+      this.errF = this.errF == null ? err : this.errF + (err - this.errF) * Math.min(1, dt / 0.25);
+      this.inWin = Math.abs(this.errF) < c.lockIn ? this.inWin + dt : 0;
       if (this.inWin > c.lockHold) { this.state = 'LOCK'; this.integ = 0; }   // the speed feed-forward already carries the master's speed: lock starts from no trim
     }
-    out.speed = this.speed; out.err = err;
+    out.speed = this.speed; out.err = err; out.tight = this.state === 'LOCK' && Math.abs(err) < c.tightIn;
     return out;
   }
 }

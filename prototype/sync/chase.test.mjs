@@ -51,9 +51,9 @@ test('chases from 30 s away, locks, and holds within a fraction of a frame with 
   assert.ok(sd < 0.0005, `speed wobble ${(sd * 100).toFixed(4)} % (resolved, not hunting)`);
 });
 test('master stops: the slave parks on the same frame', () => {
-  const { log, R } = run({ seconds: 30, stopAt: 20 });
-  const end = log[log.length - 1];
-  assert.equal(R.tr.mode, 'stop'); assert.ok(Math.abs(end.err) < 2 / 30, `parked ${(end.err * 30).toFixed(2)} frames off`);
+  const { log, R, ch } = run({ seconds: 30, stopAt: 20 });
+  const end = log[log.length - 1];   // parked a learned start-up distance ahead of the master
+  assert.equal(R.tr.mode, 'stop'); assert.ok(Math.abs(end.err + ch.parkAhead) < 2 / 30, `parked ${((end.err + ch.parkAhead) * 30).toFixed(2)} frames off the park point`);
 });
 test('follows a master running 0.1 % fast (pull-down / vari-speed)', () => {
   const { log } = run({ seconds: 40, rate: 1.001 });
@@ -81,4 +81,20 @@ test('house reference: with master and slave on one sync generator, lock is stea
   const free = stats({ jitter: 0.008 }), ref = stats({ jitter: 0.008, ref: 1 });
   assert.ok(ref.maxErr < 0.1 / 30, `error with reference ${(ref.maxErr * 1000).toFixed(2)} ms`);
   assert.ok(ref.sd < free.sd * 0.5, `speed wobble ${(ref.sd * 100).toFixed(4)} % with reference vs ${(free.sd * 100).toFixed(4)} % without`);
+});
+
+test('rolling from park: the slave parked ahead learns its start-up and locks quickly the next time', () => {
+  // master parks, the slave parks with it; the master rolls, stops, rolls again: the second lock is faster
+  const R = rig(), trk = new CodeTracker(), ch = new Chaser(); let pos = 3610, nb = 0, locks = [], lockedAt = null;
+  const dt = 0.002;
+  for (let t = 0; t < 60; t += dt) {
+    const rolling = (t > 8 && t < 25) || t > 35;
+    if (rolling) { pos += dt; if (!nb) nb = Math.ceil(pos * 120) / 120; while (pos >= nb) { trk.input(t - (pos - nb), nb); nb += 1 / 120; } }
+    else { nb = 0; if (Math.round(t / dt) % 100 === 0) trk.input(t, pos); }
+    R.apply(ch.update(dt, trk.read(t), R.status())); R.tr.advance(dt);
+    if (rolling && ch.state === 'LOCK' && lockedAt == null) { lockedAt = t; locks.push(t - (t < 30 ? 8 : 35)); }
+    if (!rolling) lockedAt = null;
+  }
+  assert.equal(locks.length, 2, 'locked both times');
+  assert.ok(locks[1] < locks[0] * 0.75, `second lock ${locks[1].toFixed(1)} s vs first ${locks[0].toFixed(1)} s after the master rolls`);
 });
