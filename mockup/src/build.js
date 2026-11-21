@@ -1790,7 +1790,7 @@ function s900Face(w, h) {
   // Akita S900 (after the Akai S900), 3U: positions from references/s900 section 2 (x = % of the full width ear to ear,
   // y = % of the panel height from the top). Light silver-grey panel, black legends, cream keys, aqua 40 x 2 LCD.
   const X = (pc) => pc / 100 * w, Y = (pc) => pc / 100 * h, K = '#151515', id = (k) => `s9-${k}`;
-  rect(0, 0, w, h, '#cfcfcb'); for (let yy = 1; yy < h; yy += 1.4) rect(0, yy, w, 0.3, '#fff', `opacity="${(0.04 + 0.03 * ((yy * 5.1) % 1)).toFixed(3)}"`);
+  rect(0, 0, w, h, '#dddcd7'); for (let yy = 1; yy < h; yy += 1.4) rect(0, yy, w, 0.3, '#fff', `opacity="${(0.04 + 0.03 * ((yy * 5.1) % 1)).toFixed(3)}"`);
   rect(0, 0, w, 1.2, '#fff', 'opacity="0.5"'); rect(0, h - 1.5, w, 1.5, '#000', 'opacity="0.35"');
   for (const ex of [X(5.3), X(94.7)]) rect(ex - 0.3, 0, 0.6, h, '#000', 'opacity="0.18"');
   for (const ex of [X(1.7), X(98.3)]) for (const ey of [Y(28.5), Y(73)]) { rect(ex - X(1.25), ey - Y(2), X(2.5), Y(4), '#2a2a2a', 'rx="2.5"'); screw(ex, ey, 2.6); }
@@ -1814,8 +1814,8 @@ function s900Face(w, h) {
   circle(X(28.4), Y(83), 0.9, '#3a1412'); p(`<circle class="${id('dled')}" cx="${X(28.4)}" cy="${Y(83)}" r="0.9" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
   // LCD window, glass, MIDI LED
   rect(X(30.4), Y(13.5), X(43.1), Y(21), '#0c0c0d', 'rx="1"');
-  p(`<rect class="${id('lcdbg')}" x="${X(32.6)}" y="${Y(17.2)}" width="${X(30.9)}" height="${Y(14.4)}" fill="#3fae9f" rx="0.6"/>`);
-  for (const [k, yy] of [['l1', Y(23.1)], ['l2', Y(29.6)]]) p(`<text class="${id(k)}" x="${X(33.0)}" y="${yy}" font-family="${MONO2}" font-size="5.75" font-weight="700" fill="#173232" style="white-space:pre" textLength="${X(30.1).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
+  p(`<rect class="${id('lcdbg')}" x="${X(32.6)}" y="${Y(17.2)}" width="${X(30.9)}" height="${Y(14.4)}" fill="#2a62e8" rx="0.6"/>`);
+  for (const [k, yy] of [['l1', Y(23.1)], ['l2', Y(29.6)]]) p(`<text class="${id(k)}" x="${X(33.0)}" y="${yy}" font-family="${MONO2}" font-size="5.75" font-weight="700" fill="#dfe9ff" style="white-space:pre" textLength="${X(30.1).toFixed(1)}" lengthAdjust="spacingAndGlyphs"> </text>`);
   T(X(69.9), Y(20), 'MIDI RECEIVE', 1.9, '#e8e8e8', 'middle', 700); rect(X(69.9) - 0.15, Y(21), 0.3, Y(3), '#bbb');
   rect(X(69.9) - 1, Y(26), 2, 1.6, '#3a1412'); p(`<rect class="${id('midi')}" x="${X(69.9) - 1}" y="${Y(26)}" width="2" height="1.6" fill="#ff3b2f" opacity="0" filter="url(#glowSm)"/>`);
   // the cream key
@@ -1839,12 +1839,12 @@ function s900Face(w, h) {
   rect(X(57.5), Y(39), X(16), Y(54), '#55575a', 'rx="1"');
   T(X(62), Y(44.5), 'PARAMETER / KEY', 1.8, '#f2f2f0', 'middle', 900); T(X(70.2), Y(44.5), 'ARROW / CURSOR', 1.8, '#f2f2f0', 'middle', 900);
   const KP = [[['7', '7'], ['8', '8'], ['9', '9'], ['◄', 'left'], ['►', 'right']], [['4', '4'], ['5', '5'], ['6', '6'], ['▲ PAGE', 'pup'], ['PAGE ▼', 'pdn']], [['1', '1'], ['2', '2'], ['3', '3'], ['SPACE', 'space'], ['LETTER', 'letter']], [['0', '0'], ['ON/+', 'plus'], ['OFF/−', 'minus'], ['ENT', 'ent'], ['P.B', 'pb']]];
-  const cx = [59.0, 62.0, 64.8, 68.5, 71.9], ry = [55, 65.5, 76, 86.5];
+  const cx = [58.6, 61.4, 64.3, 67.9, 71.2], ry = [55, 65.5, 76, 86.5];
   KP.forEach((row, r) => row.forEach(([l, k], c) => { T(X(cx[c]), Y(ry[r] - 4.4), l, 1.8, '#f2f2f0', 'middle', 900); key(X(cx[c]), Y(ry[r]), 'k:' + k, X(1.85), Y(4.5)); }));
   // CONTROL encoder
-  T(X(84.7), Y(9.5), 'CONTROL', 2.4, K, 'middle', 900, 'letter-spacing="0.8"');
-  p(`<g data-s9="control" style="cursor:ns-resize">`); circle(X(84.7), Y(27.5) + 1, X(4.15), '#000', 'opacity="0.35"'); circle(X(84.7), Y(27.5), X(4.15), '#111'); circle(X(84.7), Y(27.5), X(3.85), '#6f7072'); circle(X(84.7), Y(27.5), X(3.3), '#77787a'); circle(X(84.7) - 4, Y(27.5) - 4, X(1.8), '#fff', 'opacity="0.08"');
-  p(`<g class="${id('ctl')}" transform="rotate(0 ${X(84.7)} ${Y(27.5)})"><circle cx="${X(84.7)}" cy="${Y(27.5) - X(3.0)}" r="0.8" fill="#5a5b5d"/></g>`); circle(X(84.7), Y(27.5), X(4.6), 'transparent'); p('</g>');
+  T(X(84.2), Y(9.5), 'CONTROL', 2.4, K, 'middle', 900, 'letter-spacing="0.8"');
+  p(`<g data-s9="control" style="cursor:ns-resize">`); circle(X(84.2), Y(27.5) + 1, X(4.15), '#000', 'opacity="0.35"'); circle(X(84.2), Y(27.5), X(4.15), '#111'); circle(X(84.2), Y(27.5), X(3.85), '#6f7072'); circle(X(84.2), Y(27.5), X(3.3), '#77787a'); circle(X(84.2) - 4, Y(27.5) - 4, X(1.8), '#fff', 'opacity="0.08"');
+  p(`<g class="${id('ctl')}" transform="rotate(0 ${X(84.2)} ${Y(27.5)})"><circle cx="${X(84.2)}" cy="${Y(27.5) - X(3.0)}" r="0.8" fill="#5a5b5d"/></g>`); circle(X(84.2), Y(27.5), X(4.6), 'transparent'); p('</g>');
   // audio knobs + jacks
   const knob = (x, k, lab, cap, sub) => {
     T(x, Y(50.5), lab, 2, K, 'middle', 900); if (sub) T(x, Y(55.5), sub, 1.5, K, 'middle', 800);
@@ -1853,10 +1853,10 @@ function s900Face(w, h) {
     p(`<g data-s9="${k}" style="cursor:ns-resize">`); circle(x, Y(64.5) + 0.6, 5.2, '#000', 'opacity="0.4"'); circle(x, Y(64.5), 5, '#a9aaad'); for (let i = 0; i < 24; i++) { const a = i * 15 * Math.PI / 180; p(`<line x1="${x + Math.sin(a) * 4.2}" y1="${Y(64.5) - Math.cos(a) * 4.2}" x2="${x + Math.sin(a) * 5}" y2="${Y(64.5) - Math.cos(a) * 5}" stroke="#6d6e72" stroke-width="0.35"/>`); }
     circle(x, Y(64.5), 3.4, cap); p(`<g class="${id('k-' + k)}" transform="rotate(0 ${x} ${Y(64.5)})"><rect x="${x - 0.3}" y="${Y(64.5) - 3.3}" width="0.6" height="2.4" fill="#222"/></g>`); circle(x, Y(64.5), 7, 'transparent'); p('</g>');
   };
-  knob(X(79.1), 'rlev', 'REC LEVEL', '#b8403c'); knob(X(84.7), 'mon', 'MONITOR', '#e4dccb'); knob(X(90.5), 'out', 'OUTPUT', '#e4dccb', 'LEFT ⊙ RIGHT');
-  T(X(82), Y(78.5), 'MIC —— INPUT —— LINE', 1.6, K, 'middle', 800); T(X(90.4), Y(78.5), 'REC/P.B TRIGGER', 1.6, K, 'middle', 800);
-  for (const jx of [79.1, 84.7, 90.3]) { circle(X(jx), Y(87), X(1.15), '#111'); circle(X(jx), Y(87), X(0.95), '#b9babd'); circle(X(jx), Y(87), X(0.6), '#050505'); }
-  p(`<g data-s9="foot" style="cursor:pointer"><circle cx="${X(90.3)}" cy="${Y(87)}" r="${X(1.3)}" fill="transparent"/></g>`);
+  knob(X(78.7), 'rlev', 'REC LEVEL', '#b8403c'); knob(X(83.8), 'mon', 'MONITOR', '#e4dccb'); knob(X(89.6), 'out', 'OUTPUT', '#e4dccb', 'LEFT ⊙ RIGHT');
+  T(X(80.8), Y(78.5), 'MIC —— INPUT —— LINE', 1.6, K, 'middle', 800); T(X(89.3), Y(78.5), 'REC/P.B TRIGGER', 1.6, K, 'middle', 800);
+  for (const jx of [78.1, 83.5, 89.3]) { circle(X(jx), Y(87), X(1.15), '#111'); circle(X(jx), Y(87), X(0.95), '#b9babd'); circle(X(jx), Y(87), X(0.6), '#050505'); }
+  p(`<g data-s9="foot" style="cursor:pointer"><circle cx="${X(89.3)}" cy="${Y(87)}" r="${X(1.3)}" fill="transparent"/></g>`);
 }
 function furmanFace(w, h, i) {
   // Fermann PL-8 C power conditioner (after the Furman PL-8 C): black 1U panel, the lamp drawers at both ends (the rack

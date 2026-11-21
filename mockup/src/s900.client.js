@@ -294,7 +294,7 @@
       }
     }
     sgTxt('.s9-l1', (l1 || ' ').padEnd(40).slice(0, 40)); sgTxt('.s9-l2', (l2 || ' ').padEnd(40).slice(0, 40));
-    for (const e of c1All('s9-lcdbg')) { const c = on ? '#3fae9f' : '#7d8a80'; if (e._c !== c) { e._c = c; e.setAttribute('fill', c); } }
+    for (const e of c1All('s9-lcdbg')) { const c = on ? '#2a62e8' : '#4a5468'; if (e._c !== c) { e._c = c; e.setAttribute('fill', c); } }
     const err = S9.err > now && Math.floor(now / 180) % 2;
     for (const m of ['play', 'rec', 'esmp', 'eprg', 'midi', 'util', 'disk']) c1Lamp(`s9-m-${m}`, on && (err || (S9.mode === m && !(S9.err > now))));
     c1Lamp('s9-midi', on && S9.midiT > now); c1Lamp('s9-dled', S9.diskT > now && Math.floor(now / 90) % 2); c1Lamp('s9-disk', true);
