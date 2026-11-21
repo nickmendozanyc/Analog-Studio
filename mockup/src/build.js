@@ -1405,24 +1405,8 @@ const RX = 3290, RY = 60, RW = 550, RH = 2100;
     return { y: RY + y0, h, k, x: PX + ox, map: (fx, fy) => [PX + ox + fx * k, y0 + fy * k] };   // face coordinates -> rack coordinates
   }
   globalThis.RACK_HOT = {};
-  // Leximan 224 (3U)
-  globalThis.RACK_HOT['224'] = unit(3, 'url(#rack224)', (w, h) => {
-    text(26, 42, 'leximan', 30, '#efe9da', 'start', 900, 'letter-spacing="-0.5"');
-    text(26, 64, '224 DIGITAL REVERB', 14, '#d6cfbe', 'start', 800, 'letter-spacing="1"');
-    rect(26, 80, 150, 56, '#000', 'rx="3"'); rect(30, 84, 142, 48, 'url(#displayBg)', 'rx="2"');
-    seg7(38, 92, 30, '4.1', '#ff3220'); seg7(104, 92, 30, '2.4', '#ff3220');
-    text(60, 158, 'PROG', 14, '#d6cfbe', 'middle', 800); text(140, 158, 'RT60', 14, '#d6cfbe', 'middle', 800);
-    ['BASS', 'MID', 'XOVR', 'HF', 'DPTH'].forEach((s2, i) => {
-      const fx = 206 + i * 36;
-      rect(fx - 2.5, 24, 5, 104, '#0b0b0b', 'rx="2.5"');
-      const cy = 34 + (0.2 + rnd() * 0.6) * 84;
-      rect(fx - 11, cy - 8, 22, 16, 'url(#faderCapBlack)', 'rx="2"'); rect(fx - 9, cy - 1, 18, 2, '#e8e0cc');
-      text(fx, 156, s2, 14, '#d6cfbe', 'middle', 800);
-    });
-    for (let b = 0; b < 4; b++) button(w - 86 + (b % 2) * 32, 30 + Math.floor(b / 2) * 30, 26, 22, 'red', b === 0, String(b + 1), { size: 14 });
-    text(w - 57, 110, 'BANK', 14, '#d6cfbe', 'middle', 800);
-    text(w - 57, 156, 'AUX 1', 14, '#e8c34a', 'middle', 800);
-  });
+  // Leximan 224X mainframe (4U): the same drawing as in its pop-up, scaled to the panel
+  globalThis.RACK_HOT['224'] = unit(4, '#161718', (w, h) => { p(`<g transform="scale(${(w / 1760).toFixed(5)} ${(h / Math.round(1760 * 7 / 19)).toFixed(5)})">`); lex224Frame(0, 0, 1760, Math.round(1760 * 7 / 19)); p('</g>'); }, { native: true });
   // dbk 160X x2 (1U each): compressors on channel inserts (patchbay), live in the audio engine
   for (const u of ['A', 'B']) globalThis.RACK_HOT['c160' + u] = unit(1, '#232127', (w, h) => c160Face(w, h, u), { native: true });
   globalThis.RACK_HOT.im90 = unit(3, '#16161a', (w, h) => im90Face(w, h), { native: true });   // Publizon IM90 (3U)
@@ -1589,12 +1573,8 @@ const meterView = capture(() => {
     p(`<g class="trk-on" data-t="${i}" opacity="0">`); text(x + 240, y + 626, 'RECORD READY · MONITORING INPUT', 20, '#ff8a7a', 'middle', 800, 'letter-spacing="1.5"'); p('</g>');
   }
 });
-const lexView = capture(() => {
-  rect(0, 0, W, OVH, 'url(#wall)'); for (let x = 0; x < W; x += 96) { rect(x, 0, 94, OVH, 'url(#woodH)', 'opacity="0.3"'); rect(x + 94, 0, 2, OVH, '#000', 'opacity="0.6"'); }
-  rect(0, 0, W, OVH, '#000', 'opacity="0.35"');
-  // 224X mainframe (4U, 19"): black chassis with the blue name band
-  const fx = 1900, fy = 640, fw = 1760, fh = Math.round(1760 * 7 / 19);
-  rect(fx + 20, fy + 40, fw, fh, '#000', 'opacity="0.6" filter="url(#soft)"');
+// Leximan 224X mainframe (4U, 19"): black chassis with the blue name band (rack unit and the 224X pop-up)
+function lex224Frame(fx, fy, fw, fh) {
   rect(fx, fy, fw, fh, '#161718', 'rx="6"'); rect(fx, fy, fw, 6, '#fff', 'opacity="0.1"');
   for (let k = 0; k < 6; k++) rect(fx + 380 + k * 70, fy + 40, 40, 14, '#0b0b0c', 'rx="3"');
   for (let k = 0; k < 6; k++) rect(fx + fw - 760 + k * 70, fy + 40, 40, 14, '#0b0b0c', 'rx="3"');
@@ -1609,6 +1589,14 @@ const lexView = capture(() => {
   rect(fx + 460, fy + fh * 0.78 - 12, 26, 24, '#2a2b2e', 'rx="3"'); text(fx + 473, fy + fh * 0.78 + 40, 'RESET', 18, '#cfcfcf', 'middle', 800);
   text(fx + fw - 640, fy + fh * 0.7, 'INPUT LEVEL', 18, '#cfcfcf', 'middle', 800); text(fx + fw - 440, fy + fh * 0.7, 'LEFT', 18, '#cfcfcf', 'middle', 800); text(fx + fw - 300, fy + fh * 0.7, 'RIGHT', 18, '#cfcfcf', 'middle', 800);
   for (let k = 0; k < 4; k++) circle(fx + fw - 680 + k * 120, fy + fh * 0.8, 10, k % 2 ? '#2a2b2e' : '#ff3b2f', k % 2 ? '' : 'filter="url(#glow)"');
+}
+const lexView = capture(() => {
+  rect(0, 0, W, OVH, 'url(#wall)'); for (let x = 0; x < W; x += 96) { rect(x, 0, 94, OVH, 'url(#woodH)', 'opacity="0.3"'); rect(x + 94, 0, 2, OVH, '#000', 'opacity="0.6"'); }
+  rect(0, 0, W, OVH, '#000', 'opacity="0.35"');
+  // 224X mainframe (4U, 19"): black chassis with the blue name band
+  const fx = 1900, fy = 640, fw = 1760, fh = Math.round(1760 * 7 / 19);
+  rect(fx + 20, fy + 40, fw, fh, '#000', 'opacity="0.6" filter="url(#soft)"');
+  lex224Frame(fx, fy, fw, fh);
   // DB25 cable from the remote to the mainframe
   const d = `M${1500} ${520} C${1650} ${420} ${1780} ${700} ${fx} ${fy + fh * 0.62}`;
   p(`<path d="${d}" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="26" transform="translate(6 14)"/><path d="${d}" fill="none" stroke="#c4c7cb" stroke-width="22"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="5" transform="translate(-3 -4)"/>`);
